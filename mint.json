@@ -17,10 +17,6 @@
   },
   "tabs": [
     {
-      "name": "Test",
-      "url": ""
-    }
-    {
       "name": "API Reference",
       "url": "api-reference"
     }
