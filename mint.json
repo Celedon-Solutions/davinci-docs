@@ -15,25 +15,14 @@
       "to": "#07C983"
     }
   },
-  "topbarLinks": [
-
-  ],
-  "topbarCtaButton": {
-  },
   "tabs": [
-    {
-      "name": "Test",
-      "url": ""
-    }
     {
       "name": "API Reference",
       "url": "api-reference"
     }
   ],
-  "anchors": [
-  ],
-  "navigation": [
-  ],
+  "anchors": [],
+  "navigation": [],
   "footerSocials": {
     "x": "https://x.com/mintlify",
     "github": "https://github.com/mintlify",
