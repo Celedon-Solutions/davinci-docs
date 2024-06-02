@@ -29,6 +29,17 @@
       "url": "sections/integrations"
     }
   ],
+  "topbarLinks": [
+    {
+      "name": "Community",
+      "url": "www.celedonsoltuions.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "type": "link",
+    "url": "www.celedonsoltuions.com",
+    "name": "Try it"
+  },
   "anchors": [],
   "navigation": [
     {
@@ -60,7 +71,7 @@
     {
       "group": "Integration",
       "pages": [
-        "sections/integration/integrations"
+        "sections/integrations/integrations"
       ]
     }
   ],
