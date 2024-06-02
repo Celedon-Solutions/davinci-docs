@@ -18,7 +18,7 @@
   "tabs": [
     {
       "name": "Modeling Language",
-      "url": "sections/sysml/language"
+      "url": "sysml"
     }
   ],
   "anchors": [],
@@ -32,7 +32,7 @@
     {
       "group": "Language",
       "pages": [
-        "sections/sysml/language"
+        "sysml/language"
       ]
     }
   ],
