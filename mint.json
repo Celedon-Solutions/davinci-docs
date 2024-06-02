@@ -56,6 +56,12 @@
       "pages": [
         "sections/davinci/introduction"
       ]
+    },
+    {
+      "group": "Integration",
+      "pages": [
+        "sections/integration/integrations"
+      ]
     }
   ],
   "primaryTab": {
