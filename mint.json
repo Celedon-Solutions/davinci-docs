@@ -30,13 +30,13 @@
     {
       "group": "Getting Started",
       "pages": [
-        "overview/introduction"
+        "sections/overview/introduction"
       ]
     },
     {
       "group": "Language",
       "pages": [
-        "sysml/language"
+        "sections/sysml/language"
       ]
     },
     {
