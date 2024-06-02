@@ -23,14 +23,26 @@
     {
       "name": "Davinci",
       "url": "sections/davinci"
+    },
+    {
+      "name": "Integrations",
+      "url": "sections/integrations"
     }
   ],
   "anchors": [],
   "navigation": [
     {
-      "group": "Getting Started",
+      "group": "Get Started",
       "pages": [
-        "sections/overview/introduction"
+        "sections/overview/introduction",
+        "sections/overview/installation",
+        "sections/overview/account"
+      ]
+    },
+    {
+      "group": "Features",
+      "pages": [
+        "sections/overview/features"
       ]
     },
     {
