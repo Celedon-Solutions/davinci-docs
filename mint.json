@@ -28,6 +28,12 @@
       "pages": [
         "sections/overview/introduction"
       ]
+    },
+    {
+      "group": "Language",
+      "pages": [
+        "sections/sysml/language"
+      ]
     }
   ],
   "primaryTab": {
