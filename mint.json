@@ -17,8 +17,8 @@
   },
   "tabs": [
     {
-      "name": "API Reference",
-      "url": "api-reference"
+      "name": "Modeling Language",
+      "url": "sections/sysml"
     }
   ],
   "anchors": [],
@@ -26,7 +26,7 @@
     {
       "group": "Getting Started",
       "pages": [
-        "introduction"
+        "sections/overview/introduction"
       ]
     }
   ],
