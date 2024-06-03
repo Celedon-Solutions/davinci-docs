@@ -71,7 +71,8 @@
     {
       "group": "Tabs",
       "pages": [
-        "sections/davinci/model-tab"
+        "sections/davinci/home",
+        "sections/davinci/model"
       ]
     },
     {
