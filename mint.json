@@ -59,7 +59,8 @@
     {
       "group": "Language",
       "pages": [
-        "sections/sysml/language"
+        "sections/sysml/language",
+        "sections/sysml/objects"
       ]
     },
     {
@@ -73,12 +74,6 @@
       "pages": [
         "sections/davinci/home",
         "sections/davinci/model"
-      ]
-    },
-    {
-      "group": "Integration",
-      "pages": [
-        "sections/integrations/integrations"
       ]
     }
   ],
