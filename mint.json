@@ -69,6 +69,12 @@
       ]
     },
     {
+      "group": "Tabs",
+      "pages": [
+        "sections/davinci/model-tab"
+      ]
+    },
+    {
       "group": "Integration",
       "pages": [
         "sections/integrations/integrations"
