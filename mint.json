@@ -27,14 +27,14 @@
   ],
   "topbarLinks": [
     {
-      "name": "Community",
-      "url": "www.celedonsoltuions.com"
+      "name": "Celedon Solutions",
+      "url": "www.celedonsolutions.com"
     }
   ],
   "topbarCtaButton": {
     "type": "link",
     "url": "https://www.celedonsolutions.com/beta-waitlist",
-    "name": "Try it"
+    "name": "Try Davinci"
   },
   "anchors": [],
   "navigation": [
@@ -99,7 +99,7 @@
     }
   ],
   "primaryTab": {
-    "name": "Home"
+    "name": "Overview"
   },
   "footerSocials": {
     "x": "https://x.com/celedon_inc/",
