@@ -53,10 +53,27 @@
       ]
     },
     {
-      "group": "Language",
+      "group": "System Models",
       "pages": [
-        "sections/sysml/language",
+        "sections/sysml/systemmodeling",
         "sections/sysml/objects"
+      ]
+    },
+    {
+      "group": "Object Schema",
+      "pages": [
+        "sections/sysml/actions",
+        "sections/sysml/parts",
+        "sections/sysml/attributes",
+        "sections/sysml/package",
+        "sections/sysml/connections",
+        "sections/sysml/constraints",
+        "sections/sysml/entities",
+        "sections/sysml/ports",
+        "sections/sysml/requirements",
+        "sections/sysml/documents",
+        "sections/sysml/tables",
+        "sections/sysml/text"
       ]
     },
     {
