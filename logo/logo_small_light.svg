@@ -2,16 +2,16 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="157.75739mm"
-   height="164.69809mm"
-   viewBox="0 0 157.75739 164.69809"
+   width="440.6149mm"
+   height="115.00242mm"
+   viewBox="0 0 440.6149 115.00242"
    version="1.1"
    id="svg790"
-   inkscape:export-filename="..\..\..\davinci-docs\logo\logo_large_bright.svg"
+   inkscape:export-filename="..\..\..\davinci-docs\logo\logo_small_bright.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   sodipodi:docname="Logo_v1A.svg"
+   sodipodi:docname="Logo_v1B.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.7385171"
-     inkscape:cx="490.17146"
-     inkscape:cy="608.65212"
+     inkscape:zoom="0.26110522"
+     inkscape:cx="-287.24052"
+     inkscape:cy="55.533167"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -42,31 +42,47 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-29.220074,-83.238493)">
+     transform="translate(-36.802353,-41.434511)">
+    <g
+       inkscape:groupmode="layer"
+       id="layer2"
+       inkscape:label="Bkg"
+       style="display:none">
+      <rect
+         style="display:none;fill:#1a0030;stroke:#ffffff;stroke-width:1.93128;stroke-linecap:round;stroke-linejoin:bevel;stroke-opacity:1;paint-order:stroke fill markers"
+         id="rect1625"
+         width="210.94125"
+         height="294.87299"
+         x="-0.50501364"
+         y="0.80510181" />
+    </g>
     <circle
        style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke-width:0.228669;stroke-dasharray:none"
        id="path21087"
-       cx="108.0619"
-       cy="140.7397"
-       r="57.501205" />
+       cx="94.303558"
+       cy="98.935715"
+       r="57.501205"
+       inkscape:export-filename="..\..\..\davinci-docs\logo\logo_small_light.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <path
        id="path5508"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.307;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="m 107.54613,111.4483 c -12.69864,-7.1e-4 -33.350125,2.85662 -37.61138,9.28326 -1.995689,3.00981 8.205213,5.26614 11.510111,4.29273 1.924182,-0.56674 -3.483843,-2.76495 -0.749946,-4.94289 3.356808,-2.67418 18.981184,-3.54888 27.232485,-3.73501 8.2513,-0.18613 21.59251,-0.15915 21.7052,5.36864 0.13892,6.81458 -20.08188,9.05578 -18.04408,10.63161 2.54687,1.96949 37.10913,-8.29962 33.78746,-14.00195 -3.69623,-6.34534 -24.45497,-6.89564 -37.82985,-6.89639 z"
+       d="m 93.787746,69.644044 c -12.698598,-7.1e-4 -33.350083,2.856602 -37.611338,9.283206 -1.995689,3.009795 8.205213,5.26611 11.510111,4.292706 1.924182,-0.566737 -3.483843,-2.764935 -0.749946,-4.94286 3.356808,-2.674165 18.981184,-3.548862 27.232443,-3.734989 8.251264,-0.18613 21.592474,-0.15915 21.705164,5.368607 0.13892,6.814544 -20.081856,9.055729 -18.044065,10.63155 2.546855,1.969481 37.109115,-8.299572 33.787445,-14.001869 -3.69623,-6.345304 -24.45497,-6.895601 -37.829814,-6.896351 z"
        sodipodi:nodetypes="sssszssss" />
     <path
        id="path5510"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.702;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       d="m 105.64982,127.21279 c -0.3365,-2.06478 -49.337022,6.49895 -48.365667,14.03558 0.937786,7.27617 39.898346,6.43162 51.910917,6.21047 33.61117,-0.61875 47.89832,-6.83247 47.93018,-10.54077 0.0302,-3.52009 -17.0178,-7.03562 -17.54368,-6.07693 -0.59236,1.07987 6.93675,2.64702 3.53844,6.12987 -2.33055,2.38853 -23.8457,5.42741 -35.94102,5.09186 -8.846155,-0.24541 -27.841808,-1.04427 -26.039294,-5.17564 1.881615,-4.31267 24.824204,-7.74712 24.510124,-9.67444 z"
+       d="m 91.891448,85.408444 c -0.3365,-2.064768 -49.336992,6.498914 -48.365637,14.035502 0.937786,7.276164 39.898346,6.431614 51.910866,6.210464 33.611143,-0.61875 47.898293,-6.832461 47.930153,-10.54074 0.0302,-3.520072 -17.0178,-7.035581 -17.54368,-6.076897 -0.59236,1.079864 6.93675,2.647005 3.53844,6.129837 -2.33055,2.388515 -23.8457,5.42738 -35.940981,5.09183 -8.846116,-0.24541 -27.841769,-1.044264 -26.039255,-5.17561 1.881615,-4.312646 24.824171,-7.747078 24.510094,-9.674386 z"
        sodipodi:nodetypes="ssssssass" />
     <path
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.55662;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="m 108.29458,104.08963 c 1.29038,-0.1322 6.88679,0.34227 7.74229,-0.7932 0.57735,-0.76629 -0.0569,-2.14658 -0.62518,-3.488997 -0.97845,-2.311258 -4.97523,-7.734759 -6.13592,-8.529369 -0.31512,-0.215736 -0.6248,-0.161838 -0.74976,-0.194206 -0.12603,0.0279 -0.43359,-0.03698 -0.75619,0.167409 -1.18823,0.752812 -5.37543,6.030691 -6.43549,8.305666 -0.6157,1.321347 -1.29864,2.678207 -0.74892,3.464547 0.81457,1.16518 6.42431,0.89012 7.70917,1.06815 z"
+       d="m 94.536193,62.285416 c 1.290371,-0.1322 6.886757,0.342267 7.742257,-0.793197 0.57735,-0.766284 -0.0569,-2.146568 -0.62518,-3.488979 -0.97845,-2.311258 -4.975209,-7.734759 -6.135893,-8.529369 -0.315117,-0.215736 -0.624797,-0.161838 -0.749757,-0.194206 -0.126027,0.0279 -0.433587,-0.03698 -0.756184,0.167409 -1.188224,0.752812 -5.3754,6.030691 -6.435454,8.305666 -0.615697,1.321344 -1.298634,2.678195 -0.748917,3.464532 0.814567,1.165174 6.424274,0.890114 7.709128,1.068144 z"
        id="path5528"
        sodipodi:nodetypes="cc" />
     <g
        id="g1074"
-       transform="matrix(0.71612308,0,0,0.88419065,29.400132,-21.096785)"
+       transform="matrix(0.71612308,0,0,0.88419065,15.64179,-62.900978)"
        style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:1.47286;stroke-dasharray:none;stroke-opacity:1">
       <path
          id="path5524"
@@ -76,14 +92,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:48.5258px;line-height:1.25;font-family:'Montserrat Thin';-inkscape-font-specification:'Montserrat Thin, ';stroke-width:0.242628"
-       x="28.152506"
-       y="247.20869"
+       style="font-size:93.8772px;line-height:1.25;font-family:'Montserrat Thin';-inkscape-font-specification:'Montserrat Thin, ';stroke-width:0.469384"
+       x="170.15718"
+       y="127.63177"
        id="text5071"><tspan
          sodipodi:role="line"
          id="tspan5069"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'DM Serif Display';-inkscape-font-specification:'DM Serif Display';stroke-width:0.242628"
-         x="28.152506"
-         y="247.20869">Davinci</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'DM Serif Display';-inkscape-font-specification:'DM Serif Display';stroke-width:0.469384"
+         x="170.15718"
+         y="127.63177">Davinci</tspan></text>
   </g>
 </svg>
