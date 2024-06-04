@@ -93,10 +93,21 @@
       ]
     },
     {
-      "group": "View Tabs",
+      "group": "Engineering Tabs",
+      "pages": [
+        "sections/davinci/model",
+        "sections/davinci/software",
+        "sections/davinci/electrical",
+        "sections/davinci/mechanical",
+        "sections/davinci/modelmanagement",
+        "sections/davinci/extensions"
+      ]
+    },
+    {
+      "group": "System Tabs",
       "pages": [
         "sections/davinci/home",
-        "sections/davinci/model"
+        "sections/davinci/user"
       ]
     }
   ],
