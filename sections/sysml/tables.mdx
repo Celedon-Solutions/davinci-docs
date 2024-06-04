@@ -1,13 +1,18 @@
 ---
-title: Text
+title: Tables
 ---
 
-<img height="20" noZoom src="/images/objecticons/text.svg" /> 
+<img height="20" noZoom src="/images/objecticons/table.svg" /> 
 
 ## Description
-Text objects define the major sections of a document, containing paragraphs. Hyperlinked objects can be defined inline in the text content using the `@` command.
+Tables display object details in a condensed form. They work using a focus object per row which is defined on the first column of the table. All other columns reference either a field of an object or specifics of its owned objects (such as attributes, ports, conntections, etc.). 
 
+<Note>The first column of the table defines the reference object and can not be renamed.</Note>
 
+The header of tables define what information should be displayed. Changing the name of the header will auto update the column. If needed, each cell reference can be manually edited.
+
+<Note>Units will be displayed in cells (for values with units), units defined in the header as
+`[unit]` will auto convert units in the table column</Note>
 
 <Info>This is edited from the document view only</Info>
 
