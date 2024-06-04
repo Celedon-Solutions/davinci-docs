@@ -5,7 +5,7 @@
     "dark": "/logo/logo_small_dark.svg",
     "light": "/logo/logo_small_bright.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/logo/fav_icon_dark.svg",
   "colors": {
     "primary": "#000000",
     "light": "#FFFFFF",
@@ -28,7 +28,7 @@
   "topbarLinks": [
     {
       "name": "Celedon Solutions",
-      "url": "www.celedonsolutions.com"
+      "url": "https://www.celedonsolutions.com/"
     }
   ],
   "topbarCtaButton": {
@@ -92,7 +92,7 @@
       ]
     },
     {
-      "group": "Tabs",
+      "group": "View Tabs",
       "pages": [
         "sections/davinci/home",
         "sections/davinci/model"
