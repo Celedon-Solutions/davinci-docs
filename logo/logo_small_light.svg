@@ -43,19 +43,6 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-36.802353,-41.434511)">
-    <g
-       inkscape:groupmode="layer"
-       id="layer2"
-       inkscape:label="Bkg"
-       style="display:none">
-      <rect
-         style="display:none;fill:#1a0030;stroke:#ffffff;stroke-width:1.93128;stroke-linecap:round;stroke-linejoin:bevel;stroke-opacity:1;paint-order:stroke fill markers"
-         id="rect1625"
-         width="210.94125"
-         height="294.87299"
-         x="-0.50501364"
-         y="0.80510181" />
-    </g>
     <circle
        style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke-width:0.228669;stroke-dasharray:none"
        id="path21087"
