@@ -12,31 +12,39 @@ The System Modeling tab is where the project system model is viewable and intera
 A: Index, B: Workspace Tabs, C: Workspace Page, D: Chat, E: Event Log
 
 ## Index
-The index contains the navigation view of the system model, organized by their child parent relationships. From the index objects can be selected which are populated into the workspace. 
+The index contains the navigation view of the system model, organized by their child parent relationships. From the index objects can be selected which are populated into the workspace tab and workspace page. The index is divded into two sections called `ELEMENTS` and `ARTIFACTS`. The `ELEMENTS` section holds the main model objects and the `ARTIFACTS` section holds the artifact objects.
+
+Objects in the index can also be filtered by clicking on the filter icon on the top right of each index section. These sections can also be expanded by hovering over the section dividers.
 
 <Tip>Click and drag to move objects around.</Tip>
 
 <Tip>Right-click to access manual features such as creating, renaming, and deleting objects.</Tip>
 
 ## Chat
-The chat is the primary interaction with Davinci's AI features. Here users can provide prompts to instruct Davinci on what to create, update, or remove from the model. Optionally, the user can select different creation depths using the slider on the top-right of the change bar to guide the AI in providing more or less detail when creating new object trees. 
+The chat is the primary interaction with Davinci's AI features. Here users can provide prompts to instruct Davinci on what to create, update, or remove from the model. 
 
-<Tip>Generally using names in the chat is sufficent, but to be specific the @ can be used to ensure an accurate reference to that specific object.</Tip>
+Optionally, the user can select different creation depths using the slider on the top-right of the chat box to guide the AI in providing more or less detail when creating new objects. 
+
+<Info>Detail in this context means the depth of object generation in terms of its children and levels of grandchildren.</Info>
+
+<Tip>Generally using names in the chat is sufficent, but to be specific the `@` can be used to ensure an accurate reference to that specific object.</Tip>
 
 ## Event Log
-The event log is where the user can see all of the prior updates, manual or AI, that occur in the model. Each event provides a summary of the changes. To view the details simply click on that event log. Any undo/redo actions will be indicated by the white dot.
+The event log is where the user can see all of the updates, manual or AI, that occur in the model. Each event provides a summary of the changes. To view the details simply click on that event log and a tab will popup in the workspace showing all details for that change. Any undo/redo actions (`CTRL+Z` / `CTRL+Y`) will be indicated by the white dot in the event log list. 
 
-In addition, for actions performed by Davinci, the compute cost is shown in this log.
+<Info>Actions performed by Davinci will include a compute credit cost which is shown on the right side.</Info>
 
 ## Workspace
 The workspace is where object information can be viewed and manually edited from. 
 
 ### Tabs
-The top of the workspace contains a tab row which houses tabs or any objects selected from the index. Selecting the tabs changes the focus object and what is displayed in the workspace.
+The top of the workspace contains a tab row which houses different tabs for any objects selected from the index. Selecting the tab will change the focus object and what is displayed in the workspace page.
 
 <Tip>Use middle click to quickly close tabs.</Tip>
 
 <Tip>Drag tabs into either side of the main workspace to split the view into subpanes to see objects side-by-side.</Tip>
+
+<Tip>Use the left and right arrows on the top right of the screen to jump back and forth between tabs selected prior.</Tip>
 
 ### Tab Page
 Below the tab row is the object path which shows the full parent path up to the top level packages in the model.
@@ -51,8 +59,28 @@ The main workspace contains the object details which can be displayed in differe
 
 * **Block**: Displays the port or allocation interfaces of the focus object.
 
-* **Rollup**: Displays the required subattributes as a tree. 
-
 * **Activity**: Displays the activity flow of an action object.
 
+* **Document**: Displays documents like a standard word editor.
+
+* **Section**: Displays the selected section scope of text objects.
+
+* **Table**: Displays only the selected table with caption.
+
+* **Figure**: Displays only the selected figure with caption.
+
+You can select from each of the possible render types to redisplay the object. In addition there is a settings button located on the bottom right of the workspace page that allows for customization of that display for the given focus object.
+
+At the bottom right of the workspace page is a download icon which allows an export of the given object information from the model. As of the Beta, the following exports are possible:
+
+| Render Type | Export Option                           |
+| -------- | ------------------------------------- |
+| Tabular   | None                     |
+| Tree     | .png                          |
+| Block   | .png |
+| Activity   | .png |
+| Document   | .docx |
+| Section   | .docx |
+| Table   | .xslx |
+| Figure   | .png |
 
