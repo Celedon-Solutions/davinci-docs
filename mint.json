@@ -23,10 +23,6 @@
     {
       "name": "Davinci",
       "url": "sections/davinci"
-    },
-    {
-      "name": "Integrations",
-      "url": "sections/integrations"
     }
   ],
   "topbarLinks": [
