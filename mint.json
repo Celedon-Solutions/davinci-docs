@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Davinci Beta Docs",
+  "name": "Davinci",
   "logo": {
     "dark": "/logo/logo_small_dark.svg",
     "light": "/logo/logo_small_bright.svg"
