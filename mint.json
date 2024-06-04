@@ -73,7 +73,15 @@
         "sections/sysml/requirements",
         "sections/sysml/documents",
         "sections/sysml/tables",
+        "sections/sysml/figure",
         "sections/sysml/text"
+      ]
+    },
+    {
+      "group": "Math & Units",
+      "pages": [
+        "sections/sysml/equations",
+        "sections/sysml/units"
       ]
     },
     {
