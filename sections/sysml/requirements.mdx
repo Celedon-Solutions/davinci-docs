@@ -1,11 +1,14 @@
 ---
-title: Requirement Object
-description: 'Requirement objects.'
+title: Requirements
+description: 'Requirement model objects.'
 ---
 
 ## Description
-Requirement objects are used to formally capture a project through logical evaluable statements. These objects are evaluated as true or false based on their owned objects being either true or false. For a requirement to be complete it must either own subrequirements or a constraint object. 
+Requirement objects are used to formally capture a project through logical evaluable statements. These objects are evaluated as true or false based on their owned objects being either true or false. For a requirement to be complete it must either own subrequirement(s) or a constraint object. 
 
+<Note>Object is incomplete is no constraint or subrequirements exist, or all subrequirements are incomplete.</Note>
+
+<Info>Requirement descriotions are modeled as shall statements by Davinci, but only the constraint objects are considered during evaluation.</Info>
 
 ## Fields
 
