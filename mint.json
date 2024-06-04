@@ -92,7 +92,7 @@
       ]
     },
     {
-      "group": "Tabs",
+      "group": "View Tabs",
       "pages": [
         "sections/davinci/home",
         "sections/davinci/model"
