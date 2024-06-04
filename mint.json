@@ -42,6 +42,7 @@
       "group": "Get Started",
       "pages": [
         "sections/overview/introduction",
+        "sections/overview/subscribing",
         "sections/overview/installation",
         "sections/overview/account"
       ]
