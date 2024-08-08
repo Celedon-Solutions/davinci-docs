@@ -43,7 +43,6 @@
       "pages": [
         "sections/overview/introduction",
         "sections/overview/subscribing",
-        "sections/overview/installation",
         "sections/overview/updates",
         "sections/overview/account"
       ]
