@@ -28,12 +28,12 @@
   "topbarLinks": [
     {
       "name": "Celedon Solutions",
-      "url": "https://www.celedonsolutions.com/"
+      "url": "https://www.celedon.solutions/"
     }
   ],
   "topbarCtaButton": {
     "type": "link",
-    "url": "https://www.celedonsolutions.com/beta-waitlist",
+    "url": "https://davinci.celedon.solutions",
     "name": "Try Davinci"
   },
   "anchors": [],
@@ -43,7 +43,6 @@
       "pages": [
         "sections/overview/introduction",
         "sections/overview/subscribing",
-        "sections/overview/installation",
         "sections/overview/updates",
         "sections/overview/account"
       ]
