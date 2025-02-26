@@ -23,6 +23,10 @@
     {
       "name": "User Guide",
       "url": "sections/davinci"
+    },
+    {
+      "name": "Community",
+      "url": "sections/community"
     }
   ],
   "topbarLinks": [
@@ -41,7 +45,7 @@
     {
       "group": "Get Started",
       "pages": [
-        "sections/overview/introduction",
+        "sections/overview/get-started/introduction",
         "sections/overview/subscribing",
         "sections/overview/updates",
         "sections/overview/account"
@@ -107,6 +111,12 @@
       "pages": [
         "sections/davinci/home",
         "sections/davinci/user"
+      ]
+    },
+    {
+      "group": "Community",
+      "pages": [
+        "sections/community/community"
       ]
     }
   ],
