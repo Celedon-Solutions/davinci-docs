@@ -46,9 +46,15 @@
       "group": "Get Started",
       "pages": [
         "sections/overview/get-started/introduction",
-        "sections/overview/subscribing",
-        "sections/overview/updates",
-        "sections/overview/account"
+        "sections/overview/get-started/subscribing",
+        "sections/overview/get-started/updates",
+        "sections/overview/get-started/account"
+      ]
+    },
+    {
+      "group": "Terms & Policies",
+      "pages": [
+        "sections/overview/terms-policy/termsofservice"
       ]
     },
     {
