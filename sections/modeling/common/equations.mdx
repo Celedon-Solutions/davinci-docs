@@ -2,48 +2,43 @@
 title: Equations
 ---
 ## Descriptions
-All attribute and constraint objects have a defined value. For attributes these specify the unit, the kind of its value, and any equation assoicated. For constraints this is just a boolean statement. For each they are an equation which can be simple values, such as a strings or numbers, or full mathmatical relationa between valuea or other objects.
+Each attribute and constraint object has a defined value. For attributes, this includes the unit, the type of value, and any associated equations. For constraints, the value is simply a boolean statement. These values can either be simple values, like strings or numbers, or complex mathematical relations involving values from other objects.
 
-<Note>Special handling is given when resolving values that have TBD in them, this can be used during early model formation.</Note>
+<Note>Special handling is applied when resolving values containing strings of `TBD` (To Be Determined). This can be useful during the early stages of model formation to note resolve errors when the value is still being defined.</Note>
 
 ## Math Syntax
-Standard mathmatical operations can be used in values of attributes to build roll up values or other simple math operations. The syntax for this follows the standard format:
+Standard mathematical operations can be used within attribute values to compute derived values or perform other simple calculations. The syntax for these operations follows standard mathematical conventions:
 
-| Operation | Synatx |
-| -------- | ----- | 
-| Multiplication   | `A*B` |
-| Division | `A/B` |
-| Addition | `A + B` |
-| Powers | `A^B` |
-| Minimum | `min(A, B)` |
-| Maximum | `max(A, B)` |
+| Operation        | Syntax   |
+| ---------------- | -------- |
+| Multiplication   | `A * B`  |
+| Division         | `A / B`  |
+| Addition         | `A + B`  |
+| Exponentiation   | `A ^ B`  |
+| Minimum          | `min(A, B)` |
+| Maximum          | `max(A, B)` |
 
-| Operators | Synatx |
-| -------- | ----- | 
-| Equal  | `==` |
-| Unequal | `!=` |
-| Smaller | `<` |
-| Larger | `>` |
-| Smaller or Equal | `<=` |
-| Larger or Equal | `>=` |
+| Comparison Operators | Syntax   |
+| -------------------- | -------- |
+| Equal                | `==`     |
+| Unequal             | `!=`     |
+| Smaller             | `<`      |
+| Larger              | `>`      |
+| Smaller or Equal    | `<=`     |
+| Larger or Equal     | `>=`     |
 
-## Value Kinds
-The following kinds are allowed in attribute values
-| Kind | Usage |
-| -------- | ----- | 
-| `Boolean`  | True/False values. Does not use any unit field and clears any existing unit |
-| `Date` | Used to format the date result. Does not use any unit field and clears any existing unit |
-| `Number` | Used for standard numbers. Allows the use of a unit to be assigned to it (optional) |
-| `String` | Used for strings. Does not use any unit field and clears any existing unit |
+## Value Types
+Attributes can have the following kind assoicated to a value, which handles how it is displayed or computed:
 
-
+| Type      | Description |
+| --------- | ----------- |
+| `Boolean` | Represents `true` or `false` values. Does not use a unit and clears any existing unit. |
+| `Date`    | Used for date values. Does not use a unit and clears any existing unit. |
+| `Number`  | Represents standard numeric values. Optionally includes a unit. |
+| `String`  | Represents string values. Does not use a unit and clears any existing unit. |
 
 ## Unit Referencing
-Values can be defined inline with other attribute references as `10 kg`.
+Values can reference units inline, such as `10 kg`, where the number is associated with the unit.
 
 ## Object Referencing
-Use the `@` command to find and select objects to use in the equation. These objects will automatically use their resolved value and defined unit.
-
-
-
-
+To reference other objects within an equation, use the `@` symbol followed by the object’s name. This will automatically resolve the object’s value and unit.
