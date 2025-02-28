@@ -78,10 +78,9 @@
                     {
                         "group": "Common",
                         "pages": [
-                            "sections/modeling/overview/equations",
-                            "sections/modeling/overview/relationships",
-                            "sections/modeling/overview/text",
-                            "sections/modeling/overview/units"
+                            "sections/modeling/common/equations",
+                            "sections/modeling/common/relationships",
+                            "sections/modeling/common/units"
                         ]
                     }
                 ]
