@@ -39,6 +39,45 @@
                         ]
                     }
                 ]
+            },
+            {
+                "tab": "Digital Modeling",
+                "groups": [
+                    {
+                        "group": "Get Started",
+                        "pages": [
+                            "sections/overview/get-started/introduction",
+                            "sections/overview/get-started/subscribing",
+                            "sections/overview/get-started/account"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "User Guide",
+                "groups": [
+                    {
+                        "group": "Get Started",
+                        "pages": [
+                            "sections/overview/get-started/introduction",
+                            "sections/overview/get-started/subscribing",
+                            "sections/overview/get-started/account"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Community",
+                "groups": [
+                    {
+                        "group": "Get Started",
+                        "pages": [
+                            "sections/overview/get-started/introduction",
+                            "sections/overview/get-started/subscribing",
+                            "sections/overview/get-started/account"
+                        ]
+                    }
+                ]
             }
         ]
     }
