@@ -114,7 +114,21 @@
       ]
     },
     {
-      "group": "System Tabs",
+      "group": "Design Agent",
+      "pages": [
+        "sections/views/artifact",
+        "sections/views/block"
+      ]
+    },
+    {
+      "group": "Common",
+      "pages": [
+        "sections/q&a/q&a",
+        "sections/q&a/hotkeys"
+      ]
+    },
+    {
+      "group": "System",
       "pages": [
         "sections/davinci/home",
         "sections/davinci/user"
