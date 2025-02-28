@@ -85,15 +85,8 @@
             },
             {
                 "tab": "Community",
-                "groups": [
-                    {
-                        "group": "Get Started",
-                        "pages": [
-                            "sections/overview/get-started/introduction",
-                            "sections/overview/get-started/subscribing",
-                            "sections/overview/get-started/account"
-                        ]
-                    }
+                "pages": [
+                    "sections/community/community"
                 ]
             }
         ]
