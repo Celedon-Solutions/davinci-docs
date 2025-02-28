@@ -12,16 +12,18 @@
         "light": "#FFFFFF",
         "dark": "#000000"
     },
-    "topbarLinks": [
-        {
-            "name": "Celedon Solutions",
-            "url": "https://www.celedon.solutions/"
+    "navbar": {
+        "links": [
+            {
+                "name": "Celedon Solutions",
+                "url": "https://www.celedon.solutions/"
+            }
+        ],
+        "ctaButton": {
+            "type": "link",
+            "url": "https://davinci-app.com",
+            "name": "Use Davinci"
         }
-    ],
-    "topbarCtaButton": {
-        "type": "link",
-        "url": "https://davinci-app.com",
-        "name": "Use Davinci"
     },
     "navigation": {
         "tabs": [
