@@ -2,34 +2,59 @@
 title: Objects
 ---
 
-All data objects in Davinci have the following base properties that can edited or defined.
+# Objects
+
+All data objects in Davinci have the following base properties that can be edited or defined.
 
 ## Base Fields
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Name`        | The name of the object. |
-| `Shortname`     | An acroynm, id or other short name for the object. This will be used when displaying the object as a reference in equations or other anchor elements in code. |
-| `Documentation`    | The written summary, intent, or description of the object. |
 
+| Property        | Description                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| `Name`          | The name of the object.                                                                          |
+| `Shortname`     | An acronym, ID, or other short name for the object. This is used when displaying the object as a reference in equations or other anchor elements in code. |
+| `Documentation` | The written summary, intent, or description of the object.                                        |
 
+## Reference Objects
 
-For non reference objects an addition field exists to note its link to a reference object:
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Reference`    | Links to reference objects that inform or are the source of the value, structure, or property. |
+For non-reference objects, an additional field exists to link to a reference object:
 
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Reference` | Links to reference objects that inform or are the source of the value, structure, or property of the object. |
 
-For interface objects a field is added to show what objects it connects as part of the named interface:
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Connects`    | Lists all the objects part of that common interface. |
+## Interface Objects
 
-For attribute objects a field is added to show what objects it connects as part of the named interface:
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Value`    | The value, equation of the attribute, including its unit and kind. |
+For interface objects, a field is added to indicate which objects are connected as part of the named interface:
 
-<Note>Artifacts, actions, and code objects all have unique view editors to define there specific parameters and are not dicussed here.</Note>
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Connects`  | Lists all the objects that are part of the named interface.                                     |
+
+## Attribute Objects
+
+For attribute objects, a field is added to show the value, equation, and unit associated with the attribute:
+
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Value`     | The value or equation of the attribute, including its unit and kind.                             |
+
+<Note>Artifacts, actions, and code objects all have unique view editors to define their specific parameters and are not discussed here.</Note>
 
 ## Object Descriptions
+
+Below is a list of common objects in Davinci, along with their descriptions:
+
+|  | Name       | Description                                                                                     |
+| -- | ---------- | ----------------------------------------------------------------------------------------------- |
+| ![Part](images/objections/part.svg) | `Part`      | Represents a physical or logical component in the model. It can have associated attributes and constraints. |
+| ![Action](images/objections/action.svg) | `Action`    | Defines operations or behaviors that occur within the system, such as triggering events or changing states. |
+| ![Code](images/objections/code.svg) | `Code`      | Represents executable code snippets or functions within the system, often used for dynamic behavior or processing. |
+| ![Constraint](images/objections/constraint.svg) | `Constraint` | Defines a condition or limitation on the system, often expressed as a boolean expression or mathematical relation. |
+| ![Attribute](images/objections/attribute.svg) | `Attribute` | Represents characteristics of an object, including values, equations, units, and kinds. |
+| ![Port](images/objections/port.svg) | `Port`      | Used to connect components or objects, typically representing an input or output point for data or signals. |
+| ![Interface](images/objections/interface.svg) | `Interface` | Defines a set of connections or interactions between objects, allowing them to communicate or share information. |
+| ![Document](images/objections/document.svg) | `Document`  | Represents a structured document or record within the system, typically containing sections, tables, and references. |
+| ![Table](images/objections/table.svg) | `Table`     | A structured representation of data in rows and columns, typically used to organize attributes, values, or objects. |
+| ![Reference](images/objections/reference.svg) | `Reference` | A pointer to another object or resource within the system, often used to link related data or establish dependencies. |
+| ![Package](images/objections/package.svg) | `Package`   | Represents a collection of related objects or modules, typically used for organizing and managing a set of components or resources. |
 
