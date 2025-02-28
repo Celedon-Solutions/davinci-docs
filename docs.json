@@ -59,21 +59,7 @@
                     {
                         "group": "Objects",
                         "pages": [
-                            "sections/modeling/objects/actions",
-                            "sections/modeling/objects/attributes",
-                            "sections/modeling/objects/interfaces",
-                            "sections/modeling/objects/constraints",
-                            "sections/modeling/objects/documents",
-                            "sections/modeling/objects/entities",
-                            "sections/modeling/objects/packages",
-                            "sections/modeling/objects/parts",
-                            "sections/modeling/objects/ports",
-                            "sections/modeling/objects/requirements",
-                            "sections/modeling/objects/tables",
-                            "sections/modeling/objects/code",
-                            "sections/modeling/objects/reference",
-                            "sections/modeling/objects/geometry",
-                            "sections/modeling/objects/assembly"
+                            "sections/modeling/objects/objects"
                         ]
                     },
                     {
