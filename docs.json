@@ -64,7 +64,12 @@
                 "groups": [
                     {
                         "group": "Overview",
-                        "pages": []
+                        "pages": [
+                            "sections/user-guide/overview/quick-start",
+                            "sections/user-guide/overview/ui",
+                            "sections/user-guide/overview/snapshots",
+                            "sections/user-guide/overview/collaboration"
+                        ]
                     },
                     {
                         "group": "Design Agent",
