@@ -19,10 +19,10 @@
                 "href": "https://www.celedon.solutions/"
             }
         ],
-        "ctaButton": {
-            "type": "link",
-            "url": "https://davinci-app.com",
-            "name": "Use Davinci"
+        "primary": {
+            "type": "button",
+            "href": "https://davinci-app.com",
+            "label": "Use Davinci"
         }
     },
     "navigation": {
