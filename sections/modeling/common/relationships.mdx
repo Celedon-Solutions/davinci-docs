@@ -3,27 +3,27 @@ title: Relationships
 ---
 
 ## Description
-Objects in the model have defined relationships with each other that establish an explicit knowledge graph of the system being modeled. These relationships are bi-directional and can be traversed by the user while exploring the model. A summary of the existing relationships in Davinci are dicussed below: 
+Objects in the model have defined relationships with each other that establish an explicit knowledge graph of the system being modeled. These relationships are either unidirectional (`inout`) or bidirectional (`in` or `out`) and can be traversed by the user while exploring the model. A summary of the existing relationships in Davinci are dicussed below: 
 
 
 ### Base Relationships
 | Property | Description                           |
 | -------- | ------------------------------------- |
-| `Uses`  | Specifies the attribute referenced into equations of other attributes. Can be in and out. |
-| `Reference`   | Used for between reference object and any other object type. Is out from the reference object and in to its target. |
+| `Uses`  | Specifies the attribute referenced into equations of other attributes. Can be `in` and `out`. |
+| `Reference`   | Used for between reference object and any other object type. Is `out` from the reference object and `in` to its target. |
 
 
 ### SysML Standard Relationships
 | Property | Description                           |
 | -------- | ------------------------------------- |
-| `Performs`     | Specifies what object performs the intent of an action.                   |
-| `Subject`      | Specifies the object that realizes a requirement.                        |
-| `Connect`   | Used for interface relationships between ports as defined by interface objects. |
+| `Performs`     | Specifies what object performs the intent of an action.  Is `out` from the part and `in` to the action                 |
+| `Subject`      | Specifies the object that realizes a requirement.  Is `out` from the requirement and `in` to the target object                          |
+| `Connect`   | Used for interface relationships between ports as defined by interface objects. Is `inout`.|
 
 
 
 ### Part Specific Relationships
-<Note>All of the following are defined as inout.</Note>
+<Note>All of the following are defined as `inout`.</Note>
 
 | Property        | Description                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------- |
