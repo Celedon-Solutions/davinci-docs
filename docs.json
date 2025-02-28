@@ -12,6 +12,17 @@
         "light": "#FFFFFF",
         "dark": "#000000"
     },
+    "topbarLinks": [
+        {
+            "name": "Celedon Solutions",
+            "url": "https://www.celedon.solutions/"
+        }
+    ],
+    "topbarCtaButton": {
+        "type": "link",
+        "url": "https://davinci-app.com",
+        "name": "Use Davinci"
+    },
     "navigation": {
         "tabs": [
             {
