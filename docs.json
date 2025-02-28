@@ -1,6 +1,7 @@
 {
     "$schema": "https://mintlify.com/schema.json",
     "name": "Davinci",
+    "theme": "mint",
     "logo": {
         "dark": "/logo/logo_small_dark.svg",
         "light": "/logo/logo_small_bright.svg"
