@@ -68,11 +68,24 @@
                     },
                     {
                         "group": "Design Agent",
-                        "pages": []
+                        "pages": [
+                            "sections/user-guide/design-agent/agents",
+                            "sections/user-guide/design-agent/tips"
+                        ]
                     },
                     {
                         "group": "Views",
-                        "pages": []
+                        "pages": [
+                            "sections/user-guide/views/artifact",
+                            "sections/user-guide/views/block",
+                            "sections/user-guide/views/code",
+                            "sections/user-guide/views/connectome",
+                            "sections/user-guide/views/geometry",
+                            "sections/user-guide/views/properties",
+                            "sections/user-guide/views/reference",
+                            "sections/user-guide/views/tables",
+                            "sections/user-guide/views/tree"
+                        ]
                     },
                     {
                         "group": "Common",
