@@ -47,32 +47,6 @@
                 ]
             },
             {
-                "tab": "Digital Modeling",
-                "groups": [
-                    {
-                        "group": "Overview",
-                        "pages": [
-                            "sections/modeling/overview/systemmodeling",
-                            "sections/modeling/overview/objects"
-                        ]
-                    },
-                    {
-                        "group": "Objects",
-                        "pages": [
-                            "sections/modeling/objects/objects"
-                        ]
-                    },
-                    {
-                        "group": "Common",
-                        "pages": [
-                            "sections/modeling/common/equations",
-                            "sections/modeling/common/relationships",
-                            "sections/modeling/common/units"
-                        ]
-                    }
-                ]
-            },
-            {
                 "tab": "User Guide",
                 "groups": [
                     {
@@ -111,6 +85,32 @@
                             "sections/user-guide/common/q&a",
                             "sections/user-guide/common/hotkeys",
                             "sections/user-guide/common/search-ref"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Digital Modeling",
+                "groups": [
+                    {
+                        "group": "Overview",
+                        "pages": [
+                            "sections/modeling/overview/systemmodeling",
+                            "sections/modeling/overview/objects"
+                        ]
+                    },
+                    {
+                        "group": "Objects",
+                        "pages": [
+                            "sections/modeling/objects/objects"
+                        ]
+                    },
+                    {
+                        "group": "Common",
+                        "pages": [
+                            "sections/modeling/common/equations",
+                            "sections/modeling/common/relationships",
+                            "sections/modeling/common/units"
                         ]
                     }
                 ]
