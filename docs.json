@@ -15,7 +15,7 @@
     "navbar": {
         "links": [
             {
-                "name": "Celedon Solutions",
+                "label": "Celedon Solutions",
                 "href": "https://www.celedon.solutions/"
             }
         ],
