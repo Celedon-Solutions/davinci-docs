@@ -1,8 +1,12 @@
 ---
 title: Equations
 ---
+## Descriptions
+All attribute and constraint objects have a defined value. For attributes these specify the unit, the kind of its value, and any equation assoicated. For constraints this is just a boolean statement. For each they are an equation which can be simple values, such as a strings or numbers, or full mathmatical relationa between valuea or other objects.
 
-## Syntax
+<Note>Special handling is given when resolving values that have TBD in them, this can be used during early model formation.</Note>
+
+## Math Syntax
 Standard mathmatical operations can be used in values of attributes to build roll up values or other simple math operations. The syntax for this follows the standard format:
 
 | Operation | Synatx |
@@ -22,6 +26,17 @@ Standard mathmatical operations can be used in values of attributes to build rol
 | Larger | `>` |
 | Smaller or Equal | `<=` |
 | Larger or Equal | `>=` |
+
+## Value Kinds
+The following kinds are allowed in attribute values
+| Kind | Usage |
+| -------- | ----- | 
+| `Boolean`  | True/False values. Does not use any unit field and clears any existing unit |
+| `Date` | Used to format the date result. Does not use any unit field and clears any existing unit |
+| `Number` | Used for standard numbers. Allows the use of a unit to be assigned to it (optional) |
+| `String` | Used for strings. Does not use any unit field and clears any existing unit |
+
+
 
 ## Unit Referencing
 Values can be defined inline with other attribute references as `10 kg`.

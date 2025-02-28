@@ -14,32 +14,22 @@ All data objects in Davinci have the following base properties that can edited o
 
 
 For non reference objects an addition field exists to note its link to a reference object:
-|      |                         |
+| Property      | Description                           |
 | --------      | ------------------------------------- |
 | `Reference`    | Links to reference objects that inform or are the source of the value, structure, or property. |
 
+
+For interface objects a field is added to show what objects it connects as part of the named interface:
+| Property      | Description                           |
+| --------      | ------------------------------------- |
+| `Connects`    | Lists all the objects part of that common interface. |
+
+For attribute objects a field is added to show what objects it connects as part of the named interface:
+| Property      | Description                           |
+| --------      | ------------------------------------- |
+| `Value`    | The value, equation of the attribute, including its unit and kind. |
 
 <Note>Artifacts, actions, and code objects all have unique view editors to define there specific parameters and are not dicussed here.</Note>
 
 ## Object Descriptions
 
-
-
-### Code
-
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Name`        | The name of the object. |
-
-### Action
-
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Name`        | The name of the object. |
-
-
-### Interface
-
-| Property      | Description                           |
-| --------      | ------------------------------------- |
-| `Name`        | The name of the object. |
