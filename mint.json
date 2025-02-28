@@ -102,14 +102,15 @@
       ]
     },
     {
-      "group": "Engineering Tabs",
+      "group": "Views",
       "pages": [
-        "sections/davinci/model",
-        "sections/davinci/software",
-        "sections/davinci/electrical",
-        "sections/davinci/mechanical",
-        "sections/davinci/modelmanagement",
-        "sections/davinci/extensions"
+        "sections/views/artifact",
+        "sections/views/block",
+        "sections/views/code",
+        "sections/views/connectome",
+        "sections/views/properties",
+        "sections/views/tables",
+        "sections/views/tree"
       ]
     },
     {
