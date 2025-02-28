@@ -1,0 +1,35 @@
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "Davinci",
+    "logo": {
+        "dark": "/logo/logo_small_dark.svg",
+        "light": "/logo/logo_small_bright.svg"
+    },
+    "favicon": "/logo/fav_icon_dark.svg",
+    "colors": {
+        "primary": "#000000",
+        "light": "#FFFFFF",
+        "dark": "#000000",
+        "anchors": {
+            "from": "#000000",
+            "to": "#808080"
+        }
+    },
+    "navigation": {
+        "tabs": [
+            {
+                "tab": "Overview",
+                "groups": [
+                    {
+                        "group": "Get Started",
+                        "pages": [
+                            "sections/overview/get-started/introduction",
+                            "sections/overview/get-started/subscribing",
+                            "sections/overview/get-started/account"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
