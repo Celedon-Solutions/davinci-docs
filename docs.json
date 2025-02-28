@@ -96,7 +96,8 @@
                         "group": "Common",
                         "pages": [
                             "sections/user-guide/common/q&a",
-                            "sections/user-guide/common/hotkeys"
+                            "sections/user-guide/common/hotkeys",
+                            "sections/user-guide/common/search-ref"
                         ]
                     }
                 ]
