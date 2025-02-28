@@ -10,11 +10,7 @@
     "colors": {
         "primary": "#000000",
         "light": "#FFFFFF",
-        "dark": "#000000",
-        "anchors": {
-            "from": "#000000",
-            "to": "#808080"
-        }
+        "dark": "#000000"
     },
     "navigation": {
         "tabs": [
