@@ -37,6 +37,12 @@
                             "sections/overview/get-started/subscribing",
                             "sections/overview/get-started/account"
                         ]
+                    },
+                    {
+                        "group": "Terms & Policy",
+                        "pages": [
+                            "sections/overview/terms-policy/termsofservice"
+                        ]
                     }
                 ]
             },
@@ -44,12 +50,12 @@
                 "tab": "Digital Modeling",
                 "groups": [
                     {
-                        "group": "Get Started",
-                        "pages": [
-                            "sections/overview/get-started/introduction",
-                            "sections/overview/get-started/subscribing",
-                            "sections/overview/get-started/account"
-                        ]
+                        "group": "System Models",
+                        "pages": []
+                    },
+                    {
+                        "group": "Schema",
+                        "pages": []
                     }
                 ]
             },
@@ -57,11 +63,22 @@
                 "tab": "User Guide",
                 "groups": [
                     {
-                        "group": "Get Started",
+                        "group": "Overview",
+                        "pages": []
+                    },
+                    {
+                        "group": "Design Agent",
+                        "pages": []
+                    },
+                    {
+                        "group": "Views",
+                        "pages": []
+                    },
+                    {
+                        "group": "Common",
                         "pages": [
-                            "sections/overview/get-started/introduction",
-                            "sections/overview/get-started/subscribing",
-                            "sections/overview/get-started/account"
+                            "sections/user-guide/common/q&a",
+                            "sections/user-guide/common/hotkeys"
                         ]
                     }
                 ]
