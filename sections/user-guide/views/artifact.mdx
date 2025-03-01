@@ -11,6 +11,9 @@ Documents are structured using blocks which can be given different display types
 
 When viewing a document type object or interacting with text blocks (in either tables or documents) the top panel will show editing features aimed for text operations and block inserts. 
 
+<Note>During live collaboration only one user can edit a given block at a time.</Note>
+
+
 Inside parargraph blocks references to objects can be added inline using `@` which will place the reference at the position. 
 
 <Note>When inserting references the default is name field. To edit this right click the reference to change its display. Only `name` and `value` can be used. For `value` it will display both the resolved value and its unit (if it exists).</Note>
@@ -19,6 +22,8 @@ Inside parargraph blocks references to objects can be added inline using `@` whi
 
 ### Table Editing
 Table cells can be either text or a reference to an object. Text cells can have paragraphs or lists (bulleted or numbered) and include all the same text editing features as a document block. 
+
+<Note>During live collaboration only one user can edit a cell at a time.</Note>
 
 For reference cells, the object and its field to display can be selected. The only fields allowed are `name`, `documentation` and `value`. 
 

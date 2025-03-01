@@ -3,7 +3,24 @@ title: Code View
 ---
 
 ## Description
-Join our community discord here: 
+The code view allows the user to edit the specific fields and structure of code objects (beyond the base properties). This view has two panes, the left being the code editor and the right being an output terminal. 
 
 
-<Info>Only registered users of Davinci can join the Discord. Terms of service apply.</Info>
+<Note>You must use `plt` to plot data into the terminal.</Note>
+
+### Code Editor
+The code editor allows you to edit the code. When editing the code is automatically saved.
+
+You can reference values from model objects into the code using `@` or other scripts. For values only the resolved value is passed on compile of the code. 
+
+To import other local code, use the standard import notation followed by `@` (import [object ref]). When importing other local code objects, all of those functions will be available globally during execute.
+
+<Note>During live collaboration only one user can edit a given line of code at one time.</Note>
+
+### Terminal
+The termianl will display any print outputs and plots. If errors occur they will also be displayed here.
+
+
+<Info>By default the terminal window is closed. When running code it will be automatically opened and can be toggled by clicking the `Terminal` button on the right side of the header bar.</Info>
+
+<Note>The terminal will not save data and is reset when the tab is closed, or when the same code is rerun.</Note>
