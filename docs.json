@@ -77,8 +77,7 @@
                         "group": "Common",
                         "pages": [
                             "sections/user-guide/common/q&a",
-                            "sections/user-guide/common/hotkeys",
-                            "sections/user-guide/common/search-ref"
+                            "sections/user-guide/common/hotkeys"
                         ]
                     }
                 ]
@@ -107,12 +106,6 @@
                             "sections/modeling/common/units"
                         ]
                     }
-                ]
-            },
-            {
-                "tab": "Community",
-                "pages": [
-                    "sections/community/community"
                 ]
             }
         ]
