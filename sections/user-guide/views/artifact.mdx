@@ -6,4 +6,20 @@ title: Artifact View
 Join our community discord here: 
 
 
-<Info>Only registered users of Davinci can join the Discord. Terms of service apply.</Info>
+### Document Editing
+Documents are structured using blocks which can be given different display types, such as a bulleted list, heading, or simple paragraph. 
+
+When viewing a document type object or interacting with text blocks (in either tables or documents) the top panel will show editing features aimed for text operations and block inserts. 
+
+Inside parargraph blocks references can be added using `@` which will place the reference inline. 
+
+<Note>When inserting references the default is name field. To edit this right click the reference to change its display. Only `name` and `value`. For `value` display the unit (if it exists) will always be shown.</Note>
+
+<Warning>If the document has any formatting artifacts, try rebuilding it by clicking on the artifact view again. This will also update any inline references as well.</Warning>
+
+### Table Editing
+Table cells can be either text or a reference to an object. Text cells can have paragraphs or lists (bulleted or numbered) and include all the same text editing features as a document block. 
+
+For reference cells, the object and its field to display can be selected. The only fields allowed are `name`, `documentation` and `value`. These values can be directly edited from the top pane for reference cells, which updates the data in that object.
+
+<Info>Tables inside of documents will always default to max page width.</Info>
