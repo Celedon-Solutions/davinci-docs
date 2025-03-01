@@ -3,17 +3,24 @@ title: Agentic Design
 ---
 
 ## Description
-Davinci is full automated engineering platform that uses agentic AI to execute complex modeling tasks. You interact with Davinci by sending instructions through the chat interface on the bottom part of the screen.
+Davinci is a full automated engineering platform that uses agentic AI to execute complex modeling tasks. You interact with Davinci by sending instructions through the chat interface on the bottom part of the screen.
 
 Davinci can execute series of tasks in response to a user request. An example of this is shown below:
 
 <img height="400" noZoom src="/images/task_example.jpg" /> 
 
-In this prompt Davinci setup two tasks to complete. For each it will describe its objective for that task. Each task Davinci is working on will be shown by a blue number bubble. When complete the task is green. Tasks not yet started are white. 
+In this prompt Davinci identified two tasks to complete. For task it will describe the objectives. These will be completed in order. The active task Davinci is working on will be shown by a blue number bubble. When complete the task bubble will turn green. Tasks not yet started are white. 
 
 All completed tasks have their own change log which is accessed by clicking the `View` button. At any time the generation can be stopped by hitting the stop icon at the top left of the task. 
 
 When all tasks are complete Davinci will write a short summary at the bottom of the objectives list.
+
+### Change Log
+For each task Davinci completes you can view the changes it made to the model. These changes are organized into `Additions `, `Removals` and `Updates`. The entire change can be undone with the `Undo All` button on the right. For updates, each can be individually undone/redone.
+
+<img height="400" noZoom src="/images/change_example.jpg" /> 
+
+<Note>All change can also be redone after clicking `Undo All`.</Note>
 
 ### Limitaions
 
