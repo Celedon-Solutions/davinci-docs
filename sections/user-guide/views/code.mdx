@@ -2,26 +2,27 @@
 title: Code View
 ---
 
-## Description
-The code view allows the user to edit the specific fields and structure of code objects (beyond the base properties). This view has two panes, the left being the code editor and the right being an output terminal. 
+## Description  
+The Code View allows users to edit specific fields and structures of code objects beyond their base properties. This view consists of two panes: the left pane contains the code editor, while the right pane serves as the output terminal.  
 
-<img height="400" noZoom src="/images/workspace_example_code.jpg" /> 
+<img height="400" noZoom src="/images/workspace_example_code.jpg" />  
 
+<Note>Use `plt` to generate plots in the terminal.</Note>  
 
-<Note>You must use `plt` to plot data into the terminal.</Note>
+## Code Editor  
+The code editor enables you to modify code, and all changes are automatically saved as you edit.  
 
-### Code Editor
-The code editor allows you to edit the code. When editing the code is automatically saved.
+You can reference values from model objects within the code using `@` or other script-based methods. When attributes are referenced, only the resolved values are passed into the compiled code.  
 
-You can reference values from model objects into the code using `@` or other scripts. For attributes referenced, only the resolved value is passed into the compiled code. 
-
-To import other local code, use the standard import notation followed by using `@` to place the reference anchor 
+To import other local code, use the standard import notation followed by `@` to specify the reference anchor:  
 
 ```.py
     import [reference anchor here...]
 ``` 
 
-When importing other local code objects, all of those functions will be available globally during execute.
+<Note>During live collaboration, only one user can edit a given line of code at a time.</Note>
+
+To execute a code object, click the Run button in the top-right corner of the header bar. At any time you can halt execution by hitting the Stop button.
 
 <Note>During live collaboration only one user can edit a given line of code at one time.</Note>
 
@@ -31,6 +32,6 @@ To run any code objects simply press the run button on the top right of the head
 The output will display any print or plots. If errors occur they will also be displayed here.
 
 
-<Info>By default the output window is closed. When running code it will be automatically opened and can be toggled by clicking the `Output` button on the right side of the header bar.</Info>
+<Info>By default, the output window is closed. It automatically opens when code is executed and can be toggled using the `Output` button on the right side of the header bar.</Info>
 
-<Note>The output will not save data and is reset when the tab is closed, or when the same code is rerun.</Note>
+<Note>The output terminal does not retain data. It resets when the workspace tab is closed or when the same code is rerun.</Note>
