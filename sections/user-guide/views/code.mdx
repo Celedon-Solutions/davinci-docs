@@ -11,9 +11,16 @@ The code view allows the user to edit the specific fields and structure of code 
 ### Code Editor
 The code editor allows you to edit the code. When editing the code is automatically saved.
 
-You can reference values from model objects into the code using `@` or other scripts. For values only the resolved value is passed on compile of the code. 
+You can reference values from model objects into the code using `@` or other scripts. For attributes referenced, only the resolved value is passed into the compiled code. 
 
-To import other local code, use the standard import notation followed by `@` (import [object ref]). When importing other local code objects, all of those functions will be available globally during execute.
+To import other local code, use the standard import notation followed by using `@` to place the reference anchor 
+
+```
+    import []
+
+``` 
+
+When importing other local code objects, all of those functions will be available globally during execute.
 
 <Note>During live collaboration only one user can edit a given line of code at one time.</Note>
 
