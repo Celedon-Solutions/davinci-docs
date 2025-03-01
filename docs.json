@@ -70,14 +70,7 @@
                         "group": "Views",
                         "pages": [
                             "sections/user-guide/views/artifact",
-                            "sections/user-guide/views/block",
-                            "sections/user-guide/views/code",
-                            "sections/user-guide/views/connectome",
-                            "sections/user-guide/views/geometry",
-                            "sections/user-guide/views/properties",
-                            "sections/user-guide/views/reference",
-                            "sections/user-guide/views/tables",
-                            "sections/user-guide/views/tree"
+                            "sections/user-guide/views/code"
                         ]
                     },
                     {
