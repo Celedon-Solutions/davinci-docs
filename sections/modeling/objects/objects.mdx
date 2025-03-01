@@ -12,6 +12,11 @@ All data objects in Davinci have the following base properties that can be edite
 | `Shortname`     | An acronym, ID, or other short name for the object. This is used when displaying the object as a reference in equations or other anchor elements in code. |
 | `Documentation` | The written summary, intent, or description of the object.                                        |
 
+In addition to the base fields objects also have a `lock` status which will prevent editing of the object until it is unlocked. 
+
+<Note>Locking (or unlocking) will automatically lock all of children elements and their descendents. This action can be undone by unlocking those child elements.</Note>
+
+
 ### Reference Objects
 
 For non-reference objects, an additional field exists to link to a reference object:
