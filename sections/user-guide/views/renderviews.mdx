@@ -3,13 +3,25 @@ title: Render Views
 ---
 
 ## Description
-Beyond the main views which enable extensive editing, several allow for the unique display of data to help understand the model and context.
+Beyond the main views which enable extensive editing, several allow for the unique display of data to help understand the model and context. These views are summarized here.
 
 ### Table View
+The table view displays summary tables of the objects organized by rows of the same object type (along its descendents path) and different field or children which can be toggled. The indentation shows the parent-child relation and what depth it is at. 
+
+The depth is specified along with toggling of what fields or children to show across the columns in the top header bar. 
+
 
 ### Reference View
+The reference view displays the reference object details. This will vary by the reference file type. For text or simple data objects (csv, json) these are rendered as raw text. For pdf's these are shown with a pdf viewer.
 
 ### Tree View
+The tree view shows a breakdown of the object descendents tree. For each block in the tree you can toggle what other owned objects can be shown or the documentation. 
+
+For attributes this tree is not owned attributes but the tree of referenced values used in the equations. This displays the roll up tree used to determine the attribute.
+
 
 ### Block View
+The block view is used to show the relationhips between parts and any port interfaces between parts in a block diagram like display.
+
+<Note>Only the relationships that are specific between parts can be shown here.</Note>
 
