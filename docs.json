@@ -69,8 +69,10 @@
                     {
                         "group": "Views",
                         "pages": [
+                            "sections/user-guide/views/properties",
                             "sections/user-guide/views/artifact",
-                            "sections/user-guide/views/code"
+                            "sections/user-guide/views/code",
+                            "sections/user-guide/views/renderviews"
                         ]
                     },
                     {
