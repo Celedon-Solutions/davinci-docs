@@ -3,33 +3,32 @@ title: Render Views
 ---
 
 ## Description
-Beyond the main views which enable extensive editing, several allow for the unique display of data to help understand the model and context. These views are summarized here.
+Beyond the main views that enable extensive editing, several additional views provide unique ways to display data, helping to better understand the model and its context. These views are summarized below.
 
 <Note>Make sure to refresh rendered views to get the latest value updates in the model.</Note>
 
 ### Table View
-The table view displays summary tables of the objects organized by rows of the same object type (along its descendents path) and different field or children which can be toggled. The indentation shows the parent-child relation and what depth it is at. 
+The Table View presents summary tables of objects, organizing them by rows based on object type (including their descendant paths). Different fields or child objects can be toggled for display. Indentation represents parent-child relationships and their depth.
 
-The depth is specified along with toggling of what fields or children to show across the columns in the top header bar. 
-
+The depth level, along with the selection of fields or children to display across columns, can be configured in the top header bar.
 
 ### Reference View
-The reference view displays the reference object details. This will vary by the reference file type. For text or simple data objects (csv, json) these are rendered as raw text. For pdf's these are shown with a pdf viewer.
+The Reference View displays details of reference objects, which vary depending on the reference file type:
+- **Text or simple data objects (CSV, JSON)** are rendered as raw text.
+- **PDF files** are displayed using a PDF viewer.
 
 ### Tree View
-The tree view shows a breakdown of the object descendents tree. For each block in the tree you can toggle what other owned objects can be shown or the documentation. 
+The Tree View provides a hierarchical breakdown of the object's descendant tree. For each block in the tree, you can toggle the display of related owned objects or accompanying documentation.
 
-For attributes this tree is not owned attributes but the tree of referenced values used in the equations. This displays the roll up tree used to determine the attribute.
-
+For attributes, this tree does not represent owned attributes but rather the referenced values used in equations. It visualizes the roll-up tree that determines the attribute values.
 
 ### Block View
-The block view is used to show the relationhips between parts and any port interfaces between parts in a block diagram like display.
+The Block View illustrates relationships between different parts and any port interfaces between them in a block diagram format.
 
-<Note>Only the relationships that are specific between parts can be shown here.</Note>
+<Note>Only relationships that specifically exist between parts are displayed in this view.</Note>
 
 ### Digital Thread View
-The digital thread view shows the relationships between objects in a 3D space based on the number of relationships and density of the connections. You can specificy the depth relative the focus object.
-
+The Digital Thread View visualizes relationships between objects in a 3D space, based on the number of connections and their density. You can specify the depth relative to the focus object.
 
 
 
