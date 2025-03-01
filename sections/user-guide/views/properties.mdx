@@ -5,3 +5,35 @@ title: Properties View
 ## Description
 The properties view allows the user to edit and see key properites of the object. 
 
+<img height="400" noZoom src="/images/workspace_example_properties.jpg" />
+
+### Name Header
+The name header is the first row of the properties view and allows the renaming of the object and to specify its lock status. 
+
+To change the lock status click on the lock icon. 
+
+The `name` field is updated by the input field next to the object type icon. Following the `name` input field is the `shortname` field. The short name will be used in anchor elements and attribute equations throughout the display if used.
+
+<Note>When locking or unlocking an object its descendents will also be locked/ unlocked.</Note>
+
+
+### Attributes
+The attributes block shows any owned attributes of the object. The values of these attributes can also be edited here. These can be deleted using the trash icon when hovering over that object. 
+
+<Note>The refresh icon will recompute the attribute value.</Note>
+
+### Constraints 
+The constraint block shows any owned constraints of the object. The values of these constraints can also be edited here. These can be deleted using the trash icon when hovering over that object.
+
+<Note>The refresh icon will recompute the constraint value.</Note>
+
+### Elements
+The elements block shows all other owned object types of the parent. These are organized by type into sub tabs in the block. These can be deleted using the trash icon when hovering over that object.
+
+### References
+The reference block shows any reference objects assoicated to this parent. For each reference the description of where or how it is being referenced can be provided per reference object as a text string.
+
+### Relationships
+The relationship block shows all relationships between this object and other model objects. It is organized by `in`, `out` or `inout` directions. In each tab is a list of the relationships by type.
+
+<Note>Both `uses` and `reference` relationships can not be added or removed here. To update those relationships the assoicated reference field or value field must be updated.</Note>
