@@ -3,7 +3,31 @@ title: Tips
 ---
 
 ## Description
-Join our community discord here: 
+Here are a couple tips to consider when instructing Davinci to perform automated tasks.
+
+### 1. Be clear
+When instrcuting a change be as specific and clear as to what should be updated and the outcome you have. Instead of saying something like:
+
+"make the power attributes better"
+ 
+ try being specific, such as:
+ 
+"make the attributes more detailed and fully capture all the power conditions, like min, max, etc."
+
+
+### 2. Provide context
+When providing a design intent to Davinci the context for the design or your goals are important to specify. Make sure to provide any guidance information that is specific to your desired solution. While having a large base knowledge across many domains, Davinci can't read your mind!
+
+If building from legacy information, make sure to use the `@` system to link any reference objects for the AI to build from.
+
+<Note>Unless linked Davinci will only consider the existing model for automatic context gathering.</Note>
+
+### 3. Reference objects
+In general Davinci will often find object just fine using their name, but for larger models objects can begin to share both name and purpose (e.g., several mass attributes). Its always good to be specific on what object you are referencing in a complex model where it might be unclear. Use the `@` system to link the object in question into the chat. Once referenced it Davinci will known you want to consider that object specifically.
+
+
+
+
 
 
 <Info>Only registered users of Davinci can join the Discord. Terms of service apply.</Info>
