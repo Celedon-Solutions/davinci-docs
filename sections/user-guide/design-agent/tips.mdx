@@ -3,31 +3,24 @@ title: Tips
 ---
 
 ## Description
-Here are a couple tips to consider when instructing Davinci to perform automated tasks.
+Here are a few tips to consider when instructing Davinci to perform automated tasks:
 
-### 1. Be clear
-When instrcuting a change be as specific and clear as to what should be updated and the outcome you have. Instead of saying something like:
+### 1. Be Clear
+When requesting a change, be as specific and detailed as possible about what needs to be updated and the expected outcome. For example, instead of saying:
 
-"make the power attributes better"
- 
- try being specific, such as:
- 
-"make the attributes more detailed and fully capture all the power conditions, like min, max, etc."
+"Make the power attributes better"
 
+Try being more specific, such as:
 
-### 2. Provide context
-When providing a design intent to Davinci the context for the design or your goals are important to specify. Make sure to provide any guidance information that is specific to your desired solution. While having a large base knowledge across many domains, Davinci can't read your mind!
+"Enhance the power attributes by providing detailed information about all power conditions, such as minimum, maximum, and other relevant details."
 
-If building from legacy information, make sure to use the `@` system to link any reference objects for the AI to build from.
+### 2. Provide Context
+When sharing design intent with Davinci, it's important to provide clear context for the task or your goals. Make sure to include any relevant information that guides your desired solution. While Davinci has broad knowledge across many domains, it can't read your mind!
 
-<Note>Unless linked Davinci will only consider the existing model for automatic context gathering.</Note>
+If you're working with legacy information, make sure to link relevant reference objects using the `@` system to ensure the AI understands the context you're building upon.
 
-### 3. Reference objects
-In general Davinci will often find object just fine using their name, but for larger models objects can begin to share both name and purpose (e.g., several mass attributes). Its always good to be specific on what object you are referencing in a complex model where it might be unclear. Use the `@` system to link the object in question into the chat. Once referenced it Davinci will known you want to consider that object specifically.
+<Note>Without these references, Davinci will rely solely on the existing model for context.</Note>
 
+### 3. Reference Objects
+In most cases, Davinci can identify objects by name, but for larger models, objects might share similar names and functions (e.g., multiple mass attributes). To avoid confusion, it's always a good idea to specify the exact object you're referring to, especially in complex models. Use the `@` system to link the object directly in your message. Once referenced, Davinci will understand that you're referring to that specific object.
 
-
-
-
-
-<Info>Only registered users of Davinci can join the Discord. Terms of service apply.</Info>
