@@ -47,15 +47,25 @@
                 ]
             },
             {
+                "tab": "Features",
+                "groups": [
+                    {
+                        "group": "Get Started",
+                        "pages": [
+                            "sections/user-guide/overview/snapshots",
+                            "sections/user-guide/overview/collaboration",
+                            "sections/user-guide/overview/files"
+                        ]
+                    }
+                ]
+            },
+            {
                 "tab": "User Guide",
                 "groups": [
                     {
                         "group": "Overview",
                         "pages": [
-                            "sections/user-guide/overview/quick-start",
-                            "sections/user-guide/overview/snapshots",
-                            "sections/user-guide/overview/collaboration",
-                            "sections/user-guide/overview/files"
+                            "sections/user-guide/overview/quick-start"
                         ]
                     },
                     {
@@ -65,13 +75,6 @@
                             "sections/user-guide/navigating/home",
                             "sections/user-guide/navigating/model",
                             "sections/user-guide/navigating/project"
-                        ]
-                    },
-                    {
-                        "group": "Design Agent",
-                        "pages": [
-                            "sections/user-guide/design-agent/agents",
-                            "sections/user-guide/design-agent/tips"
                         ]
                     },
                     {
@@ -114,6 +117,18 @@
                             "sections/modeling/common/equations",
                             "sections/modeling/common/relationships",
                             "sections/modeling/common/units"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Modeling Agent",
+                "groups": [
+                    {
+                        "group": "Design Agent",
+                        "pages": [
+                            "sections/user-guide/design-agent/agents",
+                            "sections/user-guide/design-agent/tips"
                         ]
                     }
                 ]
