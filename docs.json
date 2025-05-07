@@ -35,6 +35,8 @@
                         "pages": [
                             "sections/overview/get-started/introduction",
                             "sections/overview/get-started/subscribing",
+                            "sections/overview/get-started/change-tier",
+                            "sections/overview/get-started/unsubscribing",
                             "sections/overview/get-started/account"
                         ]
                     },
