@@ -4,17 +4,19 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Mintlify Dev",
+            "name": "Mint Dev Port 3333",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "npx",
             "runtimeArgs": [
-                "mintlify",
-                "dev"
+                "mint",
+                "dev",
+                "--port",
+                "3333"
             ],
             "console": "integratedTerminal"
-        }
+        },
     ]
 } 
