@@ -78,7 +78,7 @@
                         ]
                     },
                     {
-                        "group": "Views",
+                        "group": "Object Views",
                         "pages": [
                             "sections/user-guide/views/properties",
                             "sections/user-guide/views/artifact",
