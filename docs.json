@@ -61,7 +61,10 @@
                     {
                         "group": "Using Davinci",
                         "pages": [
-                            "sections/user-guide/navigating/ui"
+                            "sections/user-guide/navigating/ui",
+                            "sections/user-guide/navigating/home",
+                            "sections/user-guide/navigating/model",
+                            "sections/user-guide/navigating/project"
                         ]
                     },
                     {
