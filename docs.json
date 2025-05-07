@@ -164,9 +164,9 @@
                                 "group": "Get Started",
                                 "pages": [
                                     "v2.0.0/overview/get-started/introduction",
-                                    "v2.0.0/overview/get-started/subscribing",
-                                    "v2.0.0/overview/get-started/change-tier",
-                                    "v2.0.0/overview/get-started/unsubscribing",
+                                    "3.0.1/overview/get-started/subscribing",
+                                    "v3.0.1/overview/get-started/change-tier",
+                                    "v3.0.1/overview/get-started/unsubscribing",
                                     "v2.0.0/overview/get-started/account"
                                 ]
                             },
