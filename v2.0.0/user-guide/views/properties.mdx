@@ -3,73 +3,37 @@ title: Properties View
 ---
 
 ## Description
-The properties view allows the user to edit and see key properites of the Object. 
-<Frame>
-    <img height="400" noZoom src="/images/workspace_example_properties.jpg" />
-</Frame>
+The properties view allows the user to edit and see key properites of the object. 
+
+<img height="400" noZoom src="/images/workspace_example_properties.jpg" />
+
 ### Name Header
-The name header is the first row of the properties view and allows the renaming of the Object and to specify its lock status. 
+The name header is the first row of the properties view and allows the renaming of the object and to specify its lock status. 
 
-<Frame>
-    <img width="400" noZoom src="/images/Name-Header.png" />
-</Frame>
+To change the lock status click on the lock icon. 
 
-#### Locking and Unlocking
-Click the Lock Icon to prevent editing of this Object. When locked, neither Users nor Davinci will be able to edit the Object. Click the Lock Icon again to enable editing.
-<Note>Locking an Object will also Lock all Child Objects at the same time.</Note>
+The `name` field is updated by the input field next to the object type icon. Following the `name` input field is the `shortname` field. The short name will be used in anchor elements and attribute equations throughout the display if used.
 
-#### Object Type Icon
-Next to the Lock Icon is the Object Type Icon. Every Object has a Type, and the current Object Type will be displayed here as an Icon.
+<Note>When locking or unlocking an object its descendents will also be locked/unlocked.</Note>
 
-#### Naming an Object
-To the left of the Object Type Icon is the Name Field. Click on the Name Field to edit the Name of the Object. Click out of the field or press Enter to save the name.
-
-**Shortname (Optional)**
-
-Next to the Name Field inside the parenthases is the Object Shortname Field. The Shortname is used in some elements like Equations and Rollups.
-
-### Documentation
-Beneath the Name Header is the Documentation Field. This field allows you to describe the Object in plain text. When Davinci creates an Object, it will fill in the Documentation with a description of what the Object is, and its relationship to the rest of the Model. It may also describe why this Object is important.
-
-<Frame>
-    <img noZoom src="/images/Documentation-Field.png" />
-</Frame>
 
 ### Attributes
-The Attributes Block shows any owned attributes of the Object. The values of these attributes can also be edited here. These can be deleted using the trash icon when hovering over that Object. 
+The attributes block shows any owned attributes of the object. The values of these attributes can also be edited here. These can be deleted using the trash icon when hovering over that object. 
 
-<img height="400" noZoom src="/images/Attributes-Field.png" />
-
-<Note>The Refresh Icon will recompute the Attribute value.</Note>
+<Note>The refresh icon will recompute the attribute value.</Note>
 
 ### Constraints 
-The constraint Block shows any owned constraints of the Object. These can be deleted using the trash icon when hovering over the Object.
+The constraint block shows any owned constraints of the object. The values of these constraints can also be edited here. These can be deleted using the trash icon when hovering over that object.
 
-<Frame>
-    <img noZoom src="/images/Constraints-Table.png" />
-</Frame>
-
-<Note>The Refresh Icon will recompute the Constraint value.</Note>
+<Note>The refresh icon will recompute the constraint value.</Note>
 
 ### Elements
-The elements Block shows all other owned Object types of the parent. These are organized by type into sub tabs in the Block. These can be deleted using the trash icon when hovering over that Object.
-
-<Frame>
-    <img noZoom src="/images/Elements-Table.png" />
-</Frame>
+The elements block shows all other owned object types of the parent. These are organized by type into sub tabs in the block. These can be deleted using the trash icon when hovering over that object.
 
 ### References
-Use the References Block to link Model Objects to Reference Object truth sources. The Reference Object should serve as the/a source of information or data within the Model Object.
-
-<Frame>
-    <img noZoom src="/images/References-Table.png" />
-</Frame>
-
-The Reference Block shows any Reference Objects assoicated with this Object. For each reference, a description of where or how it is being referenced can be provided in the text box to the right of the Reference Name. References can be deleted using the trash icon when hovering over that Object.
-
-Only Reference Objects can be added as References.
+The reference block shows any reference objects assoicated to this parent. For each reference the description of where or how it is being referenced can be provided per reference object as a text string. These can be deleted using the trash icon when hovering over that object.
 
 ### Relationships
-The relationship Block shows all relationships between this Object and other Model Objects. It is organized by `in`, `out` or `inout` directions. In each tab is a list of the relationships by type. These can be deleted using the trash icon when hovering over that Object.
+The relationship block shows all relationships between this object and other model objects. It is organized by `in`, `out` or `inout` directions. In each tab is a list of the relationships by type. These can be deleted using the trash icon when hovering over that object.
 
 <Note>Both `uses` and `reference` relationships can not be added or removed here. To update those relationships the associated reference field or value field must be updated.</Note>
