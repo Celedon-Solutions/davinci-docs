@@ -69,12 +69,22 @@
                         ]
                     },
                     {
-                        "group": "Using Davinci",
+                        "group": "General Navigation",
                         "pages": [
                             "sections/user-guide/navigating/ui",
                             "sections/user-guide/navigating/home",
                             "sections/user-guide/navigating/model",
                             "sections/user-guide/navigating/project"
+                        ]
+                    },
+                    {
+                        "group": "The Workspace",
+                        "pages": [
+                            "sections/user-guide/views/properties",
+                            "sections/user-guide/views/artifact",
+                            "sections/user-guide/views/code",
+                            "sections/user-guide/views/reference",
+                            "sections/user-guide/views/renderviews"
                         ]
                     },
                     {
@@ -99,11 +109,7 @@
                     {
                         "group": "Objects",
                         "pages": [
-                            "sections/modeling/objects/objects",
-                            "sections/user-guide/views/properties",
-                            "sections/user-guide/views/artifact",
-                            "sections/user-guide/views/code",
-                            "sections/user-guide/views/renderviews"
+                            "sections/modeling/objects/objects"
                         ]
                     },
                     {
