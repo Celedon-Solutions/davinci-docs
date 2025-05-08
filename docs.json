@@ -26,86 +26,223 @@
         }
     },
     "navigation": {
-        "tabs": [
+        "versions": [
             {
-                "tab": "Overview",
-                "groups": [
+                "version": "v3.0.x",
+                "dropdowns": [
                     {
-                        "group": "Get Started",
-                        "pages": [
-                            "sections/overview/get-started/introduction",
-                            "sections/overview/get-started/subscribing",
-                            "sections/overview/get-started/account"
+                        "dropdown": "Overview",
+                        "icon": "book-open",
+                        "groups": [
+                            {
+                                "group": "Get Started",
+                                "pages": [
+                                    "v3.0.1/overview/get-started/introduction",
+                                    "v3.0.1/overview/get-started/subscribing",
+                                    "v3.0.1/overview/get-started/change-tier",
+                                    "v3.0.1/overview/get-started/unsubscribing",
+                                    "v3.0.1/overview/get-started/account"
+                                ]
+                            },
+                            {
+                                "group": "Terms & Policy",
+                                "pages": [
+                                    "v3.0.1/overview/terms-policy/termsofservice"
+                                ]
+                            }
                         ]
                     },
                     {
-                        "group": "Terms & Policy",
+                        "dropdown": "User Guide",
+                        "icon": "user",
+                        "groups": [
+                            {
+                                "group": "Overview",
+                                "pages": [
+                                    "v3.0.1/user-guide/overview/quick-start"
+                                ]
+                            },
+                            {
+                                "group": "General Navigation",
+                                "pages": [
+                                    "v3.0.1/user-guide/navigating/ui",
+                                    "v3.0.1/user-guide/navigating/home",
+                                    "v3.0.1/user-guide/navigating/model",
+                                    "v3.0.1/user-guide/navigating/project"
+                                ]
+                            },
+                            {
+                                "group": "The Workspace",
+                                "pages": [
+                                    "v3.0.1/user-guide/views/properties",
+                                    "v3.0.1/user-guide/views/artifact",
+                                    "v3.0.1/user-guide/views/code",
+                                    "v3.0.1/user-guide/views/reference",
+                                    "v3.0.1/user-guide/views/renderviews"
+                                ]
+                            },
+                            {
+                                "group": "Extra Features",
+                                "pages": [
+                                    "v3.0.1/user-guide/overview/snapshots",
+                                    "v3.0.1/user-guide/overview/collaboration",
+                                    "v3.0.1/user-guide/overview/files"
+                                ]
+                            },
+                            {
+                                "group": "Common",
+                                "pages": [
+                                    "v3.0.1/user-guide/common/q&a",
+                                    "v3.0.1/user-guide/common/hotkeys"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Digital Modeling",
+                        "icon": "code",
+                        "groups": [
+                            {
+                                "group": "Overview",
+                                "pages": [
+                                    "v3.0.1/modeling/overview/systemmodeling",
+                                    "v3.0.1/modeling/overview/objects"
+                                ]
+                            },
+                            {
+                                "group": "Objects",
+                                "pages": [
+                                    "v3.0.1/modeling/objects/objects"
+                                ]
+                            },
+                            {
+                                "group": "Common",
+                                "pages": [
+                                    "v3.0.1/modeling/common/equations",
+                                    "v3.0.1/modeling/common/relationships",
+                                    "v3.0.1/modeling/common/units"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Modeling Agent",
+                        "icon": "robot",
+                        "groups": [
+                            {
+                                "group": "Design Agent",
+                                "pages": [
+                                    "v3.0.1/user-guide/design-agent/agents",
+                                    "v3.0.1/user-guide/design-agent/tips"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Changelog",
+                        "icon": "clock",
                         "pages": [
-                            "sections/overview/terms-policy/termsofservice"
+                            "v3.0.1/changelog"
                         ]
                     }
                 ]
             },
             {
-                "tab": "User Guide",
-                "groups": [
+                "version": "v2.0.0",
+                "dropdowns": [
                     {
-                        "group": "Overview",
-                        "pages": [
-                            "sections/user-guide/overview/quick-start",
-                            "sections/user-guide/overview/ui",
-                            "sections/user-guide/overview/snapshots",
-                            "sections/user-guide/overview/collaboration",
-                            "sections/user-guide/overview/files"
+                        "dropdown": "Overview",
+                        "icon": "book-open",
+                        "groups": [
+                            {
+                                "group": "Get Started",
+                                "pages": [
+                                    "v2.0.0/overview/get-started/introduction",
+                                    "v3.0.1/overview/get-started/subscribing",
+                                    "v3.0.1/overview/get-started/change-tier",
+                                    "v3.0.1/overview/get-started/unsubscribing",
+                                    "v2.0.0/overview/get-started/account"
+                                ]
+                            },
+                            {
+                                "group": "Terms & Policy",
+                                "pages": [
+                                    "v2.0.0/overview/terms-policy/termsofservice"
+                                ]
+                            }
                         ]
                     },
                     {
-                        "group": "Design Agent",
-                        "pages": [
-                            "sections/user-guide/design-agent/agents",
-                            "sections/user-guide/design-agent/tips"
+                        "dropdown": "User Guide",
+                        "icon": "user",
+                        "groups": [
+                            {
+                                "group": "Overview",
+                                "pages": [
+                                    "v2.0.0/user-guide/overview/quick-start",
+                                    "v2.0.0/user-guide/overview/ui",
+                                    "v2.0.0/user-guide/overview/snapshots",
+                                    "v2.0.0/user-guide/overview/collaboration",
+                                    "v2.0.0/user-guide/overview/files"
+                                ]
+                            },
+                            {
+                                "group": "Design Agent",
+                                "pages": [
+                                    "v2.0.0/user-guide/design-agent/agents",
+                                    "v2.0.0/user-guide/design-agent/tips"
+                                ]
+                            },
+                            {
+                                "group": "Views",
+                                "pages": [
+                                    "v2.0.0/user-guide/views/properties",
+                                    "v2.0.0/user-guide/views/artifact",
+                                    "v2.0.0/user-guide/views/code",
+                                    "v2.0.0/user-guide/views/renderviews"
+                                ]
+                            },
+                            {
+                                "group": "Common",
+                                "pages": [
+                                    "v2.0.0/user-guide/common/q&a",
+                                    "v2.0.0/user-guide/common/hotkeys"
+                                ]
+                            }
                         ]
                     },
                     {
-                        "group": "Views",
-                        "pages": [
-                            "sections/user-guide/views/properties",
-                            "sections/user-guide/views/artifact",
-                            "sections/user-guide/views/code",
-                            "sections/user-guide/views/renderviews"
+                        "dropdown": "Digital Modeling",
+                        "icon": "code",
+                        "groups": [
+                            {
+                                "group": "Overview",
+                                "pages": [
+                                    "v2.0.0/modeling/overview/systemmodeling",
+                                    "v2.0.0/modeling/overview/objects"
+                                ]
+                            },
+                            {
+                                "group": "Objects",
+                                "pages": [
+                                    "v2.0.0/modeling/objects/objects"
+                                ]
+                            },
+                            {
+                                "group": "Common",
+                                "pages": [
+                                    "v2.0.0/modeling/common/equations",
+                                    "v2.0.0/modeling/common/relationships",
+                                    "v2.0.0/modeling/common/units"
+                                ]
+                            }
                         ]
                     },
                     {
-                        "group": "Common",
+                        "dropdown": "Changelog",
+                        "icon": "clock",
                         "pages": [
-                            "sections/user-guide/common/q&a",
-                            "sections/user-guide/common/hotkeys"
-                        ]
-                    }
-                ]
-            },
-            {
-                "tab": "Digital Modeling",
-                "groups": [
-                    {
-                        "group": "Overview",
-                        "pages": [
-                            "sections/modeling/overview/systemmodeling",
-                            "sections/modeling/overview/objects"
-                        ]
-                    },
-                    {
-                        "group": "Objects",
-                        "pages": [
-                            "sections/modeling/objects/objects"
-                        ]
-                    },
-                    {
-                        "group": "Common",
-                        "pages": [
-                            "sections/modeling/common/equations",
-                            "sections/modeling/common/relationships",
-                            "sections/modeling/common/units"
+                            "v2.0.0/changelog"
                         ]
                     }
                 ]

@@ -1,0 +1,71 @@
+---
+title: Schema
+---
+
+## Object Descriptions
+
+Below is a list of Model Object Types in Davinci:
+
+|  Name       | Description                                                                            | Icon         |
+| --------- | ----------------------------------------------------------------------------------------------- | ------- |
+| `Part`      | Represents a physical or logical component in the model. It can have associated attributes and constraints. | <img width="15" noZoom src="/images/objecticons/part.svg" /> |
+| `Attribute` | Represents characteristics of an object, including values which are equations with unit and kind. | <img width="15" src="/images/objecticons/attribute.svg" /> |
+| `Requirement`      | Represents a requirement for the project. Requirements are true or false based on the state of their owned requirements and/or owned constraints being true or false. | <img width="15" noZoom src="/images/objecticons/requirement.svg" /> |
+| `Action`    | Defines operations or behaviors that occur within the system, such as triggering events or changing states. | <img width="15" noZoom src="/images/objecticons/action.svg" /> |
+| `Code`      | Represents executable code snippets. | <img width="15" noZoom src="/images/objecticons/code.svg" /> |
+| `Constraint` | Defines a condition or limitation on the system, expressed as a boolean expression with a mathematical relation. | <img width="15" noZoom src="/images/objecticons/constraint.svg" /> |
+| `Port`      | Used to connect components or objects, typically representing an input or output point for data or signals. | <img width="15" noZoom src="/images/objecticons/port.svg" /> |
+| `Interface` | Defines a set of connections or interactions between objects via ports. | <img width="15" noZoom src="/images/objecticons/interface.svg" /> |
+| `Document`  | Represents a structured document artifact containing sections and tables in a pageful display. | <img width="15" noZoom src="/images/objecticons/document.svg" /> |
+| `Table`     | A structured artifact representation of data in rows and columns, used to organize object data. | <img width="15" noZoom src="/images/objecticons/table.svg" /> |
+| `Reference` | A provided legacy data object used to build the model from, such as a pdf, json, etc.  | <img width="15" noZoom src="/images/objecticons/reference.svg" /> |
+| `Package`   | Organize objects together in a folder structure. | <img width="15" noZoom src="/images/objecticons/package.svg" /> |
+
+
+## Base Fields
+
+All Objects in Davinci have the following Fields that can be edited or defined.
+
+| Property        | Description                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| `Name`          | The name of the object.                                                                          |
+| `Shortname`     | An acronym, ID, or other short name for the object. This is used when displaying the object as a reference in equations or other anchor elements in code. |
+| `Documentation` | The written summary, intent, or description of the object.                                        |
+
+In addition to the base fields objects also have a `lock` status which will prevent editing of the object until it is unlocked. 
+
+<Note>Locking (or unlocking) will automatically lock all of children elements and their descendents. This action can be undone by unlocking those child elements.</Note>
+
+
+## Reference Objects
+
+Reference Objects serve as a truth source or origin of data within the model. These Objects are uploaded as Files and used by Davinci to source data for the Model.
+
+For non-reference objects, an additional field exists to link to a reference object:
+
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Reference` | Links to Reference Objects that inform or are the source of the value, structure, or property of the object. |
+
+## Interface Objects
+
+For interface objects, a field is added to indicate which objects are connected as part of the named interface:
+
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Connects`  | Lists all the objects that are part of the named interface.                                     |
+
+## Attribute Objects
+
+For attribute objects, a field is added to show the value, equation, and unit associated with the attribute:
+
+| Property    | Description                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `Value`     | The value or equation of the attribute, including its unit and kind.                            |
+
+<Note>Artifacts, actions, and code objects all have unique view editors to define their specific parameters and are not discussed here.</Note>
+
+
+
+
+

@@ -1,0 +1,30 @@
+---
+title: Tables
+---
+
+<img height="20" noZoom src="/images/objecticons/table.svg" /> 
+
+## Description
+Tables display object details in a condensed form. They work using a focus object per row which is defined on the first column of the table. All other columns reference either a field of the focus object or specifics of its owned objects (such as attributes, ports, conntections, etc.). 
+
+<Note>The first column of the table defines the reference object and can not be renamed.</Note>
+
+The header of tables define what information should be displayed. Changing the name of the header will auto update the column. If needed, each cell reference can be manually edited. To edit the cell simply right click.
+
+<Note>Units will be displayed in cells automatically (for values with units). If a unit is defined in the header as
+`[unit]` then an auto conversion will occur.</Note>
+
+<Note>The data of `description`, `value`, and `unit` fields can be directly edited from the table updating it across the model.</Note>
+
+<Info>This is edited from the document view only</Info>
+
+
+## Fields
+<ParamField path="Name" type="string">
+  Name of the object.
+</ParamField>
+
+<ParamField path="Caption" type="string">
+  Caption of the object.
+</ParamField>
+

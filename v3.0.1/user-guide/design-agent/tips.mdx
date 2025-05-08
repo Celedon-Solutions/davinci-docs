@@ -1,0 +1,29 @@
+---
+title: Tips
+---
+
+## Description
+Davinci design agents are a powerful tool for automating engineering tasks. They are able to search the model, use tools, and perform contiuned tasks until their goals are met. While they are capable of performing many tasks, they are not perfect. Here are a few tips to consider when instructing Davinci to get the best results:
+
+### 1. Be Clear
+When requesting a change, be as specific and detailed as possible about what needs to be updated and the expected outcome. For example, instead of saying:
+
+"Make the power attributes better"
+
+Try being more specific, such as:
+
+"Enhance the power attributes by providing detailed information about all power conditions, such as minimum, maximum, and other relevant details."
+
+### 2. Provide Context
+When sharing design intent with Davinci, it's important to provide clear context for the task or your goals. Make sure to include any relevant information that guides your desired solution. While Davinci has broad knowledge across many domains, it can't read your mind!
+
+If you're working with legacy information, make sure to link relevant reference objects using the `@` system to ensure the AI understands the context you're building upon.
+
+<Note>Without these references, Davinci will rely solely on the existing model for context.</Note>
+
+### 3. Reference Objects
+In most cases, Davinci can identify objects by name, but for larger models, objects might share similar names and functions (e.g., multiple mass attributes). To avoid confusion, it's always a good idea to specify the exact object you're referring to, especially in complex models. Use the `@` system to link the object directly in your message. Once referenced, Davinci will understand that you're referring to that specific object.
+
+### 4. Monitor Progress
+Check in on the agents progress to ensure they stay on track. If they start to deviate from the original goal, you can pause, stop, or provide further instructions to keep them on track.
+

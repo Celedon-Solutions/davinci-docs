@@ -1,0 +1,42 @@
+---
+title: Collaboration
+---
+
+## Description
+
+Multilpe users can work on the same Project together at the same time using Collaboration. Updates are rendered in near-real-time for each user, allowing for highly efficient teamwork within the Model. Collaborators can be managed from `Project`>`Collaborators`. Here, users can be invited or removed from the Project. 
+
+<Frame>
+    <img height="400" noZoom src="/images/Collaborators.png" /> 
+</Frame>
+
+## Managing Collaborators
+
+Click the `Add Collaborator` Button to add new Collaborators to the project. 
+
+To remove Collaborators, hover over them in the list and click the `Delete` icon.
+
+## Joining a Project
+
+After inviting a new Collaborator, they will receive an email inviting them to the project. Once they accept the invitation via the link in the email, they will be added to the project. 
+
+If the invited user does not already have a Davinci account, they will need to create one before joining the Project. Some users may need to click the invitation link a second time after creating a new account to join the Project.
+
+<Note>The invitation link is only valid for the account that the Project invite email was sent to. Check that you are signed in with the correct account if the invitation is not working properly.</Note>
+
+
+
+## Roles
+
+Davinci currently supports three kinds of roles:
+| Role | Description |
+|------|-------------|
+| `Owner` | The Owner is the user who initiated the Project originally, and the ability to add and remove Collaborators. The Owner has all permissions granted to them and cannot be removed from the Project. |
+| `Collaborator` |  Collaborators are able to interact with the model, create, edit, and remove elements and objects, and chat with Davinci. Collaborators are able to invite other Davinci users to the Project. Collaborators cannot remove other Collaborators, or remove the Owner from the Project. |
+| `Pending` | A Pending user is a Collaborator who has been invited but not yet accepted the invitation. Invitations can be revoked from pending users before they accept
+
+Projects are not transferrable to other users at this time, though this is a feature we would like to implement in the future.
+
+<Note> The Role system will be expanded in future releases.</Note>
+
+<Warning>Compute costs for tasks are defaulted to the user initiating that task. For team-level costing, an enterprise account is required.</Warning>

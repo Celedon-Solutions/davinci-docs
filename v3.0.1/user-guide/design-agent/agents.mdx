@@ -1,0 +1,62 @@
+---
+title: Agentic Design
+---
+
+## Description  
+Davinci is a fully automated engineering platform that uses AI agents to perform complex modeling tasks. Interact with Davinci by sending instructions through the chat interface at the bottom of the screen.  
+
+
+## Starting an Agent
+To use the design agents you start by prompting an objective in the main chat interface at the bottom of the screen and submit. 
+
+
+<Frame>
+
+<img height="400" noZoom src="/images/Chat-agent-example.png" />  
+
+</Frame>
+
+Depending on the request, Davinci will either start up a design agent or respond to simple questions directly in the chat interface.
+
+
+<Note>You can initiate multiple design agents simultaneously.</Note>  
+
+## Viewing Agent Details
+The top bar of the chat area displays all agents that have been started, are actively running, or have completed. Active agents have a blue background with an animation, while completed agents are grayed out.
+
+To view an agent's details, click the `View Agent` button in the chat message. This opens a new tab displaying the agent's details, where you can monitor its status and progress, or interact with the agent as it performs tasks.
+
+<Frame>
+
+<img height="400" noZoom src="/images/Agent-display-details.png" />  
+
+</Frame>
+
+In this example, the user's prompt is the first chat bubble on the top right. As the agent works, it provides feedback, model updates, and calls various tools to complete the task. Tool calls appear as dark bubbles, with their results and model updates shown in blue. Clicking these result bubbles display their details on the left panel. 
+
+## Interacting with Agents
+You can stop an agent at any time by clicking the stop icon in the bottom-right corner of the agent chat bar. 
+
+Additionally, you can provide further chat instructions to the agent. These instructions will be added to the agent's context for its subsequent steps.
+
+When all tasks are complete, the agent will display a green "task complete" bubble. Clicking this bubble reveals a change log in the left panel.  
+
+<Note>
+Agents are still an early feature and should be monitored to ensure they stay on track.
+</Note>
+
+## Change Log  
+For every completed task or model update, you can review the changes Davinci made to the model. These changes are presented in a table, with rows representing each changed object and columns representing any changed properties. Additions are highlighted in green, while removals or old values are in red. Moved objects are indicated by a dashed border in their original position and a green background in their new position. Documentation or name changes to an object are shown with a green border.
+
+<Frame>
+
+<img height="400" noZoom src="/images/Change-log-example.png" />  
+
+</Frame>
+
+## Undoing Changes
+You can revert to previous checkpoints in the agent's history at any time. Doing so will undo all changes made since that checkpoint.
+
+
+
+
