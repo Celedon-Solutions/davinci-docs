@@ -5,26 +5,54 @@ title: Agentic Design
 ## Description  
 Davinci is a fully automated engineering platform that leverages agentic AI to execute complex modeling tasks. You interact with Davinci by sending instructions through the chat interface at the bottom of the screen.  
 
-Davinci can perform multiple tasks in response to a user request. An example is shown below:  
 
-<img height="400" noZoom src="/images/task_example.jpg" />  
+## Starting an Agent
+To use the design agents you start by prompting an objective in the main chat interface at the bottom of the screen and submit. 
 
-In this example, Davinci identifies two tasks to complete. For each task, it outlines the objectives, which are executed sequentially. The active task is highlighted with a blue number bubble. Once completed, the bubble turns green, while pending tasks remain white.  
 
-Each completed task has a change log, accessible via the `View` button. At any time, you can stop the process by clicking the stop icon in the top-left corner of the task.  
+<Frame>
 
-When all tasks are completed, Davinci provides a concise summary at the bottom of the objectives list.  
+<img height="400" noZoom src="/images/Chat-agent-example.png" />  
 
-<Note>You can initiate multiple design requests simultaneously.</Note>  
+</Frame>
+
+Depending on the what is requested, Davinci will either start up a design agent or, for simple questions, respond directly in the chat interface.
+
+
+<Note>You can initiate multiple design agents simultaneously.</Note>  
+
+## Viewing Agent Details
+On the top bar of the chat area any agents started, actively running, or completed are displayed. Active agents will have a blue background with an animation. Completed agents will be grayed out.
+
+To view the details of an agent click on the `View Agent` button in the chat message. This will open a new tab displaying the agent details where you can monitor status, progress, or interact with the agent will it peforms tasks.
+
+<Frame>
+
+<img height="400" noZoom src="/images/Agent-display-details.png" />  
+
+</Frame>
+
+In this example, the first chat bubble is the user prompt on the top right. As the agent works it will provide feedback, model updates, and call different tools to complete the task. Tools will show up as dark bubbles with their results, along with model updates, in blue. Clicking on these result bubbles will show their details on the right side. 
+
+## Stopping, Starting, and Chatting with Agents
+At any time you can stop the agent by clicking the stop icon in the bottom-right corner in the agent chat bar. 
+
+In addition, you can also provide chat instructions to the agent which will be added to the agent's context during its next steps.
+
+When all tasks are completed, the agent will return a task complete bubble in green. Clicking on this will provide a change log in the right side panel.  
+
+<Note>
+Agents are still an early feature and should be monitored to ensure they stay on track.
+</Note>
 
 ## Change Log  
-For every completed task, you can review the changes Davinci made to the model. These changes are categorized into `Additions`, `Removals`, and `Updates`. You can revert all modifications using the `Undo All` button on the right. For updates, individual changes can be undone or redone separately.  
+For every completed task or model update call, you can review the changes Davinci made to the model. These changes are shown as a table organized by rows for each object and columns for the properties of the object that were changed. Additions are shown in green, removals/old values in red. Moved objects are shown with a dashed border in the old position and green in the new position. Changes to the documentation or name are shown by a green border.
 
-<img height="400" noZoom src="/images/change_example.jpg" />  
+<img height="400" noZoom src="/images/Change-log-example.png" />  
 
-<Note>After clicking `Undo All`, you can restore all changes by selecting `Redo All`.</Note>  
+## Undoing Changes
+At any time you can revert back to checkpoints at the chat messages in the agent history. Doing so will undo all changes made since that checkpoint.
 
-## Limitations  
 
 
 
