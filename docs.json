@@ -53,20 +53,6 @@
                         ]
                     },
                     {
-                        "dropdown": "Features",
-                        "icon": "star",
-                        "groups": [
-                            {
-                                "group": "Get Started",
-                                "pages": [
-                                    "v3.0.1/user-guide/overview/snapshots",
-                                    "v3.0.1/user-guide/overview/collaboration",
-                                    "v3.0.1/user-guide/overview/files"
-                                ]
-                            }
-                        ]
-                    },
-                    {
                         "dropdown": "User Guide",
                         "icon": "user",
                         "groups": [
@@ -93,6 +79,14 @@
                                     "v3.0.1/user-guide/views/code",
                                     "v3.0.1/user-guide/views/reference",
                                     "v3.0.1/user-guide/views/renderviews"
+                                ]
+                            },
+                            {
+                                "group": "Extra Features",
+                                "pages": [
+                                    "v3.0.1/user-guide/overview/snapshots",
+                                    "v3.0.1/user-guide/overview/collaboration",
+                                    "v3.0.1/user-guide/overview/files"
                                 ]
                             },
                             {
@@ -164,7 +158,7 @@
                                 "group": "Get Started",
                                 "pages": [
                                     "v2.0.0/overview/get-started/introduction",
-                                    "3.0.1/overview/get-started/subscribing",
+                                    "v3.0.1/overview/get-started/subscribing",
                                     "v3.0.1/overview/get-started/change-tier",
                                     "v3.0.1/overview/get-started/unsubscribing",
                                     "v2.0.0/overview/get-started/account"
