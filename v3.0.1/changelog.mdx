@@ -1,24 +1,85 @@
 ---
 title: 'Changelog'
-description: 'Track all the updates and improvements to Davinci'
+description: 'Stay up-to-date with all the improvements and new features added to Davinci.'
 ---
 
-# Changelog
+<Update label="Version 3.1.0 - Agent Toolboxes" description="May 16 2025">
 
-Stay up-to-date with all the improvements and new features we're adding to Davinci.
+## Version 3.1.0 - Agent Toolboxes
 
-## Version 3.0.1
+### New Features
 
-**Release Date: May 07 2025**
+#### Davinci Toolboxes
+Toolboxes allow Davinci Agents to execute custom, user defined instructions
+
+- Davinci Agents can now use Toolboxes to assist with tasks
+- Toolboxes allow Davinci Agents to execute custom, user defined instructions
+- Users can create custom Toolboxes within Davinci
+    - Toolboxes are created using Python scripts
+    - Toolboxes can be exported as MCP Servers
+    - Users can test Toolbox functionality before allowing Agent use
+- Agents will automatically choose appropriate Toolboxes when performing tasks
+    - Toolboxes can be deactivated to prevent automatic Agent use as desired
+- Toolboxes and custom Code Objects can save files to the Project as Reference Objects
+- Toolboxes and custom Code Objects can update existing Attribute Object values
+
+#### Index Redesign
+The Index has been reworked to add new functionality and a higher level of polish on existing functions
+
+- Rearranging Elements within the Index is now smoother and more consistent
+- Redesigned the Drop Indicators when moving Index Elements
+    - Known Bug: Drop Indicators for Index Elements sometimes do not adhere to parent/child restrictions and will show invalid drop locations
+- Redesigned the Drop Indicators when dragging external Files into the Index
+    - Files will now be uploaded to the nearest parent Package object
+    - File destinations are now indicated by a light box surrounding the Package that will contain the Reference Object after File upload
+    - File uploading now adheres to the parent/child restrictions imposed on Reference Objects
+- Index Elements can now be dragged into the Workspace to open new Tabs
+    - Known Bug: If multiple Index Elements are dragged into the Workspace at once, only the first Object will be opened
+
+
+### Improvements
+- Better overlay and feedback when dragging Files into Davinci
+    - Files can be dropped anywhere on the Workspace or Chat when in the Model Area to upload them directly to the Library
+    - Files can be dropped in the Index to upload them directly to a specific Package
+- Inactive Files can now all be cleared at once with a new button in the Files Tab
+    - Note: Clearing inactive Files may cause compatibility issues with Snapshots that use them
+    - [Read more about Inactive Files here](/user-guide/overview/files)
+- Stability and Reliability improvements to Snapshots
+    - Known Bug: If a Snapshot takes more than 5 seconds to apply, the User may be redirected back to the Home screen until the Snapshot is fully applied. Re-open the Project once the Snapshot is fully applied.
+- Improvements to Agent Display
+    - Agent Tool Inputs and Responses are now viewed directly in chat instead of a separate window
+    - Removed the split view previously used for Agent Responses
+    - Added a Checkpoint system to Agent Conversations
+    - Added ability for the User to Undo individual Agent Actions
+
+
+### Changes
+- Removed ability to duplicate Reference Objects
+
+### Bug fixes
+- Fixed a bug related to deleting multiple Model Objects at once
+- Fixed a bug related to client-side Model Database traversal
+- Fixed a bug related to resizing Workspace Panes via double clicking Tab headers
+- Fixed a bug that allowed Reference Objects to be children of other Reference Objects
+- Several fixes to internal command routing and AI performance
+- Several backend fixes for performance and stability
+
+</Update>
+
+<Update label="Version 3.0.1 - Stability Release" description="May 07 2025">
+
+## Version 3.0.1 - Stability Release
 
 ### Improvements
 - Added server maintenance warnings
 - Introduced forward and backward functions
 - Bug fixes and stability improvements
 
-## Version 3.0.0
+</Update>
 
-**Release Date: May 05 2025**
+<Update label="Version 3.0.0 - Agents" description="May 05 2025">
+
+## Version 3.0.0 - Agents
 
 ### Agent Capabilities
 - Introduced Design Agent capabilities
@@ -64,8 +125,12 @@ Stay up-to-date with all the improvements and new features we're adding to Davin
 - Enhanced collaboration features
 - Improved right click menus
 
-## Version 2.0.0
+</Update>
 
-**Release Date: March 03 2025**
+<Update label="Version 2.0.0 - Initial Public Release" description="March 03 2025">
 
-**Release Date: Initial Public Release**
+## Version 2.0.0 - Initial Public Release
+
+- Initial Public Release for Davinci
+
+</Update>

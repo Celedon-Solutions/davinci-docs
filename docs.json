@@ -28,7 +28,7 @@
     "navigation": {
         "versions": [
             {
-                "version": "v3.0.x",
+                "version": "v3.1.0",
                 "dropdowns": [
                     {
                         "dropdown": "Overview",
