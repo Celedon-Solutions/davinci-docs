@@ -50,10 +50,9 @@ You can reference values from model objects within the code using `@` or other s
 ``` 
 If the object is `1 kg` in the model then `varBase` will be `1` and `varConverted` will be `1000000` because of the `mg` conversion.
 
-<Note>Once assigned to a varaible you can not do any other unit conversions via `("unit")` notation. The value is a number which is converted on run of the code getting the database value at the time of the run.</Note>
+<Note>Once assigned sto a varaible you can not do any other unit conversions via `("unit")` notation. The value is a number which is converted on run of the code getting the database value at the time of the run.</Note>
 
 ### Working with Attributes
-You MUST reference attribute objects to get values. UUIDS get translated into a function call on compile using a string replace operation, so you MUST follow the format of the examples below exactly. If asked to load in values, use values, or directly referencing values in the model, MAKE sure to use a direct uuid method here as much as possible. DO NOT hardcode values from the model as strings, use the uuid method instead. THIS IS THE ONLY WAY TO GET ATTRIBUTE VALUES FROM THE MODEL.
 
 ```python unit_conversion.py
     # Get mass in grams (converts from whatever unit is stored)
