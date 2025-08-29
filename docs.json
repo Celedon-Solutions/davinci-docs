@@ -76,8 +76,8 @@
                                 "pages": [
                                     "v3.0.1/user-guide/views/properties",
                                     "v3.0.1/user-guide/views/artifact",
-                                    "v3.0.1/user-guide/views/code",
-                                    "v3.1.0/user-guide/views/toolbox",
+                                    "v3.2.0/user-guide/views/code",
+                                    "v3.0.1/user-guide/views/toolbox",
                                     "v3.0.1/user-guide/views/reference",
                                     "v3.0.1/user-guide/views/renderviews"
                                 ]
