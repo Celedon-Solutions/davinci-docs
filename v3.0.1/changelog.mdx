@@ -3,18 +3,120 @@ title: 'Changelog'
 description: 'Stay up-to-date with all the improvements and new features added to Davinci.'
 ---
 
-<Update label="Version 3.4.1 - TITLE" description="July 25 2025">
+<Update label="Version 3.7.1 - Comments, Code and Chat Update" description="October 14 2025">
 
-## Version 3.4.1 - TITLE
+## Version 3.7.1 - Comments, Code and Chat Update
 
 ### Agent
-- 
+- Fix Button: Objects with resolution Errors will now have a "Fix Error" button that sends the error to the Agent to be fixed. Users can accept or reject the proposed fix
+- Send to Agent Button: Objects with TBD resolution status will now have a "Send to Agent" button which will add that object to the chat. Users should then provide the Agent with context for how to resolve the TBD
+- The Davinci Agent now has a new look, occupying one section of the new Right Panel
+- Davinci can now generate code in any specified language. The Agent will default to Python if no language is provided. Be explicit if you want Davinci to generate code that is not Python
 
 ### New Features
-- 
+
+#### Revised Right Panel
+
+The Right Panel is now not only for Agent Chat. We've added a few new features here to improve usability and model awareness for users
+- Agent View: This is where Chat lives. Users can now paste images (png/jpg/webp) from their clipboard into chat to provide the Agent with extra visual context
+- Error View: The new error view in the Right Panel shows all Model Objects with resolution Errors and all TBD Objects. Users can click on each card to view the Object and manually resolve, or select "Fix Error" or "Send to Agent" to resolve. Filter by Errors or TBDs using the buttons at the top of the view
+- Search View: A new way to search your model! Instead of relying on the top bar to search, users can now have a more persistant search area here. Search by Object name, key values, Tags, and more. Search will even show you everywhere an Object is referenced in the model
+- Comments View: Read more about comments below! The Comments view allows users to manage all comments in the model from one central view. See all comments posted by you in the "My Comments" tab. Easily see a list of all comments in which you are directly mentioned in the "Mentions" tab. Or simply view all comments in the model in the "All Comments" tab.
+
+#### Comments
+- Added Model Object Comments
+- Users can now leave comments on Model Objects with notes for the future, requests for review, or any other use case
+- Collaborators can be directly mentioned within comments using the @ search feature within comments
+- Other Model Objects can be directly mentioned within comments as well
+- Comments can be marked as "Resolved", which will remove them from being tracked in the "All Comments" tab of the Comment View
+
+#### Other Updates
+- Cleaned up Index right click menus
+- Added ability to paste images from clipboard into chat for one-time context to the Agent. Pasting unsupported file types in chat will offer to upload them as a Reference Object instead
+- Better constrained Select All Functionality (CTRL+A/CMD+A) to be more focused on appropriate content
+- Improved copy/paste from chat output, allowing Object references to be rich-copied within Davinci and converted to text outside. Formatting between messages is maintained
+- Added support for arbitrary code language generation and storage within the Model. Code execution is still limted to Python (for now)
+- Code block output in chat and Code Objects can now be copied easily with one button click
 
 ### Bug fixes
-- 
+- Fixed issues with running Python code
+- Fixed issues with unit resolution in Attributes
+- Fixed an issue with some tooltips in the interface
+- Fixed a layout issue with sending pasted text to the Agent via chat
+
+
+### Previous Releases
+These release notes incorporate key features from these previous releases, along with new improvements and bug fixes
+
+- 3.7.0 - October 8 2025
+
+</Update>
+
+<Update label="Version 3.6.2 - Task, Resource and Risk Update" description="September 30 2025">
+
+## Version 3.6.2 - Task, Resource and Risk Update
+
+### Agent
+- Davinci can now create Task Objects, allowing you to define timelines, due dates, meetings and more, right in your Model
+- Davinci can create Risk Objects, automatically analyzing the model for potential risk and identifying them into new, customizable risk categories
+- Davinci can create Resource Objects, letting you quantify cost, usage and man-hours for any task, program or event. Resource Objects can keep track of both money and inventory of materials
+
+### New Features
+- Task, Resource and Risk Objects added as Object types
+- Task, Resource and Risk Object unique views, such as Gantt chart, Resource Pie Chart, and Risk view
+- Added exporting for all new unique views
+- Added Risk category editor inside Project View
+
+### Bug fixes
+- Fixed bugs related to right clicking multiple objects in the Index
+- Redesigned some chat bubble styles for spacing considerations
+- Fixed issue related to restoring first message of chat after session reload
+- Fixes related to documents and tables
+
+### Previous Releases
+These release notes incorporate key features from these previous releases, along with new improvements and bug fixes
+
+- 3.6.1 - September 26 2025
+- 3.6.0 - September 18 2025
+
+</Update>
+
+<Update label="Version 3.5.2 - Tags and Matrix Update" description="August 27 2025">
+
+## Version 3.5.2 - Tags and Matrix Update
+
+### Agent
+- Davinci can now create Tags when generating or updating model objects. Automatically organize your model using these Tags
+
+### New Features
+- Tagging has been added to Objects. You can now add custom tags to categorize model objects and create custom Matrix views
+- Matrix Object: Create dynamically populated tables using Matrix objects. Create rules for how to populate the tables programatically
+- Tooltips have been added in many places and improved in others to increase function discoverability. Most buttons should now have a tooltip appear on mouse hover
+
+### Bug fixes
+- Fixed several bugs related to the Index
+- Fixes for bugs in Table objects
+
+### Previous Releases
+These release notes incorporate key features from these previous releases, along with new improvements and bug fixes
+
+- 3.5.1 - August 26 2025
+- 3.5.0 - August 20 2025
+
+</Update>
+
+<Update label="Version 3.4.1 - Multimedia Update" description="July 25 2025">
+
+## Version 3.4.1 - Multimedia Update
+
+### New Features
+- Davinci now has a built in video and audio player
+- Your workspace state is now saved and restored between sessions
+
+### Bug fixes
+- Several key bug fixes for documents and Tables
+- Improved loading of chat and other consistent
+- Other small bug fixes and performance improvements
 
 </Update>
 
