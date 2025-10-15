@@ -1,0 +1,38 @@
+---
+title: Relationships
+---
+
+## Description
+Objects in the model have defined relationships with each other that establish an explicit knowledge graph of the system being modeled. These relationships are either unidirectional (`in` and `out`) or bidirectional (`inout`) and can be traversed by the user while exploring the model. A summary of the existing relationships in Davinci are dicussed below: 
+
+<Note>Relationships must be given a Relationship Type when created. Select the Relationship Type, then the Relationship Object when creating a new Relationship</Note>
+
+### Base Relationships
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| `Uses`  | Specifies the attribute referenced into equations of other attributes. Can be `in` and `out`. |
+| `Reference`   | Used for between reference object and any other object type. Is `out` from the reference object and `in` to its target. |
+
+
+### SysML Standard Relationships
+| Property | Description                           |
+| -------- | ------------------------------------- |
+| `Performs`     | Specifies what object performs the intent of an action.  Is `out` from the part and `in` to the action                 |
+| `Subject`      | Specifies the object that realizes a requirement.  Is `out` from the requirement and `in` to the target object                          |
+| `Connect`   | Used for interface relationships between ports as defined by interface objects. Is `inout`.|
+
+
+
+### Part Specific Relationships
+<Note>All of the following are defined as `inout`.</Note>
+
+| Property        | Description                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------- |
+| `Data`            | Refers to the object that carries or provides the necessary information to perform an action.     |
+| `Power`           | Denotes the object that supplies energy or force to enable or achieve a desired effect or action. |
+| `Mechanical`      | Relates to physical systems and processes that involve motion, force, or mechanical interaction.   |
+| `Optical`        | Describes actions or interactions related to light, vision, or the properties of optical systems.  |
+| `Chemical`        | Refers to the relationships and interactions involving chemical substances or processes.          |
+| `Electromagnetic` | Defines the interactions or connections involving electromagnetic forces, such as electricity or magnetism. |
+| `Thermal`         | Pertains to heat-related interactions or processes, such as temperature changes or thermal energy transfer. |
+

@@ -1,0 +1,44 @@
+---
+title: Equations
+---
+## Descriptions
+Each attribute and constraint object has a defined value. For attributes, this includes the unit, the type of value, and any associated equations. For constraints, the value is simply a boolean statement. These values can either be simple values, like strings or numbers, or complex mathematical relations involving values from other objects.
+
+<Note>Special handling is applied when resolving values containing strings of `TBD` (To Be Determined). This can be useful during the early stages of model formation to not resolve errors when the value is still being defined.</Note>
+
+## Math Syntax
+Standard mathematical operations can be used within attribute values to compute derived values or perform other simple calculations. The syntax for these operations follows standard mathematical conventions:
+
+| Operation        | Syntax   |
+| ---------------- | -------- |
+| Multiplication   | `A * B`  |
+| Division         | `A / B`  |
+| Addition         | `A + B`  |
+| Exponentiation   | `A ^ B`  |
+| Minimum          | `min(A, B)` |
+| Maximum          | `max(A, B)` |
+
+| Comparison Operators | Syntax   |
+| -------------------- | -------- |
+| Equal                | `==`     |
+| Unequal             | `!=`     |
+| Smaller             | `<`      |
+| Larger              | `>`      |
+| Smaller or Equal    | `<=`     |
+| Larger or Equal     | `>=`     |
+
+## Value Types
+Attributes can have the following kind assoicated to a value, which handles how it is displayed or computed:
+
+| Type      | Description |
+| --------- | ----------- |
+| `Boolean` | Represents `true` or `false` values. Does not use a unit and clears any existing unit. |
+| `Date`    | Used for date values. Does not use a unit and clears any existing unit. |
+| `Number`  | Represents standard numeric values. Optionally includes a unit. |
+| `String`  | Represents string values. Does not use a unit and clears any existing unit. |
+
+## Unit Referencing
+Values can reference units inline, such as `10 kg`, where the number is associated with the unit.
+
+## Object Referencing
+To reference other objects within an equation, use the `@` symbol followed by the object’s name. This will automatically resolve the object’s value and unit.

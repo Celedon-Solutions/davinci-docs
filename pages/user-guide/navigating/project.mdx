@@ -1,0 +1,80 @@
+---
+title: The Project Area
+---
+The Project Area has many different Tabs that show unique and useful information regarding the state of your Project.
+
+## Summary
+The Model Summary Tab contains statistics about your Model and various Model Health Indicators. 
+
+At the top are three global statistics of your Model:
+1. `Total Elements`: This gives you the total number of Objects in your Model.
+2. `Depth`: This gives you the maximum depth of your Model. How many layers are in your Model. 
+3. `Average Connectedness`: This stat tells you, on average, how many Object connections a given Model Object is likely to have. In our screenshot below, the average Object in our Model is connected to 0.6 other Objects.
+
+<Frame>
+    <img noZoom src="/images/Model-Summary.png" /> 
+</Frame>
+
+### Renaming a Project
+At the top of the Model Summary screen, you will see the name of your Project in a text box. 
+
+Click in the box and begin typing to rename your project. Press Enter or click outside of the box to save.
+
+### Object Type Distribution
+The Object Type Distribution graph is a visual representation of the elements that make up your Model. It also includes a statistical breakdown of the elements in your model.
+
+Click on `Details` to get a tabluated view of the statistics.
+
+### Relationship Types
+Relationship Types shows you a total count of all Relationships in your Model. This should help give you a broad idea of how connected your Model components are to each other. They are broken down by Relationship Type.
+
+Click on `Details` to get a list view of the statistics.
+
+### Model Health
+The Model Health graph shows three summary metrics for your Model. 
+1. `Documentation`: This shows the percentage of Model Objects that have data in their Documentation field.
+2. `Completeness`: This statistic represents the validity of the data within the Model. Higher Completeness indicates valid, resolved data fields within Attributes and Constraints, and satisfied conditions for Requirements.
+3. `Validation`: Validation indicates how much of the Model is connected to other sources of data. Including documentation Reference Objects, referencing Attributes or other Objects, and Locking elements after reviewing them all contribute to a higher Validation Score.
+
+Click on `Details` to get a tabluated view of the statistics. Click `Open Live View` to pop the table out into a new window. This is convenient for quickly navigating your Model to correct any issues.
+
+### Export Model
+The Export Model section allows you to export your Model in 2 different formats:
+
+1. `JSON`: Export your Model entirely in JSON. This is useful if you want to re-import the Model into Davinci in the future, or for creating an offline archive.
+2. `SysML v2`: Export your Model in the standard SysML v2 standard format. Useful when interfacing with other tools that rely on SysML formatting to process data.
+
+<Warning>
+The SysML v2 export feature is in beta and does not fully support all features or object types yet.
+</Warning>
+
+
+## Snapshots
+Snapshots are used to save the current state of the Model at a point in time. Think of them like a save file in a video game. They can be used to restore the Model to a previous state, or archive past states for future reference.
+<Card title="Snapshots" horizontal icon="link" href="/v3.0.1/user-guide/overview/snapshots" >
+  Click here to read more about Snapshots
+</Card>
+
+## Collaborators
+The Collaborators Tab is used to manage Collaborators in this Project.
+<Card title="Collaboration" horizontal icon="link" href="/v3.0.1/user-guide/overview/collaboration" >
+  Click here to read more about Collaboration
+</Card>
+
+## Units
+The Units Tab allows you to define and manage custom Units if needed. 
+
+Click `Add Unit` to define a new Unit. A Unit Creation Wizard will pop up. Provide a symbol for the unit in the first line, and an optional description in the second line. Click `Add New Unit` at the bottom of the popup to save.
+
+Custom Units can be deleted by hovering over the Unit and clicking on the Trash button on the right side.
+
+<Warning>Deleting Custom Units that are being used in the Model may cause adverse effects on Model data.</Warning>
+
+## Relationships
+The Relationships Tab shows you all of the Relationship types available to your Model. It includes data such as directionality, color, and a description of the Relationship.
+
+## Files
+The Files Tab allows you to manage your Uploaded Files and Storage for Project.
+<Card title="Files" horizontal icon="link" href="/v3.0.1/user-guide/overview/files" >
+  Click here to read more about Files
+</Card>
