@@ -12,7 +12,7 @@ At the top are three global statistics of your Model:
 3. `Average Connectedness`: This stat tells you, on average, how many Object connections a given Model Object is likely to have. In our screenshot below, the average Object in our Model is connected to 0.6 other Objects.
 
 <Frame>
-    <img noZoom src="/images/Model-Summary.png" /> 
+    <img noZoom src="/images/model_summary.png" /> 
 </Frame>
 
 ### Renaming a Project
@@ -20,10 +20,18 @@ At the top of the Model Summary screen, you will see the name of your Project in
 
 Click in the box and begin typing to rename your project. Press Enter or click outside of the box to save.
 
+<Frame>
+    <img noZoom src="/images/project_rename.png" /> 
+</Frame>
+
 ### Object Type Distribution
 The Object Type Distribution graph is a visual representation of the elements that make up your Model. It also includes a statistical breakdown of the elements in your model.
 
 Click on `Details` to get a tabluated view of the statistics.
+
+<Frame>
+    <img noZoom src="/images/object_type_distribution.png" /> 
+</Frame>
 
 ### Relationship Types
 Relationship Types shows you a total count of all Relationships in your Model. This should help give you a broad idea of how connected your Model components are to each other. They are broken down by Relationship Type.
@@ -39,25 +47,30 @@ The Model Health graph shows three summary metrics for your Model.
 Click on `Details` to get a tabluated view of the statistics. Click `Open Live View` to pop the table out into a new window. This is convenient for quickly navigating your Model to correct any issues.
 
 ### Export Model
-The Export Model section allows you to export your Model in 2 different formats:
+The Export Model section allows you to export your Model in 3 different formats:
 
-1. `JSON`: Export your Model entirely in JSON. This is useful if you want to re-import the Model into Davinci in the future, or for creating an offline archive.
-2. `SysML v2`: Export your Model in the standard SysML v2 standard format. Useful when interfacing with other tools that rely on SysML formatting to process data.
+1. `Davinci Archive Format (.DAF)`: .DAF is the best way to export a Davinci model for archive, storage, or sharing with other Davinci users without collaboration. .DAF exports both regular model objects, as well as uploaded reference files. It is a true 1:1 export of the entire model.
+2. `JSON`: Export your Model entirely in JSON. JSON exporting will not include uploaded reference files. Only non-reference model object types will be included in this export.
+3. `SysML v2`: Export your Model in the standard SysML v2 standard format. Useful when interfacing with other tools that rely on SysML formatting to process data.
 
 <Warning>
 The SysML v2 export feature is in beta and does not fully support all features or object types yet.
 </Warning>
 
+<Frame>
+    <img noZoom src="/images/export_model.png" /> 
+</Frame>
+
 
 ## Snapshots
 Snapshots are used to save the current state of the Model at a point in time. Think of them like a save file in a video game. They can be used to restore the Model to a previous state, or archive past states for future reference.
-<Card title="Snapshots" horizontal icon="link" href="/v3.0.1/user-guide/overview/snapshots" >
+<Card title="Snapshots" horizontal icon="link" href="/pages/user-guide/overview/snapshots" >
   Click here to read more about Snapshots
 </Card>
 
 ## Collaborators
 The Collaborators Tab is used to manage Collaborators in this Project.
-<Card title="Collaboration" horizontal icon="link" href="/v3.0.1/user-guide/overview/collaboration" >
+<Card title="Collaboration" horizontal icon="link" href="/pages/user-guide/overview/collaboration" >
   Click here to read more about Collaboration
 </Card>
 
@@ -68,13 +81,13 @@ Click `Add Unit` to define a new Unit. A Unit Creation Wizard will pop up. Provi
 
 Custom Units can be deleted by hovering over the Unit and clicking on the Trash button on the right side.
 
-<Warning>Deleting Custom Units that are being used in the Model may cause adverse effects on Model data.</Warning>
+<Warning>Deleting Custom Units that are being used in the Model may cause errors with existing Model data.</Warning>
 
 ## Relationships
 The Relationships Tab shows you all of the Relationship types available to your Model. It includes data such as directionality, color, and a description of the Relationship.
 
 ## Files
 The Files Tab allows you to manage your Uploaded Files and Storage for Project.
-<Card title="Files" horizontal icon="link" href="/v3.0.1/user-guide/overview/files" >
+<Card title="Files" horizontal icon="link" href="/pages/user-guide/overview/files" >
   Click here to read more about Files
 </Card>

@@ -78,6 +78,16 @@
                                 ]
                             },
                             {
+                                "group": "The Right Panel",
+                                "pages": [
+                                    "pages/user-guide/right-panel/right-panel-overview",
+                                    "pages/user-guide/right-panel/agent-chat",
+                                    "pages/user-guide/right-panel/search-view",
+                                    "pages/user-guide/right-panel/comment-view",
+                                    "pages/user-guide/right-panel/validation-view"
+                                ]
+                            },
+                            {
                                 "group": "Extra Features",
                                 "pages": [
                                     "pages/user-guide/overview/snapshots",

@@ -2,15 +2,16 @@
 title: Artifact View
 ---
 
-## Description
+<img width="50" noZoom src="/images/artifact_icon.png" />
+
 The artifact view allows the user to edit the specific fields and structure of artifact objects (beyond the base properties). This view will dynamically respond to the type of artifact object (`table` or `document`) as well as any selections in that document, such as when selecting a table cell within a document.
 
 
-## Document Editing
+## Document
 Documents are structured using blocks which can be given different display types, such as a bulleted list, heading, or simple paragraph. These blocks can also be references to other artifact objects, like a table. In these blocks the editing panel will respond to what kind of object is being edited.
 
 <Frame>
-<img height="400" noZoom src="/images/workspace_example_document.jpg" /> 
+<img height="400" noZoom src="/images/workspace_example_document.png" /> 
 </Frame>
 
 When viewing a document type object or interacting with text blocks (in either tables or documents) the top panel will show editing features aimed for text operations and block inserts. 
@@ -22,24 +23,13 @@ Inside parargraph blocks references to objects can be added inline using `@` whi
 
 When inserting references the default is name field. To edit this right click the reference to change its display. Only `name` and `value` can be used. For `value` it will display both the resolved value and its unit.
 
-<Warning>If the document has any formatting issues, try rebuilding it by clicking on the artifact view again. This will also update any inline references.</Warning>
+<Warning>If the document has any formatting issues, try rebuilding it by clicking on the Artifact View Icon again. This will also update any inline references.</Warning>
 
-### Davinci Editing
-You can use Davinci to make inline edits by selecting a range of text. Once selected a popup will appear and selecting the edit icon will make a input window open to allow instructions to edit specific areas of the document.
-
-<Frame>
-<img height="400" noZoom src="/images/workspace_example_document_aiEdit.jpg" /> 
-</Frame>
-
-Normally the edits will consider the block selected. To consider other reference information you can add reference objects using the add reference button to the right of the input box. 
-
-<Note>Davinci will replace any selected blocks with new updated blocks when it is writing. Be sure to only select blocks that you want changes to occur in.</Note>
-
-## Table Editing
+## Table
 Table cells can be either text or a reference to an object. Text cells can have paragraphs or lists (bulleted or numbered) and include all the same text editing features as a document block. 
 
 <Frame>
-<img height="400" noZoom src="/images/workspace_example_table.jpg" /> 
+<img height="400" noZoom src="/images/workspace_example_table.png" /> 
 </Frame>
 
 <Note>During live collaboration only one user can edit a cell at a time.</Note>
@@ -49,3 +39,7 @@ For reference cells, the object and its field to display can be selected. The on
 The value of the reference cell can be directly edited from the top pane which updates the data in that object.
 
 <Info>Tables inside of documents will always default to max page width.</Info>
+
+## Matrix
+
+Matricies are similar to Tables, except their content is generated programatically 
