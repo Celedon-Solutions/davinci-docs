@@ -53,6 +53,18 @@
                         ]
                     },
                     {
+                        "dropdown": "Examples",
+                        "icon": "book-open",
+                        "groups": [
+                            {
+                                "group": "Examples",
+                                "pages": [
+                                    "examples/exampleOne"
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "dropdown": "User Guide",
                         "icon": "user",
                         "groups": [
