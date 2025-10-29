@@ -1,0 +1,45 @@
+---
+title: Artifact View
+---
+
+<img width="50" noZoom src="/images/artifact_icon.png" />
+
+The artifact view allows the user to edit the specific fields and structure of artifact objects (beyond the base properties). This view will dynamically respond to the type of artifact object (`table` or `document`) as well as any selections in that document, such as when selecting a table cell within a document.
+
+
+## Document
+Documents are structured using blocks which can be given different display types, such as a bulleted list, heading, or simple paragraph. These blocks can also be references to other artifact objects, like a table. In these blocks the editing panel will respond to what kind of object is being edited.
+
+<Frame>
+<img height="400" noZoom src="/images/workspace_example_document.png" /> 
+</Frame>
+
+When viewing a document type object or interacting with text blocks (in either tables or documents) the top panel will show editing features aimed for text operations and block inserts. 
+
+<Note>During live collaboration only one user can edit a given block at a time.</Note>
+
+
+Inside parargraph blocks references to objects can be added inline using `@` which will place the reference at the position. 
+
+When inserting references the default is name field. To edit this right click the reference to change its display. Only `name` and `value` can be used. For `value` it will display both the resolved value and its unit.
+
+<Warning>If the document has any formatting issues, try rebuilding it by clicking on the Artifact View Icon again. This will also update any inline references.</Warning>
+
+## Table
+Table cells can be either text or a reference to an object. Text cells can have paragraphs or lists (bulleted or numbered) and include all the same text editing features as a document block. 
+
+<Frame>
+<img height="400" noZoom src="/images/workspace_example_table.png" /> 
+</Frame>
+
+<Note>During live collaboration only one user can edit a cell at a time.</Note>
+
+For reference cells, the object and its field to display can be selected. The only fields allowed are `name`, `documentation` and `value`. 
+
+The value of the reference cell can be directly edited from the top pane which updates the data in that object.
+
+<Info>Tables inside of documents will always default to max page width.</Info>
+
+## Matrix
+
+Matricies are similar to Tables, except their content is generated programatically 

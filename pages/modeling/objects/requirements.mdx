@@ -1,0 +1,37 @@
+---
+title: Requirements
+---
+
+<img height="20" noZoom src="/images/objecticons/requirement.svg" />
+
+## Description
+Requirement objects are used to formally capture a project through logical evaluable statements. These objects are evaluated as true or false based on their owned objects being either true or false. For a requirement to be complete it must either own subrequirement(s) or a constraint object. 
+
+<Info>Requirement descriptions are modeled as shall statements by Davinci, but only the constraint objects are considered during evaluation.</Info>
+
+Requirements can have the following status:
+
+| Status | Description                           |
+| -------- | ------------------------------------- |
+| `TRUE`     | All owned constraints or subrequirement(s) are `TRUE`|
+| `FALSE`      | One or all of the owned constraints or subrequirement(s) are `FALSE` |
+| `INCOMPLETE`   | Unable to evaluate to either true or false |
+
+<Note>Object is incomplete if no constraint or subrequirement(s) exist or all subrequirement(s) are also incomplete.</Note>
+
+
+
+## Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Description" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Subject" type="reference">
+  The object which is the subject of the requirement.
+</ParamField>

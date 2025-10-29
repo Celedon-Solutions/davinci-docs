@@ -1,0 +1,43 @@
+---
+title: Geometry
+---
+
+<img height="20" noZoom src="/images/objecticons/action.svg" /> 
+
+## Description
+Actions describe the behavior of a system. This can be constructed using nested levels of actions to refine the action in detail. 
+
+
+<Info>As of the Beta, the actions are only described in the documentation and by its subactions.</Info>
+
+## Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Description" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Sequence" type="list">
+  List of owned action sequences that comprise the main action's flow. The list follows the format of:
+
+  `Action Name` `(instance)` -> `Action Name` `(instance)`
+
+  Where action name is a reference to a specific action and the instance refers to if the action is repeated during the flow. Instances can be given as numbers.
+
+  <Info>All objects of the same instance are assumed connected.</Info>
+  
+
+### Merged Flow
+    Merged actions can be described as:
+
+  `Action Name One` `()` `&&` `Action Name Two` `()` -> `Action Name Three` `()`
+
+### Branching Flow
+  Branching actions can be described as:
+
+  `Action Name One` `()` -> `Action Name Two` `()` `&&` `Action Name Three` `()`
+</ParamField>
