@@ -1,1 +1,268 @@
-# Test Example One
+---
+title: "Make a Systems Model from an OV-1 in 10 Minutes with Davinci"
+description: "Rapidly transform DODAF OV-1 diagrams into structured systems models using Davinci"
+icon: "diagram-project"
+---
+
+## Background
+
+### What is DODAF?
+
+The **Department of Defense Architecture Framework (DODAF)** is a comprehensive architecture framework developed by the U.S. Department of Defense to standardize the way complex systems and architectures are described, communicated, and analyzed. DODAF provides a common approach for organizing and presenting architecture descriptions to ensure consistency and interoperability across defense programs and initiatives.
+
+<Note>
+DODAF Version 2.02 is the current standard, though many organizations still reference earlier versions. The framework is structured around **viewpoints** that organize architectural data into meaningful perspectives for different stakeholders.
+</Note>
+
+### Why is DODAF Important?
+
+DODAF serves several critical purposes in defense and systems engineering:
+
+1. **Standardization**: Provides a common language for describing architectures across different programs, services, and organizations
+2. **Interoperability**: Ensures systems can work together by establishing clear interfaces and data exchanges
+3. **Decision Support**: Enables informed decision-making through structured analysis and visualization of complex systems
+4. **Compliance**: Required for many DoD acquisition programs and serves as a basis for architecture reviews and assessments
+5. **Communication**: Facilitates clear communication between stakeholders including engineers, program managers, operators, and leadership
+6. **Lifecycle Management**: Supports systems from concept through development, deployment, and sustainment
+
+<Warning>
+Many DoD contracts and federal programs mandate DODAF compliance. Organizations working in defense, intelligence, and related sectors often must produce DODAF-compliant documentation as deliverables.
+</Warning>
+
+### What is the OV-1 (Operational View - High Level Operational Concept Graphic)?
+
+The **OV-1** is one of the most fundamental and widely-used DODAF products. It provides a high-level graphical/textual description of the operational concept, showing:
+
+- **Mission Context**: The overarching mission or operational scenario
+- **Operational Nodes**: Organizations, command centers, or operational facilities involved
+- **Systems and Platforms**: Major weapon systems, sensors, communications systems, and platforms
+- **Information Flows**: Key information exchanges and command/control relationships
+- **Activities**: Primary operational activities or tasks being performed
+- **Geographic Context**: Sometimes includes operational areas or deployment locations
+
+The OV-1 is typically presented as a single diagram that tells the "story" of how an operation or capability works at the highest level.
+
+#### Examples of OV-1 Diagrams
+
+OV-1 diagrams vary in style, complexity, and presentation depending on the program and operational context. Here are examples showing different approaches:
+
+<Frame>
+  <img src="/images/Joint_Task_Force_Concept_of_Operations_(OV-1).jpg" alt="Navy Concept for Strike OV-1 showing operational strike concept with aircraft, ships, and targeting operations" />
+</Frame>
+
+*Example 1: Navy Concept for Strike - A notional OV-1 showing coordinated strike operations across maritime and land domains. Note the visual depiction of platforms (aircraft, ships), targeting operations (fixed, moving, mobile targets), and information flows between operational elements.*
+
+<Frame>
+  <img src="/images/Example_OV-1_for_NCOW.jpg" alt="Warfighting in Southwest Asia OV-1 showing tactical operations with Net-Centric Information Domain" />
+</Frame>
+
+*Example 2: Warfighting in Southwest Asia Tactical Use Case - An OV-1 depicting Special Operations Forces (SOF) operations including Direct Action, Armed Reconnaissance, and integration with Net-Centric Information Domain. Shows the relationship between tactical operations (JSOAC) and intelligence sources (CIA, DIA, NSA, JSOTF).*
+
+<Note>
+OV-1 diagrams can range from simple conceptual sketches to detailed, multi-layered operational graphics. Davinci can extract structured models from any of these styles, regardless of visual complexity or format.
+</Note>
+
+### Why is the OV-1 Important?
+
+The OV-1 serves as the **executive summary** of an architecture:
+
+1. **First Impression**: Often the first artifact stakeholders see; sets the context for all other views
+2. **Stakeholder Communication**: Designed to be understandable by both technical and non-technical audiences
+3. **Concept Validation**: Helps validate that all stakeholders share a common understanding of the operational concept
+4. **Requirements Traceability**: Establishes the operational context from which requirements flow
+5. **Foundation for Detail**: Provides the framework that more detailed views (OV-2, OV-5, SV-1, etc.) expand upon
+6. **Briefing Tool**: Frequently used in program reviews, capability assessments, and stakeholder briefings
+
+<Tip>
+OV-1 diagrams often exist in various fidelity levels - from rough concept sketches to formally released and baselined artifacts. Davinci can help transform informal diagrams into structured, traceable architecture models regardless of their source format.
+</Tip>
+
+## Step 1: Upload Your OV-1 Diagram
+
+To begin analyzing your OV-1 DODAF artifact:
+
+1. **Open the Davinci Webapp** in your web browser
+2. **Start a new Project** or continue an existing one
+3. **Upload your OV-1 diagram** by:
+   - Clicking the upload/attachment icon in the chat input area, or
+   - Clicking the upload/attachment icon in the library section, or
+   - Dragging and dropping your image file directly into the chat
+   - Supported formats: PNG, JPG, JPEG, SVG, PDF
+
+<Tip>
+Ensure your OV-1 diagram is clear and readable. Higher resolution images provide better analysis results.
+</Tip>
+
+## Step 2: Prompt Davinci
+
+Once you've uploaded your OV-1 diagram, you can use various prompts to extract information and create structured models:
+
+### Example Prompts
+
+**Create a Basic Parts Tree:**
+```
+Create a parts tree based on the ov-1 here "@Ov-1".
+```
+
+**Create Structured Model:**
+```
+Based on this OV-1 diagram, create a Davinci model that includes:
+- The mission statement as a Requirement
+- Each operational node as an Entity
+- The tasks shown in the diagram
+- Relationships between components
+```
+
+**Extract Specific Information:**
+```
+From this OV-1 diagram, extract and document:
+1. The mission statement and desired effects
+2. All weapon systems and platforms identified
+3. The operational tasks and their relationships
+4. C2ISR components and their interactions
+```
+
+**Generate Documentation:**
+```
+Generate a comprehensive documentation package from this OV-1 that includes:
+- System overview
+- Operational concept description
+- Component descriptions
+- Interface definitions
+```
+
+## Step 3: Review and Refine Results
+
+The Davinci will analyze your OV-1 diagram and provide structured results:
+
+### What to Expect
+
+**1. Model Elements Created:**
+- **Parts**: Logical pieces of systems or system of systems
+- **Requirements**: Mission statements, operational objectives, desired effects
+- **Entities**: Operational nodes, weapon systems, platforms, C2ISR components
+- **Actions**: Operational tasks and activities (e.g., Detect, Fuse, Allocate, Engage, Assess)
+- **References**: Relationships and information flows between components
+- **Documentation**: Descriptions and context for each element
+
+**2. Structured Tables:**
+The agent will organize information into tables showing:
+- Component hierarchies
+- Task sequences
+- System relationships
+- Capability mappings
+
+**3. Relationships and Interfaces:**
+- Information exchanges between nodes
+- Command and control relationships
+- Data flows and dependencies
+
+### Refining the Results
+
+You can iteratively improve the model by:
+
+```
+Add more detail to the [Entity Name] entity based on the diagram's 
+system descriptions.
+```
+
+```
+Create interface definitions for the data flows between GPS and 
+Recon/Surveillance components.
+```
+
+```
+Organize the weapon systems into a package hierarchy reflecting the 
+operational architecture.
+```
+
+## Example Use Case
+
+Consider an OV-1 diagram showing a Joint Network Enabled Weapon system with:
+
+- **Mission**: Blue Force conducts joint forcible entry operations
+- **Desired Effects**: Reduce combat effectiveness, enhance blue combat effectiveness, seize/control terrain
+- **Operational Nodes**: Airborne C2, GPS, Sensor Grid, Recon/Surveillance, Weapon systems
+- **Tasks**: CAS operations (Detect, Fuse, Allocate, Engage, Assess)
+
+<Frame>
+  <img src="/images/Uploaded_Ov-1.png" alt="OV-1 DODAF diagram showing Joint Network Enabled Weapon (NEW) Capability Operational Concept" />
+</Frame>
+
+*Figure 1: Example OV-1 diagram showing the Joint Network Enabled Weapon OV-1 within Davinci*
+
+### Sample Interaction
+
+**User uploads OV-1 diagram and prompts:**
+
+<Frame>
+  <img src="/images/Ov-1_Prompt.png" alt="Davinci prompt showing user request to create parts tree from OV-1 diagram" />
+</Frame>
+
+*Figure 2: Prompting the Davinci to create a parts tree from the OV-1 diagram*
+
+**Davinci Response:**
+The agent will create a parts tree based on the OV-1 diagram, organizing the system components hierarchically:
+- Top-level system (Joint Network Enabled Weapon System)
+- Major subsystems (Airborne C2, GPS, Sensor Grid, Recon/Surveillance, Weapon platforms, etc.)
+- Component relationships reflecting the operational architecture
+
+<Frame>
+  <img src="/images/OV-1_Parts_Tree.png" alt="Generated parts tree showing hierarchical structure of Joint Network Enabled Weapon system components" />
+</Frame>
+
+*Figure 3: Resulting parts tree generated by Davinci from the OV-1 diagram, showing the hierarchical organization of system components*
+
+## Why This Matters
+
+Transforming OV-1 diagrams into structured Davinci models delivers critical value throughout the system lifecycle:
+
+**Speed & Efficiency**: What traditionally takes hours or days of manual transcription now happens in minutes. Systems engineers can rapidly convert legacy diagrams, proposal graphics, or stakeholder sketches into working models without tedious data entry.
+
+**From Static to Dynamic**: OV-1 diagrams are typically static images locked in PowerPoint or PDF files. Davinci transforms them into living, queryable models that can be analyzed, traced, versioned, and evolved as the architecture matures. Components become traceable objects with relationships, attributes, and requirements linkages.
+
+**Early Program Acceleration**: During critical early phases—concept development, Analysis of Alternatives, proposal response—teams need to rapidly iterate on architectural concepts. Davinci enables fast exploration of alternatives by quickly generating baseline models that stakeholders can refine and compare.
+
+**Reduces Error & Rework**: Manual transcription introduces errors and inconsistencies. Automated extraction from source artifacts ensures fidelity to the original diagram while creating a structured foundation that reduces costly rework later in the program lifecycle.
+
+<Warning>
+Programs that delay creating structured models often face significant technical debt. Converting static diagrams into Davinci models early establishes a traceable foundation that supports requirements analysis, interface definition, and integration planning.
+</Warning>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Image Quality" icon="image">
+    Use high-resolution images with clear text and legible annotations
+  </Card>
+  
+  <Card title="Context" icon="message">
+    Provide additional context about the operational scenario in your prompts
+  </Card>
+  
+  <Card title="Iterative" icon="arrows-rotate">
+    Start with broad analysis, then refine specific components
+  </Card>
+  
+  <Card title="Verification" icon="check">
+    Review generated elements against the source diagram for accuracy
+  </Card>
+</CardGroup>
+
+## Tips for Better Results
+
+1. **Be Specific**: Reference specific components or areas of the diagram in your prompts
+2. **Break It Down**: For complex diagrams, analyze sections independently
+3. **Validate**: Cross-check generated models against the source diagram
+4. **Enhance**: Add additional attributes and relationships not visible in the diagram
+
+## Next Steps
+
+After creating your initial model from the OV-1:
+
+- **Add Detail**: Enhance entities with attributes, constraints, and detailed requirements
+- **Link Artifacts**: Connect to other architectural views and documentation
+- **Generate Reports**: Use Davinci's export features to create deliverable documentation
+
+
+
