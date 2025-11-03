@@ -1,6 +1,6 @@
 ---
-title: "Perform Technical Decomposition from PDFs with Davinci in 15 minutes"
-description: "Transform technical documents into structured system models with requirements, parts, and relationships"
+title: "Technical Decomposition from PDFs"
+description: "Transform technical documents into structured system models with requirements, parts, and relationships using Davinci in under 15 minutes"
 icon: "file-lines"
 ---
 
@@ -73,12 +73,13 @@ Technical documents come from various sources throughout the program lifecycle:
 - Integration guides
 
 <Tip>
-PDF documents often contain tables, diagrams, and hierarchical structures that Davinci can interpret and convert into structured model elements. Even scanned documents can be processed if they have been OCR'd.
+PDF documents often contain tables, diagrams, and hierarchical structures that Davinci can interpret and convert into structured model elements. Even scanned documents can be processed if clear and legible.
 </Tip>
 
-## Step 1: Upload Your Technical PDF
+## Modeling with Davinci
+### Step 1: Upload Your Technical PDF
 
-In this example, we'll use a **Phoenix CubeSat proposal document** for an urban heat island detection mission. This 3U CubeSat specification includes system architecture, subsystem descriptions (Structure, Power, ADCS, Communications, Thermal Imaging Payload), dispersed requirements throughout the document, and interface definitions.
+In this example, we'll use a **[Phoenix CubeSat proposal document](https://phxcubesat.asu.edu/resources/documents)** for an urban heat island detection mission. This 3U CubeSat specification includes system architecture, subsystem descriptions (Structure, Power, ADCS, Communications, Thermal Imaging Payload), dispersed requirements throughout the document, and interface definitions.
 
 To begin technical decomposition in Davinci:
 
@@ -118,7 +119,7 @@ To begin technical decomposition in Davinci:
 For large documents (100+ pages), consider uploading one section at a time or asking Davinci to focus on specific chapters or sections. This improves processing speed and result quality.
 </Tip>
 
-## Step 2: Prompt Davinci for Decomposition
+### Step 2: Prompt Davinci for Decomposition
 
 Once you've uploaded your technical PDF, use prompts to extract structured information. For the Phoenix CubeSat example, start with the system hierarchy:
 
@@ -158,7 +159,7 @@ Please now make requirements based on @phoenix_proposal_fall2015
 
 *Example of expanding the model - extracting requirements from the dispersed information in the proposal*
 
-### Other Prompt Patterns
+#### Other Prompt Patterns
 
 You can adapt these patterns for your own documents:
 
@@ -178,11 +179,11 @@ Create a complete system model including parts tree, requirements,
 key performance parameters, and interface definitions
 ```
 
-## Step 3: Review and Refine Results
+### Step 3: Review and Refine Results
 
 Davinci will analyze your PDF and provide structured results:
 
-### What to Expect
+#### What to Expect
 
 **1. Model Elements Created:**
 - **Parts**: System, subsystems, components organized hierarchically, with relationships
@@ -202,7 +203,7 @@ Davinci organizes extracted information into:
 - Page numbers and context for verification
 - Linkages between requirements and implementing components
 
-### Source Traceability - A Critical Feature
+#### Source Traceability - A Critical Feature
 
 One of Davinci's most powerful capabilities is its ability to **trace every extracted element back to its source** in the original PDF. This isn't just a page number reference—Davinci can highlight the exact text and context it used to create each model element.
 
@@ -211,6 +212,10 @@ One of Davinci's most powerful capabilities is its ability to **trace every extr
 </Frame>
 
 *Davinci highlights the specific section of the source document used to extract information, enabling rapid verification and validation*
+
+<Note>
+The text highlight will show exact text if 1:1 with the source document and if that source has text content. If referencing an image or scanned PDF, it will only navigate to the page.
+</Note>
 
 **Why Source Traceability Matters:**
 
@@ -224,7 +229,7 @@ One of Davinci's most powerful capabilities is its ability to **trace every extr
 This level of traceability transforms Davinci from a convenience tool into a mission-critical capability for regulated industries and high-reliability systems where documentation provenance is essential.
 </Info>
 
-### Refining the Results
+#### Refining the Results
 
 You can iteratively improve the model by:
 
@@ -262,7 +267,7 @@ Technical debt accumulates when organizations delay creating structured models. 
 
 <CardGroup cols={2}>
   <Card title="Document Quality" icon="file-check">
-    Use high-quality PDFs with clear text (not scanned images unless OCR'd)
+    Use high-quality PDFs with clear text
   </Card>
   
   <Card title="Section Focus" icon="crosshairs">
