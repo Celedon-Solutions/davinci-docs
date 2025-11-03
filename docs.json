@@ -48,19 +48,6 @@
                         ]
                     },
                     {
-                        "dropdown": "Examples",
-                        "icon": "book-sparkles",
-                        "groups": [
-                            {
-                                "group": "Examples",
-                                "pages": [
-                                    "examples/OV1_example",
-                                    "examples/Technical_Decomposition_Example"
-                                ]
-                            }
-                        ]
-                    },
-                    {
                         "dropdown": "User Guide",
                         "icon": "user",
                         "groups": [
@@ -153,6 +140,19 @@
                                 "pages": [
                                     "pages/user-guide/design-agent/agents",
                                     "pages/user-guide/design-agent/tips"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Examples",
+                        "icon": "book-sparkles",
+                        "groups": [
+                            {
+                                "group": "Examples",
+                                "pages": [
+                                    "examples/OV1_example",
+                                    "examples/Technical_Decomposition_Example"
                                 ]
                             }
                         ]
