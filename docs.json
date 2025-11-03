@@ -54,7 +54,7 @@
                             {
                                 "group": "Examples",
                                 "pages": [
-                                    "examples/OV1_example"
+                                    "examples/OV1_example",
                                     "examples/Technical_Decomposition_Example"
                                 ]
                             }
