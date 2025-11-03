@@ -54,7 +54,8 @@
                             {
                                 "group": "Examples",
                                 "pages": [
-                                    "examples/exampleOne"
+                                    "examples/exampleOne",
+                                    "examples/exampleTwo"
                                 ]
                             }
                         ]
