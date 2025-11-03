@@ -49,13 +49,13 @@
                     },
                     {
                         "dropdown": "Examples",
-                        "icon": "book-open",
+                        "icon": "book-sparkles",
                         "groups": [
                             {
                                 "group": "Examples",
                                 "pages": [
-                                    "examples/exampleOne",
-                                    "examples/exampleTwo"
+                                    "examples/OV1_example"
+                                    "examples/Technical_Decomposition_Example"
                                 ]
                             }
                         ]
