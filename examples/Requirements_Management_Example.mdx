@@ -1,0 +1,402 @@
+---
+title: "Requirements Management & Traceability"
+description: "Learn how to create, organize, and trace requirements in Davinci with powerful table views and model integration for comprehensive requirements management"
+icon: "list-check"
+---
+
+## Background
+
+### The Challenge of Requirements Management
+
+Requirements are the foundation of any system development effort. They define what the system must do, how it must perform, and what constraints it must satisfy. However, managing requirements effectively is notoriously difficult:
+
+- **Scattered Information**: Requirements exist in multiple documents, spreadsheets, and tools
+- **Poor Traceability**: Linking requirements to design elements and verification activities is manual and error-prone
+- **Change Impact**: Understanding how requirement changes affect the system is time-consuming
+- **Inconsistent Format**: Different stakeholders document requirements in different ways
+- **Version Control**: Tracking requirement changes across the project lifecycle is challenging
+
+<Warning>
+Traditional requirements management often involves juggling multiple tools—Word documents for specification, Excel spreadsheets for tracking, and separate databases for traceability. This fragmentation leads to gaps, inconsistencies, and lost information.
+</Warning>
+
+### Why Requirements Management in Davinci Matters
+
+Davinci provides an integrated approach to requirements management that connects requirements directly to your system model:
+
+1. **Single Source of Truth**: Requirements live in the same environment as your design model
+2. **Automatic Traceability**: Direct relationships between requirements and implementing components
+3. **Visual Organization**: Hierarchical requirement structures and table views for analysis
+4. **AI-Assisted Creation**: Extract requirements from documents or generate from high-level needs
+5. **Living Requirements**: Requirements that evolve with your design and maintain traceability
+
+<Info>
+In Davinci, requirements aren't isolated text statements—they're connected model elements that can be traced, analyzed, validated, and reported on alongside your system architecture.
+</Info>
+
+### Common Requirement Types
+
+Davinci can support organizing requirements across multiple categories:
+
+**Functional Requirements:**
+- System capabilities and behaviors
+- User interactions and workflows
+- Feature specifications
+- Operational scenarios
+
+**Performance Requirements:**
+- Speed, throughput, latency constraints
+- Capacity and scalability targets
+- Resource utilization limits
+- Timing and synchronization needs
+
+**Interface Requirements:**
+- Data formats and protocols
+- API specifications
+- Hardware interfaces
+- System boundaries and connections
+
+**Standards Requirements:**
+- Design limitations and restrictions
+- Regulatory and compliance mandates
+- Technology standards
+- Budget and schedule constraints
+
+<Tip>
+Organizing requirements by type, subsystem, or priority helps manage complexity and ensures comprehensive coverage of stakeholder needs.
+</Tip>
+
+## Modeling with Davinci
+
+### Step 1: Create Requirements in Davinci
+
+There are multiple ways to create requirements in Davinci, each suited to different workflows:
+
+#### Method 1: AI-Assisted Requirement Extraction from Documents
+
+An efficient way to populate your model with requirements is to extract them directly from specification documents. Upload a requirements document (PDF, Word, Excel) and ask Davinci to extract and organize the requirements for you.
+
+**Example: Extracting Requirements from a Mission Proposal**
+
+Let's say you have a mission proposal document that contains requirements scattered throughout sections on different subsystems. Simply reference the document and ask Davinci to create requirements:
+
+```
+Please now make requirements based on @phoenix_proposal_fall2016.pdf
+```
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_makeRequirementsPrompt.png" alt="Prompting Davinci to extract requirements from the Phoenix mission proposal PDF" />
+</Frame>
+
+*Prompting Davinci to extract requirements from a mission proposal document—just reference the PDF and ask*
+
+Davinci will read through the document, identify requirements across all sections, and create structured requirement objects in your model. The AI understands context and can extract requirements from narrative text, tables, specifications sheets, and technical descriptions.
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_displayRequirements.png" alt="Davinci displays the PDF alongside the extracted requirements organized in the model tree" />
+</Frame>
+
+*Davinci extracts requirements from the proposal and organizes them into a hierarchical structure—Command and Data Handling Requirements, Thermal Control Requirements, Ground Segment Requirements, Orbit Requirements, and more, all automatically categorized and ready for traceability*
+
+The extracted requirements are immediately added to your model tree with proper organization, complete with detailed text, and ready to be linked to your system components for full traceability.
+
+<Tip>
+You can extract requirements from any type of document—proposals, specifications, standards, SOWs (Statements of Work), or technical reports. Davinci can even extract from documents that mix requirements with other content like background information, diagrams, and analysis.
+</Tip>
+
+#### Method 2: Create Requirements from Lists
+
+Davinci can also work with simpler formats like requirements lists from spreadsheets, text files, or even pasted content:
+
+```
+Create requirements from this list:
+- The system shall operate at temperatures between -40°C and +85°C
+- The system shall consume less than 5W average power
+- The system shall communicate via RS-422 interface
+```
+
+This is useful when you have requirements in emails, meeting notes, or simple lists that need to be formalized into your model.
+
+#### Method 3: Generate Requirements from System Context
+
+If you already have a system model, generate requirements based on your design:
+
+```
+Generate performance requirements for the Power System subsystem 
+including voltage regulation, current capacity, and efficiency targets
+```
+
+#### Method 4: Manual Creation via Properties Panel
+
+You can also manually create requirements directly in the Davinci interface:
+
+1. **Open the New Object button** to see objects types that can be created
+2. **Select Requirement** to create a new Requirement object
+3. **Set requirement properties** including Documentation, Attributes, Constraints, Elements, and References.
+4. **Create relationships** to link requirements to implementing parts
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_manualRequirementsCreation.png" alt="Creating a requirement manually using the New Object button in Davinci" />
+</Frame>
+
+*Using the New Object button (+) to manually create a Requirement—select Requirement from the menu to add a new requirement object to your model*
+
+<Tip>
+For most projects, start with AI extraction from proposal or specification documents—this gives you the bulk of your requirements in minutes. Then refine with manual edits, generate additional requirements from your system model, or supplement with requirements from lists and other sources.
+</Tip>
+
+### Step 2: Organize and Structure Requirements
+
+Once requirements are created, organize them into a logical hierarchy:
+
+#### Hierarchical Organization
+
+Requirements can be nested to show decomposition from high-level system requirements down to detailed component requirements:
+
+```
+Create a requirement hierarchy starting with mission-level requirements, 
+decomposing to system requirements, and then to subsystem requirements 
+for each major component
+```
+
+**Example Structure (from Phoenix Mission):**
+- **Mission Requirements** (Top Level)
+  - Urban Heat Island Investigation Requirements
+  - Thermal Imaging Coverage Requirements
+  - High-Resolution Imaging Deliverables
+    - Minimum Imaging Requirements
+    - Maximum Imaging Requirements
+  - Minimum Mission Duration Requirements
+  - Science Requirements
+  - System Requirements
+  - Payload Requirements
+    - Power Subsystem Requirements
+    - Solar Panel Type Requirements
+  - Battery Configuration Requirements
+  - Ground Segment Requirements
+  - Orbit Requirements
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsHierarchy.png" alt="Hierarchical requirement structure showing decomposition from mission to subsystem level" />
+</Frame>
+
+*Visual diagram showing the Phoenix 3U CubeSat Mission Requirements hierarchy with Science Requirements as a child and multiple specific requirements including Ecosystem Change Detection, Human Activity Influence Study, Recurring Coverage, Thermal Variation Study, and more—all organized in a logical structure for comprehensive coverage*
+
+### Step 3: Link Requirements to the Model
+
+The true power of requirements in Davinci comes from connecting them to your system model:
+
+#### Creating Traceability Links
+
+Link requirements to the parts that satisfy them:
+
+```
+Create relationships between the parts and requirements in the model.
+```
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_linkRequirementsPrompt.png" alt="Prompting Davinci to create relationships between parts and requirements" />
+</Frame>
+
+*Asking Davinci to create traceability relationships—simply prompt the AI to link parts and requirements, and it will create the appropriate connections*
+
+Once you prompt Davinci, it will analyze your model and create relationships between components and the requirements they satisfy:
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsRelationships.png" alt="Requirement properties showing in/out relationships to system parts and subsystems" />
+</Frame>
+
+*You can also view relationships directly in the requirement’s properties panel—showing In, Out, and In-Out connections to specific parts, subsystems, and other model elements*
+
+### Step 4: Leverage Table Views for Requirements
+
+One of Davinci's most powerful features for requirements management is the **Table View**, which provides spreadsheet-like functionality for viewing and analyzing requirements:
+
+#### Accessing Table Views
+
+1. **Select a Requirement** in the MODEL section
+2. **View the table layout** showing all requirements
+3. **Customize columns** to show the requirement attributes you need
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsTableView.png" alt="Table view showing Phoenix requirements with Name and Documentation columns" />
+</Frame>
+
+*Table view displaying all Phoenix 3U CubeSat Mission Requirements in a spreadsheet-like format—showing the requirement names and full documentation text for easy review, analysis, and stakeholder presentations*
+
+#### Table View Capabilities
+
+
+**Bulk Operations:**
+- Review multiple requirements simultaneously
+- Export to Excel or CSV for stakeholder reviews
+- Update requirement attributes across multiple items
+- Identify gaps and inconsistencies
+
+**Digital Thread Visualization:**
+
+Beyond tables, Davinci provides a powerful **Digital Thread** view that visually shows how requirements connect to parts and components throughout your system:
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsDigitalThread.png" alt="Digital thread view showing Battery Configuration Requirement traced to parts and components" />
+</Frame>
+
+*Digital Thread view showing the Battery Configuration Requirement and its traceability connections—visualizing how the requirement flows through multiple system levels from high-level specifications down to individual components and parts*
+
+This visual traceability diagram reveals:
+
+- **Direct Relationships**: See orange connection lines showing how requirements link to satisfying components
+- **Multi-Level Tracing**: Follow requirements through system hierarchy from top-level specifications to detailed parts
+- **Impact Visualization**: Instantly understand which parts are affected by each requirement
+- **Completeness Checking**: Identify requirements without implementing parts or parts without requirements
+- **Change Impact Analysis**: Visually trace how requirement changes ripple through the system
+
+The Davinci Agent automatically analyzes the traceability and provides insights on:
+- Requirements Verification: Each requirement traced to specific implementing parts
+- Impact Analysis: Changes to parts traced back to affected requirements  
+- Completeness Checking: Identifying requirements without implementing parts or parts without requirements
+- Design Validation: Verifying all requirements have corresponding design elements
+- Documentation: Automatically generating traceability matrices and verification documents
+
+<Tip>
+Use the Digital Thread view during design reviews to demonstrate complete traceability, during change impact analysis to assess affected components, and for stakeholder communication to visually explain how requirements are satisfied by the system design.
+</Tip>
+
+#### Verification via Requirement Values (Constraints)
+
+Beyond relationships, each requirement can include a computable Value expression that Davinci evaluates to drive verification tracking. Values support quantitative checks and resolve to one of four states: TBD, Error, FALSE, or TRUE.
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_Constraints.png" alt="Requirement with a TBD value expression used for verification" />
+</Frame>
+
+*TBD: requirement value or measurement is not yet provided—verification pending*
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_ConstraintsError.png" alt="Requirement value expression showing Error state when expression is invalid" />
+</Frame>
+
+*Error: expression cannot be evaluated (e.g., malformed units or syntax)—fix before verification*
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_ConstraintsFalse.png" alt="Requirement value expression evaluated to FALSE (does not meet requirement)" />
+</Frame>
+
+*FALSE: measured/entered value does not satisfy the requirement—verification failed*
+
+<Frame>
+  <img src="/images/Requirements_Management_and_Traceability_ConstraintsTrue.png" alt="Requirement value expression evaluated to TRUE (meets requirement)" />
+</Frame>
+
+*TRUE: requirement satisfied—verification passed*
+
+Use table views to sort and filter by these states to create a live verification dashboard, and link references to source documents, tests, or analyses directly in each requirement.
+
+### Step 5: Analyze and Report on Requirements
+
+With requirements structured in Davinci, perform powerful analysis:
+
+#### Coverage Analysis
+
+```
+Show me which requirements are not yet satisfied by any component
+```
+
+This identifies gaps in your design where requirements aren't being addressed.
+
+#### Impact Analysis
+
+```
+What components would be affected if requirement REQ-SYS-042 changes?
+```
+
+Trace forward from requirements to see design impact of requirement changes.
+
+#### Completeness Check
+
+```
+Generate a report showing requirement coverage by subsystem with 
+verification status
+```
+
+## Why This Matters
+
+Integrating requirements directly into your Davinci model delivers transformative value:
+
+**End-to-End Traceability**: From stakeholder needs through requirements to design components to verification activities—all connected in a single model. No more maintaining separate traceability matrices by hand.
+
+**Living Requirements**: Requirements evolve with your design. When you update the model, traceability is maintained automatically. When requirements change, impact analysis is immediate.
+
+**Validation & Verification**: Table views make it easy to track which requirements have been verified, which tests cover which requirements, and where verification gaps exist.
+
+**Stakeholder Communication**: Generate requirement views, traceability matrices, and compliance reports directly from the model—always up-to-date and consistent with your design.
+
+<Warning>
+Without integrated requirements management, traceability becomes a documentation burden that falls behind the actual design. Teams spend weeks before reviews scrambling to update traceability matrices instead of doing valuable engineering work.
+</Warning>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Clear Requirement IDs" icon="hashtag">
+    Use consistent ID schemes (REQ-SYS-001, REQ-PWR-042) that indicate type and system
+  </Card>
+  
+  <Card title="Verification Methods" icon="vial">
+    Assign verification methods (Test, Analysis, Inspection, Demo) to every requirement
+  </Card>
+  
+  <Card title="Maintain Traceability" icon="link">
+    Create "satisfies" relationships as you develop the design, not as an afterthought
+  </Card>
+  
+  <Card title="Regular Reviews" icon="calendar">
+    Use table views for periodic requirements reviews with stakeholders
+  </Card>
+</CardGroup>
+
+## Tips for Better Requirements Management
+
+1. **Start with High-Level Requirements**: Begin with mission or stakeholder requirements, then decompose to system and subsystem levels
+2. **Use Requirement Templates**: Establish consistent statement formats ("The system shall..." for functional, "The system shall achieve..." for performance)
+3. **Link Early and Often**: Create traceability relationships as you build the model, not after the fact
+4. **Leverage AI for Extraction**: Let Davinci extract requirements from documents, then review and refine rather than starting from scratch
+5. **Track Verification Status**: Use table views to monitor verification progress throughout development
+6. **Export for Reviews**: Generate Excel exports from table views for stakeholder reviews and comments
+
+
+## Common Workflows
+
+
+
+### Design Impact Analysis
+
+1. **Select a requirement** that needs to change
+2. **View relationships** to see which components satisfy it
+3. **Trace to verification activities** to understand test impact
+4. **Assess effort** based on number of affected components
+5. **Document change rationale** in requirement attributes
+
+### Verification Planning
+
+1. **Create table view** showing requirements with verification method
+2. **Filter to "Test" verification method** to identify requirements needing test procedures
+3. **Link test specifications** to requirements using "verifies" relationships
+4. **Track completion** as tests are executed
+5. **Generate verification matrix** showing requirement verification status
+
+## Next Steps
+
+After establishing your requirements in Davinci:
+
+- **Enrich with Details**: Add rationale, assumptions, and notes to each requirement
+- **Link Verification Artifacts**: Connect test procedures, analysis reports, and inspection criteria
+- **Create Derived Requirements**: Decompose high-level requirements into implementable specifications
+- **Monitor Compliance**: Use table views to track requirement status throughout the project lifecycle
+- **Generate Reports**: Export traceability matrices, coverage reports, and verification status for stakeholders
+- **Maintain as Living System**: Update requirements as the system evolves, maintaining traceability automatically
+
+<Info>
+Requirements in Davinci aren't static documents—they're living model elements that evolve with your design, maintain traceability automatically, and enable powerful analysis. This is requirements management done right.
+</Info>
+

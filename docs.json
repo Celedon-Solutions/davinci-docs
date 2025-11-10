@@ -152,7 +152,8 @@
                                 "group": "Examples",
                                 "pages": [
                                     "examples/OV1_example",
-                                    "examples/Technical_Decomposition_Example"
+                                    "examples/Technical_Decomposition_Example",
+                                    "examples/Requirements_Management_Example"
                                 ]
                             }
                         ]
