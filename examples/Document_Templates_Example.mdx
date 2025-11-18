@@ -145,7 +145,7 @@ Davinci will:
 
 *Fully populated System Design Document with model data automatically inserted into the template structure*
 
-### Method 2: Import an External Template
+{/* ### Method 2: Import an External Template
 
 If you have existing templates from your organization, tools like Microsoft Word, or previous programs, you can import them into Davinci.
 
@@ -213,6 +213,82 @@ all requirements in the model, not just leaves
 
 <Note>
 You can keep making changes as you see fit, edit the template or output rapidly; then, if needed, export back out to whatever file format you need.
+</Note> */}
+
+### Method 2: Import and Populate an Invoice Template
+
+Davinci can work with external document templates like invoices, quotes, and order forms—automatically populating them with data from your model.
+
+#### Step 1: Upload Your Invoice Template
+
+Start by uploading your existing invoice template document:
+
+1. **Open Davinci** and navigate to your project
+2. **Upload your invoice template** (.docx format recommended)
+3. **Reference the template** in the file library
+
+<Frame>
+  <img src="/images/examples/Document_templates_example/document_Templates_Imported_Template_Document.png" alt="Uploading an invoice template document into Davinci" />
+</Frame>
+
+*Uploading an existing invoice template with standard fields like part number, description, quantity, price, and totals*
+
+<Tip>
+Invoice templates work best with clearly labeled fields and table structures. You may include placeholders for: Header information (company name, invoice number, date), line item tables (part number, description, quantity, unit price, total), and summary sections (subtotal, tax, total due).
+</Tip>
+
+#### Step 2: Prompt Davinci to Populate the Invoice
+
+Tell Davinci to fill out the invoice using parts from your model:
+
+```
+Generate an invoice using @Invoice for all parts in the 
+@Power Subsystem. Include part numbers, descriptions, quantities, 
+and calculate unit prices based on the cost attribute.
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_5.png" alt="Prompting Davinci to generate an invoice using model data" />
+</Frame>
+
+*Instructing Davinci to populate the invoice template with part data from your system model*
+
+Davinci will:
+- Extract part numbers and names from the model
+- Pull descriptions from part documentation
+- Use quantity attributes or default to 1
+- Retrieve cost/price data from part attributes
+- Calculate line totals and grand totals automatically
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Imported_Template_Document_First.png" alt="Example of a completed invoice with part data, quantities, prices, and calculated totals" />
+</Frame>
+
+*Completed invoice with all fields populated from the model—part numbers, descriptions, quantities, unit prices, and automatically calculated totals*
+
+#### Step 3: Review and Adjust
+
+Review the generated invoice and make any necessary adjustments:
+
+```
+In the @Power_Subsystem_Invoice, update the Price for the 
+@Solar Panels to 2000 and recalculate the totals
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_6.png" alt="Refining invoice price and recalculating totals" />
+</Frame>
+
+*Making adjustments to price and having Davinci recalculate totals automatically*
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Imported_Template_Document_Second.png" alt="Refining invoice price and recalculating totals document" />
+</Frame>
+
+*Davinci successfully made adjustments to price and recalculated totals automatically*
+
+<Note>
+Once your invoice is finalized, export it as a Word document or PDF for distribution. The template remains in your library for future use with different subsystems or parts.
 </Note>
 
 ## Why This Matters
@@ -313,7 +389,7 @@ After establishing template-based documentation:
 - **Train Your Team**: Ensure team members understand how to generate and customize documents
 - **Integrate with Workflows**: Make document generation part of your regular design review process
 - **Customize for Stakeholders**: Create different template variants for technical vs. executive audiences
-- **Automate Reporting**: Set up regular document generation for status reports and dashboards
+- **Help Automate Reporting**: Set up regular document generation period for your team to create status reports and dashboards
 - **Maintain Living Documentation**: Regenerate key documents as the model evolves to keep documentation current
 
 <Info>
