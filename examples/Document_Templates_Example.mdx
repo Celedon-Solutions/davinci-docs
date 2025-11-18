@@ -1,0 +1,323 @@
+---
+title: "Document Generation with Templates"
+description: "Create and use customizable templates to automatically generate formatted documents, reports, and deliverables from your system model"
+icon: "file-contract"
+---
+
+## Background
+
+### The Challenge of Documentation
+
+Technical documentation is essential but time-consuming. Engineering teams spend countless hours creating and maintaining documents that must be:
+
+- **Consistent**: Following corporate or customer-mandated formats
+- **Complete**: Covering all required content sections and data
+- **Current**: Reflecting the latest model state and design decisions
+- **Compliant**: Meeting standards like MIL-STD, ISO, or contractual requirements
+- **Repetitive**: Generating similar documents across multiple programs or subsystems
+
+<Warning>
+Traditional documentation approaches create significant overhead. Engineers manually populate Word templates, copy data from models into documents, update figures, and struggle to keep documentation synchronized as designs evolve. This manual process is error-prone and often results in outdated documents that don't reflect the actual system state.
+</Warning>
+
+### Why Template-Based Document Generation Matters
+
+Davinci's template-based document generation transforms documentation from a manual burden into an automated capability:
+
+1. **On-Demand Population**: Tell Davinci to generate a document from a template and it populates with current model data
+2. **Consistency**: Templates ensure uniform formatting and structure across all deliverables
+3. **Living Documents**: Regenerate documents anytime to reflect the latest model state
+4. **Custom Formats**: Support any document structure—from design documents to compliance reports
+5. **Reusability**: Create once, reuse across projects with different model content
+6. **Efficiency**: Generate documents in seconds instead of hours or days
+
+<Info>
+Template-based generation creates a direct link between your system model and formal documentation. When the model changes, simply tell Davinci to regenerate the document—no manual data copying required.
+</Info>
+
+### Types of Documents You Can Generate
+
+Davinci can generate various document types using templates:
+
+**System Documentation:**
+- System Design Documents (SDD)
+- Architecture Description Documents
+- Interface Control Documents (ICD)
+- Technical Data Packages
+- Concept of Operations (CONOPS)
+
+**Requirements & Verification:**
+- System Requirements Specifications (SRS)
+- Requirements Traceability Matrices
+- Verification & Validation Reports
+- Test Procedures and Results
+- Compliance Documentation
+
+**Program Documentation:**
+- Technical Performance Measures (TPM) Reports
+- Design Review Packages
+- Stakeholder Briefings
+- Status Reports and Dashboards
+- Risk Assessment Reports
+
+**Standards-Based:**
+- MIL-STD-961E specifications
+- ISO 15288 documentation
+- DODAF architecture products
+- Agile documentation artifacts
+
+<Tip>
+Templates can include any combination of text, tables, figures, diagrams, and model data. You control the structure and formatting—Davinci handles the content population from your model.
+</Tip>
+
+## Modeling with Davinci
+
+### Method 1: Create a Template from Scratch
+
+Davinci can generate templates based on your requirements, creating the structure and placeholders you need.
+
+#### Step 1: Describe Your Documentation Needs
+
+Start by prompting Davinci to create a template that matches your requirements:
+
+**Example: System Design Document Template**
+
+```
+Create a document template for a System Design Document that includes:
+- Executive Summary
+- System Overview with architecture description
+- Subsystem descriptions (one section per part)
+- Requirements traceability table
+- Interface definitions
+- Performance parameters table
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_1.png" alt="Prompting Davinci to create a System Design Document template from requirements" />
+</Frame>
+
+*Prompting Davinci to generate a document template based on specific requirements*
+
+#### Step 2: Review the Generated Template
+
+Davinci creates a template with:
+- **Section structure**: Organized headings and subheadings
+- **Placeholder text**: Descriptive content showing what each section should contain
+- **Data fields**: Marked locations where model data will be inserted
+- **Tables**: Pre-formatted tables with column headers for model data
+- **Figure placeholders**: Locations for diagrams and visualizations
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Generated_Template.png" alt="Example of a generated template showing structure with sections, tables, and placeholders" />
+</Frame>
+
+*Generated template showing document structure with sections, data fields, and table placeholders*
+
+<Tip>
+**Best Practice: Store Templates in the Library** - Save your document templates in the project library for easy reuse and quick access. Once stored in the library, you can reference templates using the `@` symbol (e.g., `@SDD_Template`) and edit them manually to adjust formatting, add sections, or modify the structure before generating final documents.
+</Tip>
+
+#### Step 3: Generate a Document from the Template
+
+Once you have a template, generate a populated document:
+
+```
+Generate a System Design Document using the @System Design Document Template
+for the @CubeSat
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_2.png" alt="Prompting Davinci to generate a document using a specific template and model element" />
+</Frame>
+
+*Generating a document by referencing both the template and the model element to document*
+
+Davinci will:
+- Pull data from your model (the CubeSat system part and its children)
+- Populate all sections with relevant information
+- Generate tables with requirements, attributes, interfaces
+- Create diagrams showing system structure
+- Format everything according to the template
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Generated_Document_From_Template.png" alt="Example of a fully populated System Design Document with model data, tables, and diagrams" />
+</Frame>
+
+*Fully populated System Design Document with model data automatically inserted into the template structure*
+
+### Method 2: Import an External Template
+
+If you have existing templates from your organization, tools like Microsoft Word, or previous programs, you can import them into Davinci.
+
+#### Step 1: Upload Your Template Document
+
+Import your existing template file:
+
+1. **Open Davinci** and navigate to your project
+2. **Upload your template** (.docx, .xlsx, or .pdf format)
+3. **Reference the template** in the file library
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Imported_Template.png" alt="Uploading an external .xlsx template document into Davinci" />
+</Frame>
+
+*Uploading an existing Requirements template to use in Davinci*
+
+<Tip>
+External templates work best when they have clear section headers, consistent formatting, and well-defined table structures. Davinci can interpret the structure and map model data to appropriate sections.
+</Tip>
+
+#### Step 2: Prompt Davinci use the template to create a new artifact
+
+Tell Davinci how to populate the external template with your model data:
+
+```
+Please create a new Requirements List from @Basic Requirements Template 
+using @CubSat System Requirements
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_3.png" alt="Prompting Davinci use an external template to create a new artifact" />
+</Frame>
+
+*Instructing Davinci how to map your model data into the existing template structure*
+
+#### Step 3: Review and Regenerate
+
+Review the generated document and make adjustments:
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Imported_Template_First.png" alt="Davinci's first take at using the template" />
+</Frame>
+
+<Note>
+Only leaf requirements were mapped to the template, lets ask Davinci to include all the requirements!
+</Note>
+
+```
+In the @CubSat System Requirements List, please include 
+all requirements in the model, not just leaves
+```
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Prompt_4.png" alt="Refining a generated document by adding all requirements" />
+</Frame>
+
+*Iteratively refining the generated document by adding sections or modifying content*
+
+<Frame>
+  <img src="/images/examples/document_templates_example/Document_Templates_Imported_Template_Second.png" alt="Final Output after prompting Davinci for an update" />
+</Frame>
+
+*Final Output after prompting Davinci for an update*
+
+<Note>
+You can keep making changes as you see fit, edit the template or output rapidly; then, if needed, export back out to whatever file format you need.
+</Note>
+
+## Why This Matters
+
+Template-based document generation delivers transformative value throughout the program lifecycle:
+
+**Eliminate Manual Documentation**: What traditionally takes hours of copying, formatting, and updating now happens automatically in seconds. Engineers focus on design instead of document maintenance.
+
+**Always Current**: Generated documents reflect the actual model state—no risk of outdated documentation. When the model changes, simply regenerate the document.
+
+**Consistency Across Programs**: Create templates once, reuse them across multiple projects. Every document follows the same structure and quality standards.
+
+**Rapid Response**: Generate status reports, design reviews, or compliance documents on-demand for stakeholder meetings or milestone reviews.
+
+**Reduce Errors**: Automated population eliminates transcription errors and ensures traceability between documents and model elements.
+
+<Warning>
+Organizations that rely on manual documentation face significant risks: outdated documents that don't match the design, inconsistent formats across teams, and enormous effort required to update documentation when designs evolve.
+</Warning>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start Simple" icon="seedling">
+    Begin with basic templates covering common sections, then add complexity as needed
+  </Card>
+  
+  <Card title="Standardize Early" icon="ruler">
+    Create organizational templates early in the program to ensure consistency
+  </Card>
+  
+  <Card title="Version Templates" icon="code-branch">
+    Maintain template versions aligned with program phases or customer requirements
+  </Card>
+  
+  <Card title="Test with Real Data" icon="vial">
+    Generate test documents to validate templates before using for deliverables
+  </Card>
+</CardGroup>
+
+## Tips for Better Templates
+
+1. **Clear Section Headers**: Use descriptive headers that clearly indicate content purpose
+2. **Consistent Formatting**: Establish formatting standards (fonts, spacing, numbering) early
+3. **Flexible Structure**: Design templates that work for systems of different sizes or complexity
+4. **Include Examples**: Add sample content or annotations showing what belongs in each section
+5. **Document the Template**: Maintain notes on what model data maps to which template sections
+6. **Iterate and Improve**: Refine templates based on stakeholder feedback and document reviews
+
+## Common Workflows
+
+### Milestone Deliverable Generation
+
+1. **Select the template** for the required deliverable (SRR, PDR, CDR)
+2. **Reference the system** or subsystem being documented
+3. **Generate the document** and review for completeness
+4. **Export to Word** for final formatting touches and submission
+5. **Regenerate** if model changes before the milestone
+
+### Requirements Documentation
+
+1. **Create requirements template** with sections for each requirement category
+2. **Include traceability tables** linking requirements to implementing parts
+3. **Add verification sections** showing test procedures and results
+4. **Generate complete specification** directly from model
+5. **Update as requirements evolve** by regenerating the document
+
+### Interface Control Documents
+
+1. **Design template** with sections for each interface type (mechanical, electrical, data)
+2. **Include interface tables** showing connections, protocols, and specifications
+3. **Add diagrams** visualizing interface relationships
+4. **Generate ICD** for each major interface or subsystem boundary
+5. **Maintain consistency** across all ICDs using the same template
+
+### Status Reports
+
+1. **Create report template** with sections for progress, issues, and metrics
+2. **Link to model attributes** tracking technical performance measures
+3. **Include summary tables** showing requirement status, verification progress
+4. **Generate weekly or monthly** with updated model data
+5. **Track trends** by comparing generated reports over time
+
+### Proposal Writing
+
+1. **Build preliminary model** based on proposal requirements and concept design
+2. **Create proposal template** matching RFP section structure and compliance matrix
+3. **Generate technical volumes** with system architecture, requirements flow-down, and design descriptions
+4. **Include compliance tables** mapping proposal sections to RFP requirements
+5. **Update and regenerate** as the proposal evolves and team refines the technical approach
+6. **Export final documents** for integration with management and cost volumes
+
+## Next Steps
+
+After establishing template-based documentation:
+
+- **Build a Template Library**: Create templates for all common document types in your organization
+- **Train Your Team**: Ensure team members understand how to generate and customize documents
+- **Integrate with Workflows**: Make document generation part of your regular design review process
+- **Customize for Stakeholders**: Create different template variants for technical vs. executive audiences
+- **Automate Reporting**: Set up regular document generation for status reports and dashboards
+- **Maintain Living Documentation**: Regenerate key documents as the model evolves to keep documentation current
+
+<Info>
+Template-based document generation transforms documentation from a time-consuming burden into an automated asset. Your documentation becomes a living reflection of your system model—always current, always consistent, and always available.
+</Info>
+
+

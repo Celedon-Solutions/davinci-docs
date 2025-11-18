@@ -85,7 +85,7 @@ Please now make requirements based on @phoenix_proposal_fall2016.pdf
 ```
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_makeRequirementsPrompt.png" alt="Prompting Davinci to extract requirements from the Phoenix mission proposal PDF" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_makeRequirementsPrompt.png" alt="Prompting Davinci to extract requirements from the Phoenix mission proposal PDF" />
 </Frame>
 
 *Prompting Davinci to extract requirements from a mission proposal document—just reference the PDF and ask*
@@ -93,7 +93,7 @@ Please now make requirements based on @phoenix_proposal_fall2016.pdf
 Davinci will read through the document, identify requirements across all sections, and create structured requirement objects in your model. The AI understands context and can extract requirements from narrative text, tables, specifications sheets, and technical descriptions.
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_displayRequirements.png" alt="Davinci displays the PDF alongside the extracted requirements organized in the model tree" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_displayRequirements.png" alt="Davinci displays the PDF alongside the extracted requirements organized in the model tree" />
 </Frame>
 
 *Davinci extracts requirements from the proposal and organizes them into a hierarchical structure—Command and Data Handling Requirements, Thermal Control Requirements, Ground Segment Requirements, Orbit Requirements, and more, all automatically categorized and ready for traceability*
@@ -136,7 +136,7 @@ You can also manually create requirements directly in the Davinci interface:
 4. **Create relationships** to link requirements to implementing parts
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_manualRequirementsCreation.png" alt="Creating a requirement manually using the New Object button in Davinci" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_manualRequirementsCreation.png" alt="Creating a requirement manually using the New Object button in Davinci" />
 </Frame>
 
 *Using the New Object button (+) to manually create a Requirement—select Requirement from the menu to add a new requirement object to your model*
@@ -177,7 +177,7 @@ for each major component
   - Orbit Requirements
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsHierarchy.png" alt="Hierarchical requirement structure showing decomposition from mission to subsystem level" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_displayRequirementsHierarchy.png" alt="Hierarchical requirement structure showing decomposition from mission to subsystem level" />
 </Frame>
 
 *Visual diagram showing the Phoenix 3U CubeSat Mission Requirements hierarchy with Science Requirements as a child and multiple specific requirements including Ecosystem Change Detection, Human Activity Influence Study, Recurring Coverage, Thermal Variation Study, and more—all organized in a logical structure for comprehensive coverage*
@@ -195,7 +195,7 @@ Create relationships between the parts and requirements in the model.
 ```
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_linkRequirementsPrompt.png" alt="Prompting Davinci to create relationships between parts and requirements" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_linkRequirementsPrompt.png" alt="Prompting Davinci to create relationships between parts and requirements" />
 </Frame>
 
 *Asking Davinci to create traceability relationships—simply prompt the AI to link parts and requirements, and it will create the appropriate connections*
@@ -203,7 +203,7 @@ Create relationships between the parts and requirements in the model.
 Once you prompt Davinci, it will analyze your model and create relationships between components and the requirements they satisfy:
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsRelationships.png" alt="Requirement properties showing in/out relationships to system parts and subsystems" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_displayRequirementsRelationships.png" alt="Requirement properties showing in/out relationships to system parts and subsystems" />
 </Frame>
 
 *You can also view relationships directly in the requirement’s properties panel—showing In, Out, and In-Out connections to specific parts, subsystems, and other model elements*
@@ -219,7 +219,7 @@ One of Davinci's most powerful features for requirements management is the **Tab
 3. **Customize columns** to show the requirement attributes you need
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsTableView.png" alt="Table view showing Phoenix requirements with Name and Documentation columns" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_displayRequirementsTableView.png" alt="Table view showing Phoenix requirements with Name and Documentation columns" />
 </Frame>
 
 *Table view displaying all Phoenix 3U CubeSat Mission Requirements in a spreadsheet-like format—showing the requirement names and full documentation text for easy review, analysis, and stakeholder presentations*
@@ -238,7 +238,7 @@ One of Davinci's most powerful features for requirements management is the **Tab
 Beyond tables, Davinci provides a powerful **Digital Thread** view that visually shows how requirements connect to parts and components throughout your system:
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_displayRequirementsDigitalThread.png" alt="Digital thread view showing Battery Configuration Requirement traced to parts and components" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_displayRequirementsDigitalThread.png" alt="Digital thread view showing Battery Configuration Requirement traced to parts and components" />
 </Frame>
 
 *Digital Thread view showing the Battery Configuration Requirement and its traceability connections—visualizing how the requirement flows through multiple system levels from high-level specifications down to individual components and parts*
@@ -267,25 +267,25 @@ Use the Digital Thread view during design reviews to demonstrate complete tracea
 Beyond relationships, each requirement can include a computable Value expression that Davinci evaluates to drive verification tracking. Values support quantitative checks and resolve to one of four states: TBD, Error, FALSE, or TRUE.
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_Constraints.png" alt="Requirement with a TBD value expression used for verification" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_Constraints.png" alt="Requirement with a TBD value expression used for verification" />
 </Frame>
 
 *TBD: requirement value or measurement is not yet provided—verification pending*
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_ConstraintsError.png" alt="Requirement value expression showing Error state when expression is invalid" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_ConstraintsError.png" alt="Requirement value expression showing Error state when expression is invalid" />
 </Frame>
 
 *Error: expression cannot be evaluated (e.g., malformed units or syntax)—fix before verification*
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_ConstraintsFalse.png" alt="Requirement value expression evaluated to FALSE (does not meet requirement)" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_ConstraintsFalse.png" alt="Requirement value expression evaluated to FALSE (does not meet requirement)" />
 </Frame>
 
 *FALSE: measured/entered value does not satisfy the requirement—verification failed*
 
 <Frame>
-  <img src="/images/Requirements_Management_and_Traceability_ConstraintsTrue.png" alt="Requirement value expression evaluated to TRUE (meets requirement)" />
+  <img src="/images/examples/requirements_management_example/Requirements_Management_and_Traceability_ConstraintsTrue.png" alt="Requirement value expression evaluated to TRUE (meets requirement)" />
 </Frame>
 
 *TRUE: requirement satisfied—verification passed*

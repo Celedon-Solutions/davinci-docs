@@ -151,9 +151,11 @@
                             {
                                 "group": "Examples",
                                 "pages": [
+                                    "examples/index",
                                     "examples/OV1_example",
                                     "examples/Technical_Decomposition_Example",
-                                    "examples/Requirements_Management_Example"
+                                    "examples/Requirements_Management_Example",
+                                    "examples/Document_Templates_Example"
                                 ]
                             }
                         ]
