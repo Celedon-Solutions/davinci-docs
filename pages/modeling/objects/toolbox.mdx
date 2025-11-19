@@ -1,0 +1,54 @@
+---
+title: Toolbox
+---
+
+<img height="20" noZoom src="/images/objecticons/toolbox.svg" />
+
+## Description
+Toolboxes allow the Davinci Agent to connect to any publicly available API to retrieve data for use in the model. The default toolbox retrieves weather data from weather.gov as an example for how to use toolboxes.
+
+<Info>Toolboxes need to be enabled from the Toolbox View in order to be used by the agent.</Info>
+
+## Creating Tools
+Tools are created by defining Python functions that the agent can execute. These functions can include operations and connections to external APIs.
+
+### Defining a Tool
+To create a tool, call the `davinci.tool()` function immediately before defining your asynchronous function. The function's name serves as the tool's identifier for the agent.
+
+```python
+davinci.tool()
+async def get_alerts(state: str) -> str:
+```
+
+### Tool Description and Arguments
+The agent understands how to use the tool through the function's docstring.
+- **Description**: The text at the top of the docstring explains the tool's purpose.
+- **Args**: The `Args:` section specifies the expected input parameters.
+
+```python
+    """Get weather alerts for a US state.
+
+    Args:
+        state: Two-letter US state code (e.g. CA, NY)
+    """
+```
+
+## Testing
+Toolboxes include a testing function to verify that connections are successful and arguments are passed correctly.
+
+Users can run tests by:
+1. Entering specific instructions in the input field within the Toolbox Testing Area (e.g., "Get weather alerts for CA").
+2. Clicking the **Run Test** button.
+
+This allows for the validation of API connections and logic before the tool is used in the model.
+
+## Fields
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Description" type="string">
+  Description of the object.
+</ParamField>
+

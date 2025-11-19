@@ -2,42 +2,75 @@
 title: Reference
 ---
 
-<img height="20" noZoom src="/images/objecticons/action.svg" /> 
+<img height="20" noZoom src="/images/objecticons/reference.svg" />
 
 ## Description
-Actions describe the behavior of a system. This can be constructed using nested levels of actions to refine the action in detail. 
+Reference objects allow users to upload data directly into their Davinci system model. This is useful for keeping all data sources in one location, and for access by the agent. 
 
+When the agent uses reference objects to generate or modify other model objects, it will create reference relationships between the reference object. This relationship will describe where in the reference object it found the information that it used.
 
-<Info>As of the Beta, the actions are only described in the documentation and by its subactions.</Info>
+Files can be uploaded and added as Reference Objects to the model by dragging and dropping the file into Davinci when a project is open, or by uploading with the upload button in the Library Index header.
+
+The files that Reference objects contain can be managed inside [Project Settings](../../user-guide/overview/files).
 
 ## Fields
 
-
 <ParamField path="Name" type="string">
 Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
 </ParamField>
 
 <ParamField path="Description" type="string">
   Description of the object.
 </ParamField>
 
-<ParamField path="Sequence" type="list">
-  List of owned action sequences that comprise the main action's flow. The list follows the format of:
+<ParamField path="Authors" type="string">
+  The authors of the reference.
+</ParamField>
 
-  `Action Name` `(instance)` -> `Action Name` `(instance)`
+<ParamField path="Publication" type="string">
+  The publication where the reference appeared.
+</ParamField>
 
-  Where action name is a reference to a specific action and the instance refers to if the action is repeated during the flow. Instances can be given as numbers.
+<ParamField path="Publisher" type="string">
+  The publisher of the reference.
+</ParamField>
 
-  <Info>All objects of the same instance are assumed connected.</Info>
-  
+<ParamField path="Edition" type="string">
+  The edition of the reference.
+</ParamField>
 
-### Merged Flow
-    Merged actions can be described as:
+<ParamField path="Volume" type="string">
+  The volume number of the reference.
+</ParamField>
 
-  `Action Name One` `()` `&&` `Action Name Two` `()` -> `Action Name Three` `()`
+<ParamField path="Issue" type="string">
+  The issue number of the reference.
+</ParamField>
 
-### Branching Flow
-  Branching actions can be described as:
+<ParamField path="Pages" type="string">
+  The page numbers of the reference.
+</ParamField>
 
-  `Action Name One` `()` -> `Action Name Two` `()` `&&` `Action Name Three` `()`
+<ParamField path="Year" type="string">
+  The year of publication.
+</ParamField>
+
+<ParamField path="Month" type="string">
+  The month of publication.
+</ParamField>
+
+<ParamField path="DOI" type="string">
+  The Digital Object Identifier (DOI) of the reference.
+</ParamField>
+
+<ParamField path="URL" type="string">
+  The URL link to the reference.
+</ParamField>
+
+<ParamField path="ISBN" type="string">
+  The International Standard Book Number (ISBN) of the reference.
 </ParamField>

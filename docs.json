@@ -28,7 +28,7 @@
     "navigation": {
         "versions": [
             {
-                "version": "3.8.0",
+                "version": "4.0.0",
                 "dropdowns": [
                     {
                         "dropdown": "Overview",
@@ -138,38 +138,38 @@
                             {
                                 "group": "Model-Based Systems Engineering",
                                 "pages": [
-                                    "pages/modeling/object-types/parts",
-                                    "pages/modeling/object-types/attributes",
-                                    "pages/modeling/object-types/requirements",
-                                    "pages/modeling/object-types/constraints",
-                                    "pages/modeling/object-types/ports",
-                                    "pages/modeling/object-types/interfaces",
-                                    "pages/modeling/object-types/entities",
-                                    "pages/modeling/object-types/packages",
-                                    "pages/modeling/object-types/relationships"
+                                    "pages/modeling/objects/parts",
+                                    "pages/modeling/objects/attributes",
+                                    "pages/modeling/objects/requirements",
+                                    "pages/modeling/objects/constraints",
+                                    "pages/modeling/objects/ports",
+                                    "pages/modeling/objects/interfaces",
+                                    "pages/modeling/objects/entities",
+                                    "pages/modeling/objects/packages",
+                                    "pages/modeling/objects/relationships"
                                 ]
                             },
                             {
                                 "group": "Artifacts",
                                 "pages": [
-                                    "pages/modeling/artifacts/documents",
-                                    "pages/modeling/artifacts/tables",
-                                    "pages/modeling/artifacts/slides",
-                                    "pages/modeling/artifacts/matrices"
+                                    "pages/modeling/objects/documents",
+                                    "pages/modeling/objects/tables",
+                                    "pages/modeling/objects/slides",
+                                    "pages/modeling/objects/matrices"
                                 ]
                             },
                             {
                                 "group": "Simulation",
                                 "pages": [
-                                    "pages/modeling/object-types/code",
-                                    "pages/modeling/object-types/actions"
+                                    "pages/modeling/objects/code",
+                                    "pages/modeling/objects/actions"
                                 ]
                             },
                             {
                                 "group": "Imported Data",
                                 "pages": [
-                                    "pages/modeling/object-types/reference",
-                                    "pages/modeling/object-types/toolbox"
+                                    "pages/modeling/objects/reference",
+                                    "pages/modeling/objects/toolbox"
                                 ]
                             }
                         ]
