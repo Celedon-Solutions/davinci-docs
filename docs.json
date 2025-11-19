@@ -132,6 +132,49 @@
                         ]
                     },
                     {
+                        "dropdown": "Object Types",
+                        "icon": "cube",
+                        "groups": [
+                            {
+                                "group": "Model-Based Systems Engineering",
+                                "pages": [
+                                    "pages/modeling/object-types/parts",
+                                    "pages/modeling/object-types/attributes",
+                                    "pages/modeling/object-types/requirements",
+                                    "pages/modeling/object-types/constraints",
+                                    "pages/modeling/object-types/ports",
+                                    "pages/modeling/object-types/interfaces",
+                                    "pages/modeling/object-types/entities",
+                                    "pages/modeling/object-types/packages",
+                                    "pages/modeling/object-types/relationships"
+                                ]
+                            },
+                            {
+                                "group": "Artifacts",
+                                "pages": [
+                                    "pages/modeling/artifacts/documents",
+                                    "pages/modeling/artifacts/tables",
+                                    "pages/modeling/artifacts/slides",
+                                    "pages/modeling/artifacts/matrices"
+                                ]
+                            },
+                            {
+                                "group": "Simulation",
+                                "pages": [
+                                    "pages/modeling/object-types/code",
+                                    "pages/modeling/object-types/actions"
+                                ]
+                            },
+                            {
+                                "group": "Imported Data",
+                                "pages": [
+                                    "pages/modeling/object-types/reference",
+                                    "pages/modeling/object-types/toolbox"
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "dropdown": "Modeling Agent",
                         "icon": "robot",
                         "groups": [
