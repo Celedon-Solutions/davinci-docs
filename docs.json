@@ -44,19 +44,19 @@
                                     "pages/overview/get-started/account",
                                     "pages/overview/terms-policy/termsofservice"
                                 ]
+                            },
+                            {
+                                "group": "Quick Start",
+                                "pages": [
+                                    "pages/user-guide/overview/quick-start"
+                                ]
                             }
                         ]
                     },
                     {
-                        "dropdown": "User Guide",
-                        "icon": "user",
+                        "dropdown": "Interface Guide",
+                        "icon": "window",
                         "groups": [
-                            {
-                                "group": "Overview",
-                                "pages": [
-                                    "pages/user-guide/overview/quick-start"
-                                ]
-                            },
                             {
                                 "group": "General Navigation",
                                 "pages": [
