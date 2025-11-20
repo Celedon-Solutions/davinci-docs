@@ -1,0 +1,41 @@
+---
+title: Matrices
+---
+
+<img height="20" noZoom src="/images/objecticons/matrix.svg" /> 
+
+## Description
+Matrix objects provide a grid-based view to analyze and edit relationships between sets of model elements. They are commonly used for traceability matrices (e.g., Requirements vs. Test Cases) or interface matrices (e.g., N-squared diagrams), helping to visualize and manage complex dependencies.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Matrix](#matrix-artifact) | Analyze relationships in a grid format. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## Matrix Artifact
+The Matrix Artifact view displays the configured matrix, showing the intersection of rows and columns where relationships can be viewed and edited.
+

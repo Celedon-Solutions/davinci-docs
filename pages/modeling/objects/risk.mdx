@@ -1,0 +1,56 @@
+---
+title: Risk
+---
+
+<img height="20" noZoom src="/images/objecticons/risk.svg" /> 
+
+## Description
+Risk objects represent potential uncertain events or conditions that, if they occur, have a positive or negative effect on one or more project objectives. In systems engineering, risks are typically characterized by their probability of occurrence and the impact they would have. Managing risks involves identifying, analyzing, and planning responses to these uncertainties to minimize negative outcomes and maximize opportunities.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Risk Analysis](#risk-analysis) | Analyze risks with probability and impact matrices. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the object. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Risks" type="object">
+
+<a href="/pages/modeling/objects/risk" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/risk.svg" /> </a>
+
+  A list of all sub-risk objects owned by this risk.
+
+  Sub-risks can be viewed and deleted.
+
+  [Read more about Risks](/pages/modeling/objects/risk)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## Risk Analysis
+This view provides a specialized interface for analyzing the risk, typically including probability and impact assessments to calculate risk exposure or severity.
+

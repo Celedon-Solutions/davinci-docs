@@ -149,6 +149,14 @@
                                 ]
                             },
                             {
+                                "group": "Project Management",
+                                "pages": [
+                                    "pages/modeling/objects/resource",
+                                    "pages/modeling/objects/task",
+                                    "pages/modeling/objects/risk"
+                                ]
+                            },
+                            {
                                 "group": "Artifacts",
                                 "pages": [
                                     "pages/modeling/objects/documents",

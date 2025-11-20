@@ -1,0 +1,53 @@
+---
+title: Resource
+---
+
+<img height="20" noZoom src="/images/objecticons/resource.svg" /> 
+
+## Description
+Resource (Resource) objects represent the quantifiable assets required to perform tasks or achieve system objectives. These can include financial Resources, materials, equipment, personnel (headcount), or energy. In systems engineering, managing resources is critical to ensure that the system can be developed and operated within constraints.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Pie Chart](#pie-chart) | Visualize resource distribution. |
+| [Plot](#plot) | Analyze resource trends and usage. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Resources" type="object">
+
+<a href="/pages/modeling/objects/Resource" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/resource.svg" /> </a>
+
+  A list of all sub-resource objects owned by this Resource.
+
+  Sub-resources can be viewed and deleted.
+
+  [Read more about Resources](/pages/modeling/objects/Resource)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+

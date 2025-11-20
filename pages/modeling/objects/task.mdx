@@ -1,0 +1,54 @@
+---
+title: Tasks
+---
+
+<img height="20" noZoom src="/images/objecticons/task.svg" /> 
+
+## Description
+Task objects represent discrete units of work or activities that need to be performed to achieve a specific objective. In a project management and systems engineering context, tasks have defined durations, start and end dates, and may depend on other tasks or require resources. They are the building blocks of project schedules and work breakdown structures.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Gantt](#gantt-chart) | Visualize tasks and dependencies on a timeline. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Tasks" type="object">
+
+<a href="/pages/modeling/objects/task" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/task.svg" /> </a>
+
+  A list of all sub-task objects owned by this task.
+
+  Sub-tasks can be viewed and deleted.
+
+  [Read more about Tasks](/pages/modeling/objects/task)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## Gantt Chart
+The Gantt Chart view visualizes the task and its sub-tasks on a timeline, showing start dates, end dates, durations, and dependencies between tasks.
+
