@@ -1,0 +1,48 @@
+---
+title: Interfaces
+---
+
+<img height="20" noZoom src="/images/objecticons/connection.svg" /> 
+
+## Description
+Interfaces define the connections and relationships between ports, specifying how system components interact and communicate with each other. In SysML v2, interfaces represent the contracts for interactions between components, defining sets of operations, signals, and flows that components provide or require for proper system integration.
+
+Interfaces model the communication paths between parts by linking their ports together, indicating that components are connected and can exchange information, energy, or materials. Multiple ports can be connected through a single interface, creating complex interaction networks that represent how the system's internal architecture enables its functionality. Interfaces ensure compatibility and interoperability between components by defining what each component expects from the others and what it provides in return.
+
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Connects" type="list">
+  List of ports that are in the interface.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this interface.
+
+  Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

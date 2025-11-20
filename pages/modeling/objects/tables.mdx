@@ -19,12 +19,27 @@ The header of tables define what information should be displayed. Changing the n
 <Info>This is edited from the document view only</Info>
 
 
-## Fields
+## Properties Fields
+
 <ParamField path="Name" type="string">
   Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
 </ParamField>
 
 <ParamField path="Caption" type="string">
   Caption of the object.
 </ParamField>
 
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

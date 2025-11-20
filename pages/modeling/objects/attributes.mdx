@@ -5,30 +5,43 @@ title: Attributes
 <img height="20" noZoom src="/images/objecticons/attribute.svg" /> 
 
 ## Description
-Attributes define the parameters of the objects they own. Attributes can be singular values (strings or numbers), or be references to other values (attributes) in the model. Attributes can also have units. 
+Attributes define properties or characteristics of system elements, specifying quantitative or qualitative aspects such as dimensions, weight, material properties, performance metrics, or other parameters. In SysML v2, attributes are fundamental modeling elements that capture the values and properties that describe system components.
 
-  <Note>The unit field is optional. If used it provides the unit of the value. For values that reference other attributes, the unit can be changed and the evaluted value will be transformed if possible.</Note>
+Attributes can contain singular values (strings, numbers, or booleans), or they can reference other attributes in the model, creating calculated relationships between system properties. They support units of measurement and type specifications, enabling precise engineering analysis and ensuring consistency across the model. When attributes reference other values, they can perform unit conversions automatically, allowing engineers to view the same property in different unit systems.
+
+<Note>The unit field is optional but recommended for engineering values. When specified, it enables automatic unit conversion and helps prevent errors in calculations. For attributes that reference other attributes, the unit can be changed and the evaluated value will be transformed automatically if the conversion is possible.</Note>
 
 
-## Fields
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
 <ParamField path="Value" type="string">
   The value of the attribute which as the form of:
 
-  `Equation or value` [`unit`]
+  `Equation or value` [`unit`] (`type`)
 
 
 
   <Warning>If the units of the equation or reference either do not match or can not be convereted, an error will occur. Mouseover the error box to see the details of the error.</Warning>
 
   <Info>See the allowed [mathmatical operations/syntax](/sections/sysml/equations) and [base units](/sections/sysml/units) for details on what is allowed.</Info>
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

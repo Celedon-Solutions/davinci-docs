@@ -5,19 +5,58 @@ title: Packages
 <img height="20" noZoom src="/images/objecticons/package.svg" /> 
 
 ## Description
-Packages are used to organize objects in the model.
+Packages organize model elements into logical groups, providing namespace management and structural organization for complex system models. In SysML v2, packages are fundamental organizational containers that help manage model complexity by grouping related elements together, defining their scope and visibility, and establishing clear boundaries between different aspects of the system model.
 
-  <Note>All projects have two reserved packages of "Elements" and "Artifacts".</Note>
+Packages facilitate modularity and maintainability by allowing engineers to partition large models into manageable sections. They can contain any type of model element including other packages, creating hierarchical structures that reflect the organization of the system or the structure of the engineering team. Packages also support model reuse and configuration management by enabling clear ownership boundaries and version control at the package level.
 
-<Warning>Packages under parts or other elements will break the chain of ownership.</Warning>
+<Note>All Davinci projects have two reserved top-level packages: "Elements" contains the system model components (parts, requirements, etc.), while "Artifacts" contains documentation and presentation objects (documents, tables, slides).</Note>
 
-## Fields
+<Warning>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy. Packages should generally be organized at the model level to maintain clear organizational structure.</Warning>
+
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
+</ParamField>
+
+<ParamField path="Elements" type="object">
+
+<div style={{ display: 'flex', flexDirection: 'row', gap: '10px', flexWrap: 'wrap' }}>
+  <a href="/pages/modeling/objects/packages" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/package.svg" /> </a>
+  <a href="/pages/modeling/objects/parts" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/part.svg" /> </a>
+  <a href="/pages/modeling/objects/requirements" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/requirement.svg" /> </a>
+  <a href="/pages/modeling/objects/actions" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/action.svg" /> </a>
+  <a href="/pages/modeling/objects/entities" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/entity.svg" /> </a>
+  <a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+  <a href="/pages/modeling/objects/ports" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/port.svg" /> </a>
+  <a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/connection.svg" /> </a>
+  <a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+  <a href="/pages/modeling/objects/code" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
+  <a href="/pages/modeling/objects/documents" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/document.svg" /> </a>
+  <a href="/pages/modeling/objects/tables" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/table.svg" /> </a>
+  <a href="/pages/modeling/objects/reference" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/reference.svg" /> </a>
+  <a href="/pages/modeling/objects/geometry" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/geometry.svg" /> </a>
+  <a href="/pages/modeling/objects/assembly" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/assembly.svg" /> </a>
+  <a href="/pages/modeling/objects/toolbox" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/toolbox.svg" /> </a>
+</div>
+
+  A list of all model objects owned by this package.
+
+  Packages can contain most object types including other packages, parts, requirements, actions, entities, and more.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

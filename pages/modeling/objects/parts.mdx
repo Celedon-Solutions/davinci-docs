@@ -5,22 +5,83 @@ title: Parts
 <img height="20" noZoom src="/images/objecticons/part.svg" /> 
 
 ## Description
-Parts are the main structural element of a system. They can be any kind of physical thing that has an extent in both time and space. Parts have values or parameters set by their owned Attributes.
+Parts represent components or subsystems within a larger system, forming the fundamental building blocks of system structure in Model-Based Systems Engineering. In SysML v2, parts are objects that illustrate the hierarchical composition of systems, showing how components are assembled to form the whole system.
 
-  <Note>A special object of Entity exists to model persons, groups, and organizations.</Note>
+Parts are the main structural elements that can represent any kind of physical or logical component with an extent in both time and space. They encapsulate both structural and behavioral features, making them modular units that define how a system is organized and how its components interact. Parts have values and parameters defined by their owned Attributes, and they can contain other parts, creating nested hierarchies that represent complex system architectures.
+
+<Note>A special object type called Entity exists to model persons, groups, and organizations, which are non-physical parts of a system.</Note>
 
 
-## Fields
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
-  Description of the object.
+<ParamField path="Short Name" type="string">
+Short name of the object.
 </ParamField>
 
-<ParamField path="Performs" type="reference">
-  Link to an action that this part performs.
+<ParamField path="Documentation" type="string">
+  Description of the part.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this part.
+
+  Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this part.
+
+  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+
+<ParamField path="Elements" type="object">
+
+<div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+  <img height="20" noZoom src="/images/objecticons/part.svg" />
+  <a href="/pages/modeling/objects/port" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/port.svg" /> </a>
+  <a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/interface.svg" /> </a>
+</div> 
+
+  A list of all other model objects owned by this part.
+
+  Parts, Ports and Interfaces can be viewed and deleted. 
+
+  [Read more about Ports](/pages/modeling/common/port)
+  
+  [Read more about Interfaces](/pages/modeling/common/interface)
+</ParamField>
+
+<ParamField path="References" type="object">
+
+<a href="/pages/modeling/objects/reference" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/reference.svg" /> </a>
+
+  A list of all Reference objects used by this part.
+
+  The Davinci Agent will add Reference objects used during generation to this list automatically. Users can also manually add References here.
+
+    [Read more about References](/pages/modeling/objects/reference)
+
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

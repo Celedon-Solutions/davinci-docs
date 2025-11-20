@@ -13,7 +13,7 @@ Files can be uploaded and added as Reference Objects to the model by dragging an
 
 The files that Reference objects contain can be managed inside [Project Settings](../../user-guide/overview/files).
 
-## Fields
+## Properties Fields
 
 <ParamField path="Name" type="string">
 Name of the object.
@@ -37,6 +37,13 @@ Short name of the object.
 
 <ParamField path="Publisher" type="string">
   The publisher of the reference.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
 
 <ParamField path="Edition" type="string">

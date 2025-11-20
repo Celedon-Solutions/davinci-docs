@@ -2,42 +2,52 @@
 title: Assembly
 ---
 
-<img height="20" noZoom src="/images/objecticons/action.svg" /> 
+<img height="20" noZoom src="/images/objecticons/assembly.svg" /> 
 
 ## Description
-Actions describe the behavior of a system. This can be constructed using nested levels of actions to refine the action in detail. 
+Assembly objects combine multiple geometry objects together with positional and rotational transformations.
 
 
-<Info>As of the Beta, the actions are only described in the documentation and by its subactions.</Info>
-
-## Fields
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
-<ParamField path="Sequence" type="list">
-  List of owned action sequences that comprise the main action's flow. The list follows the format of:
+<ParamField path="Geometries" type="object">
 
-  `Action Name` `(instance)` -> `Action Name` `(instance)`
+<a href="/pages/modeling/objects/geometry" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/geometry.svg" /> </a>
 
-  Where action name is a reference to a specific action and the instance refers to if the action is repeated during the flow. Instances can be given as numbers.
+  A list of all Geometry objects in this assembly.
 
-  <Info>All objects of the same instance are assumed connected.</Info>
-  
+  Geometries can be positioned, rotated, and deleted.
 
-### Merged Flow
-    Merged actions can be described as:
+  [Read more about Geometry](/pages/modeling/objects/geometry)
+</ParamField>
 
-  `Action Name One` `()` `&&` `Action Name Two` `()` -> `Action Name Three` `()`
+<ParamField path="Assemblies" type="object">
 
-### Branching Flow
-  Branching actions can be described as:
+<a href="/pages/modeling/objects/assembly" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/assembly.svg" /> </a>
 
-  `Action Name One` `()` -> `Action Name Two` `()` `&&` `Action Name Three` `()`
+  A list of all sub-assembly objects owned by this assembly.
+
+  Sub-assemblies can be positioned, rotated, and deleted.
+
+  [Read more about Assembly](/pages/modeling/objects/assembly)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

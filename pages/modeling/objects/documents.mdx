@@ -12,10 +12,34 @@ Documents are a containing object that holds text sections, tables, and figures 
 <Info>This is edited from the document view only</Info>
 
 
-## Fields
+## Properties Fields
 
 <ParamField path="Title" type="string">
 Title of the document which also the displayed name of the object. 
 </ParamField>
 
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
 
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Tables" type="object">
+
+<a href="/pages/modeling/objects/tables" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/table.svg" /> </a>
+
+  A list of all Table objects owned by this document.
+
+  Tables can be viewed and deleted.
+
+  [Read more about Tables](/pages/modeling/objects/tables)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

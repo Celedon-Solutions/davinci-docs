@@ -42,13 +42,28 @@ Users can run tests by:
 
 This allows for the validation of API connections and logic before the tool is used in the model.
 
-## Fields
+## Properties Fields
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
+</ParamField>
+
+<ParamField path="Code" type="string">
+  The Python code that defines the toolbox tools and connections.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
 

@@ -143,10 +143,9 @@
                                     "pages/modeling/objects/requirements",
                                     "pages/modeling/objects/constraints",
                                     "pages/modeling/objects/ports",
-                                    "pages/modeling/objects/interfaces",
+                                    "pages/modeling/objects/interface",
                                     "pages/modeling/objects/entities",
-                                    "pages/modeling/objects/packages",
-                                    "pages/modeling/objects/relationships"
+                                    "pages/modeling/objects/packages"
                                 ]
                             },
                             {
@@ -154,8 +153,8 @@
                                 "pages": [
                                     "pages/modeling/objects/documents",
                                     "pages/modeling/objects/tables",
-                                    "pages/modeling/objects/slides",
-                                    "pages/modeling/objects/matrices"
+                                    "pages/modeling/objects/slide",
+                                    "pages/modeling/objects/matrix"
                                 ]
                             },
                             {

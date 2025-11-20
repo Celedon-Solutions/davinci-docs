@@ -5,20 +5,66 @@ title: Entities
 <img height="20" noZoom src="/images/objecticons/entity.svg" /> 
 
 ## Description
-Entities are special kind of part objects used to model persons, groups, and organizations.
+Entities are specialized system components used to model human actors, organizations, groups, and other stakeholder elements that interact with or are part of the system. In SysML v2, entities represent the people, teams, and organizational units that play roles in system operations, development, or management.
+
+While traditional parts represent physical or logical system components, entities capture the human and organizational aspects of systems engineering. They can model system operators, maintenance personnel, user groups, development teams, or external organizations that interact with the system. Entities can own attributes to define their characteristics (such as skills, responsibilities, or organizational structure) and can be linked to actions they perform, requirements they impose, or other system elements they interact with. This enables comprehensive modeling of socio-technical systems where human factors are critical to system success.
 
 
-## Fields
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
 <ParamField path="Performs" type="reference">
   Link to an action that this entity performs.
+</ParamField>
+
+<ParamField path="Entities" type="object">
+
+<a href="/pages/modeling/objects/entities" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/entity.svg" /> </a>
+
+  A list of all sub-entity objects owned by this entity.
+
+  Sub-entities can be viewed and deleted.
+
+  [Read more about Entities](/pages/modeling/objects/entities)
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this entity.
+
+  Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this entity.
+
+  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

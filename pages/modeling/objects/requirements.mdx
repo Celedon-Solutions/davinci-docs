@@ -5,9 +5,11 @@ title: Requirements
 <img height="20" noZoom src="/images/objecticons/requirement.svg" />
 
 ## Description
-Requirement objects are used to formally capture a project through logical evaluable statements. These objects are evaluated as true or false based on their owned objects being either true or false. For a requirement to be complete it must either own subrequirement(s) or a constraint object. 
+Requirements specify conditions or capabilities that a system must satisfy to meet stakeholder needs and objectives. In SysML v2, requirements are fundamental elements that capture what the system must do, how well it must perform, and under what conditions it must operate. They form the foundation of system verification and validation activities.
 
-<Info>Requirement descriptions are modeled as shall statements by Davinci, but only the constraint objects are considered during evaluation.</Info>
+Requirements in Davinci are formally captured through logical, evaluable statements that can be assessed as true or false. This enables automated verification of whether the system design meets its specified requirements. Each requirement can be decomposed into sub-requirements, creating a hierarchical structure that traces from high-level stakeholder needs down to detailed design specifications. Requirements are validated through their owned constraint objects, which define the specific testable conditions that determine requirement satisfaction.
+
+<Info>While requirement descriptions are typically written as "shall" statements following systems engineering best practices, the actual evaluation and verification is performed using the mathematical constraints and conditions owned by the requirement.</Info>
 
 Requirements can have the following status:
 
@@ -21,17 +23,72 @@ Requirements can have the following status:
 
 
 
-## Fields
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
 <ParamField path="Subject" type="reference">
   The object which is the subject of the requirement.
+</ParamField>
+
+<ParamField path="Requirements" type="object">
+
+<a href="/pages/modeling/objects/requirements" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/requirement.svg" /> </a>
+
+  A list of all sub-requirement objects owned by this requirement.
+
+  Sub-requirements can be viewed and deleted.
+
+  [Read more about Requirements](/pages/modeling/objects/requirements)
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this requirement.
+
+  Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this requirement.
+
+  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Code" type="object">
+
+<a href="/pages/modeling/objects/code" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
+
+  A list of all Code objects owned by this requirement.
+
+  Code objects can be viewed and deleted.
+
+  [Read more about Code](/pages/modeling/objects/code)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
