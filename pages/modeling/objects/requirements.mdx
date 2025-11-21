@@ -47,20 +47,6 @@ Short name of the object.
   Description of the object.
 </ParamField>
 
-<ParamField path="Subject" type="reference">
-  The object which is the subject of the requirement.
-</ParamField>
-
-<ParamField path="Requirements" type="object">
-
-<a href="/pages/modeling/objects/requirements" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/requirement.svg" /> </a>
-
-  A list of all sub-requirement objects owned by this requirement.
-
-  Sub-requirements can be viewed and deleted.
-
-  [Read more about Requirements](/pages/modeling/objects/requirements)
-</ParamField>
 
 <ParamField path="Attributes" type="object">
 
@@ -84,15 +70,20 @@ Short name of the object.
   [Read more about Constraints](/pages/modeling/objects/constraints)
 </ParamField>
 
-<ParamField path="Code" type="object">
 
-<a href="/pages/modeling/objects/code" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
+<ParamField path="Elements" type="object">
 
-  A list of all Code objects owned by this requirement.
+<div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+  <img height="20" noZoom src="/images/objecticons/requirement.svg" />
+  <a href="/pages/modeling/objects/port" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
+</div> 
 
-  Code objects can be viewed and deleted.
+  A list of all other model objects owned by this part.
 
-  [Read more about Code](/pages/modeling/objects/code)
+  Requirements and Code can be viewed and deleted. 
+  
+  [Read more about Code](/pages/modeling/common/code)
+  
 </ParamField>
 
 <ParamField path="Relationships" type="connection">
