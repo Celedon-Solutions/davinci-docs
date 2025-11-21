@@ -60,21 +60,10 @@
                             {
                                 "group": "General Navigation",
                                 "pages": [
-                                    "pages/user-guide/navigating/ui",
                                     "pages/user-guide/navigating/home",
                                     "pages/user-guide/navigating/model",
-                                    "pages/user-guide/navigating/project"
-                                ]
-                            },
-                            {
-                                "group": "The Workspace",
-                                "pages": [
-                                    "pages/user-guide/views/properties",
-                                    "pages/user-guide/views/artifact",
-                                    "pages/user-guide/views/code",
-                                    "pages/user-guide/views/toolbox",
-                                    "pages/user-guide/views/reference",
-                                    "pages/user-guide/views/renderviews"
+                                    "pages/user-guide/navigating/project",
+                                    "pages/user-guide/navigating/ui"
                                 ]
                             },
                             {
@@ -91,7 +80,6 @@
                             {
                                 "group": "Extra Features",
                                 "pages": [
-                                    "pages/user-guide/overview/snapshots",
                                     "pages/user-guide/overview/collaboration",
                                     "pages/user-guide/overview/files",
                                     "pages/user-guide/common/hotkeys"
@@ -107,13 +95,7 @@
                                 "group": "Overview",
                                 "pages": [
                                     "pages/modeling/overview/systemmodeling",
-                                    "pages/modeling/overview/objects"
-                                ]
-                            },
-                            {
-                                "group": "Objects",
-                                "pages": [
-                                    "pages/modeling/objects/objects"
+                                    "pages/modeling/overview/language"
                                 ]
                             },
                             {
@@ -122,6 +104,17 @@
                                     "pages/modeling/common/equations",
                                     "pages/modeling/common/relationships",
                                     "pages/modeling/common/units"
+                                ]
+                            },
+                            {
+                                "group": "Object Views",
+                                "pages": [
+                                    "pages/user-guide/views/properties",
+                                    "pages/user-guide/views/artifact",
+                                    "pages/user-guide/views/code",
+                                    "pages/user-guide/views/toolbox",
+                                    "pages/user-guide/views/reference",
+                                    "pages/user-guide/views/renderviews"
                                 ]
                             }
                         ]
@@ -183,7 +176,9 @@
                             {
                                 "group": "Design Agent",
                                 "pages": [
+                                    "pages/user-guide/design-agent/workspaces",
                                     "pages/user-guide/design-agent/agents",
+                                    "pages/user-guide/design-agent/persona",
                                     "pages/user-guide/design-agent/tips"
                                 ]
                             }
