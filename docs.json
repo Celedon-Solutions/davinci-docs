@@ -86,7 +86,8 @@
                                     "pages/user-guide/project-settings/tags",
                                     "pages/user-guide/project-settings/risk",
                                     "pages/user-guide/project-settings/dependencies",
-                                    "pages/user-guide/project-settings/relationship-settings"
+                                    "pages/user-guide/project-settings/relationship-settings",
+                                    "pages/user-guide/project-settings/unit-settings"
                                 ]
                             },
                             {
