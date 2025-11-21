@@ -54,7 +54,7 @@
                         ]
                     },
                     {
-                        "dropdown": "Interface Guide",
+                        "dropdown": "Interface",
                         "icon": "window",
                         "groups": [
                             {
@@ -82,6 +82,7 @@
                                 "pages": [
                                     "pages/user-guide/right-panel/right-panel-overview",
                                     "pages/user-guide/right-panel/agent-chat",
+                                    "pages/user-guide/right-panel/version-control",
                                     "pages/user-guide/right-panel/search-view",
                                     "pages/user-guide/right-panel/comment-view",
                                     "pages/user-guide/right-panel/validation-view"
@@ -92,13 +93,7 @@
                                 "pages": [
                                     "pages/user-guide/overview/snapshots",
                                     "pages/user-guide/overview/collaboration",
-                                    "pages/user-guide/overview/files"
-                                ]
-                            },
-                            {
-                                "group": "Common",
-                                "pages": [
-                                    "pages/user-guide/common/q&a",
+                                    "pages/user-guide/overview/files",
                                     "pages/user-guide/common/hotkeys"
                                 ]
                             }
@@ -208,6 +203,13 @@
                                     "examples/Document_Templates_Example"
                                 ]
                             }
+                        ]
+                    },
+                    {
+                        "dropdown": "FAQs",
+                        "icon": "question",
+                        "pages": [
+                            "pages/faqs/common-faqs"
                         ]
                     },
                     {
