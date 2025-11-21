@@ -78,10 +78,17 @@
                                 ]
                             },
                             {
-                                "group": "Extra Features",
+                                "group": "Project Settings",
                                 "pages": [
                                     "pages/user-guide/overview/collaboration",
                                     "pages/user-guide/overview/files",
+                                    "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/overview/tags"
+                                ]
+                            },
+                            {
+                                "group": "Extra Features",
+                                "pages": [
                                     "pages/user-guide/common/hotkeys"
                                 ]
                             }
