@@ -48,7 +48,7 @@
                             {
                                 "group": "Quick Start",
                                 "pages": [
-                                    "pages/user-guide/overview/quick-start"
+                                    "pages/user-guide/common/quick-start"
                                 ]
                             }
                         ]
@@ -80,10 +80,11 @@
                             {
                                 "group": "Project Settings",
                                 "pages": [
-                                    "pages/user-guide/overview/collaboration",
-                                    "pages/user-guide/overview/files",
+                                    "pages/user-guide/project-settings/collaboration",
+                                    "pages/user-guide/project-settings/files",
                                     "pages/user-guide/design-agent/persona",
-                                    "pages/user-guide/overview/tags"
+                                    "pages/user-guide/project-settings/tags",
+                                    "pages/user-guide/project-settings/risk"
                                 ]
                             },
                             {
