@@ -1,0 +1,41 @@
+---
+title: Relationships
+---
+
+The Relationship Settings view provides a comprehensive overview of all relationship types currently available in your project.
+
+<Note>
+Creating custom relationship types is not currently supported but will be available in a future update.
+</Note>
+
+## Relationship Properties
+
+For each relationship type, the settings list displays:
+- **Name**: The identifier of the relationship.
+- **Direction**: Whether the relationship is unidirectional (`in`/`out`) or bidirectional (`inout`).
+- **Color**: The visual color used to represent this relationship in diagrams and views.
+- **Description**: A brief explanation of the relationship's purpose.
+- **Limitations**: Defines the valid "From" and "To" object types.
+  - **From**: The types of objects that can be the source of this relationship.
+  - **To**: The types of objects that can be the target.
+  
+  *Example: The `Performs` relationship can originate **from** a Part or Entity and go **to** an Action.*
+
+## Relationship Categories
+
+Davinci organizes relationships into three categories:
+
+### Internal Relationships
+These are managed automatically by Davinci's internal logic to maintain model connectivity.
+- **Example**: The `Uses` relationship is automatically created when an Attribute references another Attribute in its equation.
+- **Example**: The `Reference` relationship links Reference objects to other model elements.
+
+### Base Relationships (SysML v2)
+These are standard relationships defined by the SysML v2 specification. Using these relationships ensures your model remains compatible with standard systems engineering practices and can be exported to valid SysML v2 formats.
+
+### Custom Relationships
+These are specialized relationships included in Davinci to provide more descriptive modeling capabilities for physical and logical interactions.
+- **Examples**: `Thermal`, `Power`, `Chemical`, `Mechanical`.
+
+For a detailed list of all available relationship types and their definitions, please see the [Relationships Documentation](/pages/modeling/common/relationships).
+
