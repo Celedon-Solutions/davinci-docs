@@ -5,18 +5,186 @@ title: Tables
 <img height="20" noZoom src="/images/objecticons/table.svg" /> 
 
 ## Description
-Tables display object details in a condensed form. They work using a focus object per row which is defined on the first column of the table. All other columns reference either a field of the focus object or specifics of its owned objects (such as attributes, ports, conntections, etc.). 
+Tables provide a spreadsheet interface for organizing, calculating, and analyzing data within your model. They support three types of cells—text, equation, and reference—enabling everything from simple documentation to complex calculations that link directly to model objects.
 
-<Note>The first column of the table defines the reference object and can not be renamed.</Note>
+Tables use an infinite grid layout with column headers (A, B, C, ...) and row headers (1, 2, 3, ...), allowing you to reference cells using standard spreadsheet notation like A1, B2, etc.
 
-The header of tables define what information should be displayed. Changing the name of the header will auto update the column. If needed, each cell reference can be manually edited. To edit the cell simply right click.
+<Info>Tables are edited from the document view only</Info>
 
-<Note>Units will be displayed in cells automatically (for values with units). If a unit is defined in the header as
-`[unit]` then an auto conversion will occur.</Note>
+## Importing Excel Files
 
-<Note>The data of `description`, `value`, and `unit` fields can be directly edited from the table updating it across the model.</Note>
+Davinci tables support importing Excel spreadsheets (`.xlsx` and `.xls` formats), which automatically convert to native Davinci spreadsheets. This allows you to bring existing Excel data directly into your model while preserving formulas, formatting, and structure.
 
-<Info>This is edited from the document view only</Info>
+### Import Process
+To import an Excel file:
+1. Drag and drop the Excel file into your workspace, or use the file import dialog
+2. Each worksheet in the Excel file becomes a separate table object
+3. Cell data, formulas, and formatting are automatically converted
+
+### What Gets Converted
+- **Cell values**: Text, numbers, and dates are preserved
+- **Formulas**: Common Excel functions are converted to Math.js equivalents:
+  - `SUM()`, `MAX()`, `MIN()` remain the same
+  - `AVERAGE()` converts to `mean()`
+  - `MEDIAN()` remains `median()`
+  - `STDEV()`, `STDEV.S()`, `STDEV.P()` convert to `std()`
+- **Cell references**: A1 notation is converted to Davinci's internal reference system
+- **Formatting**: Background colors and borders are preserved
+- **Layout**: Column widths are estimated based on content
+
+<Note>If a single-sheet Excel file is imported, the table is named after the filename. Multi-sheet files create tables named "filename - sheetname" for each worksheet.</Note>
+
+<Warning>Formulas containing unsupported Excel functions will be converted to text cells displaying the formula. You can manually edit these cells to use supported operations.</Warning>
+
+## Cell Types
+
+Tables support three distinct cell types, each optimized for different use cases:
+
+### Text Cells
+Text cells contain freeform content including plain text, formatted text, and rich content. They support all standard text formatting options such as bold, italic, color, and alignment. Text cells are the default cell type and are ideal for labels, descriptions, and documentation.
+
+### Equation Cells
+Equation cells perform calculations using formulas, similar to attribute equations. To create an equation cell, begin the cell content with `=` followed by your formula.
+
+Equation cells support:
+- **Mathematical operations**: `+`, `-`, `*`, `/`, `^` (exponentiation)
+- **Cell references**: Reference other cells using A1 notation (e.g., `=A1+B2`)
+- **Cell ranges**: Reference ranges of cells (e.g., `=SUM(A1:A10)`)
+- **Functions**: Use mathematical functions like `SUM()`, `AVERAGE()`, `MIN()`, `MAX()`
+- **Model object references**: Reference attributes and other model objects using `@` notation (e.g., `=@MyPart.mass * 2`)
+
+<Note>Equation cells automatically compute their result when the formula or any referenced cells change. The computed value is displayed in the cell while the formula remains editable.</Note>
+
+<Info>See the [equation syntax documentation](/pages/modeling/common/equations) for details on mathematical operations and functions.</Info>
+
+### Reference Cells
+Reference cells create direct links to model objects. To create a reference cell, begin typing `@` and select an object from the model. Reference cells display key information about the linked object and open that object when clicked, making them useful for creating navigable tables and traceability matrices.
+
+<Note>Reference cells cannot be edited in-place. Typing in a highlighted reference cell will convert it to a text cell.</Note>
+
+## Cell Selection and Editing
+
+### Selecting Cells
+- **Single click**: Select a cell
+- **Double click**: Enter edit mode for the selected cell
+- **Click and drag**: Select multiple cells
+- **Click column/row headers**: Select entire columns or rows
+
+### Entering Formulas
+When editing a cell, you can click on other cells to insert them into your formula. The system automatically highlights referenced cells with color coding to help visualize dependencies.
+
+To create an equation:
+1. Type `=` to begin the formula
+2. Either type cell references manually (e.g., `A1`) or click cells to insert them
+3. Add operators and functions as needed
+4. Press Enter to save the formula
+
+<Note>Typing `=` in any cell converts it to an equation cell. The formula is stored and computed automatically.</Note>
+
+## Cell Reference Notation
+
+### Basic Cell References
+Cell references use standard spreadsheet notation with column letters and row numbers:
+- `A1` - References column A, row 1
+- `B5` - References column B, row 5
+- `AA10` - References column AA, row 10
+
+### Absolute and Relative References
+By default, cell references are relative, meaning they adjust when formulas are copied or moved. You can make references absolute using the `$` symbol:
+
+| Notation | Column | Row | Example |
+| :--- | :--- | :--- | :--- |
+| `A1` | Relative | Relative | Adjusts both when copied |
+| `$A1` | Absolute | Relative | Column stays fixed, row adjusts |
+| `A$1` | Relative | Absolute | Column adjusts, row stays fixed |
+| `$A$1` | Absolute | Absolute | Stays fixed when copied |
+
+<Note>When copying a cell with `$A$1`, the reference will always point to cell A1 regardless of where it's pasted. A reference like `B2` will adjust relative to the paste location.</Note>
+
+### Cell Ranges
+Cell ranges are specified using colon notation:
+- `A1:A10` - All cells from A1 to A10 (column A, rows 1-10)
+- `A1:C1` - All cells from A1 to C1 (row 1, columns A-C)
+- `A1:C10` - A rectangular range from A1 to C10
+
+## Cell Equation Operations
+
+### Supported Functions
+
+Spreadsheet equations support the full range of Math.js operations, including:
+
+- **Basic arithmetic**: Addition (`+`), subtraction (`-`), multiplication (`*`), division (`/`), exponentiation (`^`)
+- **Mathematical functions**: `sqrt()`, `abs()`, `round()`, `floor()`, `ceil()`, `pow()`, `log()`, `exp()`
+- **Trigonometric functions**: `sin()`, `cos()`, `tan()`, `asin()`, `acos()`, `atan()`
+- **Statistical functions**: `sum()`, `mean()`, `median()`, `std()`, `variance()`, `min()`, `max()`
+- **Logical operations**: `and()`, `or()`, `not()`, comparison operators (`==`, `!=`, `<`, `>`, `<=`, `>=`)
+- **Constants**: `pi`, `e`, `phi`
+
+### Examples
+- `=SUM(A1:A10)` - Sum a range of cells from A1 through A10
+- `=AVERAGE(B1:B5)` - Calculate the average of cells B1 through B5
+- `=round(A1 * 1.15, 2)` - Multiply A1 by 1.15 and round to 2 decimal places
+- `=max(A1:A10) - min(A1:A10)` - Calculate the range (difference between max and min)
+- `=sin(A1 * pi / 180)` - Convert degrees to radians and calculate sine
+- `=if(A1 > 100, "High", "Low")` - Conditional logic based on cell value
+
+<Info>For a complete reference of all available operations and functions, see the [equation syntax documentation](/pages/modeling/common/equations).</Info>
+
+## Fill Handle
+
+The Fill Handle feature allows you to quickly populate cells by dragging the small square in the bottom-right corner of the selection. The system intelligently detects patterns in your selected cells and extends them, or repeats the data if no pattern is found.
+
+### Using the Fill Handle
+1. Select one or more cells containing data
+2. Hover over the fill handle in the bottom-right corner of the selection
+3. Click and drag in any direction to fill adjacent cells
+4. Release to apply the fill
+
+### Pattern Detection
+The spreadsheet automatically detects several types of patterns:
+
+- `1, 2, 3` → continues as `4, 5, 6...`
+- `Monday, Tuesday, Wednesday` → continues as `Thursday, Friday, Saturday...`
+
+**No Pattern Detected**
+If no pattern is detected, the system cycles through the selected values repeatedly. For example, `Apple, Orange` fills as `Apple, Orange, Apple, Orange...`
+
+### 2D Fill Support
+The Fill Handle works with multi-cell selections in both directions. You can select a block of cells (e.g., a 2x3 grid) and drag-fill to replicate patterns across both rows and columns simultaneously.
+
+### Cell References during fill
+When filling cells containing formulas, cell references adjust according to their `$` notation. For example, dragging `=A1` down becomes `=A2`, `=A3`, etc., while dragging right becomes `=B1`, `=C1`, etc. Absolute references like `=$A$1` stay fixed regardless of fill direction.
+
+<Note>Pattern detection only applies to text cells. Equation cells always copy their formulas with adjusted references based on the `$` notation.</Note>
+
+## Formula Examples
+
+```
+=A1+B1
+Sum two cells
+```
+
+```
+=SUM(A1:A10)
+Sum a range of cells
+```
+
+```
+=$A$1*B2
+Multiply an absolute reference by a relative reference
+```
+
+```
+=@MyPart.mass+@MyPart.margin
+Add values from two model object attributes
+```
+
+```
+=(A1+A2)/2
+Calculate average of two cells using parentheses
+```
+
+<Warning>Circular dependencies (a cell referencing itself through a chain of formulas) will result in a `#CIRCDEP!` error.</Warning>
 
 ## View Types
 
@@ -36,9 +204,6 @@ The header of tables define what information should be displayed. Changing the n
 Short name of the object.
 </ParamField>
 
-<ParamField path="Caption" type="string">
-  Caption of the object.
-</ParamField>
 
 <ParamField path="Documentation" type="string">
   Description of the object.

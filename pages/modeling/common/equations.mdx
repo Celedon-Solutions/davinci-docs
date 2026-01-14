@@ -7,25 +7,91 @@ Each attribute and constraint object has a defined value. For attributes, this i
 <Note>Special handling is applied when resolving values containing strings of `TBD` (To Be Determined). This can be useful during the early stages of model formation to not resolve errors when the value is still being defined.</Note>
 
 ## Math Syntax
-Standard mathematical operations can be used within attribute values to compute derived values or perform other simple calculations. The syntax for these operations follows standard mathematical conventions:
+Equations are powered by Math.js, providing a comprehensive set of mathematical operations and functions. The syntax follows standard mathematical conventions:
+
+### Basic Operations
 
 | Operation        | Syntax   |
 | ---------------- | -------- |
+| Addition         | `A + B`  |
+| Subtraction      | `A - B`  |
 | Multiplication   | `A * B`  |
 | Division         | `A / B`  |
-| Addition         | `A + B`  |
+| Modulus          | `A % B`  |
 | Exponentiation   | `A ^ B`  |
-| Minimum          | `min(A, B)` |
-| Maximum          | `max(A, B)` |
 
-| Comparison Operators | Syntax   |
-| -------------------- | -------- |
-| Equal                | `==`     |
-| Unequal             | `!=`     |
-| Smaller             | `<`      |
-| Larger              | `>`      |
-| Smaller or Equal    | `<=`     |
-| Larger or Equal     | `>=`     |
+### Comparison Operators
+
+| Operator         | Syntax   |
+| ---------------- | -------- |
+| Equal            | `==`     |
+| Not Equal        | `!=`     |
+| Less Than        | `<`      |
+| Greater Than     | `>`      |
+| Less or Equal    | `<=`     |
+| Greater or Equal | `>=`     |
+
+### Mathematical Functions
+
+| Function         | Syntax              | Description |
+| ---------------- | ------------------- | ----------- |
+| Absolute Value   | `abs(x)`            | Returns the absolute value |
+| Square Root      | `sqrt(x)`           | Returns the square root |
+| Cube Root        | `cbrt(x)`           | Returns the cube root |
+| Power            | `pow(x, y)`         | Returns x raised to power y |
+| Exponential      | `exp(x)`            | Returns e raised to power x |
+| Natural Log      | `log(x)`            | Returns the natural logarithm |
+| Base-10 Log      | `log10(x)`          | Returns the base-10 logarithm |
+| Minimum          | `min(a, b, ...)`    | Returns the minimum value |
+| Maximum          | `max(a, b, ...)`    | Returns the maximum value |
+| Round            | `round(x)`          | Rounds to nearest integer |
+| Floor            | `floor(x)`          | Rounds down to integer |
+| Ceil             | `ceil(x)`           | Rounds up to integer |
+| Sign             | `sign(x)`           | Returns -1, 0, or 1 |
+
+### Trigonometric Functions
+
+| Function         | Syntax              | Description |
+| ---------------- | ------------------- | ----------- |
+| Sine             | `sin(x)`            | Sine of x (in radians) |
+| Cosine           | `cos(x)`            | Cosine of x (in radians) |
+| Tangent          | `tan(x)`            | Tangent of x (in radians) |
+| Arcsine          | `asin(x)`           | Inverse sine |
+| Arccosine        | `acos(x)`           | Inverse cosine |
+| Arctangent       | `atan(x)`           | Inverse tangent |
+| Arctangent2      | `atan2(y, x)`       | Angle from x-axis to point |
+| Hyperbolic Sine  | `sinh(x)`           | Hyperbolic sine |
+| Hyperbolic Cosine| `cosh(x)`           | Hyperbolic cosine |
+| Hyperbolic Tangent| `tanh(x)`          | Hyperbolic tangent |
+
+### Statistical Functions
+
+| Function         | Syntax              | Description |
+| ---------------- | ------------------- | ----------- |
+| Mean             | `mean(a, b, ...)`   | Returns the average value |
+| Median           | `median(a, b, ...)`  | Returns the median value |
+| Mode             | `mode(a, b, ...)`   | Returns the most frequent value |
+| Standard Deviation| `std(a, b, ...)`   | Returns standard deviation |
+| Variance         | `variance(a, b, ...)` | Returns variance |
+| Sum              | `sum(a, b, ...)`    | Returns the sum of all values |
+| Product          | `prod(a, b, ...)`   | Returns the product of all values |
+
+### Logical Functions
+
+| Function         | Syntax              | Description |
+| ---------------- | ------------------- | ----------- |
+| AND              | `and(a, b)`         | Logical AND |
+| OR               | `or(a, b)`          | Logical OR |
+| NOT              | `not(x)`            | Logical NOT |
+| XOR              | `xor(a, b)`         | Logical XOR |
+
+### Constants
+
+| Constant         | Syntax   | Value |
+| ---------------- | -------- | ----- |
+| Pi               | `pi`     | 3.14159... |
+| Euler's Number   | `e`      | 2.71828... |
+| Golden Ratio     | `phi`    | 1.61803... |
 
 ## Value Types
 Attributes can have the following kind assoicated to a value, which handles how it is displayed or computed:
