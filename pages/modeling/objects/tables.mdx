@@ -11,31 +11,6 @@ Tables use an infinite grid layout with column headers (A, B, C, ...) and row he
 
 <Info>Tables are edited from the document view only</Info>
 
-## Importing Excel Files
-
-Davinci tables support importing Excel spreadsheets (`.xlsx` and `.xls` formats), which automatically convert to native Davinci spreadsheets. This allows you to bring existing Excel data directly into your model while preserving formulas, formatting, and structure.
-
-### Import Process
-To import an Excel file:
-1. Drag and drop the Excel file into your workspace, or use the file import dialog
-2. Each worksheet in the Excel file becomes a separate table object
-3. Cell data, formulas, and formatting are automatically converted
-
-### What Gets Converted
-- **Cell values**: Text, numbers, and dates are preserved
-- **Formulas**: Common Excel functions are converted to Math.js equivalents:
-  - `SUM()`, `MAX()`, `MIN()` remain the same
-  - `AVERAGE()` converts to `mean()`
-  - `MEDIAN()` remains `median()`
-  - `STDEV()`, `STDEV.S()`, `STDEV.P()` convert to `std()`
-- **Cell references**: A1 notation is converted to Davinci's internal reference system
-- **Formatting**: Background colors and borders are preserved
-- **Layout**: Column widths are estimated based on content
-
-<Note>If a single-sheet Excel file is imported, the table is named after the filename. Multi-sheet files create tables named "filename - sheetname" for each worksheet.</Note>
-
-<Warning>Formulas containing unsupported Excel functions will be converted to text cells displaying the formula. You can manually edit these cells to use supported operations.</Warning>
-
 ## Cell Types
 
 Tables support three distinct cell types, each optimized for different use cases:
@@ -185,6 +160,32 @@ Calculate average of two cells using parentheses
 ```
 
 <Warning>Circular dependencies (a cell referencing itself through a chain of formulas) will result in a `#CIRCDEP!` error.</Warning>
+
+
+## Importing Excel Files
+
+Davinci tables support importing Excel spreadsheets (`.xlsx` and `.xls` formats), which automatically convert to native Davinci spreadsheets. This allows you to bring existing Excel data directly into your model while preserving formulas, formatting, and structure.
+
+### Import Process
+To import an Excel file:
+1. Drag and drop the Excel file into your workspace, or use the file import dialog
+2. Each worksheet in the Excel file becomes a separate table object
+3. Cell data, formulas, and formatting are automatically converted
+
+### What Gets Converted
+- **Cell values**: Text, numbers, and dates are preserved
+- **Formulas**: Common Excel functions are converted to Math.js equivalents:
+  - `SUM()`, `MAX()`, `MIN()` remain the same
+  - `AVERAGE()` converts to `mean()`
+  - `MEDIAN()` remains `median()`
+  - `STDEV()`, `STDEV.S()`, `STDEV.P()` convert to `std()`
+- **Cell references**: A1 notation is converted to Davinci's internal reference system
+- **Formatting**: Background colors and borders are preserved
+- **Layout**: Column widths are estimated based on content
+
+<Note>If a single-sheet Excel file is imported, the table is named after the filename. Multi-sheet files create tables named "filename - sheetname" for each worksheet.</Note>
+
+<Warning>Formulas containing unsupported Excel functions will be converted to text cells displaying the formula. You can manually edit these cells to use supported operations.</Warning>
 
 ## View Types
 
