@@ -137,8 +137,6 @@
                                     "pages/user-guide/views/activity",
                                     "pages/user-guide/views/sequence",
                                     "pages/user-guide/views/risk",
-                                    "pages/user-guide/views/schematic",
-                                    "pages/user-guide/views/simulation",
                                     "pages/user-guide/views/slide"
                                 ]
                             }
