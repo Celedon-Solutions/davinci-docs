@@ -5,27 +5,420 @@ title: Toolbox
 <img height="20" noZoom src="/images/objecticons/toolbox.svg" />
 
 ## Description
-Toolboxes allow the Davinci Agent to connect to any publicly available API to retrieve data for use in the model. The default toolbox retrieves weather data from weather.gov as an example for how to use toolboxes.
+Toolboxes extend the Davinci Agent's capabilities by providing custom Python functions that can connect to external APIs, perform specialized operations, and retrieve real-time data. When you enable a toolbox, its tools become available to the agent, allowing it to call them when needed during conversations and task execution.
 
-<Info>Toolboxes need to be enabled from the Toolbox View in order to be used by the agent.</Info>
+Toolboxes are ideal for integrating third-party services (weather, databases, web APIs), automating data retrieval, performing specialized calculations, and extending agent functionality beyond built-in capabilities.
 
-## Creating Tools
-Tools are created by defining Python functions that the agent can execute. These functions can include operations and connections to external APIs.
+## Creating a Toolbox
 
-### Defining a Tool
-To create a tool, call the `davinci.tool()` function immediately before defining your asynchronous function. The function's name serves as the tool's identifier for the agent.
+Toolboxes are Python code objects that define one or more tools using the `davinci.tool()` decorator. Each tool is an asynchronous function that the agent can call with specific parameters.
+
+### Basic Structure
+
+A typical toolbox contains:
+
+1. **Imports**: Required libraries (httpx for API calls, typing for type hints)
+2. **Constants**: API endpoints, configuration values
+3. **Helper Functions**: Internal functions that support tool operations
+4. **Tool Functions**: Functions marked with `davinci.tool()` that the agent calls
+5. **Documentation**: Docstrings that explain what each tool does
+
+**Example skeleton:**
+```python
+from typing import Any
+import httpx
+
+# Constants
+API_BASE = "https://api.example.com"
+
+# Helper function (not exposed to agent)
+async def make_request(url: str) -> dict:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        return response.json()
+
+# Tool function (exposed to agent)
+davinci.tool()
+async def get_data(parameter: str) -> str:
+    """Tool description goes here.
+    
+    Args:
+        parameter: Description of this parameter
+    """
+    data = await make_request(f"{API_BASE}/{parameter}")
+    return format_result(data)
+```
+
+## Defining Tools
+
+### The davinci.tool() Decorator
+
+Place `davinci.tool()` immediately before any async function you want to expose to the agent:
+
+```python
+davinci.tool()
+async def my_tool_name(param1: str, param2: float) -> str:
+    """Tool description."""
+    # Implementation here
+    return result
+```
+
+**Key points:**
+- Must be an `async` function
+- Must have a docstring (agent uses this to understand the tool)
+- Parameters should have type hints
+- Return type should be specified
+
+### Function Documentation
+
+The docstring is critical—the agent reads it to understand when and how to use your tool.
+
+**Docstring format:**
+```python
+davinci.tool()
+async def get_weather(city: str, units: str = "metric") -> str:
+    """Get current weather for a city.
+    
+    Args:
+        city: City name (e.g., "San Francisco", "London")
+        units: Temperature units - "metric" (Celsius) or "imperial" (Fahrenheit)
+    """
+```
+
+**Docstring sections:**
+- **Description**: First line(s) explain what the tool does
+- **Args**: List each parameter with its purpose and format
+- **Return** (optional): Describe what the tool returns
+
+<Note>Write clear, concise docstrings. The agent uses them to decide when to call your tool and what arguments to provide.</Note>
+
+## Connecting to APIs
+
+Toolboxes commonly use the `httpx` library for making HTTP requests to external APIs.
+
+### Making API Requests
+
+Use `httpx.AsyncClient()` for asynchronous API calls:
+
+```python
+async def fetch_from_api(endpoint: str) -> dict:
+    """Make an async GET request to an API."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            endpoint,
+            headers={"User-Agent": "MyApp/1.0"},
+            timeout=30.0
+        )
+        response.raise_for_status()  # Raise exception for 4xx/5xx
+        return response.json()
+```
+
+**Best practices:**
+- Always use `async with` for proper connection cleanup
+- Set appropriate timeouts (default: 30 seconds)
+- Include a User-Agent header (some APIs require it)
+- Use `raise_for_status()` to catch HTTP errors
+- Handle exceptions gracefully
+
+### Error Handling
+
+Wrap API calls in try-except blocks to handle failures:
+
+```python
+davinci.tool()
+async def get_data(query: str) -> str:
+    """Fetch data from API."""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{API_BASE}/{query}")
+            response.raise_for_status()
+            data = response.json()
+            return format_result(data)
+    except httpx.HTTPError:
+        return "Unable to fetch data from API."
+    except Exception:
+        return "An unexpected error occurred."
+```
+
+<Warning>Always handle exceptions. If a tool crashes, it disrupts agent execution. Return error messages as strings instead of raising exceptions.</Warning>
+
+## Enabling and Using Toolboxes
+
+### Activating a Toolbox
+
+To make a toolbox available to the agent:
+
+1. Open the toolbox in the Toolbox view
+2. Toggle the **Active/Inactive** switch in the header to "Active"
+3. The toolbox's tools are now available to the agent
+
+<Info>Only active toolboxes are available to the agent. Deactivate toolboxes you're not using to reduce agent complexity.</Info>
+
+### How the Agent Uses Tools
+
+When you interact with the agent, it:
+
+1. **Analyzes your request**: Determines if any tools can help
+2. **Selects appropriate tools**: Chooses tools based on docstrings
+3. **Calls tools with parameters**: Invokes tools with extracted arguments
+4. **Uses results**: Incorporates tool output into its response
+
+**Example conversation:**
+```
+User: "What's the weather in California?"
+
+Agent thinking: User wants weather data. I have a get_alerts tool 
+that works with state codes. California = CA.
+
+Agent: *Calls get_alerts(state="CA")*
+Agent: "Here are the current weather alerts for California: ..."
+```
+
+The agent automatically determines when to use your tools based on the conversation context and tool descriptions.
+
+## Updating Model Data from Tools
+
+Tools can write data back to your model using the same `update()` function as regular code:
+
+```python
+davinci.tool()
+async def fetch_and_store_temperature(city: str) -> str:
+    """Fetch temperature and store it in the model.
+    
+    Args:
+        city: City name to get temperature for
+    """
+    # Fetch from API
+    temp = await get_temperature_from_api(city)
+    
+    # Update model attribute
+    update(@TemperatureAttribute, temp, "celsius", "number")
+    
+    return f"Stored temperature: {temp}°C"
+```
+
+This allows tools to both retrieve external data and populate your model automatically.
+
+## Testing Toolboxes
+
+Always test your toolbox before using it with the agent.
+
+### Using the Test Interface
+
+The right pane of the Toolbox view provides a testing area:
+
+1. Type a natural language instruction (e.g., "Get weather alerts for Texas")
+2. Click **Run Test**
+3. Review the output to verify your tool works correctly
+
+**Test different scenarios:**
+- Valid inputs
+- Edge cases (empty strings, unusual values)
+- Error conditions (invalid API keys, network failures)
+- Different parameter combinations
+
+<Note>Thorough testing prevents agent failures during actual use. Test each tool with various inputs before activating the toolbox.</Note>
+
+## Example: Weather Data Toolbox
+
+The default weather toolbox provides real-time weather data from the National Weather Service API. This example demonstrates API integration, error handling, and creating multiple related tools within one toolbox.
+
+### Complete Script
+
+Here's the full example weather toolbox. We will break it down below to explain each section.
+
+```python
+from typing import Any
+import httpx
+
+# Constants
+NWS_API_BASE = "https://api.weather.gov"
+USER_AGENT = "weather-app/1.0"
+
+async def make_nws_request(url: str) -> dict[str, Any] | None:
+    """Make a request to the NWS API with proper error handling."""
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/geo+json"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers, timeout=30.0)
+            response.raise_for_status()
+            return response.json()
+        except Exception:
+            return None
+
+def format_alert(feature: dict) -> str:
+    """Format an alert feature into a readable string."""
+    props = feature["properties"]
+    return f"""
+Event: {props.get('event', 'Unknown')}
+Area: {props.get('areaDesc', 'Unknown')}
+Severity: {props.get('severity', 'Unknown')}
+Description: {props.get('description', 'No description available')}
+Instructions: {props.get('instruction', 'No specific instructions provided')}
+"""
+
+davinci.tool()
+async def get_alerts(state: str) -> str:
+    """Get weather alerts for a US state.
+
+    Args:
+        state: Two-letter US state code (e.g. CA, NY)
+    """
+    url = f"{NWS_API_BASE}/alerts/active/area/{state}"
+    data = await make_nws_request(url)
+
+    if not data or "features" not in data:
+        return "Unable to fetch alerts or no alerts found."
+
+    if not data["features"]:
+        return "No active alerts for this state."
+
+    alerts = [format_alert(feature) for feature in data["features"]]
+    return "\n---\n".join(alerts)
+
+davinci.tool()
+async def get_forecast(latitude: float, longitude: float) -> str:
+    """Get weather forecast for a location.
+
+    Args:
+        latitude: Latitude of the location
+        longitude: Longitude of the location
+    """
+    # First get the forecast grid endpoint
+    points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
+    points_data = await make_nws_request(points_url)
+
+    if not points_data:
+        return "Unable to fetch forecast data for this location."
+
+    # Get the forecast URL from the points response
+    forecast_url = points_data["properties"]["forecast"]
+    forecast_data = await make_nws_request(forecast_url)
+
+    if not forecast_data:
+        return "Unable to fetch detailed forecast."
+
+    # Format the periods into a readable forecast
+    periods = forecast_data["properties"]["periods"]
+    forecasts = []
+    for period in periods[:5]:  # Only show next 5 periods
+        forecast = f"""
+{period['name']}:
+Temperature: {period['temperature']}°{period['temperatureUnit']}
+Wind: {period['windSpeed']} {period['windDirection']}
+Forecast: {period['detailedForecast']}
+"""
+        forecasts.append(forecast)
+
+    return "\n---\n".join(forecasts)
+```
+
+### Imports and Constants
+
+```python
+from typing import Any
+import httpx
+
+# Constants
+NWS_API_BASE = "https://api.weather.gov"
+USER_AGENT = "weather-app/1.0"
+```
+
+**Lines 1-2: Imports**
+- `typing.Any`: Type hint for dictionaries with unknown structure
+- `httpx`: Async HTTP client library for API requests
+
+**Lines 4-5: Constants**
+- `NWS_API_BASE`: Base URL for National Weather Service API
+- `USER_AGENT`: Identifier for API requests (NWS requires this)
+
+---
+
+### Helper Function: make_nws_request
+
+```python
+async def make_nws_request(url: str) -> dict[str, Any] | None:
+    """Make a request to the NWS API with proper error handling."""
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/geo+json"
+    }
+```
+
+**Line 7: Helper function definition**
+- `async def`: Asynchronous function (doesn't block while waiting for API)
+- `url: str`: Takes a URL string as input
+- `-> dict[str, Any] | None`: Returns either a dictionary or None if it fails
+
+**Lines 8-11: Request headers**
+- `User-Agent`: Required by NWS API to identify the client
+- `Accept`: Tells API we want GeoJSON format response
+
+---
+
+```python
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers, timeout=30.0)
+            response.raise_for_status()
+            return response.json()
+        except Exception:
+            return None
+```
+
+**Line 13: Create async HTTP client**
+- `async with`: Ensures connection closes properly after use
+- `httpx.AsyncClient()`: Creates reusable HTTP client
+
+**Lines 14-18: Make request and handle response**
+- `await client.get()`: Make GET request, wait for response
+- `timeout=30.0`: Wait up to 30 seconds before giving up
+- `raise_for_status()`: Throw error if response is 4xx or 5xx
+- `response.json()`: Parse JSON response into Python dictionary
+
+**Lines 19-20: Error handling**
+- Catch any exception (network error, timeout, invalid JSON)
+- Return `None` to indicate failure (caller checks for this)
+
+---
+
+### Helper Function: format_alert
+
+```python
+def format_alert(feature: dict) -> str:
+    """Format an alert feature into a readable string."""
+    props = feature["properties"]
+    return f"""
+Event: {props.get('event', 'Unknown')}
+Area: {props.get('areaDesc', 'Unknown')}
+Severity: {props.get('severity', 'Unknown')}
+Description: {props.get('description', 'No description available')}
+Instructions: {props.get('instruction', 'No specific instructions provided')}
+"""
+```
+
+**Line 22: Helper function for formatting**
+- Takes raw API data (`feature`) and makes it human-readable
+
+**Line 24: Extract properties**
+- `feature["properties"]`: Get the properties section from API response
+
+**Lines 25-30: Format as string**
+- Uses f-string with multi-line format
+- `.get()` method provides default values if fields are missing
+- Returns formatted string with event details
+
+---
+
+### Tool 1: get_alerts
 
 ```python
 davinci.tool()
 async def get_alerts(state: str) -> str:
-```
-
-### Tool Description and Arguments
-The agent understands how to use the tool through the function's docstring.
-- **Description**: The text at the top of the docstring explains the tool's purpose.
-- **Args**: The `Args:` section specifies the expected input parameters.
-
-```python
     """Get weather alerts for a US state.
 
     Args:
@@ -33,24 +426,146 @@ The agent understands how to use the tool through the function's docstring.
     """
 ```
 
-## Testing
-Toolboxes include a testing function to verify that connections are successful and arguments are passed correctly.
+**Line 32: Tool decorator**
+- `davinci.tool()`: Marks this function as available to the agent
 
-Users can run tests by:
-1. Entering specific instructions in the input field within the Toolbox Testing Area (e.g., "Get weather alerts for CA").
-2. Clicking the **Run Test** button.
+**Line 33: Tool function definition**
+- `async def`: Async function (can make API calls without blocking)
+- `get_alerts`: Function name (agent sees this as tool name)
+- `state: str`: Required parameter—a string state code
+- `-> str`: Returns a string (formatted alert information)
 
-This allows for the validation of API connections and logic before the tool is used in the model.
+**Lines 34-38: Docstring**
+- First line: Clear description of what the tool does
+- `Args:` section: Explains the `state` parameter
+- Agent reads this to understand when/how to use the tool
+
+---
+
+```python
+    url = f"{NWS_API_BASE}/alerts/active/area/{state}"
+    data = await make_nws_request(url)
+```
+
+**Line 39: Build API URL**
+- Uses f-string to insert state code into URL
+- Example: For "CA", creates `https://api.weather.gov/alerts/active/area/CA`
+
+**Line 40: Make API request**
+- Calls helper function to fetch data
+- `await`: Wait for request to complete before continuing
+- `data` will be dictionary (success) or None (failure)
+
+---
+
+```python
+    if not data or "features" not in data:
+        return "Unable to fetch alerts or no alerts found."
+
+    if not data["features"]:
+        return "No active alerts for this state."
+```
+
+**Lines 42-43: Check for API failure**
+- If `data` is None or doesn't have "features" key, API failed
+- Return error message to agent
+
+**Lines 45-46: Check for empty alerts**
+- If "features" exists but is empty, no alerts are active
+- Return informative message instead of empty response
+
+---
+
+```python
+    alerts = [format_alert(feature) for feature in data["features"]]
+    return "\n---\n".join(alerts)
+```
+
+**Line 48: Format all alerts**
+- List comprehension: Process each alert in the data
+- `format_alert(feature)`: Convert each raw alert to readable text
+- Creates list of formatted alert strings
+
+**Line 49: Join and return**
+- `"\n---\n".join()`: Combine all alerts with separator lines
+- Returns single string with all formatted alerts
+- Agent receives this string and can present it to the user
+
+---
+
+### Tool 2: get_forecast
+
+```python
+davinci.tool()
+async def get_forecast(latitude: float, longitude: float) -> str:
+    """Get weather forecast for a location.
+
+    Args:
+        latitude: Latitude of the location
+        longitude: Longitude of the location
+    """
+    # First get the forecast grid endpoint
+    points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
+    points_data = await make_nws_request(points_url)
+
+    if not points_data:
+        return "Unable to fetch forecast data for this location."
+
+    # Get the forecast URL from the points response
+    forecast_url = points_data["properties"]["forecast"]
+    forecast_data = await make_nws_request(forecast_url)
+
+    if not forecast_data:
+        return "Unable to fetch detailed forecast."
+
+    # Format the periods into a readable forecast
+    periods = forecast_data["properties"]["periods"]
+    forecasts = []
+    for period in periods[:5]:  # Only show next 5 periods
+        forecast = f"""
+{period['name']}:
+Temperature: {period['temperature']}°{period['temperatureUnit']}
+Wind: {period['windSpeed']} {period['windDirection']}
+Forecast: {period['detailedForecast']}
+"""
+        forecasts.append(forecast)
+
+    return "\n---\n".join(forecasts)
+```
+
+**This tool demonstrates:**
+- Multi-step API calls (first get grid point, then get forecast)
+- Handling latitude/longitude coordinates
+- Processing nested API responses
+- Limiting output (only 5 forecast periods)
+- Formatting complex data structures
+
+The NWS API requires two steps: first call `/points/` to get grid coordinates, then call the forecast URL from that response. The tool handles this complexity and returns simple formatted text.
+
+## Tips for Effective Toolboxes
+
+**Keep Tools Focused**: Each tool should do one thing well. Multiple simple tools are better than one complex tool.
+
+**Write Clear Docstrings**: The agent's ability to use your tools depends entirely on your descriptions. Be specific and include examples.
+
+**Handle Errors Gracefully**: Return error messages instead of crashing. The agent can communicate errors to users.
+
+**Use Type Hints**: They improve code clarity and help catch bugs during development.
+
+**Test Thoroughly**: Test with various inputs, including edge cases and error conditions.
+
+**Limit Output Length**: Don't return megabytes of data. Summarize, truncate, or format data before returning it.
+
+**Add Timeouts**: Network requests can hang. Always specify reasonable timeouts.
 
 ## View Types
 
 | View | Description |
 | :--- | :--- |
-| [Toolbox](/pages/user-guide/views/toolbox) | Manage and test tool definitions and API connections. |
+| [Toolbox](/pages/user-guide/views/toolbox) | Edit tool code, view detected tools, and test functionality. |
 | [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
 
 ## Properties Fields
-
 
 <ParamField path="Name" type="string">
 Name of the object.

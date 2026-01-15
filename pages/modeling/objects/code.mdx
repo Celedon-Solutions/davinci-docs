@@ -5,18 +5,376 @@ title: Code
 <img height="20" noZoom src="/images/objecticons/code.svg" /> 
 
 ## Description
-Code objects contain executable code that can be written in various programming languages.
+Code objects contain executable code that integrates directly with your model. They support multiple programming languages, with Python being the only browser-executable language through the built-in Pyodide runtime. Code can read attribute values, update model data, generate plots, and perform complex analysis—all while maintaining live connections to your model objects.
+
+Code objects are ideal for parametric studies, design optimization, analysis automation, and model-driven calculations that need to access and manipulate model data programmatically.
+
+## Language Support
+
+### Browser-Executable: Python
+
+**Python** is the only language that executes directly in the browser without requiring server-side infrastructure. The Pyodide runtime provides a full Python environment with scientific computing libraries including NumPy, SciPy, and Matplotlib.
+
+**When to use Python:**
+- Parametric analysis and optimization
+- Model-driven calculations
+- Data visualization and plotting
+- Automation scripts that read/write model data
+- Design space exploration
+
+<Note>When creating code through the AI agent, Python is used by default unless you explicitly specify another language.</Note>
+
+### Non-Executable Languages
+
+Other programming languages are supported for storage and syntax highlighting but do not execute in the browser:
+
+- **JavaScript/TypeScript**
+- **C/C++**
+- **Java**
+- **MATLAB**
+- **Other languages**: Formatting and/or syntax highlighting may not function correctly
+
+<Info>Non-executable languages are useful for storing implementation code, generated code, or reference implementations alongside your model. They provide syntax highlighting but no execution capabilities.</Info>
+
+## Referencing Model Objects
+
+Code can reference any model object using `@` notation, creating live connections between your code and model data.
+
+### Basic Object References
+
+Type `@` in the code editor to insert a reference to a model object:
+
+1. Type `@` in the code
+2. Select an object from the dropdown
+3. A reference anchor is inserted at that location
+
+The reference resolves to the object when the code executes, allowing you to access its data.
+
+**Example:**
+```python
+# Reference a component's mass attribute
+mass_value = @MyComponent.mass
+print(f"Component mass: {mass_value} kg")
+```
+
+### Reading Attribute Values
+
+Attribute references return the resolved numeric value when the code runs:
+
+```python
+# Get attribute value in default units
+base_value = @MyAttribute
+
+# Get attribute value converted to specific units
+converted_value = @MyAttribute("mg")
+```
+
+**Unit conversion example:**
+```python
+# If @MassAttribute is "1 kg" in the model
+mass_kg = @MassAttribute        # Returns: 1
+mass_g = @MassAttribute("g")     # Returns: 1000
+mass_mg = @MassAttribute("mg")   # Returns: 1000000
+```
+
+<Note>Once assigned to a variable, the value is a number. You cannot perform unit conversions on the variable—conversions must happen at reference time using the `("unit")` notation.</Note>
+
+<Warning>Unit conversions must use compatible units. Attempting to convert mass to length will cause an error.</Warning>
+
+### Reading Object Properties
+
+Reference non-attribute properties directly:
+
+```python
+# Get object name
+component_name = @MyComponent.name
+
+# Get documentation
+description = @MyComponent.documentation
+
+# Get value (for parameters, attributes, etc.)
+param_value = @MyParameter.value
+```
+
+## Updating Model Objects
+
+Code can write data back to the model, updating attributes and constraints programmatically.
+
+### Updating Attributes
+
+Use the `update()` function to write attribute values:
+
+```python
+# Update attribute with unit
+new_value = 1500
+update(@MassAttribute, new_value, "kg", "number")
+
+# Update unitless attribute
+count = 42
+update(@CountAttribute, count, None, "number")
+```
+
+**Update function signature:**
+```python
+update(object_reference, value, unit, kind)
+```
+
+**Parameters:**
+- `object_reference`: The `@ObjectName` reference to update
+- `value`: The new numeric value
+- `unit`: The unit string (e.g., "kg", "m", "s") or `None` for unitless
+- `kind`: The value type ("number", "integer", "boolean")
+
+**Supported value kinds:**
+- `"number"`: Floating-point numbers
+- `"integer"`: Whole numbers
+- `"boolean"`: True/False values
+
+<Note>The `update()` function only works on Attribute and Constraint objects. You cannot update other object types through code.</Note>
+
+### Updating Constraints
+
+Constraints can be updated without specifying unit or kind:
+
+```python
+# Update constraint value
+update(@SafetyConstraint, 0.95)
+
+# Constraint status updates automatically based on the value
+```
+
+### Example: Parametric Update
+
+```python
+# Read current values
+length = @Length("m")
+width = @Width("m")
+
+# Calculate new area
+area = length * width
+
+# Update area attribute
+update(@Area, area, "m^2", "number")
+
+print(f"Updated area: {area} m²")
+```
+
+## Available Python Modules
+
+The Pyodide runtime includes essential scientific computing packages:
+
+| Package | Import As | Description |
+|---------|-----------|-------------|
+| numpy | `numpy` | Numerical computing and arrays |
+| matplotlib | `matplotlib.pyplot as plt` | Plotting and visualization |
+| scipy | `scipy` | Scientific algorithms |
+| Pillow | `PIL` | Image processing |
+| pandas | `pandas` | Data manipulation (limited) |
+
+**Example usage:**
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create plot
+plt.figure()
+plt.plot(x, y)
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.title('Sine Wave')
+plt.show()
+```
+
+<Note>Use `plt.show()` to display plots in the output terminal. Plots appear in the terminal and can be saved as figures to your model.</Note>
+
+## File Operations
+
+Code can save and load files to/from your model.
+
+### Saving Files
+
+Save data to the model using `save()`:
+
+```python
+# Save text file
+save("@ParentObject/results.txt", "Analysis complete")
+
+# Save data to a specific location
+data = "Temperature: 25°C\nPressure: 101.3 kPa"
+save("@DataFolder/measurements.txt", data)
+```
+
+The `save()` function creates a Reference object at the specified path.
+
+**Path syntax:**
+- Starts with `@ObjectName` to specify the parent location
+- Use `/` to traverse into child objects
+- The filename becomes the Reference object's name
+
+### Loading Files
+
+Load reference files using `open()`:
+
+```python
+# Load text file
+with open("@ParentObject/config.txt", "r") as f:
+    config = f.read()
+
+# Process file content
+lines = config.split('\n')
+for line in lines:
+    print(line)
+```
+
+<Note>File paths must use `@` notation to reference package objects. You cannot use `../` to traverse upward in the hierarchy.</Note>
+
+## Importing Code Objects
+
+Import functions and classes from other code objects in your model:
+
+```python
+# Import another code object
+import @UtilityFunctions
+
+# Use imported functions
+result = UtilityFunctions.calculate_mass(volume, density)
+```
+
+**Example setup:**
+
+**Code Object 1: `utils.py`**
+```python
+def calculate_mass(volume, density):
+    return volume * density
+
+def calculate_volume(length, width, height):
+    return length * width * height
+```
+
+**Code Object 2: `analysis.py`**
+```python
+import @utils
+
+# Use imported functions
+vol = utils.calculate_volume(10, 5, 2)
+mass = utils.calculate_mass(vol, 7.85)  # Steel density
+
+print(f"Volume: {vol} m³")
+print(f"Mass: {mass} kg")
+```
+
+<Note>Imported code objects expose all their functions to the global namespace of the importing code.</Note>
+
+## Executing Code
+
+### Running Scripts
+
+Click the **Run** button to execute the entire code object from top to bottom. This runs all code and displays output in the terminal.
+
+### Running Functions
+
+Select a specific function from the function dropdown to execute only that function:
+
+1. Select function from dropdown (e.g., `calculate_mass()`)
+2. Click **Run**
+3. Only the selected function executes
+
+<Info>Functions must be defined at the top level (not nested) to appear in the function dropdown.</Info>
+
+### Output Terminal
+
+The output terminal displays:
+- Print statements
+- Plots and figures
+- Error messages and stack traces
+- Execution status
+
+**Terminal features:**
+- **Auto-opens**: Terminal opens automatically when code runs
+- **Toggle visibility**: Click "Output" to show/hide the terminal
+- **Save figures**: Click "Save Figure" beneath plots to save them as Reference objects
+- **No persistence**: Terminal clears when workspace closes or code reruns
+
+<Note>Use `plt.show()` to display matplotlib plots in the terminal. Each `plt.show()` call creates a separate figure in the output.</Note>
+
+## Example: Parametric Analysis
+
+This example demonstrates reading model data, performing analysis, and updating results:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read component properties
+length = @BeamLength("m")
+width = @BeamWidth("m")
+height = @BeamHeight("m")
+material_density = @MaterialDensity("kg/m^3")
+
+# Calculate volume and mass
+volume = length * width * height
+mass = volume * material_density
+
+# Update mass attribute
+update(@CalculatedMass, mass, "kg", "number")
+
+# Perform stress analysis
+load = @AppliedLoad("N")
+area = width * height
+stress = load / area
+
+# Update stress result
+update(@StressResult, stress, "Pa", "number")
+
+# Generate visualization
+x = np.linspace(0, length, 100)
+deflection = (load * x**2 * (3*length - x)) / (6 * 210e9 * (width * height**3 / 12))
+
+plt.figure(figsize=(10, 6))
+plt.plot(x, deflection * 1000)  # Convert to mm
+plt.xlabel('Position (m)')
+plt.ylabel('Deflection (mm)')
+plt.title('Beam Deflection Under Load')
+plt.grid(True)
+plt.show()
+
+# Print summary
+print(f"Analysis Results:")
+print(f"  Volume: {volume:.4f} m³")
+print(f"  Mass: {mass:.2f} kg")
+print(f"  Stress: {stress/1e6:.2f} MPa")
+print(f"  Max Deflection: {max(deflection)*1000:.3f} mm")
+```
+
+This code reads beam geometry and material properties, calculates mass and stress, updates model attributes with results, and generates a deflection plot.
+
+## Tips for Effective Code
+
+**Use References Liberally**: Reference model objects instead of hardcoding values. This keeps your analysis connected to model updates.
+
+**Document Functions**: Add docstrings to functions so their purpose is clear when selected in the dropdown.
+
+**Handle Units Carefully**: Always specify units when reading and updating attributes to avoid confusion and errors.
+
+**Organize with Imports**: Split complex analysis into multiple code objects and import them as needed for maintainability.
+
+**Save Important Plots**: Use "Save Figure" to store analysis plots as Reference objects for documentation and reporting.
+
+**Check Output**: Always review the output terminal for warnings and errors, especially after model changes.
 
 ## View Types
 
 | View | Description |
 | :--- | :--- |
-| [Code](/pages/user-guide/views/code) | Edit source code with syntax highlighting. |
+| [Code](/pages/user-guide/views/code) | Edit source code with syntax highlighting and execution. |
 | [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
 | [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
 
 ## Properties Fields
-
 
 <ParamField path="Name" type="string">
 Name of the object.
