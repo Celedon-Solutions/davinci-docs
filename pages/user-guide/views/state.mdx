@@ -1,0 +1,52 @@
+---
+title: State View
+---
+
+## Description
+
+The State View displays state machine diagrams for State objects, showing states, transitions, and the flow of system behavior. This view automatically generates diagrams from state definitions, making it easy to understand and document system state machines.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_state.png" />  
+</Frame>
+
+States are represented as rounded rectangles, with arrows showing possible transitions between states. Transition labels display trigger conditions and actions, providing a complete picture of state machine behavior.
+
+## View Controls
+
+### Depth
+
+Controls how many levels of nested states to display. State machines can contain hierarchical states (states within states), and depth determines how deep into this hierarchy the diagram shows.
+
+### Orientation
+
+Choose between horizontal and vertical layout for the state diagram. This affects the primary direction of state flow in the visualization.
+
+### Show Documentation
+
+Toggle to display or hide documentation text for states. When enabled, documentation appears within or alongside each state node.
+
+### Transition Visibility
+
+Control which types of transitions appear in the diagram:
+- **Show Incoming**: Display transitions coming into states from elsewhere
+- **Show Outgoing**: Display transitions leaving states
+- **Show Trigger**: Display event-triggered transitions
+
+### Refresh
+
+Regenerates the state diagram layout. Use this if the diagram needs updating after changes to states or transitions.
+
+## Interaction
+
+**Pan and Zoom**: Click and drag to pan around the diagram. Use mouse wheel or pinch gestures to zoom in and out.
+
+**Click States**: Click on any state to open that state object.
+
+**Click Transitions**: Click on transition arrows to view or edit transition details.
+
+## Use Cases
+
+**Behavior Modeling**: Document and understand how systems transition between different operational modes.
+
+**Control Logic Visualization**: See the complete flow of state-based control systems at a glance.

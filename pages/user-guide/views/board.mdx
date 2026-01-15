@@ -1,0 +1,55 @@
+---
+title: Board View
+---
+
+## Description
+
+The Board View provides a layout environment for printed circuit board (PCB) design, showing component placement, routing, and board geometry for Circuit objects. This view is used in conjunction with the Schematic View to create complete electronic designs.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_board.png" />  
+</Frame>
+
+The board view displays the physical layout of circuit components on a PCB, including component footprints, copper traces, vias, and board outline. This view helps you transition from circuit schematic to manufacturable board design.
+
+## View Controls
+
+### Pan and Zoom
+
+Click and drag to move around the board layout. Use mouse wheel or pinch gestures to zoom in and out. This allows you to examine fine details or see the entire board at once.
+
+### Layer Selection
+
+Toggle visibility of different PCB layers:
+- **Top/Bottom Copper**: Conductive traces on each side of the board
+- **Silkscreen**: Component labels and markings
+- **Solder Mask**: Protective coating areas
+- **Board Outline**: Physical board edge
+
+### Component Placement
+
+Components from the schematic are represented as footprints on the board. The view shows:
+- Footprint outlines
+- Pad locations
+- Component reference designators
+- Orientation indicators
+
+### Routing Display
+
+Copper traces connecting components are displayed with appropriate widths and layer assignments. Vias connecting different layers are shown as filled circles.
+
+## Board Elements
+
+**Footprints**: Physical component outlines showing pin/pad locations and orientation.
+
+**Traces**: Copper paths connecting component pads according to the schematic netlist.
+
+**Vias**: Plated holes connecting traces between board layers.
+
+**Board Outline**: The physical edge and shape of the PCB.
+
+## Use Cases
+
+**PCB Layout Verification**: Review component placement and routing before manufacturing to ensure the design meets size, clearance, and manufacturability requirements.
+
+**Design Documentation**: Generate board layout views for design reviews, manufacturing documentation, and assembly instructions.

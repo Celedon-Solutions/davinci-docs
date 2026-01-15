@@ -1,0 +1,68 @@
+---
+title: Activity View
+---
+
+## Description
+
+The Activity View displays activity diagrams for Action objects, showing the flow of actions, decisions, and control logic. This view uses a two-pane layout with code editor on the left and generated diagram on the right, allowing you to define activity flows in text and see them visualized instantly.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_activity.png" />  
+</Frame>
+
+Activity diagrams illustrate workflows, decision points, parallel actions, and loops using standard activity diagram notation. The view parses your activity definition code and automatically generates the corresponding visual representation.
+
+## View Controls
+
+### Code Editor
+
+The left pane contains a code editor where you define the activity flow using structured syntax. Changes to the code automatically update the diagram on the right after a brief delay.
+
+### Wrap
+
+Toggle line wrapping in the code editor for better readability of long lines.
+
+### Depth
+
+Controls how deep into nested actions and sub-activities the diagram displays.
+
+### Orientation
+
+Choose between horizontal and vertical layout for the activity diagram flow.
+
+### Show Documentation
+
+Toggle to display or hide documentation text for activities and actions within the diagram.
+
+### Show Flows
+
+Control visibility of flow lines between actions.
+
+### Show Performers
+
+Toggle display of performers (actors or systems) responsible for executing actions.
+
+### Refresh
+
+Regenerates the activity diagram from the current code definition.
+
+## Diagram Elements
+
+Activity diagrams include:
+- **Actions**: Rectangular blocks representing individual actions or operations
+- **Decisions**: Diamond shapes for conditional branching
+- **Flow Lines**: Arrows showing the sequence and flow of control
+- **Start/End**: Circular markers indicating activity start and end points
+- **Parallel Actions**: Synchronized bars for concurrent execution paths
+
+## Interaction
+
+**Pan and Zoom**: In the diagram pane, click and drag to pan. Use mouse wheel to zoom.
+
+**Edit Code**: Modify the activity definition in the left pane to change the diagram structure.
+
+## Use Cases
+
+**Process Documentation**: Model business processes, workflows, and operational procedures.
+
+**Algorithm Visualization**: Illustrate complex algorithms and control flow logic in a visual format.

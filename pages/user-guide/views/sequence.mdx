@@ -1,0 +1,60 @@
+---
+title: Sequence View
+---
+
+## Description
+
+The Sequence View displays sequence diagrams for Action objects, showing interactions and message exchanges between different entities over time. This view uses a two-pane layout with code editor on the left and generated diagram on the right.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_sequence.png" />  
+</Frame>
+
+Sequence diagrams visualize how objects interact in a time-ordered sequence, with lifelines representing participants and arrows showing messages or calls between them. The view automatically generates these diagrams from your sequence definition code.
+
+## View Controls
+
+### Code Editor
+
+The left pane contains a code editor where you define the sequence interactions using structured syntax. The diagram updates automatically as you edit the code.
+
+### Wrap
+
+Toggle line wrapping in the code editor for better readability of long lines.
+
+### Depth
+
+Controls how deep into nested interactions and sub-sequences the diagram displays.
+
+### Orientation
+
+Choose between horizontal and vertical layout for the sequence diagram.
+
+### Show Documentation
+
+Toggle to display or hide documentation text for interactions within the diagram.
+
+### Refresh
+
+Regenerates the sequence diagram from the current code definition.
+
+## Diagram Elements
+
+Sequence diagrams include:
+- **Lifelines**: Vertical dashed lines representing entities or objects participating in the sequence
+- **Messages**: Horizontal arrows between lifelines showing communication or calls
+- **Activation Boxes**: Rectangles on lifelines indicating when an entity is actively processing
+- **Return Messages**: Dashed arrows showing return values or responses
+- **Time Flow**: Implicit top-to-bottom ordering represents progression of time
+
+## Interaction
+
+**Pan and Zoom**: In the diagram pane, click and drag to pan. Use mouse wheel to zoom.
+
+**Edit Code**: Modify the sequence definition in the left pane to change interactions and message flows.
+
+## Use Cases
+
+**Interface Documentation**: Document API calls, method interactions, and communication protocols between system components.
+
+**Scenario Modeling**: Illustrate how different parts of a system collaborate to accomplish specific use cases or scenarios.

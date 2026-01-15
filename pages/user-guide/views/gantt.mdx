@@ -1,0 +1,55 @@
+---
+title: Gantt View
+---
+
+## Description
+
+The Gantt View displays Task objects in a timeline format, showing task durations, dependencies, and scheduling information. This view provides a visual representation of project timelines, making it easy to understand task sequencing, resource allocation, and project progress.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_gantt.png" />  
+</Frame>
+
+Tasks are rendered as horizontal bars along a timeline, with their position and length representing start dates and durations. Dependencies between tasks are shown as connecting lines, illustrating which tasks must complete before others can begin.
+
+## View Controls
+
+### Scale
+
+Select the time scale for the timeline display. Options include milliseconds, seconds, minutes, hours, days, weeks, months, and years. The view automatically suggests an appropriate scale based on task durations and available screen space.
+
+### Refresh
+
+Recomputes task schedules and regenerates the Gantt chart. Use this after updating task properties, durations, or dependencies.
+
+### Timeline Navigation
+
+Use the horizontal scrollbar to navigate through time. The timeline headers show date/time markers appropriate for the selected scale.
+
+## Task Information
+
+Each task bar displays:
+- **Task Name**: Shown on or near the bar
+- **Duration**: Represented by bar length
+- **Dependencies**: Lines connecting dependent tasks
+- **Progress**: Visual indicator if task includes completion percentage
+
+Click on a task bar to open that task object and edit its properties.
+
+## Task Table
+
+The left side of the Gantt view shows a table listing all tasks with key fields:
+- Task name
+- Start date
+- End date  
+- Duration
+- Assigned resources
+- Status
+
+This table synchronizes with the timeline, allowing you to see both detailed data and visual representation simultaneously.
+
+## Use Cases
+
+**Project Planning**: Visualize project schedules and identify critical paths through task networks.
+
+**Resource Management**: See how tasks are distributed over time and identify resource conflicts or gaps.

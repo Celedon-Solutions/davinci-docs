@@ -1,0 +1,57 @@
+---
+title: Schematic View
+---
+
+## Description
+
+The Schematic View provides an interactive environment for creating and editing circuit schematics for Circuit and Component objects. This view uses a three-pane layout with code editor, schematic canvas, and output terminal.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_schematic.png" />  
+</Frame>
+
+The left pane contains a code editor where you define circuit components, connections, and attributes using a specialized circuit description language. The middle pane displays the rendered schematic diagram, and the right pane shows output from simulation or compilation operations.
+
+## View Controls
+
+### Code Editor (Left Pane)
+
+Define your circuit structure using component and connection syntax. The editor provides syntax highlighting for circuit-specific keywords and auto-completion for component types.
+
+### Wrap
+
+Toggle line wrapping in the code editor for better readability.
+
+### Compile
+
+Generates the schematic diagram from your circuit code. This also validates your circuit definition and reports any errors in the terminal pane.
+
+### Run/Simulate
+
+Executes circuit simulation if simulation parameters are defined. Results appear in the output terminal.
+
+### Schematic Canvas (Middle Pane)
+
+Displays the rendered schematic diagram. Components are automatically placed and routed based on your code definition.
+
+**Pan and Zoom**: Click and drag to pan around the schematic. Use mouse wheel to zoom in and out.
+
+**Click Components**: Click on components in the diagram to highlight them in the code editor, making it easy to find and edit specific elements.
+
+### Output Terminal (Right Pane)
+
+Shows compilation messages, errors, simulation results, and other output from circuit operations. Use this to debug circuit definitions and interpret simulation results.
+
+## Circuit Definition
+
+Circuit code typically includes:
+- **Component Declarations**: Define resistors, capacitors, transistors, ICs, and other components
+- **Connections**: Specify how component pins connect to nets or other components
+- **Attributes**: Set component values, ratings, and parameters
+- **Simulation Directives**: Configure analysis types and simulation parameters
+
+## Use Cases
+
+**Circuit Design**: Create and document electronic circuit designs with proper component specifications and connections.
+
+**Simulation Setup**: Define circuits for electrical simulation and analysis using standard SPICE-like syntax.

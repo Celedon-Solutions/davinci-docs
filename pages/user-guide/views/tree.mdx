@@ -1,0 +1,49 @@
+---
+title: Tree View
+---
+
+## Description
+
+The Tree View provides a hierarchical breakdown of an object's descendant tree, showing the complete parent-child structure of model elements. This view displays objects in an expandable tree format, making it easy to navigate complex hierarchies.
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_render_tree.jpg" />  
+</Frame>
+
+Each node in the tree represents an object, and expanding a node reveals its children. For each object, you can optionally display related owned objects (attributes, constraints, ports) or accompanying documentation.
+
+## View Controls
+
+### Depth
+
+Controls how many levels deep into the hierarchy the tree initially displays. You can manually expand or collapse nodes beyond this depth as needed.
+
+### Show Documentation
+
+Toggle to display or hide documentation text for each object in the tree. When enabled, documentation appears below or alongside each tree node.
+
+### Show Related Objects
+
+Toggle visibility of related owned objects for each node:
+- Attributes
+- Constraints
+- Ports
+- Other owned elements
+
+This allows you to see not just the structural hierarchy, but also the properties and connections of each object.
+
+## Tree Structure
+
+**Expand/Collapse**: Click the arrow icon next to any node to expand or collapse its children.
+
+**Object Icons**: Each node displays the appropriate icon for its object type (part, requirement, attribute, etc.).
+
+**Click to Open**: Click on any object name to open that object in a new workspace tab.
+
+**Indentation**: Visual indentation shows the depth and nesting of objects within the hierarchy.
+
+## Use Cases
+
+**System Navigation**: Quickly navigate through complex system hierarchies to find and open specific objects deep within the structure.
+
+**Structure Review**: Understand the complete decomposition of a system, seeing all levels of hierarchy in one view.
