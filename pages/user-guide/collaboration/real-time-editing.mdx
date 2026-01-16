@@ -1,0 +1,144 @@
+---
+title: Real-Time Editing
+---
+
+## Description
+
+Real-time editing in Davinci means that changes made by any collaborator are visible to all other active users within seconds. This creates a truly concurrent modeling environment where team members can work together as if they were all looking at the same screen.
+
+## How Real-Time Updates Work
+
+### Update Propagation
+
+When a user makes a change to the model:
+
+1. **Local Change**: The change is applied immediately in the user's browser
+2. **Server Sync**: The change is sent to the Davinci server
+3. **Broadcast**: The server broadcasts the change to all other active users
+4. **Remote Update**: Other users' browsers receive and apply the update
+
+This process typically completes in 1-3 seconds, depending on network conditions and the complexity of the change.
+
+### What Gets Synchronized
+
+Real-time synchronization applies to virtually all model changes:
+
+- **Object Creation**: New objects appear in everyone's index
+- **Property Updates**: Changes to names, documentation, values
+- **Attribute Changes**: Value, unit, and equation modifications
+- **Relationship Updates**: New connections or deleted relationships
+- **Document Edits**: Text changes, formatting, block additions
+- **Structure Changes**: Objects moved or reorganized
+- **Deletions**: Removed objects disappear from all views
+
+### What You See from Others
+
+**Active Indicators**: Visual indicators may show which objects or sections other users are currently viewing or editing.
+
+**Change Highlights**: Recently updated elements may be briefly highlighted to draw attention to changes.
+
+**Lock Indicators**: Objects or blocks being edited by others show lock icons, preventing simultaneous editing.
+
+## Working with Updates
+
+### Receiving Updates
+
+Updates from other users appear automatically:
+
+- **Background Updates**: If you're viewing a different part of the model, updates happen silently
+- **Visible Updates**: If you're viewing an object someone else modifies, you see the change appear
+- **Edit Protection**: If you're editing something and someone else tries to edit it, they see it's locked
+
+### Making Updates
+
+Your changes are sent to other users the same way:
+
+- **Immediate Feedback**: You see your changes instantly
+- **Automatic Sync**: No "save" button needed—changes sync automatically
+- **Network Resilience**: If your connection drops temporarily, changes queue and sync when reconnected
+
+### Stale Data Prevention
+
+Davinci prevents stale data issues common in traditional collaboration:
+
+- No need to "refresh" to see latest changes
+- No risk of overwriting someone else's work
+- No manual merge processes
+- No "which version is correct?" confusion
+
+## Performance Considerations
+
+### Large Team Collaboration
+
+Davinci is designed to handle teams of various sizes:
+
+- **Small Teams (2-5 users)**: Essentially no performance impact
+- **Medium Teams (6-15 users)**: Minimal latency, typically unnoticeable
+- **Large Teams (15+ users)**: May experience slightly longer update propagation times
+
+### Network Requirements
+
+For optimal real-time collaboration:
+
+- **Bandwidth**: Modest requirements—typical updates are small
+- **Latency**: Lower latency improves update speed
+- **Stability**: Stable connections prevent queue buildup
+
+### Heavy Edit Scenarios
+
+During periods of intense simultaneous editing:
+
+- Update frequency may increase
+- Short delays (2-5 seconds) may occur
+- System prioritizes data integrity over speed
+- All changes are eventually synchronized
+
+## Collaborative Workflows
+
+### Divide and Conquer
+
+Split work across model areas to minimize overlap:
+- One person on requirements, another on design
+- Different team members on different subsystems
+- One person updating attributes while another writes documentation
+
+### Sequential Handoffs
+
+Pass work smoothly between team members:
+- Designer completes component → Analyst adds attributes
+- Requirements author finishes → Designer links to design elements
+- No file handoff delays—next person can start immediately
+
+### Parallel Refinement
+
+Multiple people refining different aspects simultaneously:
+- Technical content in documentation
+- Visual layout in presentations
+- Data accuracy in tables and matrices
+
+### Review and Feedback
+
+Stakeholders can review and comment in real-time:
+- Open the model during a meeting
+- Make changes as feedback is given
+- Everyone sees updates immediately
+
+## Troubleshooting
+
+**Updates Not Appearing**: Check your network connection. If offline, changes will sync when reconnected.
+
+**Unexpected Changes**: Another collaborator may be working in the same area. Check the collaborators list in project settings.
+
+**Performance Issues**: If updates are slow, check your network speed and whether many users are editing simultaneously.
+
+<Note>Real-time collaboration requires an active internet connection. Davinci queues changes when offline and syncs when connectivity is restored.</Note>
+
+## Limits and Considerations
+
+**Connection Required**: Collaboration requires internet access. Offline work is individual only.
+
+**Concurrent Locks**: Only one user can edit a specific object or block at a time. See [Object Locking](/pages/user-guide/collaboration/object-locking).
+
+**Large Operations**: Bulk operations (importing hundreds of objects) may cause brief delays for other users.
+
+**Browser Performance**: Very large projects with many simultaneous users may require adequate browser resources (RAM, CPU).

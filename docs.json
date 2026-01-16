@@ -48,7 +48,8 @@
                             {
                                 "group": "Quick Start",
                                 "pages": [
-                                    "pages/user-guide/common/quick-start"
+                                    "pages/user-guide/common/quick-start",
+                                    "pages/faqs/common-faqs"
                                 ]
                             }
                         ]
@@ -202,7 +203,22 @@
                                     "pages/user-guide/design-agent/workspaces",
                                     "pages/user-guide/design-agent/agents",
                                     "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/design-agent/agent-tools",
                                     "pages/user-guide/design-agent/tips"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Collaboration",
+                        "icon": "users",
+                        "groups": [
+                            {
+                                "group": "Working Together",
+                                "pages": [
+                                    "pages/user-guide/collaboration/overview",
+                                    "pages/user-guide/collaboration/real-time-editing",
+                                    "pages/user-guide/collaboration/object-locking"
                                 ]
                             }
                         ]
@@ -221,13 +237,6 @@
                                     "examples/Document_Templates_Example"
                                 ]
                             }
-                        ]
-                    },
-                    {
-                        "dropdown": "FAQs",
-                        "icon": "question",
-                        "pages": [
-                            "pages/faqs/common-faqs"
                         ]
                     },
                     {

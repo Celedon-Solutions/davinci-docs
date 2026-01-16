@@ -11,6 +11,41 @@ Attributes can contain singular values (strings, numbers, or booleans), or they 
 
 <Note>The unit field is optional but recommended for engineering values. When specified, it enables automatic unit conversion and helps prevent errors in calculations. For attributes that reference other attributes, the unit can be changed and the evaluated value will be transformed automatically if the conversion is possible.</Note>
 
+## Unit Conversion and Validation
+
+### Automatic Unit Conversion
+
+When an attribute references another attribute with a different unit, Davinci automatically converts between compatible units. This allows you to work with the same physical quantity in different unit systems without manual conversion.
+
+**Example:** If an attribute `Length_m` has a value of `10 m` and another attribute `Length_ft` references it with units specified as `ft`, Davinci automatically converts and displays `32.8084 ft`.
+
+The system supports conversions between:
+- **Length units**: meters, feet, inches, kilometers, miles, etc.
+- **Mass units**: kilograms, pounds, grams, tonnes, etc.
+- **Time units**: seconds, minutes, hours, days, etc.
+- **Temperature units**: Celsius, Fahrenheit, Kelvin
+- **And many more**: pressure, velocity, energy, power, etc.
+
+Unit conversion works in equations as well. You can mix units freely in expressions, and Davinci will convert all terms to compatible units before performing calculations.
+
+### Unit Validation
+
+The system validates unit compatibility during equation evaluation to prevent physically meaningless operations. When units are incompatible, Davinci displays an error indicator.
+
+**Invalid operations that trigger errors:**
+- Adding or subtracting incompatible units: `5 m + 3 kg` (length + mass)
+- Comparing incompatible quantities: `10 s > 20 m` (time > length)
+- Assigning incompatible units: Setting `@Length` to `25 kg` when Length has units of `m`
+
+**Error indicators:**
+- Red error box appears next to the attribute value field
+- Hover over the error to see detailed explanation
+- Error message specifies which units are incompatible
+
+The validation system ensures that your model maintains physical consistency and helps catch errors early in the design process.
+
+<Info>For custom unit definitions and unit system management, see [Unit Settings](/pages/user-guide/project-settings/unit-settings).</Info>
+
 ## View Types
 
 | View | Description |

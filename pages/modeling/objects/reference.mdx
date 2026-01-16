@@ -13,6 +13,69 @@ Files can be uploaded and added as Reference Objects to the model by dragging an
 
 The files that Reference objects contain can be managed inside [Project Settings](../../user-guide/overview/files).
 
+## Importing Files
+
+Reference objects support importing various file types, making it easy to integrate existing documentation, data, and media into your Davinci model.
+
+### Supported File Types
+
+**Documents:**
+- PDF files - Technical specifications, datasheets, research papers
+- Word documents (DOCX) - Requirements documents, design descriptions
+- Excel spreadsheets (XLSX) - Data tables, BOMs, test results
+
+**Images:**
+- PNG, JPG, JPEG - Photographs, screenshots, diagrams
+- GIF - Animated graphics, simple diagrams
+- WebP - Modern compressed images
+
+**Arbitrary Files:**
+- Any file type can be uploaded for storage and agent access
+- Non-standard formats stored as-is for reference
+
+### Import Methods
+
+**Drag and Drop:**
+1. Open a project in Davinci
+2. Drag files from your file system into the Davinci window
+3. Files are automatically uploaded and Reference objects are created
+4. Multiple files can be dragged simultaneously
+
+**Upload Button:**
+1. Click the upload button in the Library Index header
+2. Select files from the file browser dialog
+3. Files are uploaded and Reference objects are created
+
+Both methods create Reference objects with appropriate metadata extracted from the file (filename, type, size).
+
+### Document Conversion and Agent Usage
+
+**Automatic Content Extraction:**
+The Davinci agent can read and analyze imported files to extract information:
+- PDF text extraction for datasheets and specifications
+- Image analysis for diagrams and photographs
+- Excel data parsing for tables and datasets
+- Word document text extraction for requirements
+
+**Agent-Assisted Model Population:**
+When you ask the agent to extract information from a Reference object, it:
+1. Reads the file content
+2. Analyzes and structures the information
+3. Creates appropriate model objects (requirements, attributes, parts, etc.)
+4. Establishes reference relationships linking new objects back to the source
+
+**Example:** Upload a component datasheet PDF, then ask the agent to "extract the specifications from @DatasheetReference and create attributes." The agent creates attribute objects with values from the datasheet and links them to the Reference object.
+
+### Image Integration
+
+Images imported as Reference objects can be:
+- Inserted into Documents as figures or inline images
+- Added to Slides for presentations
+- Referenced in model object documentation
+- Analyzed by the agent for diagram interpretation
+
+Images are stored efficiently and can be reused throughout the model without duplication.
+
 ## View Types
 
 | View | Description |

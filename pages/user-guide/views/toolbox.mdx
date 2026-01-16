@@ -62,4 +62,15 @@ In the code above each tool is defined with the `davinci.tool()` decorator. This
 
 This toolbox could be used by design agents to fetch and format weather data for various locations. To have data passed directly from the tool to the database, you can use the `save()` and `update()` functions as in regular code.
 
+## Export Options
+
+Toolbox objects support exporting in formats suitable for sharing and integration.
+
+| Format | Description |
+|--------|-------------|
+| PY | Export toolbox code as a Python file for use in external environments |
+| MCP | Export toolbox in Model Context Protocol format for integration with MCP-compatible systems |
+
+These export options enable toolbox reuse across projects and integration with external tools.
+
 
