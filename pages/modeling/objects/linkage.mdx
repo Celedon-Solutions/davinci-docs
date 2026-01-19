@@ -1,0 +1,323 @@
+---
+title: Linkage
+---
+
+<img height="20" noZoom src="/images/objecticons/connection.svg" /> 
+
+## Description
+Linkages represent mechanical connections and kinematic relationships between physical components in a system. In SysML v2, linkages are parts, in Davinci they are parts used for specialized structural elements to model joints, cables, couplings, and other physical connections that constrain the relative motion or provides flow of an interface between parts.
+
+<Note>Linkages are particularly important for modeling cables, working with ports and interfaces to define the physical thing which flows the interfaces.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the linkage. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing linkage connections. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the linkage, including the type of mechanical connection and its purpose in the system.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this linkage.
+
+  Attributes can define linkage parameters such as:
+  - Cable length, diameter, and material properties
+  - Wire gauge, conductor count, and insulation type
+  - Range of motion (minimum/maximum angles or displacements)
+  - Joint stiffness or compliance
+  - Friction coefficients and damping factors
+  - Mass and inertia properties
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Ports" type="object">
+
+<a href="/pages/modeling/objects/ports" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/port.svg" /> </a>
+
+  A list of all Port objects owned by this linkage.
+
+  Ports can represent:
+  - Cable endpoints and connectors
+  - Electrical connection points
+  - Mechanical connection points
+  - Force and torque interfaces
+  - Motion input/output points
+
+  Ports can be viewed and deleted.
+
+  [Read more about Ports](/pages/modeling/objects/ports)
+</ParamField>
+
+<ParamField path="Interfaces" type="object">
+
+<a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/interface.svg" /> </a>
+
+  A list of all Interface objects owned by this linkage.
+
+  Interfaces define the interaction protocols and connection specifications for the linkage.
+
+  Interfaces can be viewed and deleted.
+
+  [Read more about Interfaces](/pages/modeling/objects/interface)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this linkage.
+
+  Constraints can define:
+  - Cable routing and bend radius limits
+  - Voltage and current capacity
+  - Kinematic relationships between connected parts
+  - Motion limits and boundaries
+  - Force and torque constraints
+
+  Constraint Equations and Analysis Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Items" type="object">
+
+<a href="/pages/modeling/objects/item" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/item.svg" /> </a>
+
+  A list of all Item objects associated with this linkage.
+
+  Items can represent electrical signals, data packets, power, forces, torques, or fluids flowing through the linkage.
+
+  [Read more about Items](/pages/modeling/objects/item)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## Common Linkage Types
+
+### Electrical Cables and Wiring
+Electrical cables provide power and signal transmission between components.
+
+**Key Attributes:**
+- Cable length and routing path
+- Wire gauge (AWG) and conductor count
+- Voltage and current ratings
+- Insulation type and temperature rating
+- Shielding specifications
+- Connector types at each end
+
+**Use Cases:**
+- Power distribution cables
+- Signal and data cables
+- Sensor wiring harnesses
+- Control system interconnects
+- Communication buses
+
+**Example:**
+A power cable connecting a battery to a motor controller would have attributes for voltage rating (48V), current capacity (100A), cable length (2m), and connector types (Anderson PowerPole at both ends).
+
+### Fluid and Pneumatic Lines
+Tubes, hoses, and pipes that transport fluids, gases, or hydraulic power.
+
+**Key Attributes:**
+- Line diameter and wall thickness
+- Material type (rubber, metal, composite)
+- Pressure rating and temperature range
+- Bend radius limits
+- Fitting and connector types
+
+**Use Cases:**
+- Hydraulic lines
+- Pneumatic tubing
+- Fuel lines
+- Coolant hoses
+- Compressed air distribution
+
+**Example:**
+A hydraulic line in a robotic arm would specify pressure rating (3000 PSI), line diameter (0.5 inch), material (steel braided hose), and minimum bend radius (4 inches).
+
+### Mechanical Cables
+Flexible mechanical cables that transmit force or motion.
+
+**Key Attributes:**
+- Cable construction (wire rope, Bowden cable)
+- Breaking strength and working load
+- Flexibility and minimum bend radius
+- End fittings and terminations
+
+**Use Cases:**
+- Control cables (throttle, brake)
+- Lifting cables and slings
+- Tension members in structures
+- Actuation cables
+
+### Revolute Joint (Hinge)
+A mechanical joint allowing rotation about a single axis.
+
+**Key Attributes:**
+- Rotation axis direction
+- Minimum and maximum rotation angles
+- Joint friction and damping
+- Angular velocity limits
+- Bearing type and load capacity
+
+**Use Cases:**
+- Robot arm joints
+- Door and hatch mechanisms
+- Rotating platforms
+- Gimbal systems
+
+### Prismatic Joint (Slider)
+A mechanical joint allowing linear translation along a single axis.
+
+**Key Attributes:**
+- Translation axis direction
+- Minimum and maximum displacement
+- Friction and damping coefficients
+- Velocity and acceleration limits
+- Guide rail specifications
+
+**Use Cases:**
+- Linear actuators
+- Telescoping mechanisms
+- Sliding doors
+- Piston assemblies
+
+### Fiber Optic Cables
+High-speed data transmission through optical fibers.
+
+**Key Attributes:**
+- Fiber type (single-mode, multi-mode)
+- Core and cladding diameter
+- Wavelength and bandwidth
+- Connector types (LC, SC, ST)
+- Cable length and attenuation
+- Minimum bend radius
+
+**Use Cases:**
+- High-speed data links
+- Sensor networks
+- Communication backbones
+- Remote instrumentation
+
+## Cable Routing and Management
+
+Cables and flexible connections require careful routing and management:
+
+### Routing Constraints
+Physical constraints affect cable paths:
+- **Minimum bend radius**: Prevents damage to cables and maintains performance
+- **Cable length**: Total length including service loops and strain relief
+- **Routing path**: Physical path through the system structure
+- **Clearances**: Separation from moving parts, heat sources, and sharp edges
+- **Support points**: Clamps, ties, and guides along the route
+
+### Electrical Considerations
+For electrical cables, consider:
+- **Voltage drop**: Resistance over cable length affects delivered voltage
+- **Current capacity**: Wire gauge must support maximum current
+- **Signal integrity**: Shielding and separation for sensitive signals
+- **EMI/EMC**: Electromagnetic interference and compatibility
+- **Grounding**: Proper grounding and shielding connections
+
+### Thermal Management
+Temperature affects cable performance:
+- **Ambient temperature**: Operating environment temperature range
+- **Current heating**: I²R losses generate heat in conductors
+- **Insulation rating**: Maximum temperature for insulation materials
+- **Derating**: Reduced capacity in high-temperature environments
+
+## Mechanical Joint Analysis
+
+For mechanical linkages, kinematic and dynamic analysis is essential:
+
+### Degrees of Freedom
+Calculate mechanism mobility:
+- **Revolute joints**: 1 DOF (rotation about axis)
+- **Prismatic joints**: 1 DOF (translation along axis)
+- **Spherical joints**: 3 DOF (rotation about three axes)
+- **Cylindrical joints**: 2 DOF (rotation and translation)
+
+### Force and Motion Transmission
+Mechanical linkages transmit forces and motion:
+- **Joint reaction forces**: Forces at connection points
+- **Mechanical advantage**: Force/torque amplification or reduction
+- **Friction losses**: Energy dissipation in joints
+- **Backlash and compliance**: Play and flexibility in connections
+
+### Load Analysis
+Evaluate structural requirements:
+- **Static loads**: Weight and steady-state forces
+- **Dynamic loads**: Acceleration and impact forces
+- **Fatigue**: Cyclic loading and lifetime considerations
+- **Safety factors**: Design margins for reliability
+
+## Best Practices
+
+### Linkage Modeling
+
+- **Clear Type Definition**: Specify the linkage type (cable, joint, line) clearly in documentation
+- **Appropriate Attributes**: Include relevant parameters for the specific linkage type
+- **Consistent Units**: Use consistent unit systems for all parameters
+- **Realistic Specifications**: Define limits and ratings based on physical constraints and standards
+
+### Cable and Connection Design
+
+- **Proper Sizing**: Select wire gauge, hose diameter, or joint capacity based on requirements
+- **Routing Planning**: Plan cable routes considering bend radius, clearances, and accessibility
+- **Connector Selection**: Choose appropriate connectors for the application and environment
+- **Service Loops**: Include extra length for maintenance and strain relief
+- **Labeling**: Document cable identification and connection points
+- **Testing**: Verify continuity, insulation, and performance after installation
+
+### Mechanical Joint Design
+
+- **Load Analysis**: Calculate forces and torques throughout the motion range
+- **Workspace Analysis**: Verify mechanisms can reach required positions
+- **Singularity Avoidance**: Identify and avoid kinematic singularities
+- **Lubrication**: Plan for joint maintenance and lubrication
+- **Wear Considerations**: Account for friction, wear, and lifetime
+
+### Integration with System Model
+
+- **Port Connections**: Use ports to define connection endpoints on parts
+- **Interface Definition**: Use interfaces to specify what flows through the linkage
+- **Item Specification**: Define items that represent the transmitted signals, power, or materials
+- **Constraint Specification**: Use constraints to define performance limits and requirements
+- **Coordinate Systems**: Establish consistent reference frames for spatial relationships
+
+### Documentation and Validation
+
+- **Bill of Materials**: Include linkage specifications in BOM with part numbers
+- **Routing Diagrams**: Create cable routing and connection diagrams
+- **Test Procedures**: Define acceptance tests for cables and connections
+- **Failure Modes**: Consider failure modes, redundancy, and safety factors
+- **Maintenance Planning**: Document inspection, testing, and replacement schedules

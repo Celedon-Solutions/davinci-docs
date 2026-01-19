@@ -1,3 +1,262 @@
 ---
 title: Transition
 ---
+
+<img height="20" noZoom src="/images/objecticons/state.svg" /> 
+
+## Description
+Transitions define the paths and conditions that cause a system to move from one state to another in a state machine. In SysML v2, transitions are the connective elements that specify when and how state changes occur, capturing the dynamic behavior and control flow of state-based systems.
+
+A transition specifies a source state (fromState), one or more target states (toStates), and the conditions or events that trigger the state change. Transitions can include guard conditions that must be satisfied for the transition to occur, and they can be classified by kind to represent different types of state changes such as default transitions, triggered transitions, or failure transitions. Transitions enable modeling of complex control logic, event-driven behavior, and probabilistic state changes in systems ranging from simple controllers to sophisticated autonomous systems.
+
+<Note>Transitions can specify multiple target states, enabling non-deterministic or probabilistic state machines where the system can move to different states based on runtime conditions or probability distributions.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing transition connections. |
+| [History](/pages/user-guide/navigating/model) | Track changes to attributes of the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the transition and the conditions that trigger it.
+</ParamField>
+
+<ParamField path="Kind" type="enum">
+  The type of transition, which determines its behavior and triggering semantics.
+
+  **Options:**
+  - **default**: Standard transition that occurs when its condition is satisfied
+  - **trigger**: Event-triggered transition activated by specific signals or events
+  - **failure**: Transition that occurs when an error or failure condition is detected
+
+  Default value: `default`
+</ParamField>
+
+<ParamField path="Conditional" type="string">
+  A boolean expression that must evaluate to true for the transition to occur.
+
+  The conditional can reference attributes using the `@` notation and use standard comparison and logical operators.
+
+  **Examples:**
+  - `@temperature > 100`
+  - `and(@mode == "active", @battery_level > 20)`
+  - `or(@error_count >= 3, @timeout_occurred)`
+
+  If empty, the transition always occurs when triggered (for trigger kind) or is always available (for default kind).
+</ParamField>
+
+<ParamField path="From State" type="reference">
+  Reference to the State object from which this transition originates.
+
+  This is the source state that the system must be in for this transition to be considered.
+
+  [Read more about States](/pages/modeling/objects/state)
+</ParamField>
+
+<ParamField path="To States" type="array">
+  Array of references to State objects that are the potential targets of this transition.
+
+  **Single Target**: Most transitions specify one target state, creating deterministic behavior.
+
+  **Multiple Targets**: When multiple target states are specified, the transition can be:
+  - **Conditional**: Different targets selected based on runtime conditions
+  - **Probabilistic**: Target selected based on probability distribution
+  - **Non-deterministic**: Target selected by the execution environment
+
+  [Read more about States](/pages/modeling/objects/state)
+</ParamField>
+
+<ParamField path="Probability" type="number">
+  Probability value (0.0 to 1.0) used for probabilistic state transitions.
+
+  When multiple transitions from the same state have probability values, the system selects which transition to take based on these probabilities. This enables modeling of stochastic systems and reliability analysis.
+
+  **Example**: A transition with probability 0.95 represents a 95% chance of taking that path, while a parallel transition with probability 0.05 represents a 5% chance (failure case).
+
+  Default value: `0` (not probabilistic)
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this transition.
+
+  Attributes can store metadata about the transition such as execution counts, timing information, or configuration parameters.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Items" type="object">
+
+<a href="/pages/modeling/objects/item" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/item.svg" /> </a>
+
+  A list of all Item objects associated with this transition.
+
+  Items can represent data or resources that are transferred or transformed during the state transition.
+
+  [Read more about Items](/pages/modeling/objects/item)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## Transition Types
+
+### Default Transitions
+
+Default transitions are the standard type used for most state changes. They are evaluated continuously while the system is in the source state, and the transition occurs when the conditional expression becomes true.
+
+**Characteristics:**
+- Evaluated every state machine cycle
+- Occur automatically when condition is satisfied
+- Can have guard conditions to control when they fire
+- Most common transition type
+
+**Example Use Cases:**
+- Timeout transitions: `@elapsed_time > 30`
+- Threshold-based transitions: `@pressure > 100`
+- Mode changes: `@command == "start"`
+- Combined conditions: `and(@ready == true, @temperature < 50)`
+
+### Trigger Transitions
+
+Trigger transitions are activated by specific events or signals rather than continuous condition evaluation. They represent event-driven state changes that occur in response to external stimuli.
+
+**Characteristics:**
+- Activated by explicit events or signals
+- Only evaluated when the triggering event occurs
+- Can still have guard conditions that must be satisfied
+- Used for event-driven systems
+
+**Example Use Cases:**
+- User input events
+- Message reception
+- Interrupt signals
+- External system notifications
+
+### Failure Transitions
+
+Failure transitions represent error handling and fault recovery paths. They are triggered when error conditions or failures are detected, enabling robust system behavior.
+
+**Characteristics:**
+- Specifically for error and exception handling
+- Often have lower priority than normal transitions
+- May bypass normal state flow to reach safe or recovery states
+- Critical for system reliability
+
+**Example Use Cases:**
+- Hardware failures: `@sensor_status == "fault"`
+- Communication errors: `@connection_lost == true`
+- Validation failures: `@data_integrity_check == false`
+- Timeout conditions: `@response_timeout == true`
+- Multiple failure modes: `or(@sensor_fault, @power_failure)`
+
+## Conditional Expressions
+
+Transition conditionals use math.js syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete math.js syntax reference.
+
+### Comparison Operators
+```
+@value == 10      # Equality
+@value != 10      # Inequality
+@value > 10       # Greater than
+@value >= 10      # Greater than or equal
+@value < 10       # Less than
+@value <= 10      # Less than or equal
+```
+
+### Logical Functions
+Math.js uses function-based logical operators:
+
+```
+and(@a, @b)       # Logical AND
+or(@a, @b)        # Logical OR
+not(@a)           # Logical NOT
+xor(@a, @b)       # Logical XOR
+```
+
+### Complex Conditions
+Combine comparison operators with logical functions:
+
+```
+or(and(@temp > 100, @pressure < 50), @emergency_stop)
+and(@mode == "active", or(@battery > 20, @external_power))
+not(or(@error_flag, @maintenance_mode))
+```
+
+**Alternative syntax for simple conditions:**
+For basic comparisons, you can also use inline operators:
+```
+@temp > 100 and @pressure < 50
+@battery > 20 or @external_power
+```
+
+<Note>When using complex nested logic, the function-based syntax (`and()`, `or()`, `not()`) is more explicit and easier to read than inline operators.</Note>
+
+## Probabilistic Transitions
+
+When multiple transitions from the same state have probability values, the system uses these to determine which path to take. This enables:
+
+### Reliability Modeling
+Model system behavior under different failure scenarios:
+```
+Normal Operation: probability = 0.99
+Degraded Mode: probability = 0.009
+Complete Failure: probability = 0.001
+```
+
+### Stochastic Behavior
+Represent inherently random processes:
+```
+Path A: probability = 0.7
+Path B: probability = 0.3
+```
+
+### Monte Carlo Simulation
+Run multiple simulations with probabilistic branching to analyze system behavior under uncertainty.
+
+<Warning>The sum of probabilities for all transitions from a given state should equal 1.0 for proper probabilistic behavior.</Warning>
+
+## Best Practices
+
+### Transition Design
+
+- **Clear Conditions**: Write explicit, understandable conditional expressions
+- **Avoid Ambiguity**: Ensure only one transition can fire at a time (or use probabilities intentionally)
+- **Complete Coverage**: Verify all necessary transitions exist from each state
+- **Guard Carefully**: Use conditions to prevent unintended state changes
+
+### Conditional Expressions
+
+- **Simple Logic**: Keep conditions as simple as possible while meeting requirements
+- **Attribute References**: Always use `@` notation for attribute references
+- **Type Consistency**: Ensure attribute types match the operations used
+- **Avoid Side Effects**: Conditions should not modify system state
+
+### State Machine Validation
+
+- **Reachability**: Verify all states can be reached from the initial state
+- **Completeness**: Ensure there are appropriate transitions from each state
+- **Deadlock Prevention**: Avoid states with no outgoing transitions (unless intentional final states)
+- **Determinism**: For deterministic systems, ensure at most one transition can fire at a time

@@ -2,3 +2,171 @@
 title: State
 ---
 
+<img height="20" noZoom src="/images/objecticons/state.svg" /> 
+
+## Description
+States represent distinct modes or configurations that a system or component can occupy during its lifecycle. In SysML v2, states are fundamental elements of state machine modeling, capturing the behavioral aspects of systems that exhibit mode-based or event-driven behavior.
+
+A state defines what the system does while in that particular mode, including actions that execute when entering the state (entry actions), actions that execute continuously while in the state (do actions), and actions that execute when leaving the state (exit actions). States are connected by transitions that define the conditions and events that cause the system to move from one state to another. State machines built from states and transitions provide a powerful way to model complex behavioral logic, such as control systems, protocols, operational modes, and lifecycle phases.
+
+States can be hierarchical, containing nested sub-states to represent refinements of behavior at different levels of abstraction. This enables modular design of complex state-based systems where high-level states can be decomposed into detailed state machines.
+
+<Note>The interval property defines how frequently the do action executes while the system remains in this state. This is particularly useful for periodic monitoring, control loops, or continuous operations.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [State](/pages/user-guide/views/state) | Visualize the state machine diagram showing states and transitions. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of nested states. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing state composition. |
+| [History](/pages/user-guide/navigating/model) | Track changes to attributes. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the state and its purpose in the state machine.
+</ParamField>
+
+<ParamField path="Entry Action" type="reference">
+  Reference to an Action object that executes once when the system enters this state.
+
+  Entry actions are typically used for initialization, setup, or notification tasks that should occur at the beginning of the state.
+
+  [Read more about Actions](/pages/modeling/objects/actions)
+</ParamField>
+
+<ParamField path="Do Action" type="reference">
+  Reference to an Action object that executes repeatedly while the system remains in this state.
+
+  The frequency of execution is controlled by the Interval property. Do actions are used for continuous monitoring, control loops, or ongoing operations.
+
+  [Read more about Actions](/pages/modeling/objects/actions)
+</ParamField>
+
+<ParamField path="Exit Action" type="reference">
+  Reference to an Action object that executes once when the system leaves this state.
+
+  Exit actions are typically used for cleanup, finalization, or notification tasks that should occur at the end of the state.
+
+  [Read more about Actions](/pages/modeling/objects/actions)
+</ParamField>
+
+<ParamField path="Interval" type="object">
+  Time interval between executions of the do action while in this state.
+
+  **Value**: Numeric value for the interval duration.
+
+  **Unit**: Time unit (Seconds, Minutes, Hours, etc.).
+
+  Example: `{ value: "0.1", unit: "Seconds" }` executes the do action every 100 milliseconds.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this state.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this state.
+
+  Constraint Equations and Analysis Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+## State Machine Modeling
+
+States are the fundamental building blocks of state machines, which model systems that exhibit distinct behavioral modes. A complete state machine consists of:
+
+- **States**: The different modes or configurations the system can be in
+- **Transitions**: The paths between states, triggered by events or conditions
+- **Actions**: The behaviors that execute in response to state changes or while in a state
+- **Initial State**: The starting point when the state machine begins execution
+- **Final States**: Terminal states that end the state machine execution
+
+### Entry, Do, and Exit Actions
+
+The three action types provide precise control over state behavior:
+
+**Entry Actions** execute once when entering the state:
+```
+- Initialize variables
+- Start timers
+- Send notifications
+- Configure hardware
+```
+
+**Do Actions** execute repeatedly at the specified interval:
+```
+- Monitor sensors
+- Update control outputs
+- Check conditions
+- Perform periodic tasks
+```
+
+**Exit Actions** execute once when leaving the state:
+```
+- Clean up resources
+- Stop timers
+- Save state information
+- Send completion notifications
+```
+
+### Hierarchical States
+
+States can contain nested sub-states, creating hierarchical state machines. This enables:
+
+- **Abstraction**: High-level states hide internal complexity
+- **Reusability**: Sub-state machines can be reused in different contexts
+- **Modularity**: Complex behaviors are broken into manageable pieces
+- **Inheritance**: Transitions at higher levels apply to all sub-states
+
+## Best Practices
+
+### State Design
+
+- **Clear Purpose**: Each state should represent a distinct, meaningful mode of operation
+- **Single Responsibility**: States should have a focused, well-defined purpose
+- **Appropriate Granularity**: Balance between too many trivial states and too few complex states
+- **Meaningful Names**: Use descriptive names that clearly indicate what the state represents
+
+### Action Assignment
+
+- **Entry for Setup**: Use entry actions for one-time initialization when entering a state
+- **Do for Continuous**: Use do actions for ongoing operations that repeat while in the state
+- **Exit for Cleanup**: Use exit actions for finalization tasks when leaving a state
+- **Interval Tuning**: Set appropriate intervals for do actions based on system requirements
+
+### Transition Management
+
+- **Complete Coverage**: Ensure all necessary transitions exist to reach other states
+- **Avoid Deadlocks**: Verify that the state machine cannot get stuck in unintended states
+- **Guard Conditions**: Use transition conditions to control when state changes occur
+- **Event Handling**: Define clear triggers for state transitions
