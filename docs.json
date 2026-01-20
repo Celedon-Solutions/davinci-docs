@@ -81,14 +81,17 @@
                                 "group": "Project Settings",
                                 "pages": [
                                     "pages/user-guide/project-settings/project",
-                                    "pages/user-guide/project-settings/collaboration",
                                     "pages/user-guide/project-settings/files",
-                                    "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/project-settings/toolboxes",
+                                    "pages/user-guide/project-settings/collaboration",
+                                    "pages/user-guide/project-settings/unit-settings",
+                                    "pages/user-guide/project-settings/relationship-settings",
+                                    "pages/user-guide/project-settings/secrets",
+                                    "pages/user-guide/project-settings/dependencies",
                                     "pages/user-guide/project-settings/tags",
                                     "pages/user-guide/project-settings/risk",
-                                    "pages/user-guide/project-settings/dependencies",
-                                    "pages/user-guide/project-settings/relationship-settings",
-                                    "pages/user-guide/project-settings/unit-settings"
+                                    "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/design-agent/mcp"
                                 ]
                             },
                             {
