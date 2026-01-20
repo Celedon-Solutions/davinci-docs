@@ -5,7 +5,7 @@ title: Version Control Panel
 The Version Control Panel provides comprehensive project-wide version control management with support for branching, merging, committing changes, and viewing commit history. Version control in Davinci is multiplayer-enabled, allowing teams to collaborate effectively on the same model with full branch management capabilities.
 
 <Frame>
-    <img noZoom src="/images/version_control_overview.png" />
+    <img noZoom src="/images/version-control-main.png" />
 </Frame>
 
 ## Branches
@@ -13,7 +13,7 @@ The Version Control Panel provides comprehensive project-wide version control ma
 The Branches section allows you to manage all aspects of your project's branch structure. Version control in Davinci operates at the project level, meaning all changes and branches are shared across all collaborators.
 
 <Frame>
-    <img noZoom src="/images/version_control_branches.png" />
+    <img noZoom src="/images/vc-branches.png" />
 </Frame>
 
 ### Creating Branches
@@ -23,6 +23,10 @@ New branches can be created from the current branch at any time. This allows you
 ### Switching Branches
 
 You can switch between existing branches using the branch selector. When switching branches, any uncommitted changes will remain live in the previous branch and will be preserved when you return to that branch.
+
+<Frame>
+    <img noZoom src="/images/vc-change-branch.png" />
+</Frame>
 
 <Note>Uncommitted changes do not transfer between branches when switching. They remain in the branch where they were made.</Note>
 
@@ -38,7 +42,7 @@ To merge changes from one branch into another:
 6. Resolve merge conflicts
 
 <Frame>
-    <img noZoom src="/images/merge_preview.png" />
+    <img noZoom src="/images/vc-conflict-popup.png" />
 </Frame>
 
 <Warning>Merges cannot be performed when uncommitted changes are present on the current branch. Commit or undo your changes before merging.</Warning>
@@ -51,9 +55,7 @@ Conflicts occur when the same object or field has been modified in different way
 
 **Change-Delete Conflicts**: The object was changed on one branch and deleted on the other. You must choose whether to keep the changed object or delete it entirely.
 
-<Frame>
-    <img noZoom src="/images/merge_conflicts.png" />
-</Frame>
+
 
 All other scenarios are automatically resolved by Davinci's merge logic.
 
@@ -64,6 +66,12 @@ All merge conflicts in the model can be viewed from the [Validation Panel](/page
 Merge conflicts can be resolved cooperatively by any team member working in that branch. All users will see the same conflicts and can work together to resolve them.
 
 When a conflict is resolved, it appears as a change in the Changes section. Commit the change to finalize the conflict resolution.
+
+Changes marked `Current` are from the active branch. Changes marked `Incoming
+
+<Frame>
+    <img noZoom src="/images/vc-conflict-resolve.png" />
+</Frame>
 
 <Note>Project-level settings (units, secrets, dependencies, tags, and risk configurations) are also tracked by version control. Conflicts for these objects are managed from the [Project Settings](/pages/user-guide/navigating/project).</Note>
 
@@ -84,16 +92,12 @@ You cannot delete the main branch of the project.
 The Changes section displays all modifications made since the last commit on the current branch. This section shows changes from all users working on the current branch, providing full transparency for collaborative work.
 
 <Frame>
-    <img noZoom src="/images/version_control_changes.png" />
+    <img noZoom src="/images/vc-changes.png" />
 </Frame>
 
-### Paneling Changes
+### View Current Changes
 
 Click on any object in the changes list to open a diff view showing exactly what has changed since the last commit. You can view both the live editable object and the diff view simultaneously for easy comparison.
-
-<Frame>
-    <img noZoom src="/images/diff_view.png" />
-</Frame>
 
 The diff view highlights:
 - **Added content** in green
@@ -114,10 +118,6 @@ To commit your changes:
 2. Enter a descriptive commit message (required)
 3. Click the **Commit** button
 
-<Frame>
-    <img noZoom src="/images/commit_changes.png" />
-</Frame>
-
 <Note>Commits require at least one change since the last commit and a commit message. Commits are manual and only occur when explicitly performed by a user.</Note>
 
 Commits capture the current state of all changes and create a permanent record in the project's history. All team members will be able to see your commits in the commit history.
@@ -127,10 +127,10 @@ Commits capture the current state of all changes and create a permanent record i
 The Graph section displays the complete commit history for the current branch, showing a chronological list of all commits with their associated metadata.
 
 <Frame>
-    <img noZoom src="/images/version_control_graph.png" />
+    <img noZoom src="/images/vc-graph.png" />
 </Frame>
 
-### Paneling Commit Details
+### View Commit Details
 
 Each commit in the graph shows:
 - Commit message
@@ -143,7 +143,7 @@ Hover over any commit to see additional information:
 - Change statistics (Insertions, Deletions, Modifications)
 
 <Frame>
-    <img noZoom src="/images/commit_hover_details.png" />
+    <img noZoom src="/images/vc-commit-hover.png" />
 </Frame>
 
 ### Inspecting Commits
@@ -154,7 +154,7 @@ Click on any commit in the graph to open it in a new tab. From this detailed vie
 - Review the full context of what was changed and why
 
 <Frame>
-    <img noZoom src="/images/commit_detail_view.png" />
+    <img noZoom src="/images/vc-commit-details.png" />
 </Frame>
 
 ### Rolling Back

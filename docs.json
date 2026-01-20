@@ -63,7 +63,6 @@
                                 "pages": [
                                     "pages/user-guide/navigating/home",
                                     "pages/user-guide/navigating/model",
-                                    "pages/user-guide/navigating/project",
                                     "pages/user-guide/navigating/ui"
                                 ]
                             },
@@ -81,14 +80,18 @@
                             {
                                 "group": "Project Settings",
                                 "pages": [
-                                    "pages/user-guide/project-settings/collaboration",
+                                    "pages/user-guide/project-settings/project",
                                     "pages/user-guide/project-settings/files",
-                                    "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/project-settings/toolboxes",
+                                    "pages/user-guide/project-settings/collaboration",
+                                    "pages/user-guide/project-settings/unit-settings",
+                                    "pages/user-guide/project-settings/relationship-settings",
+                                    "pages/user-guide/project-settings/secrets",
+                                    "pages/user-guide/project-settings/dependencies",
                                     "pages/user-guide/project-settings/tags",
                                     "pages/user-guide/project-settings/risk",
-                                    "pages/user-guide/project-settings/dependencies",
-                                    "pages/user-guide/project-settings/relationship-settings",
-                                    "pages/user-guide/project-settings/unit-settings"
+                                    "pages/user-guide/project-settings/persona-settings",
+                                    "pages/user-guide/project-settings/mcp"
                                 ]
                             },
                             {
@@ -243,10 +246,20 @@
                         ]
                     },
                     {
-                        "dropdown": "Changelog",
+                        "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [
-                            "pages/changelog"
+                            "pages/release-notes/v4.0.0",
+                            "pages/release-notes/v3.7.2",
+                            "pages/release-notes/v3.6.2",
+                            "pages/release-notes/v3.5.2",
+                            "pages/release-notes/v3.4.1",
+                            "pages/release-notes/v3.3.0",
+                            "pages/release-notes/v3.2.0",
+                            "pages/release-notes/v3.1.0",
+                            "pages/release-notes/v3.0.1",
+                            "pages/release-notes/v3.0.0",
+                            "pages/release-notes/v2.0.0"
                         ]
                     }
                 ]

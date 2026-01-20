@@ -2,31 +2,80 @@
 title: Files & File Storage
 ---
 
+The Files view provides centralized management of all files uploaded to your project. Files serve as reference materials and source data that can be imported into your model, referenced by the AI agent, or used as documentation. Examples include requirements tables, system descriptions, technical specifications, CAD drawings, and other project documentation.
+
+<Frame>
+    <img src="/images/files-settings.png" /> 
+</Frame>
+
 ## Uploading Files
-Uploading Files is one of the best ways of importing legacy model documentation into Davinci. Old system descriptions, requirements tables, personnel trackers, and other documentation can be uploaded directly into Davinci and easily transitioned into Davinci Model Objects.
 
-Files can be uploaded in one of two ways:
+Files can be uploaded in multiple ways:
 
-1. Directly through `Chat`
-2. Using the File Uploader in `Project`>`Files`
+1. Using the **Upload File** button in the `Library` Index Panel
+2. Using the **Upload File** button in `Project Settings` > `Files`
+3. Drag and drop files directly into Davinci
 
-<Note>When uploading `Files` to Davinci they are created as both index objects in the model and uploaded to the project storage. Files that are removed from the model are retained in project storage to maintain `Snapshot` integrity.</Note>
+The Upload File button in the Files view supports uploading multiple files simultaneously. A progress bar will display the upload status and percentage completion.
+
+<Note>
+When uploading files to Davinci, they are created as both index objects in the model and uploaded to the project storage. Files that are removed from the model are retained in project storage to maintain Snapshot integrity.
+</Note>
 
 ## Using Uploaded Files
-Uploaded Files can be referenced directly in chat by referencing them using the "@" menu. Davinci will attempt to utilize information in the `File` when performing the task. 
 
-`Files` can have one of two different statuses:
+Uploaded files can be referenced directly in chat by referencing them using the "@" menu. Davinci will attempt to utilize information in the file when performing the task.
+
+## File Status
+
+Files can have one of two different statuses:
 
 | Status | Description              |
 |--------|--------------------------|
-| `Active` | Active Files are currently in the project Library. These files are likely, but not necessarily, connected to model objects, documentation, or other parts of the model. These files are actively being used by the model.
-| `Inactive` | Inactive Files are not currently used in the model. They have been deleted from the `Library` by a user and are no longer used or referenced in the current version of the model.
+| `Active` | Active files are currently in the project Library. These files are actively being used by the model and may be connected to model objects, documentation, or other parts of the model. Active files appear in green. |
+| `Inactive` | Inactive files are not currently used in the model. They have been deleted from the Library but are retained in storage. Inactive files appear in orange. |
 
-## File Management
-Files can be managed efficiently inside of the `Files` Tab within the `Project View`. Files can be sorted by name, size, type, and other parameters. File UUIDs are also visible here for debugging purposes. 
+## Managing Files
 
-Files can also be managed from within the `Project View`, in the `Library` section of the `Index`. Files will become Inactive if removed from the `Library`. Files can be permanantely deleted from the `Files Tab`. Files can be renamed in the `Library`.
+The Files view displays all project files in a sortable table with the following columns:
 
-<Warning>Deleting Inactive Files may damage previously generated model `Snapshots`, and render the Files unrecoverable and parts of the Model that relied on these files incomplete. Only fully delete Files if you are sure they are no longer needed. Files permanantely deleted from the Files Tab are not recoverable.</Warning>
+- **Name**: The filename
+- **Type**: File type/extension (PDF, DOCX, PNG, etc.)
+- **Size**: File size in bytes, KB, MB, or GB
+- **Status**: Active or Inactive
+- **ID**: The file's UUID for debugging purposes
 
+### Sorting Files
+
+Click on any column header to sort by that column. Click again to reverse the sort direction. The table supports sorting by name, type, size, status, and ID.
+
+### Refreshing the File List
+
+Click the **Refresh** button to reload the file list and update file information.
+
+### Deleting Files
+
+To delete a single file:
+
+1. Hover over the file row to reveal the delete icon
+2. Click the trash icon
+3. Confirm the deletion
+
+<Note>
+Only the project owner can delete files.
+</Note>
+
+### Removing All Inactive Files
+
+To permanently delete all inactive files at once:
+
+1. Click the **Remove Inactive Files** button
+2. Review the list of files to be deleted
+3. Confirm the deletion
+
+Files can also be managed from the Library section of the Index. Files will become Inactive if removed from the Library. Files can be renamed in the Library.
+
+<Warning>
+Deleting inactive files may damage previously generated model Snapshots, and render the files unrecoverable and parts of the model that relied on these files incomplete. Only fully delete files if you are sure they are no longer needed. Files permanently deleted from the Files view are not recoverable.
+</Warning>
 

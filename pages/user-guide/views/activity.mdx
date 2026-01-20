@@ -7,16 +7,39 @@ title: Activity View
 The Activity View displays activity diagrams for Action objects, showing the flow of actions, decisions, and control logic. This view uses a two-pane layout with code editor on the left and generated diagram on the right, allowing you to define activity flows in text and see them visualized instantly.
 
 <Frame>
-    <img height="400" noZoom src="/images/workspace_activity.png" />  
+    <img height="400" noZoom src="/images/activity-view.png" />  
 </Frame>
 
 Activity diagrams illustrate workflows, decision points, parallel actions, and loops using standard activity diagram notation. The view parses your activity definition code and automatically generates the corresponding visual representation.
 
+## Code Editor
+
+The left pane contains a code editor where you define the activity flow using structured syntax. Changes to the code automatically update the diagram on the right.
+
+### Code History
+
+Under the Code Editor, the Code History Slider allows you to scrub through past edits of the code. Use this to recover deleted code or view previous versions of the Action Flow. Click `Restore` to apply the current history selection.
+
+<Note>
+    Reverting code to a previous state will not overwrite the history. That update is saved as a new state, and you can use the slider to revert again if needed.
+</Note>
+
+## Diagram Elements
+
+Activity diagrams include:
+- **Actions**: Rectangular blocks representing individual actions or operations
+- **Decisions**: Diamond shapes for conditional branching
+- **Flow Lines**: Arrows showing the sequence and flow of control
+- **Start/End**: Circular markers indicating activity start and end points
+- **Parallel Actions**: Synchronized bars for concurrent execution paths
+
 ## View Controls
 
-### Code Editor
+### Panel Control
 
-The left pane contains a code editor where you define the activity flow using structured syntax. Changes to the code automatically update the diagram on the right after a brief delay.
+- Toggle Code Editior and Diagram visibility with the buttons on the left.
+
+- Toggle Horizontal or Vertical split for Code Editor and Diagram with the button on the far right.
 
 ### Wrap
 
@@ -25,10 +48,6 @@ Toggle line wrapping in the code editor for better readability of long lines.
 ### Depth
 
 Controls how deep into nested actions and sub-activities the diagram displays.
-
-### Orientation
-
-Choose between horizontal and vertical layout for the activity diagram flow.
 
 ### Show Documentation
 
@@ -45,15 +64,6 @@ Toggle display of performers (actors or systems) responsible for executing actio
 ### Refresh
 
 Regenerates the activity diagram from the current code definition.
-
-## Diagram Elements
-
-Activity diagrams include:
-- **Actions**: Rectangular blocks representing individual actions or operations
-- **Decisions**: Diamond shapes for conditional branching
-- **Flow Lines**: Arrows showing the sequence and flow of control
-- **Start/End**: Circular markers indicating activity start and end points
-- **Parallel Actions**: Synchronized bars for concurrent execution paths
 
 ## Interaction
 

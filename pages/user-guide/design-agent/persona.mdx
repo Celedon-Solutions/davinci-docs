@@ -4,13 +4,13 @@ title: Personas & Background
 
 Personas and User Background allow you to customize how the Davinci Agent interacts with you and performs tasks. Personas provide specific instructions to guide agent behavior, while User Background gives the agent context about your role and perspective in the project.
 
+[Manage Personas & Background in Project Settings](/pages/user-guide/project-settings/persona-settings)
+
 ## Personas
 
 Personas are reusable instruction sets that modify how the agent approaches tasks. Each persona provides consistent context to the agent with every message, allowing you to customize agent behavior for different workflows without repeating instructions.
 
-<Frame>
-    <img noZoom src="/images/persona_overview.png" />
-</Frame>
+
 
 ### Persona Structure
 
@@ -26,19 +26,14 @@ Each persona consists of three components:
 - Define quality standards or constraints
 - Specify formatting or documentation requirements
 
-<Frame>
-    <img noZoom src="/images/persona_structure.png" />
-</Frame>
 
 ### Using Personas
 
 You can quickly switch between personas from the Agent view using the dropdown menu. The currently selected persona will be applied to all subsequent messages sent to the agent.
 
-<Frame>
-    <img noZoom src="/images/persona_dropdown.png" />
-</Frame>
-
-<Note>Become familiar with a persona before using it to ensure you understand what instructions will be included alongside your prompts.</Note>
+<Note>
+Become familiar with a persona before using it to ensure you understand what instructions will be included alongside your prompts.
+</Note>
 
 **Example Persona Use Cases:**
 - **Detailed Designer**: Ensures thorough documentation and traceability for all generated elements
@@ -46,76 +41,9 @@ You can quickly switch between personas from the Agent view using the dropdown m
 - **Requirements Analyst**: Focuses on verification, validation, and requirement satisfaction
 - **Documentation Writer**: Emphasizes clear explanations and comprehensive descriptions
 
-### Managing Personas
-
-More detailed persona management is available in [Project Settings](/pages/user-guide/navigating/project). From there you can:
-
-- **View** all available personas in the project
-- **Create** new personas with custom instructions
-- **Edit** existing personas to refine their purpose and approach
-- **Delete** personas that are no longer needed
-
-<Frame>
-    <img noZoom src="/images/persona_management.png" />
-</Frame>
-
-### Persona Storage and Scope
-
-Personas are stored **per-user, per-project**. This means:
-- Each user has their own list of personas
-- Personas are unique to each project
-- Other users cannot see or use your personas unless you share them
-
-### Importing and Exporting Personas
-
-Personas can be exported as `.dmo` files and imported into other projects:
-
-**To export a persona:**
-1. Navigate to Project Settings
-2. Select the persona you want to export
-3. Click the export button
-4. Save the `.dmo` file
-
-**To import a persona:**
-1. Open the destination project
-2. Upload the `.dmo` file directly into the project (drag-and-drop or upload button)
-3. Davinci will recognize it as a persona and automatically add it to your persona list
-
-This is useful for reusing effective personas across multiple projects or sharing successful persona configurations with team members.
-
-### Version Control
-
-Personas are tracked by [Version Control](/pages/user-guide/right-panel/version-control) just like model objects. This means:
-
-- Different branches may have different personas available
-- The same persona may have different configurations on different branches
-- Merge conflicts can occur if a persona is edited on multiple branches before merging
-
-When merging branches, review any persona conflicts carefully to ensure the correct version is preserved.
-
 ## User Background
 
 User Background allows you to specify your role, discipline, and perspective within the project. This helps the agent understand what angle you're approaching the work from and what aspects you're likely to care about.
-
-<Frame>
-    <img noZoom src="/images/user_background.png" />
-</Frame>
-
-### Setting Your Background
-
-Describe your position, expertise, and focus areas. For example:
-- "Mechanical Engineer focused on thermal analysis and structural design"
-- "Systems Engineer responsible for requirements management and verification"
-- "Project Manager overseeing schedule, budget, and stakeholder communication"
-- "Electrical Engineer specializing in power systems and circuit design"
-
-**To edit your background:**
-1. Type in the User Background text box
-2. Click the **Save** button to save your changes
-
-<Warning>If you navigate away from the page without clicking Save, your background changes will not be updated.</Warning>
-
-### Background Storage
 
 Like personas, User Background is stored **per-user, per-project**. Each user can set their own background for each project they work on, allowing the agent to provide personalized, role-appropriate assistance.
 
@@ -139,3 +67,7 @@ Like personas, User Background is stored **per-user, per-project**. Each user ca
 - **Include relevant expertise**: Mention your technical background and specializations
 - **Describe your role**: Explain your responsibilities in the project
 - **Update as needed**: Your background can change as your role evolves in different projects
+
+## Managing Personas
+
+For detailed instructions on creating, editing, exporting, and managing personas, see [Persona Settings](/pages/user-guide/project-settings/persona-settings).
