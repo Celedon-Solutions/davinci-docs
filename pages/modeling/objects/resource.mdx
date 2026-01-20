@@ -5,7 +5,17 @@ title: Resource
 <img height="20" noZoom src="/images/objecticons/resource.svg" /> 
 
 ## Description
-Resource (Resource) objects represent the quantifiable assets required to perform tasks or achieve system objectives. These can include financial Resources, materials, equipment, personnel (headcount), or energy. In systems engineering, managing resources is critical to ensure that the system can be developed and operated within constraints.
+Resource objects represent the quantifiable attributes used to perform tasks or achieve system objectives. These can include financial Resources, materials, equipment, personnel (headcount), or energy. In systems engineering, managing resources is critical to ensure that the system can be developed and operated within constraints.
+
+Resources work like [Attributes](/pages/modeling/objects/attributes) but have a unique property that they automatically roll up values of owned children resources. This means that a tree of resources will sum up each other without requiring equations allowing for quick modeling of simple roll up values and easy categorization. They also provide automatic projection of values across time periods if the equation of the resource uses a [Task](/pages/modeling/objects/task), where the task defines the duration and start / end dates.
+
+<Note>If viewing a Resource that has children resource, the value display will only show the rolled up result and will not have any editing ability</Note>
+
+For leaf resources you can set their values using the same equation setup as [Attributes](/pages/modeling/objects/attributes). Resources have two unique toggles:
+
+`isConsumable` - indicates that this resource is "consumed" meaning that its value is rolled up as a sum. Non consumable means it is rolled up as a max value. Non consumable would be for things "reused", where the parent value would be total number of unique elements required.
+
+`Effective Labor Hours` - For values that involve a [Task](/pages/modeling/objects/task) as an element of its equation, the task's total duration is used. If `Effective Labor Hours` is true, then it will not consider weekends in the duration computed and assume a standard 40 hour work week.
 
 ## View Types
 
@@ -32,16 +42,16 @@ Short name of the object.
   Description of the object.
 </ParamField>
 
-<ParamField path="Resources" type="object">
+<ParamField path="Value" type="string">
+  The value of the attribute which as the form of:
 
-<a href="/pages/modeling/objects/Resource" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/resource.svg" /> </a>
+  `Equation or value` [`unit`] (`isConsumable`)(`Use Effective Labor Hours`)
 
-  A list of all sub-resource objects owned by this Resource.
+  <Warning>If the units of the equation or reference either do not match or can not be convereted, an error will occur. Mouseover the error box to see the details of the error.</Warning>
 
-  Sub-resources can be viewed and deleted.
-
-  [Read more about Resources](/pages/modeling/objects/Resource)
+  <Info>See the allowed [mathmatical operations/syntax](/sections/sysml/equations) and [base units](/sections/sysml/units) for details on what is allowed.</Info>
 </ParamField>
+
 
 <ParamField path="Relationships" type="connection">
 

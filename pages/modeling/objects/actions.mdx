@@ -52,6 +52,36 @@ Short name of the object.
 
 <ParamField path="Sequence" type="code">
   Code that defines the action's behavior and flow. The sequence uses standard Python syntax with specialized functions and reference notation for modeling behaviors.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this action.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this action.
+
+  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
 
 ### Action References
 Actions are referenced using the `@` system (which get resolved into elements in the code):
@@ -171,58 +201,6 @@ else:
     @Notify_Administrator
     end()
 ```
-</ParamField>
-
-<ParamField path="Actions" type="object">
-
-<a href="/pages/modeling/objects/actions" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/action.svg" /> </a>
-
-  A list of all sub-action objects owned by this action.
-
-  Sub-actions can be viewed and deleted.
-
-  [Read more about Actions](/pages/modeling/objects/actions)
-</ParamField>
-
-<ParamField path="Attributes" type="object">
-
-<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
-
-  A list of all Attribute objects owned by this action.
-
-  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
-
-  [Read more about Attributes](/pages/modeling/objects/attributes)
-</ParamField>
-
-<ParamField path="Constraints" type="object">
-
-<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
-
-  A list of all Constraint objects owned by this action.
-
-  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
-
-  [Read more about Constraints](/pages/modeling/objects/constraints)
-</ParamField>
-
-<ParamField path="Code" type="object">
-
-<a href="/pages/modeling/objects/code" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
-
-  A list of all Code objects owned by this action.
-
-  Code objects can be viewed and deleted.
-
-  [Read more about Code](/pages/modeling/objects/code)
-</ParamField>
-
-<ParamField path="Relationships" type="connection">
-
-  A list of all Relationships this object has with other model objects.
-
-  [Read more about Relationships](/pages/modeling/common/relationships)
-</ParamField>
 
 ## Message Flow Modeling
 
@@ -277,9 +255,3 @@ When an action sequence is executed, the system performs several parse-time tran
 2. **Attribute Binding**: Attribute references are converted to global variable names and bound to their current values
 3. **Code Import Resolution**: References to code objects are resolved to module imports
 4. **Unit Conversion**: Attribute values with units are automatically converted to the target unit system
-
-## Activity View
-The Activity View visually represents the sequence and flow of actions, showing control nodes, decision points, and parallel execution paths.
-
-## Sequence View
-The Sequence View illustrates interactions between the action and other system components over time, detailing the message exchange order.

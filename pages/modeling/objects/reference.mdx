@@ -21,8 +21,7 @@ Reference objects support importing various file types, making it easy to integr
 
 **Documents:**
 - PDF files - Technical specifications, datasheets, research papers
-- Word documents (DOCX) - Requirements documents, design descriptions
-- Excel spreadsheets (XLSX) - Data tables, BOMs, test results
+<Note>Word (DOCX) and Excel spreadsheets (XLSX) all will be converted automatically into Davinci documents and tables.</Note>
 
 **Images:**
 - PNG, JPG, JPEG - Photographs, screenshots, diagrams
@@ -98,18 +97,6 @@ Short name of the object.
   Description of the object.
 </ParamField>
 
-<ParamField path="Authors" type="string">
-  The authors of the reference.
-</ParamField>
-
-<ParamField path="Publication" type="string">
-  The publication where the reference appeared.
-</ParamField>
-
-<ParamField path="Publisher" type="string">
-  The publisher of the reference.
-</ParamField>
-
 <ParamField path="Relationships" type="connection">
 
   A list of all Relationships this object has with other model objects.
@@ -117,38 +104,62 @@ Short name of the object.
   [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
 
-<ParamField path="Edition" type="string">
-  The edition of the reference.
+### Citation
+
+<ParamField path="citation.name" type="string">
+  The citation name.
 </ParamField>
 
-<ParamField path="Volume" type="string">
+<ParamField path="citation.authors" type="string">
+  The authors of the reference.
+</ParamField>
+
+<ParamField path="citation.title" type="string">
+  The title of the reference.
+</ParamField>
+
+<ParamField path="citation.publication" type="string">
+  The publication where the reference appeared.
+</ParamField>
+
+<ParamField path="citation.volume" type="string">
   The volume number of the reference.
 </ParamField>
 
-<ParamField path="Issue" type="string">
+<ParamField path="citation.issue" type="string">
   The issue number of the reference.
 </ParamField>
 
-<ParamField path="Pages" type="string">
+<ParamField path="citation.pages" type="string">
   The page numbers of the reference.
 </ParamField>
 
-<ParamField path="Year" type="string">
-  The year of publication.
-</ParamField>
-
-<ParamField path="Month" type="string">
+<ParamField path="citation.month" type="string">
   The month of publication.
 </ParamField>
 
-<ParamField path="DOI" type="string">
+<ParamField path="citation.year" type="string">
+  The year of publication.
+</ParamField>
+
+<ParamField path="citation.doi" type="string">
   The Digital Object Identifier (DOI) of the reference.
 </ParamField>
 
-<ParamField path="URL" type="string">
+<ParamField path="citation.url" type="string">
   The URL link to the reference.
 </ParamField>
 
-<ParamField path="ISBN" type="string">
+<ParamField path="citation.isbn" type="string">
   The International Standard Book Number (ISBN) of the reference.
 </ParamField>
+
+<ParamField path="citation.publisher" type="string">
+  The publisher of the reference.
+</ParamField>
+
+<ParamField path="citation.edition" type="string">
+  The edition of the reference.
+</ParamField>
+
+<Note>If using references in Davinci documents, use the @reference inline in text. Any added bibliography section will use the citation data of the object and rendered a citation list with numbered citations in documents.</Note>
