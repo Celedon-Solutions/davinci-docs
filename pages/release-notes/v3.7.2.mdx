@@ -1,0 +1,50 @@
+---
+title: 'Version 3.7.2 - Comments, Code and Chat Update'
+description: 'October 14 2025'
+---
+
+## Version 3.7.2 - Comments, Code and Chat Update
+
+### Agent
+- Fix Button: Objects with resolution Errors will now have a "Fix Error" button that sends the error to the Agent to be fixed. Users can accept or reject the proposed fix
+- Send to Agent Button: Objects with TBD resolution status will now have a "Send to Agent" button which will add that object to the chat. Users should then provide the Agent with context for how to resolve the TBD
+- The Davinci Agent now has a new look, occupying one section of the new Right Panel
+- Davinci can now generate code in any specified language. The Agent will default to Python if no language is provided. Be explicit if you want Davinci to generate code that is not Python
+
+### New Features
+
+#### Revised Right Panel
+
+The Right Panel is now not only for Agent Chat. We've added a few new features here to improve usability and model awareness for users
+- Agent View: This is where Chat lives. Users can now paste images (png/jpg/webp) from their clipboard into chat to provide the Agent with extra visual context
+- Error View: The new error view in the Right Panel shows all Model Objects with resolution Errors and all TBD Objects. Users can click on each card to view the Object and manually resolve, or select "Fix Error" or "Send to Agent" to resolve. Filter by Errors or TBDs using the buttons at the top of the view
+- Search View: A new way to search your model! Instead of relying on the top bar to search, users can now have a more persistant search area here. Search by Object name, key values, Tags, and more. Search will even show you everywhere an Object is referenced in the model
+- Comments View: Read more about comments below! The Comments view allows users to manage all comments in the model from one central view. See all comments posted by you in the "My Comments" tab. Easily see a list of all comments in which you are directly mentioned in the "Mentions" tab. Or simply view all comments in the model in the "All Comments" tab.
+
+#### Comments
+- Added Model Object Comments
+- Users can now leave comments on Model Objects with notes for the future, requests for review, or any other use case
+- Collaborators can be directly mentioned within comments using the @ search feature within comments
+- Other Model Objects can be directly mentioned within comments as well
+- Comments can be marked as "Resolved", which will remove them from being tracked in the "All Comments" tab of the Comment View
+
+#### Other Updates
+- Cleaned up Index right click menus
+- Added ability to paste images from clipboard into chat for one-time context to the Agent. Pasting unsupported file types in chat will offer to upload them as a Reference Object instead
+- Better constrained Select All Functionality (CTRL+A/CMD+A) to be more focused on appropriate content
+- Improved copy/paste from chat output, allowing Object references to be rich-copied within Davinci and converted to text outside. Formatting between messages is maintained
+- Added support for arbitrary code language generation and storage within the Model. Code execution is still limted to Python (for now)
+- Code block output in chat and Code Objects can now be copied easily with one button click
+
+### Bug fixes
+- Fixed issues with running Python code
+- Fixed issues with unit resolution in Attributes
+- Fixed an issue with some tooltips in the interface
+- Fixed a layout issue with sending pasted text to the Agent via chat
+
+
+### Previous Releases
+These release notes incorporate key features from these previous releases, along with new improvements and bug fixes
+
+- 3.7.1 - October 14 2025
+- 3.7.0 - October 8 2025

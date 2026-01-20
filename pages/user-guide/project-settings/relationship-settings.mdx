@@ -2,41 +2,109 @@
 title: Relationships
 ---
 
-The Relationship Settings view provides a comprehensive overview of all relationship types currently available in your project.
+The Relationship Settings view allows you to manage and configure all relationship types in your project. Relationships define how different objects in your model connect and interact with each other, forming the structure and logic of your system model.
+
+<Frame>
+    <img src="/images/relationships-settings.png" /> 
+</Frame>
+
+## Managing Relationships
+
+### Searching Relationships
+
+Use the search box in the header to filter relationships by name. The search updates in real-time as you type.
+
+### Creating Custom Relationships
+
+To create a new custom relationship:
+
+1. Click the **New Relationship** button in the header
+2. Configure the relationship properties:
+   - **Name**: The identifier for the relationship
+   - **Direction**: Unidirectional or bidirectional
+   - **Color**: Visual color for diagrams
+   - **Description**: Purpose and usage
+   - **From**: Valid source object types
+   - **To**: Valid target object types
+
+### Editing Custom Relationships
+
+Custom relationships can be edited directly in the table:
+
+- **Direction**: Click the dropdown to switch between unidirectional and bidirectional
+- **Color**: Click the color box to open the color picker
+- **Description**: Click the description text to edit inline
 
 <Note>
-Creating custom relationship types is not currently supported but will be available in a future update.
+Only custom relationships can be edited. Base and internal relationships are read-only to maintain SysML v2 compatibility and system integrity.
 </Note>
+
+### Deleting Custom Relationships
+
+To delete a custom relationship:
+
+1. Hover over the relationship row
+2. Click the trash icon that appears
+3. Confirm the deletion
+
+<Warning>
+Deleting a relationship type will not automatically remove existing relationship instances from your model objects. Use the Clean Up feature to remove invalid relationships.
+</Warning>
+
+### Cleaning Up Relationships
+
+The **Clean Up** button removes all invalid relationship instances from your model. This is useful when:
+
+- You've deleted a relationship type
+- Object types have changed
+- Relationship constraints have been modified
+
+Click **Clean Up** to scan all objects and remove relationships that no longer match valid relationship type definitions.
 
 ## Relationship Properties
 
-For each relationship type, the settings list displays:
-- **Name**: The identifier of the relationship.
-- **Direction**: Whether the relationship is unidirectional (`in`/`out`) or bidirectional (`inout`).
-- **Color**: The visual color used to represent this relationship in diagrams and views.
-- **Description**: A brief explanation of the relationship's purpose.
-- **Limitations**: Defines the valid "From" and "To" object types.
-  - **From**: The types of objects that can be the source of this relationship.
-  - **To**: The types of objects that can be the target.
-  
-  *Example: The `Performs` relationship can originate **from** a Part or Entity and go **to** an Action.*
+Each relationship type displays the following properties:
+
+- **Name**: The identifier of the relationship
+- **Direction**: Whether the relationship is unidirectional or bidirectional
+- **Color**: The visual color used to represent this relationship in diagrams and views
+- **Description**: A brief explanation of the relationship's purpose
+- **From**: The types of objects that can be the source of this relationship (displayed as bubbles with icons)
+- **To**: The types of objects that can be the target (displayed as bubbles with icons)
+
+<Note>
+When a relationship shows "ALL" in the From or To column, it can connect to any object type.
+</Note>
 
 ## Relationship Categories
 
-Davinci organizes relationships into three categories:
-
-### Internal Relationships
-These are managed automatically by Davinci's internal logic to maintain model connectivity.
-- **Example**: The `Uses` relationship is automatically created when an Attribute references another Attribute in its equation.
-- **Example**: The `Reference` relationship links Reference objects to other model elements.
-
-### Base Relationships (SysML v2)
-These are standard relationships defined by the SysML v2 specification. Using these relationships ensures your model remains compatible with standard systems engineering practices and can be exported to valid SysML v2 formats.
+Relationships are organized into three categories, displayed in separate tables:
 
 ### Custom Relationships
-These are specialized relationships included in Davinci to provide more descriptive modeling capabilities for physical and logical interactions.
-- **Examples**: `Thermal`, `Power`, `Chemical`, `Mechanical`.
 
-For a detailed list of all available relationship types and their definitions, please see the [Relationships Documentation](/pages/modeling/common/relationships).
+User-created relationships specific to your project needs. These are fully editable and can be deleted.
 
+**Examples**: `Thermal`, `Power`, `Chemical`, `Mechanical`
+
+Custom relationships provide specialized modeling capabilities for physical and logical interactions beyond standard SysML v2.
+
+### Base Relationships (SysML v2)
+
+Standard relationships defined by the SysML v2 specification. These relationships are read-only to ensure your model remains compatible with standard systems engineering practices and can be exported to valid SysML v2 formats.
+
+These relationships cannot be edited or deleted.
+
+### Internal Relationships
+
+System-managed relationships that Davinci creates automatically to maintain model connectivity and structure. These relationships are read-only.
+
+**Examples**:
+- `Uses`: Automatically created when an Attribute references another Attribute in its equation
+- `Reference`: Links Reference objects to other model elements
+
+Internal relationships cannot be edited or deleted.
+
+## Additional Resources
+
+For a detailed list of all available relationship types and their definitions, see the [Relationships Documentation](/pages/modeling/common/relationships).
 

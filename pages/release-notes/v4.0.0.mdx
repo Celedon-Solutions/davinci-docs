@@ -1,0 +1,109 @@
+---
+title: 'Version 4.0.0 - Major Systems Update'
+description: 'January 20 2026'
+---
+
+## Version 4.0.0 - Major Systems Update
+
+Version 4.0 represents a significant evolution of Davinci with comprehensive updates to core modeling capabilities, new visualization systems, and enhanced collaboration features. This release includes rebuilt action execution, state machine support, standalone spreadsheet functionality, and numerous improvements across the platform.
+
+### [Actions](/pages/modeling/objects/actions) System
+
+The action system has been completely rebuilt to provide more powerful sequence modeling and execution capabilities.
+
+- **New [Sequence View](/pages/user-guide/views/sequence)**: Actions now feature a dual-pane sequence view with a code editor on the left and auto-generated sequence diagrams on the right
+- **Improved Action Graphs**: Enhanced flow visualization with better layout algorithms and edge rendering
+- **Message Passing**: Added support for message passing between components with ports and interfaces
+- **Enhanced Execution**: Improved action execution tracking with better state management and error handling
+- **SysML v2 Export**: Full support for exporting action sequences in SysML v2 format
+
+### [States](/pages/user-guide/views/state) and Transitions
+
+Introducing comprehensive state machine modeling with visual state diagrams and transition management.
+
+- **State Objects**: New state object type with support for hierarchical nested states
+- **[State View](/pages/user-guide/views/state)**: Dedicated state diagram view with configurable depth, orientation, and transition visibility controls
+- **Transitions System**: Full support for state transitions with triggers, guard conditions, and transition actions
+- **Entry/Exit/Do Behaviors**: Define entry actions, exit actions, and ongoing do activities for each state
+- **State-Dependent Values**: Attribute values can now be dependent on the current state, with automatic rollup calculations
+- **Visual Enhancements**: State diagrams include legends, documentation display, and focused highlighting
+- **Export Support**: State diagrams can be exported as high-resolution PNG images
+
+### [Spreadsheets](/pages/modeling/objects/tables)
+
+Tables have been completely overhauled to function as powerful spreadsheet objects with Excel-like capabilities.
+
+- **Full Spreadsheet Functionality**: Tables now operate as independent spreadsheet objects with rich calculation capabilities
+- **Formula Support**: Cells can contain formulas beginning with `=` for dynamic calculations
+- **A1 Notation**: Support for standard spreadsheet cell referencing using A1 notation
+- **Cell Referencing**: Use the `@` system to reference other cells and model objects within formulas
+- **Drag-Fill**: Intelligent drag-fill with pattern recognition and directional controls
+- **Multi-Cell Operations**: Select and operate on multiple cells simultaneously with improved selection handling
+- **Circular Dependency Detection**: Automatic detection and warnings for circular formula dependencies
+- **Formatting Controls**: Apply borders, colors, and text styling to cells with copy/paste preservation
+- **[Equation](/pages/modeling/common/equations) Cells**: Dedicated equation cell type with unit support and mathematical operations
+- **Zoom Controls**: Ctrl+wheel zoom that centers on cursor position for precise navigation
+- **Row/Column Operations**: Full support for selecting, formatting, and manipulating entire rows and columns
+- **Enhanced Export**: XLSX export now preserves formulas, formatting, and all cell properties
+
+### [Document](/pages/modeling/objects/documents) and [Artifact](/pages/user-guide/views/artifact) Enhancements
+
+Significant improvements to documents, slides, and other artifact types.
+
+- **Figure Elements**: New figure support allowing mathematical plots and visualizations to be embedded in slides and documents
+- **Enhanced [Equations](/pages/modeling/common/equations)**: Improved inline equation editing with live preview and object reference support
+- **[Slide](/pages/modeling/objects/slide) Improvements**: Better element selection, resize alignment, image cropping, and fit-to-screen controls
+- **Table-in-Document Editing**: Improved editing experience for tables embedded within documents
+- **Block Management**: Enhanced text block operations including better split/merge behavior and format preservation
+- **Image Paste**: Paste images directly from clipboard into documents and slides
+
+### Visualization and Views
+
+New and improved views for better model understanding and navigation.
+
+- **[Package View](/pages/user-guide/views/package)**: New hierarchical package visualization for organizing and viewing package structures
+- **[Block Diagram](/pages/user-guide/views/block) Enhancements**: Redesigned port layouts, improved interface rendering, and better edge routing with line jumpers
+- **[State View](/pages/user-guide/views/state)**: Completely new state machine diagram view with configurable options
+- **[Sequence View](/pages/user-guide/views/sequence)**: New dedicated view for action sequence diagrams
+- **Improved Rendering**: Enhanced rendering performance and quality across all diagram types with better SVG centering and bounding box calculations
+- **Better Integrated Documentation**: Added the help view to all objects as well as adding "right-click" functionality to all objects to link directly to Davinci Docs
+
+### Interaction and Usability
+
+Comprehensive improvements to selection, copy/paste, and interaction behaviors.
+
+- **Enhanced Multi-Select**: Improved multi-selection across all views including documents, tables, and slides
+- **Better Copy/Paste**: Copy and paste functionality now works seamlessly between documents, tables, chat, and external applications
+- **Context-Aware Selection**: Ctrl+A/Cmd+A now intelligently selects content based on current context
+- **Improved Drag Operations**: Better drag indicators and feedback throughout the interface
+- **Help Bubbles**: Added contextual help bubbles in Properties View and settings areas for better discoverability
+
+### Export and Import
+
+Expanded import/export capabilities for better interoperability.
+
+- **SysML v2 Export**: Full support for exporting models in SysML v2 format
+- **Enhanced DOCX**: Improved DOCX import/export with better equation and formatting support
+- **Formula Preservation**: XLSX exports now maintain formulas and cell dependencies
+- **PNG Exports**: Export state diagrams, package views, and other visualizations as high-quality images
+- **Better References**: Improved handling of object references in all export formats
+
+### Server and Deployment
+
+Significant infrastructure improvements for better reliability and scalability.
+
+- **Docker Containerization**: Complete Docker-based deployment system with isolated services (web, routing-server, projects-server, design-engine)
+- **Improved Reliability**: Enhanced service isolation and better error recovery
+- **Streamlined Deployment**: Comprehensive deployment packages with automated installation scripts
+- **Better Scaling**: Infrastructure improvements to support larger deployments and concurrent users
+
+### Bug Fixes
+
+- **[Code View](/pages/user-guide/views/code)**: Fixed drag divider interaction issues and improved code rendering performance
+- **Index**: Fixed selection handling, drag counter visibility, chevron alignment, and object ordering
+- **[Search View](/pages/user-guide/right-panel/search-view)**: Fixed line number accuracy when jumping to search results
+- **[Chat](/pages/user-guide/right-panel/agent-chat)**: Fixed anchor imports, improved markdown rendering, and better message copying
+- **[Properties View](/pages/user-guide/views/properties)**: Improved performance and reactivity throughout properties panel
+- **[Comments View](/pages/user-guide/right-panel/comment-view)**: Fixed comment reactivity and updater synchronization
+- **Authentication**: Improved password strength validation and OAuth integration
+- **General**: Fixed z-index conflicts between overlays, improved border sizing consistency, and corrected tooltip positioning throughout the interface

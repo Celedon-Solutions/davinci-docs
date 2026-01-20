@@ -1,7 +1,9 @@
 ---
 title: Summary
 ---
-Project Settings has many different views that show unique and useful information regarding the state of your Project.
+Project Settings has many different views that show useful information and configuration options for your Project.
+
+Project Settings is now a content Tab, just like Model Objects, making it easy to browse your configuration settings alongside the rest of your model.
 
 ## Summary
 The Model Summary Tab contains statistics about your Model and various Model Health Indicators. 
@@ -12,16 +14,16 @@ At the top are three global statistics of your Model:
 3. `Average Connectedness`: This stat tells you, on average, how many Object connections a given Model Object is likely to have. In our screenshot below, the average Object in our Model is connected to 0.6 other Objects.
 
 <Frame>
-    <img noZoom src="/images/model_summary.png" /> 
+    <img src="/images/summary-view.png" /> 
 </Frame>
 
 ### Renaming a Project
-At the top of the Model Summary screen, you will see the name of your Project in a text box. 
+At the top of the Views list, you will see the name of your Project in a text box. 
 
 Click in the box and begin typing to rename your project. Press Enter or click outside of the box to save.
 
 <Frame>
-    <img noZoom src="/images/project_rename.png" /> 
+    <img noZoom src="/images/project-rename.png" /> 
 </Frame>
 
 ### Object Type Distribution
@@ -60,34 +62,3 @@ The SysML v2 export feature is in beta and does not fully support all features o
 <Frame>
     <img noZoom src="/images/export_model.png" /> 
 </Frame>
-
-
-## Snapshots
-Snapshots are used to save the current state of the Model at a point in time. Think of them like a save file in a video game. They can be used to restore the Model to a previous state, or archive past states for future reference.
-<Card title="Snapshots" horizontal icon="link" href="/pages/user-guide/overview/snapshots" >
-  Click here to read more about Snapshots
-</Card>
-
-## Collaborators
-The Collaborators Tab is used to manage Collaborators in this Project.
-<Card title="Collaboration" horizontal icon="link" href="/pages/user-guide/overview/collaboration" >
-  Click here to read more about Collaboration
-</Card>
-
-## Units
-The Units Tab allows you to define and manage custom Units if needed. 
-
-Click `Add Unit` to define a new Unit. A Unit Creation Wizard will pop up. Provide a symbol for the unit in the first line, and an optional description in the second line. Click `Add New Unit` at the bottom of the popup to save.
-
-Custom Units can be deleted by hovering over the Unit and clicking on the Trash button on the right side.
-
-<Warning>Deleting Custom Units that are being used in the Model may cause errors with existing Model data.</Warning>
-
-## Relationships
-The Relationships Tab shows you all of the Relationship types available to your Model. It includes data such as directionality, color, and a description of the Relationship.
-
-## Files
-The Files Tab allows you to manage your Uploaded Files and Storage for Project.
-<Card title="Files" horizontal icon="link" href="/pages/user-guide/overview/files" >
-  Click here to read more about Files
-</Card>
