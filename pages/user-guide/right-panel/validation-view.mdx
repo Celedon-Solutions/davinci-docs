@@ -2,45 +2,21 @@
 title: Validation Panel
 ---
 
-The Validation Panel allows users to see where Errors and incomplete objects may exist within the Model in one central location. 
+The Validation Panel allows users to see where Errors, incomplete objects, and Conflicts may exist within the Model in one central location. 
 
-All Model Objects with Value Resolution Errors will appear here. These errors can range from unit mismatches, to logical errors, and more.
+All Model Objects with Value Resolution Errors, TBDs, or merge Conflicts will appear here. Errors can range from unit mismatches to logical errors, TBDs indicate incomplete values, and Conflicts arise from branch merging.
 
 <Frame>
-    <img noZoom src="/images/validation_view.png" />
+    <img noZoom src="/images/validation-main.png" />
 </Frame>
 
-Each result shown in the Validation Panel will be a "Root Cause", meaning the error or TBD originates from that Object. 
+Each result shown in the Validation Panel will be a "Root Cause", meaning the error, TBD, or conflict originates from that Object. 
 
 Errors and TBDs can propagate through the Model if Objects with Errors or TBDs are used to calculate other Objects. These secondary errors are shown under the `Affected Objects` section in each card as appropriate.
 
-The total number of Objects affected by a Root Cause error or TBD will also be shown in the badge at the top right corner of each error card.
+The total number of Objects affected by a Root Cause error, TBD, or conflict will also be shown in the badge at the top right corner of each card.
 
-## Fix Error Button
-
-Each error card will contain a `Fix Error` button. 
-
-Clicking this button will pass the Model Object and error message directly to the Agent to be fixed. The Agent will then apply a fix, and the user can either accept or reject the fix. If accepted, the change is applied to the Object and the error should be resolved.
-
-<Frame>
-    <img noZoom src="/images/fix_error_button.png" />
-</Frame>
-
-## Send To Agent Button
-
-Each TBD card will contain a `Send to Agent` button. Because TBDs are a little more difficult to resolve, the Agent usually requires more context than the Model alone can provide.
-
-Clicking this button will add text to the [Davinci Agent](/pages/user-guide/right-panel/agent-chat) area directly referencing the TBD Object and asking the Agent to resolve the TBD. Here, users should provide additonal context for how the TBD should be resolved, including specific numbers, units, equation examples, etc. Once all needed context is added, send the message as normal and the Agent will resolve the TBD.
-
-<Frame>
-    <img noZoom src="/images/attribute_tbd_result_card.png" />
-</Frame>
-
-## Errors vs TBDs
-
-It is important to understand the difference and intent behind an Error vs a TBD.
-
-### Errors
+## Errors
 
 A Value Resolution Error is an error that occurs when Davinci attempts to resolve an equation into a final value. These errors can be caused by incorrect or incompatable units, unauthorized characters or inputs in different field types (letters in a "number" field, for example), or other logical errors within the equation.
 
@@ -50,7 +26,19 @@ Each of these will result in an error in the resolution field.
     <img noZoom src="/images/attribute_error.png" />
 </Frame>
 
-### TBDs
+### Fix Error Button
+
+Error cards contain a **Fix Error** button that automatically attempts to fix the issue. 
+
+When clicked, the button analyzes the error and applies an automatic fix to the object. The fix is then presented to you for review - you can either accept the proposed fix to apply it to the object, or reject it if the fix isn't appropriate. If accepted, the change is applied and the error should be resolved.
+
+<Frame>
+    <img noZoom src="/images/fix_error_button.png" />
+</Frame>
+
+This automatic fix approach works well for straightforward errors like unit mismatches or equation syntax issues where the correct fix is clear.
+
+## TBDs
 
 TBDs are a special status given to Attributes, Requirements and Constraints that are either empty, or have "TBD" written in their equation field. TBD Objects are incomplete, and should be filled in once their data or equation is known. This can be useful if, for example, a constraint is identified, but not fully realized in scope yet. 
 
@@ -59,3 +47,29 @@ TBD Objects indicate an incomplete Model, and should be resolved as soon as poss
 <Frame>
     <img noZoom src="/images/attribute_tbd.png" />
 </Frame>
+
+### Send To Agent Button
+
+TBD cards contain a **Send to Agent** button that adds the object to chat for guided resolution.
+
+When clicked, the button opens the [Davinci Agent](/pages/user-guide/right-panel/agent-chat) chat panel and automatically adds a message referencing the TBD object with a prompt like "Please help resolve TBD fields for this attribute." This approach is used for TBDs because they often require additional context to resolve properly - the agent needs to know what value should replace the TBD, what units to use, or what equation logic to apply.
+
+<Frame>
+    <img noZoom src="/images/attribute_tbd_result_card.png" />
+</Frame>
+
+After the object is added to chat, provide the agent with specific context about how to resolve the TBD, such as:
+- The specific value and units to use
+- The equation or calculation method
+- References to other objects or data sources
+- Any constraints or requirements
+
+Once you've provided the necessary context, send the message and the agent will resolve the TBD accordingly.
+
+## Conflicts
+
+Conflicts are merge conflicts that occur when the same object has been modified on different branches before merging. These conflicts must be manually resolved before you can continue working with the affected objects.
+
+Clicking on a conflict card will navigate you directly to the object with the conflict, where you can review the conflicting changes and choose which version to keep.
+
+[Read More About Merge Conflicts](/pages/user-guide/right-panel/version-control#merge-conflicts)
