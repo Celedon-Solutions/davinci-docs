@@ -37,6 +37,19 @@ These are standard relationships defined by the SysML v2 specification. Using th
 These are specialized relationships included in Davinci to provide more descriptive modeling capabilities for physical and logical interactions.
 - **Examples**: `Thermal`, `Power`, `Chemical`, `Mechanical`.
 
-For a detailed list of all available relationship types and their definitions, please see the [Relationships Documentation](/pages/modeling/common/relationships).
+You can define your own custom relationships using the Add Relationship button.
+
+<Warning>All relationships require unique names and do not support spaces in those names.</Warning>
+
+### Removing Relationships
+You can at any time remove relationships. When a relationship is removed from the project schema it will not longer show up as a relationship that can be added by the AI or users. 
+
+<Info>Removing a relationship from the project schema will not automatically clear it out in objects in the database. You must use the `Clean Up` button to clear out relationships from the objects in the project.</Info>
+
+You can clear out any relationships that exist in the model but are no longer defined in the schema using the `Clean Up` button. 
+
+<Danger>The clean up action will go through all model objects and ensure that all relationships that are not defined in the schema are removed. This can not be undone directly, but you can readd those relationship later once defined in the schema again.</Danger>
+
+For a detailed list of all base relationship types and their definitions, please see the [Relationships Documentation](/pages/modeling/common/relationships).
 
 
