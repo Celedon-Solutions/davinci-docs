@@ -63,7 +63,6 @@
                                 "pages": [
                                     "pages/user-guide/navigating/home",
                                     "pages/user-guide/navigating/model",
-                                    "pages/user-guide/navigating/project",
                                     "pages/user-guide/navigating/ui"
                                 ]
                             },
@@ -81,6 +80,7 @@
                             {
                                 "group": "Project Settings",
                                 "pages": [
+                                    "pages/user-guide/project-settings/project",
                                     "pages/user-guide/project-settings/collaboration",
                                     "pages/user-guide/project-settings/files",
                                     "pages/user-guide/design-agent/persona",
