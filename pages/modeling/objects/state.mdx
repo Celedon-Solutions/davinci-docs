@@ -116,28 +116,10 @@ States are the fundamental building blocks of state machines, which model system
 The three action types provide precise control over state behavior:
 
 **Entry Actions** execute once when entering the state:
-```
-- Initialize variables
-- Start timers
-- Send notifications
-- Configure hardware
-```
 
 **Do Actions** execute repeatedly at the specified interval:
-```
-- Monitor sensors
-- Update control outputs
-- Check conditions
-- Perform periodic tasks
-```
 
 **Exit Actions** execute once when leaving the state:
-```
-- Clean up resources
-- Stop timers
-- Save state information
-- Send completion notifications
-```
 
 ### Hierarchical States
 
@@ -147,26 +129,3 @@ States can contain nested sub-states, creating hierarchical state machines. This
 - **Reusability**: Sub-state machines can be reused in different contexts
 - **Modularity**: Complex behaviors are broken into manageable pieces
 - **Inheritance**: Transitions at higher levels apply to all sub-states
-
-## Best Practices
-
-### State Design
-
-- **Clear Purpose**: Each state should represent a distinct, meaningful mode of operation
-- **Single Responsibility**: States should have a focused, well-defined purpose
-- **Appropriate Granularity**: Balance between too many trivial states and too few complex states
-- **Meaningful Names**: Use descriptive names that clearly indicate what the state represents
-
-### Action Assignment
-
-- **Entry for Setup**: Use entry actions for one-time initialization when entering a state
-- **Do for Continuous**: Use do actions for ongoing operations that repeat while in the state
-- **Exit for Cleanup**: Use exit actions for finalization tasks when leaving a state
-- **Interval Tuning**: Set appropriate intervals for do actions based on system requirements
-
-### Transition Management
-
-- **Complete Coverage**: Ensure all necessary transitions exist to reach other states
-- **Avoid Deadlocks**: Verify that the state machine cannot get stuck in unintended states
-- **Guard Conditions**: Use transition conditions to control when state changes occur
-- **Event Handling**: Define clear triggers for state transitions

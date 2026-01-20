@@ -7,7 +7,17 @@ title: Interfaces
 ## Description
 Interfaces define the connections and relationships between ports, specifying how system components interact and communicate with each other. In SysML v2, interfaces represent the contracts for interactions between components, defining sets of operations, signals, and flows that components provide or require for proper system integration.
 
-Interfaces model the communication paths between parts by linking their ports together, indicating that components are connected and can exchange information, energy, or materials. Multiple ports can be connected through a single interface, creating complex interaction networks that represent how the system's internal architecture enables its functionality. Interfaces ensure compatibility and interoperability between components by defining what each component expects from the others and what it provides in return.
+Interfaces model the communication paths between systems by linking their ports together, indicating that components are connected and can exchange information, energy, or materials. Multiple ports can be connected through a single interface, creating complex interaction networks that represent how the system's internal architecture enables its functionality. Interfaces ensure compatibility and interoperability between components by defining what each component expects from the others and what it provides in return.
+
+### Working with Linkages
+
+Interfaces are often realized through physical linkages (cables, wires, hoses, etc.). The relationship between interfaces and linkages:
+
+- **Interface**: Defines the logical connection between any port and what flows between ports
+- **Linkage**: Represents the physical cable, wire, or conduit that implements the interface
+
+For example, to model a USB cable, you would use a combination of linkages, ports, and interfaces. The physical connection (the cable itself) would be represented as a linkage with ports at each end. Each port, in turn, connects to multiple interfaces that define the ground, power, and data lines running through the system. In this arrangement, the interface specifies what is being connected and how it flows across ports, often spanning across systems, while the linkage captures the physical aspect that implements the connection.
+
 
 ## View Types
 
@@ -51,42 +61,15 @@ Short name of the object.
   **Structure:**
   ```
   [
-    [port1_uuid, port2_uuid],      // Connection 1
-    [port3_uuid, port4_uuid],      // Connection 2
-    [port5_uuid, port6_uuid, ...]  // Connection N
+    [@port1_uuid, @port2_uuid],      // Connection 1
+    [@port3_uuid, @port4_uuid],      // Connection 2
+    [@port5_uuid, @port6_uuid, ...]  // Connection N
   ]
   ```
 
-  **Topology Patterns:**
-  - **Point-to-Point**: `[[portA, portB]]` - Direct connection between two ports
-  - **Bus**: `[[port1, port2, port3, ...]]` - Multiple ports on shared bus
-  - **Star**: Multiple point-to-point connections from a central hub
-  - **Mesh**: Multiple interconnected groups for redundancy
+  Each group connects to the other based on the order of the groups. For simple linear chains, as is most common, use single uuids in each group. 
 
-  **Use Cases:**
-  - **Electrical networks**: Define which pins connect to which signals
-  - **Data buses**: Specify bus topology and connected devices
-  - **Hydraulic systems**: Map fluid paths between components
-  - **Communication networks**: Define message routing topology
-
-  <Note>The topology field provides fine-grained control over how ports are interconnected, enabling complex connection patterns beyond simple point-to-point links.</Note>
-</ParamField>
-
-<ParamField path="Items" type="object">
-
-<a href="/pages/modeling/objects/item" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/item.svg" /> </a>
-
-  A list of all Item objects that flow through this interface.
-
-  Items define what is being transferred between connected ports, such as electrical signals, data packets, power, fluids, or materials.
-
-  **Examples:**
-  - Electrical interface: Voltage, Current, Ground items
-  - Data interface: Message, Command, Status items
-  - Hydraulic interface: Hydraulic Fluid, Pressure items
-  - Mechanical interface: Force, Torque items
-
-  [Read more about Items](/pages/modeling/objects/item)
+  <Note>The topology field provides fine-grained control over how ports are interconnected, enabling complex connection patterns. They are critical to specify how data flows and to render diagrams properly.</Note>
 </ParamField>
 
 <ParamField path="Attributes" type="object">
@@ -109,114 +92,4 @@ Short name of the object.
   [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
 
-## Interface Modeling Patterns
 
-Interfaces define how components interact by connecting their ports and specifying what flows between them.
-
-### Basic Point-to-Point Connection
-
-The simplest interface connects two ports directly:
-
-**Example: Sensor to Controller**
-- **Connect**: `[sensor_output_port, controller_input_port]`
-- **Topology**: `[[sensor_output_port, controller_input_port]]`
-- **Items**: Temperature_Data, Timestamp
-
-This creates a direct data path from the sensor to the controller, with specific items (temperature data and timestamp) flowing through the connection.
-
-### Multi-Port Bus Connection
-
-A bus interface connects multiple ports to a shared communication medium:
-
-**Example: CAN Bus**
-- **Connect**: `[ecu1_can_port, ecu2_can_port, ecu3_can_port, sensor_can_port]`
-- **Topology**: `[[ecu1_can_port, ecu2_can_port, ecu3_can_port, sensor_can_port]]`
-- **Items**: CAN_Message, CAN_High, CAN_Low, Ground
-- **Attributes**: Baud_Rate (500 kbps), Bus_Length (10 m)
-
-All ports share the same bus, enabling any device to communicate with any other device.
-
-### Star Topology
-
-A star configuration has a central hub with multiple point-to-point connections:
-
-**Example: Ethernet Switch**
-- **Connect**: `[switch_port1, device1_port, switch_port2, device2_port, switch_port3, device3_port]`
-- **Topology**: 
-  ```
-  [
-    [switch_port1, device1_port],
-    [switch_port2, device2_port],
-    [switch_port3, device3_port]
-  ]
-  ```
-- **Items**: Ethernet_Frame, Power_over_Ethernet
-
-Each device has a dedicated connection to the switch, which routes traffic between devices.
-
-### Power Distribution
-
-Power interfaces can have complex topologies:
-
-**Example: Power Distribution Network**
-- **Connect**: `[battery_pos, battery_neg, load1_pos, load1_neg, load2_pos, load2_neg]`
-- **Topology**: 
-  ```
-  [
-    [battery_pos, load1_pos, load2_pos],  // Positive rail
-    [battery_neg, load1_neg, load2_neg]   // Ground/negative rail
-  ]
-  ```
-- **Items**: Electrical_Power, Voltage, Current
-- **Attributes**: Voltage_Level (48 V), Max_Current (100 A)
-
-The topology defines separate positive and ground rails, with multiple loads connected in parallel.
-
-## Working with Linkages
-
-Interfaces are often realized through physical linkages (cables, wires, hoses, etc.). The relationship between interfaces and linkages:
-
-- **Interface**: Defines the logical connection and what flows between ports
-- **Linkage**: Represents the physical cable, wire, or conduit that implements the interface
-
-**Example: USB Connection**
-- **Interface**: USB_Interface
-  - Connect: `[computer_usb_port, device_usb_port]`
-  - Items: USB_Data_Plus, USB_Data_Minus, VBUS, Ground
-  - Attributes: USB_Version (3.0), Data_Rate (5 Gbps)
-- **Linkage**: USB_Cable
-  - Ports: Connector_A (computer end), Connector_B (device end)
-  - Interfaces: USB_Interface (references the interface above)
-  - Attributes: Cable_Length (2 m), Shielding (Yes)
-
-The interface defines what is being connected and what flows, while the linkage represents the physical implementation.
-
-## Best Practices
-
-### Interface Definition
-
-- **Clear Purpose**: Document what the interface is for and what it connects
-- **Complete Item List**: Specify all items that flow through the interface
-- **Topology Specification**: Use topology field to define connection patterns explicitly
-- **Attribute Documentation**: Include relevant performance characteristics
-
-### Port Management
-
-- **Consistent Naming**: Use clear, consistent names for ports
-- **Type Matching**: Ensure connected ports are compatible
-- **Direction Specification**: Clearly define input/output directions on ports
-- **Multiplicity**: Document how many connections each port can support
-
-### System Integration
-
-- **Hierarchical Interfaces**: Use nested interfaces for complex systems
-- **Interface Reuse**: Define standard interfaces that can be reused across the model
-- **Physical Realization**: Link interfaces to linkages that implement them
-- **Validation**: Verify that all ports in Connect array are included in Topology
-
-### Documentation
-
-- **Connection Diagrams**: Create visual representations of interface topology
-- **Signal Lists**: Document all items flowing through the interface
-- **Performance Specs**: Include bandwidth, latency, capacity attributes
-- **Standards Compliance**: Reference applicable standards (USB, CAN, Ethernet, etc.)

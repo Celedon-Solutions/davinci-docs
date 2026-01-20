@@ -72,10 +72,7 @@ Short name of the object.
 
   **Single Target**: Most transitions specify one target state, creating deterministic behavior.
 
-  **Multiple Targets**: When multiple target states are specified, the transition can be:
-  - **Conditional**: Different targets selected based on runtime conditions
-  - **Probabilistic**: Target selected based on probability distribution
-  - **Non-deterministic**: Target selected by the execution environment
+  **Multiple Targets**: When multiple target states are specified, the transition will trigger all of them at once.
 
   [Read more about States](/pages/modeling/objects/state)
 </ParamField>
@@ -139,124 +136,19 @@ Default transitions are the standard type used for most state changes. They are 
 - Mode changes: `@command == "start"`
 - Combined conditions: `and(@ready == true, @temperature < 50)`
 
+<Note>"t" is a global variable that is used in code simulations. Using "t > 30" will link to simulations automatically.</Note>
+
 ### Trigger Transitions
 
-Trigger transitions are activated by specific events or signals rather than continuous condition evaluation. They represent event-driven state changes that occur in response to external stimuli.
-
-**Characteristics:**
-- Activated by explicit events or signals
-- Only evaluated when the triggering event occurs
-- Can still have guard conditions that must be satisfied
-- Used for event-driven systems
-
-**Example Use Cases:**
-- User input events
-- Message reception
-- Interrupt signals
-- External system notifications
+Trigger transitions are used to show how one state will activate other states. Use this to indicate how software states impact physical states or how states between different hierarchies interact. This type of transition is used to render the tree view of how states activate other states.
 
 ### Failure Transitions
 
-Failure transitions represent error handling and fault recovery paths. They are triggered when error conditions or failures are detected, enabling robust system behavior.
-
-**Characteristics:**
-- Specifically for error and exception handling
-- Often have lower priority than normal transitions
-- May bypass normal state flow to reach safe or recovery states
-- Critical for system reliability
-
-**Example Use Cases:**
-- Hardware failures: `@sensor_status == "fault"`
-- Communication errors: `@connection_lost == true`
-- Validation failures: `@data_integrity_check == false`
-- Timeout conditions: `@response_timeout == true`
-- Multiple failure modes: `or(@sensor_fault, @power_failure)`
+Failure transitions represent error handling and fault recovery paths. They are the same as a trigger transition and used specifically to mark error conditions or failures, with special rendering features.
 
 ## Conditional Expressions
 
-Transition conditionals use math.js syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete math.js syntax reference.
-
-### Comparison Operators
-```
-@value == 10      # Equality
-@value != 10      # Inequality
-@value > 10       # Greater than
-@value >= 10      # Greater than or equal
-@value < 10       # Less than
-@value <= 10      # Less than or equal
-```
-
-### Logical Functions
-Math.js uses function-based logical operators:
-
-```
-and(@a, @b)       # Logical AND
-or(@a, @b)        # Logical OR
-not(@a)           # Logical NOT
-xor(@a, @b)       # Logical XOR
-```
-
-### Complex Conditions
-Combine comparison operators with logical functions:
-
-```
-or(and(@temp > 100, @pressure < 50), @emergency_stop)
-and(@mode == "active", or(@battery > 20, @external_power))
-not(or(@error_flag, @maintenance_mode))
-```
-
-**Alternative syntax for simple conditions:**
-For basic comparisons, you can also use inline operators:
-```
-@temp > 100 and @pressure < 50
-@battery > 20 or @external_power
-```
+Transition conditionals use standard syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete syntax reference.
 
 <Note>When using complex nested logic, the function-based syntax (`and()`, `or()`, `not()`) is more explicit and easier to read than inline operators.</Note>
 
-## Probabilistic Transitions
-
-When multiple transitions from the same state have probability values, the system uses these to determine which path to take. This enables:
-
-### Reliability Modeling
-Model system behavior under different failure scenarios:
-```
-Normal Operation: probability = 0.99
-Degraded Mode: probability = 0.009
-Complete Failure: probability = 0.001
-```
-
-### Stochastic Behavior
-Represent inherently random processes:
-```
-Path A: probability = 0.7
-Path B: probability = 0.3
-```
-
-### Monte Carlo Simulation
-Run multiple simulations with probabilistic branching to analyze system behavior under uncertainty.
-
-<Warning>The sum of probabilities for all transitions from a given state should equal 1.0 for proper probabilistic behavior.</Warning>
-
-## Best Practices
-
-### Transition Design
-
-- **Clear Conditions**: Write explicit, understandable conditional expressions
-- **Avoid Ambiguity**: Ensure only one transition can fire at a time (or use probabilities intentionally)
-- **Complete Coverage**: Verify all necessary transitions exist from each state
-- **Guard Carefully**: Use conditions to prevent unintended state changes
-
-### Conditional Expressions
-
-- **Simple Logic**: Keep conditions as simple as possible while meeting requirements
-- **Attribute References**: Always use `@` notation for attribute references
-- **Type Consistency**: Ensure attribute types match the operations used
-- **Avoid Side Effects**: Conditions should not modify system state
-
-### State Machine Validation
-
-- **Reachability**: Verify all states can be reached from the initial state
-- **Completeness**: Ensure there are appropriate transitions from each state
-- **Deadlock Prevention**: Avoid states with no outgoing transitions (unless intentional final states)
-- **Determinism**: For deterministic systems, ensure at most one transition can fire at a time
