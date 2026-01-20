@@ -11,6 +11,27 @@ A transition specifies a source state (fromState), one or more target states (to
 
 <Note>Transitions can specify multiple target states, enabling non-deterministic or probabilistic state machines where the system can move to different states based on runtime conditions or probability distributions.</Note>
 
+
+## Transition Types
+
+### Default Transitions
+
+Default transitions are the standard type used for most state changes. They are evaluated continuously while the system is in the source state, and the transition occurs when the conditional expression becomes true.
+
+<Note>Default transition types will cause the `fromState` to deactivate and `toStates` to activate.</Note>
+
+### Trigger Transitions
+
+Trigger transitions are used to show how one state will activate other states. Use this to indicate how software states impact physical states or how states between different hierarchies interact. This type of transition is used to render the tree view of how states activate other states. The trigger is also special in that it will not deactivate the fromState.
+
+<Note>Trigger transition types will only activate `toStates` and leave `fromStates` activate.</Note>
+
+### Failure Transitions
+
+Failure transitions represent error handling and fault recovery paths. They are the same as a trigger transition and used specifically to mark error conditions or failures, with special rendering features.
+
+<Note>Failure transition types will only activate `toStates` and leave `fromStates` activate.</Note>
+
 ## View Types
 
 | View | Description |
@@ -56,7 +77,9 @@ Short name of the object.
   - `and(@mode == "active", @battery_level > 20)`
   - `or(@error_count >= 3, @timeout_occurred)`
 
-  If empty, the transition always occurs when triggered (for trigger kind) or is always available (for default kind).
+  If empty, the transition always occurs when triggered (for trigger kind) or is always available (for default kind). Transition conditionals use standard syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete syntax reference.
+
+  <Note>"t" is a global variable that is used in code simulations. Using "t > 30" will link to simulations automatically.</Note>
 </ParamField>
 
 <ParamField path="From State" type="reference">
@@ -100,16 +123,6 @@ Short name of the object.
   [Read more about Attributes](/pages/modeling/objects/attributes)
 </ParamField>
 
-<ParamField path="Items" type="object">
-
-<a href="/pages/modeling/objects/item" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/item.svg" /> </a>
-
-  A list of all Item objects associated with this transition.
-
-  Items can represent data or resources that are transferred or transformed during the state transition.
-
-  [Read more about Items](/pages/modeling/objects/item)
-</ParamField>
 
 <ParamField path="Relationships" type="connection">
 
@@ -117,38 +130,4 @@ Short name of the object.
 
   [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
-
-## Transition Types
-
-### Default Transitions
-
-Default transitions are the standard type used for most state changes. They are evaluated continuously while the system is in the source state, and the transition occurs when the conditional expression becomes true.
-
-**Characteristics:**
-- Evaluated every state machine cycle
-- Occur automatically when condition is satisfied
-- Can have guard conditions to control when they fire
-- Most common transition type
-
-**Example Use Cases:**
-- Timeout transitions: `@elapsed_time > 30`
-- Threshold-based transitions: `@pressure > 100`
-- Mode changes: `@command == "start"`
-- Combined conditions: `and(@ready == true, @temperature < 50)`
-
-<Note>"t" is a global variable that is used in code simulations. Using "t > 30" will link to simulations automatically.</Note>
-
-### Trigger Transitions
-
-Trigger transitions are used to show how one state will activate other states. Use this to indicate how software states impact physical states or how states between different hierarchies interact. This type of transition is used to render the tree view of how states activate other states.
-
-### Failure Transitions
-
-Failure transitions represent error handling and fault recovery paths. They are the same as a trigger transition and used specifically to mark error conditions or failures, with special rendering features.
-
-## Conditional Expressions
-
-Transition conditionals use standard syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete syntax reference.
-
-<Note>When using complex nested logic, the function-based syntax (`and()`, `or()`, `not()`) is more explicit and easier to read than inline operators.</Note>
 

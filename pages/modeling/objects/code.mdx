@@ -11,9 +11,9 @@ Code objects are ideal for parametric studies, design optimization, analysis aut
 
 ## Language Support
 
-### Browser-Executable: Python
+### Browser-Executable
 
-**Python** is the only language that executes directly in the browser without requiring server-side infrastructure. The Pyodide runtime provides a full Python environment with scientific computing libraries including NumPy, SciPy, and Matplotlib.
+**Python** is the main language that executes directly in the browser without requiring server-side infrastructure. The Pyodide runtime provides a full Python environment with scientific computing libraries including NumPy, SciPy, and Matplotlib.
 
 **When to use Python:**
 - Parametric analysis and optimization
@@ -22,14 +22,14 @@ Code objects are ideal for parametric studies, design optimization, analysis aut
 - Automation scripts that read/write model data
 - Design space exploration
 
+**C/C++** and **JavaScript** is supported but more limited and does not support the model integration capabilities of Python at this time.
+
 <Note>When creating code through the AI agent, Python is used by default unless you explicitly specify another language.</Note>
 
 ### Non-Executable Languages
 
 Other programming languages are supported for storage and syntax highlighting but do not execute in the browser:
 
-- **JavaScript/TypeScript**
-- **C/C++**
 - **Java**
 - **MATLAB**
 - **Other languages**: Formatting and/or syntax highlighting may not function correctly
@@ -49,13 +49,6 @@ Type `@` in the code editor to insert a reference to a model object:
 3. A reference anchor is inserted at that location
 
 The reference resolves to the object when the code executes, allowing you to access its data.
-
-**Example:**
-```python
-# Reference a component's mass attribute
-mass_value = @MyComponent.mass
-print(f"Component mass: {mass_value} kg")
-```
 
 ### Reading Attribute Values
 
@@ -80,21 +73,6 @@ mass_mg = @MassAttribute("mg")   # Returns: 1000000
 <Note>Once assigned to a variable, the value is a number. You cannot perform unit conversions on the variable—conversions must happen at reference time using the `("unit")` notation.</Note>
 
 <Warning>Unit conversions must use compatible units. Attempting to convert mass to length will cause an error.</Warning>
-
-### Reading Object Properties
-
-Reference non-attribute properties directly:
-
-```python
-# Get object name
-component_name = @MyComponent.name
-
-# Get documentation
-description = @MyComponent.documentation
-
-# Get value (for parameters, attributes, etc.)
-param_value = @MyParameter.value
-```
 
 ## Updating Model Objects
 
@@ -386,40 +364,247 @@ davinci_open_file(path, mode='rb', encoding='utf-8')
 
 ## Importing Code Objects
 
-Import functions and classes from other code objects in your model:
+Import functions and classes from other code objects in your model using multiple import patterns. The system supports both UUID-based references and name-based imports with automatic resolution.
+
+### Quick Reference
+
+| Pattern | Syntax | Use Case |
+|---------|--------|----------|
+| **UUID wildcard** | `import @Module` | Import all functions from a code object by UUID |
+| **UUID with alias** | `import @Module as m` | Import with custom name using UUID |
+| **UUID specific** | `from @Module import func1, func2` | Import specific items by UUID |
+| **Name-based** | `import module_name` | Import by name (searches siblings, Model, Library) |
+| **Name with alias** | `import module_name as m` | Import by name with alias |
+| **Name specific** | `from module_name import func` | Import specific items by name |
+| **Relative** | `from . import sibling` | Import from parent container |
+| **Relative up** | `from .. import uncle` | Import from grandparent container |
+| **Direct call** | `[@Module].function()` | Call function without import statement |
+| **Multi-line** | `from @Module import (`<br/>`    func1, func2`<br/>`)` | Break long imports across lines |
+
+### Import Patterns
+
+#### 1. UUID-Based Imports
+
+Reference code objects directly using their UUID with `@` notation:
 
 ```python
-# Import another code object
+# Import all functions from a code object (wildcard import)
 import @UtilityFunctions
 
-# Use imported functions
-result = UtilityFunctions.calculate_mass(volume, density)
+# Import with alias
+import @UtilityFunctions as utils
+
+# Import specific items
+from @UtilityFunctions import calculate_mass, calculate_volume
+
+# Import specific items with aliases
+from @UtilityFunctions import calculate_mass as calc_mass
 ```
 
-**Example setup:**
+#### 2. Name-Based Imports
 
-**Code Object 1: `utils.py`**
+Reference code objects by their name. The system searches for matching code objects in:
+1. Sibling objects (same parent container)
+2. Top-level Model objects
+3. Top-level Library objects
+
+```python
+# Simple import by name
+import utils
+
+# Import with alias
+import utils as u
+
+# Import specific items
+from utils import calculate_mass, calculate_volume
+
+# Import with aliases
+from utils import calculate_mass as calc_mass
+```
+
+#### 3. Relative Imports
+
+Use Python's relative import syntax to reference code objects relative to the current object's location in the hierarchy:
+
+```python
+# Import from parent container
+from . import sibling_module
+
+# Import from grandparent container
+from .. import uncle_module
+
+# Import specific items from parent
+from . import helper_function, utility_class
+
+# Import from named module in parent
+from .calculations import compute_stress
+```
+
+**Relative import levels:**
+- `.` - Current parent container
+- `..` - Grandparent container
+- `...` - Great-grandparent container (and so on)
+
+#### 4. Direct Method Calls (No Import)
+
+Call functions from other code objects directly without importing, using the `[uuid].function()` syntax:
+
+```python
+# Call function directly using UUID
+result = [@UtilityFunctions].calculate_mass(volume, density)
+
+# Multiple calls without import statement
+mass = [@physics_utils].calculate_mass(vol, density)
+stress = [@stress_analysis].calculate_stress(force, area)
+```
+
+This pattern automatically imports the code object behind the scenes and makes its functions available in the global namespace. It's useful for one-off function calls where you don't want to add an import statement.
+
+#### 5. Multi-line Imports
+
+Break long import statements across multiple lines using parentheses:
+
+```python
+from @UtilityFunctions import (
+    calculate_mass,
+    calculate_volume,
+    calculate_density,
+    calculate_stress
+)
+```
+
+### Import Resolution
+
+The import system resolves references in the following order:
+
+**For UUID-based imports (`@`):**
+- Directly resolves to the referenced object by UUID
+- Most reliable method when you know the exact object
+
+**For name-based imports:**
+1. **Siblings**: Searches objects with the same parent
+2. **Model root**: Searches top-level objects in Model
+3. **Library root**: Searches top-level objects in Library
+
+**For relative imports (`.` and `..`):**
+- Navigates up the object hierarchy based on dot count
+- Searches for the named module at the target level
+
+### Complete Example
+
+**Code Object 1: `physics_utils` (in Model/Calculations/)**
 ```python
 def calculate_mass(volume, density):
+    """Calculate mass from volume and density."""
     return volume * density
 
 def calculate_volume(length, width, height):
+    """Calculate volume of a rectangular prism."""
     return length * width * height
+
+def calculate_density(mass, volume):
+    """Calculate density from mass and volume."""
+    return mass / volume
+
+# Physical constants
+STEEL_DENSITY = 7850  # kg/m³
+ALUMINUM_DENSITY = 2700  # kg/m³
 ```
 
-**Code Object 2: `analysis.py`**
+**Code Object 2: `stress_analysis` (in Model/Calculations/)**
 ```python
-import @utils
+import numpy as np
 
-# Use imported functions
-vol = utils.calculate_volume(10, 5, 2)
-mass = utils.calculate_mass(vol, 7.85)  # Steel density
+def calculate_stress(force, area):
+    """Calculate stress from force and area."""
+    return force / area
 
-print(f"Volume: {vol} m³")
-print(f"Mass: {mass} kg")
+def calculate_strain(stress, elastic_modulus):
+    """Calculate strain from stress and elastic modulus."""
+    return stress / elastic_modulus
 ```
 
-<Note>Imported code objects expose all their functions to the global namespace of the importing code.</Note>
+**Code Object 3: `beam_analysis` (in Model/Calculations/)**
+```python
+# Import using relative imports (same parent)
+from . import physics_utils
+from . import stress_analysis
+
+# Or import using names
+# import physics_utils
+# import stress_analysis
+
+# Or import using UUID references
+# import @physics_utils
+# import @stress_analysis
+
+# Import specific items
+from physics_utils import STEEL_DENSITY
+
+# Read model attributes
+length = @BeamLength("m")
+width = @BeamWidth("m")
+height = @BeamHeight("m")
+applied_force = @AppliedForce("N")
+
+# Calculate volume using imported function
+volume = physics_utils.calculate_volume(length, width, height)
+
+# Calculate mass using imported constant
+mass = physics_utils.calculate_mass(volume, STEEL_DENSITY)
+
+# Calculate stress
+cross_section_area = width * height
+stress = stress_analysis.calculate_stress(applied_force, cross_section_area)
+
+# Update results
+update(@CalculatedMass, mass, "kg", "number")
+update(@CalculatedStress, stress, "Pa", "number")
+
+print(f"Volume: {volume:.4f} m³")
+print(f"Mass: {mass:.2f} kg")
+print(f"Stress: {stress/1e6:.2f} MPa")
+```
+
+**Code Object 4: `report_generator` (in Model/Reports/)**
+```python
+# Import from different parent using relative import
+from ..Calculations import physics_utils, stress_analysis
+
+# Or import using name-based resolution
+# import physics_utils
+# import stress_analysis
+
+# Generate analysis report
+def generate_report():
+    print("=== Analysis Report ===")
+    print(f"Steel Density: {physics_utils.STEEL_DENSITY} kg/m³")
+    # ... rest of report
+```
+
+### Import Best Practices
+
+**Use UUID references (`@`) when:**
+- You need guaranteed resolution to a specific object
+- The code object might move in the hierarchy
+- You want explicit, unambiguous imports
+
+**Use name-based imports when:**
+- You want more readable, maintainable code
+- The code object names are unique and stable
+- You're following Python conventions
+
+**Use relative imports when:**
+- Organizing related code objects in containers
+- Building reusable module hierarchies
+- You want imports that adapt to container moves
+
+**Avoid wildcard imports (`import @module`) when:**
+- You only need specific functions
+- You want to keep the namespace clean
+- You need to understand dependencies clearly
+
+<Note>All import patterns are resolved at parse time. Circular imports are not supported—ensure your code objects form a directed acyclic graph (DAG) of dependencies.</Note>
 
 ## Monitoring and Data Collection
 

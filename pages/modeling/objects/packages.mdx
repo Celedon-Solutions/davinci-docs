@@ -9,9 +9,11 @@ Packages organize model elements into logical groups, providing namespace manage
 
 Packages facilitate modularity and maintainability by allowing engineers to partition large models into manageable sections. They can contain any type of model element including other packages, creating hierarchical structures that reflect the organization of the system or the structure of the engineering team. Packages also support model reuse and configuration management by enabling clear ownership boundaries and version control at the package level.
 
-<Note>All Davinci projects have two reserved top-level packages: "Elements" contains the system model components (parts, requirements, etc.), while "Artifacts" contains documentation and presentation objects (documents, tables, slides).</Note>
+<Note>All Davinci projects have two reserved top-level packages: `LIBRARY` and `MODEL`. By default `LIBRARY` is where all included packages from other projects exist. In general model elements will get placed under `MODEL` and uploaded files default to `LIBRARY`</Note>
 
-<Warning>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy. Packages should generally be organized at the model level to maintain clear organizational structure.</Warning>
+Packages also can be defined as `private` or `public`, if public collaborators can import these packages (and their owned elements) into other projects for reuse. By default all packages are private.
+
+<Warning>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy.</Warning>
 
 ## View Types
 
@@ -32,6 +34,10 @@ Name of the object.
 
 <ParamField path="Short Name" type="string">
 Short name of the object.
+</ParamField>
+
+<ParamField path="Access" type="string">
+Defines if the package is either `private` or `public`. If public this package (and its owned elements) can be imported into other projects.
 </ParamField>
 
 <ParamField path="Documentation" type="string">

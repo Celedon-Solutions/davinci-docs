@@ -161,7 +161,8 @@
                                     "pages/modeling/objects/ports",
                                     "pages/modeling/objects/interface",
                                     "pages/modeling/objects/entities",
-                                    "pages/modeling/objects/packages"
+                                    "pages/modeling/objects/packages",
+                                    "pages/modeling/objects/linkages"
                                 ]
                             },
                             {
@@ -182,14 +183,16 @@
                                 ]
                             },
                             {
-                                "group": "Simulation",
+                                "group": "Simulation & Behavior",
                                 "pages": [
                                     "pages/modeling/objects/code",
-                                    "pages/modeling/objects/actions"
+                                    "pages/modeling/objects/actions",
+                                    "pages/modeling/objects/states",
+                                    "pages/modeling/objects/transitions"
                                 ]
                             },
                             {
-                                "group": "Imported Data",
+                                "group": "Data & Tools",
                                 "pages": [
                                     "pages/modeling/objects/reference",
                                     "pages/modeling/objects/toolbox"
