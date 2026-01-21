@@ -9,7 +9,7 @@ Davinci uses AI agents to automate complex engineering tasks within your system 
 Each agent operates within its own workspace, maintaining separate chat histories and contexts. This allows you to work on multiple aspects of your model simultaneously with different agents, each focused on specific tasks or areas.
 
 <Frame>
-    <img height="400" noZoom src="/images/agent_workspace_overview.png" />  
+    <img noZoom src="/images/chat_input.png" />
 </Frame>
 
 ## Working with Agents
@@ -17,6 +17,8 @@ Each agent operates within its own workspace, maintaining separate chat historie
 For detailed information about the agent chat interface and input options, see the [Agent Chat documentation](/pages/user-guide/right-panel/agent-chat).
 
 ### Starting and Stopping Agents
+
+<img width="50" noZoom src="/images/agent-start-stop.png" /> 
 
 - **Play button**: Starts the agent or resumes execution
 - **Stop button**: Pauses agent execution
@@ -35,14 +37,29 @@ The more specific you are with your instructions, the better results you'll get.
 
 ### Web Search
 
-Click the **globe icon** to enable web search for the agent. When enabled, the agent can:
+<img width="50" noZoom src="/images/agent-web-search.png" /> 
+
+
+Click the **globe icon** to enable web search for the agent. When enabled (colored blue), the agent can:
 - Search the internet for information
 - Import data, images, PDFs, and documents
 - Add imported content as Reference objects in the Library
 
 This is useful for pulling in specifications, standards, research papers, or other public information directly into your model.
 
+### Upload Reference Files
+
+<img width="50" noZoom src="/images/upload-icon.png" /> 
+
+The Agent can interact with Reference Objects to get more information about your Model. Click the `Upload a File` button to add new Reference Objects.
+
+[Read more about uploading files to Davinci](/pages/user-guide/project-settings/files#uploading-files)
+
+
 ### Agent Personas
+
+<img width="200" noZoom src="/images/agent-persona-picker.png" /> 
+
 
 Agents can be assigned personas—predefined instruction sets that modify how the agent works. The currently selected persona is displayed in the dropdown menu.
 
@@ -61,7 +78,7 @@ Personas can be created and managed in [Project Settings](/pages/user-guide/navi
 Each action performed by the agent can be undone independently. Click the **Undo** button next to any tool call in the chat history to revert only the changes made by that specific action.
 
 <Frame>
-    <img noZoom src="/images/agent_undo_action.png" />
+    <img noZoom src="/images/agent-undo-action.png" />
 </Frame>
 
 This allows you to selectively keep the changes you want while reverting specific mistakes without losing all progress.
@@ -82,6 +99,9 @@ To restore a checkpoint:
 
 
 ### Clearing Chat History
+
+<img width="50" noZoom src="/images/agent-clear-chat.png" /> 
+
 
 Click the **trash can icon** to clear the agent's entire chat history. This starts the agent fresh with no prior context, which can be useful if:
 - The agent seems stuck or incorrectly focused
