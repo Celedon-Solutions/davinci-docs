@@ -1,0 +1,97 @@
+---
+title: Digital Thread View
+---
+
+<img width="50" noZoom src="/images/digital-thread-icon.png" />
+
+The Digital Thread View visualizes requirements and their relationships as an interactive graph, providing a comprehensive view of requirement traceability and interconnections throughout your system model.
+
+## Overview
+
+The Digital Thread View creates a network diagram showing how requirements relate to each other and to other model objects. Each requirement appears as a node, with arrows representing relationships between them. This visualization makes it easy to understand requirement dependencies, trace satisfaction paths, and identify gaps in your requirements structure.
+
+## Graph Elements
+
+### Nodes
+
+Each node in the graph represents a requirement object and displays:
+
+- **Requirement Name**: The identifier for the requirement
+- **Satisfaction Status**: Visual indicator showing if the requirement is satisfied (TRUE/FALSE)
+- **Parent Path**: Hierarchical location in the model
+- **Documentation**: Descriptive text explaining the requirement (when enabled)
+- **Constraint Children**: Any constraint objects belonging to the requirement
+
+### Edges
+
+Arrows connecting nodes represent relationships between requirements:
+
+- **Child Relationships**: Parent-child hierarchical connections
+- **Uses Relationships**: Dependencies where one requirement references another
+- **References**: Links to related requirements or objects
+- **Custom Relationships**: Any custom relationship types defined in your project
+
+Each edge is color-coded and labeled according to its relationship type, making it easy to distinguish different connection types at a glance.
+
+## Interactive Features
+
+**Pan and Zoom**: Click and drag to pan around the diagram. Use mouse wheel or pinch gestures to zoom in and out.
+
+**Click Nodes**: Click on any requirement node to navigate to that requirement object for detailed viewing or editing.
+
+**Click Edges**: Click on relationship arrows to view relationship details.
+
+## Layout
+
+The Digital Thread View uses a force-directed layout algorithm that automatically positions nodes to minimize edge crossings and create a clear, readable diagram. The layout:
+
+- Spaces nodes evenly with repulsion forces
+- Pulls connected nodes closer together with spring forces
+- Optimizes readability by preventing node overlap
+- Adapts automatically as you add or remove requirements
+
+## Use Cases
+
+**Requirement Traceability**: Visualize how high-level requirements decompose into lower-level requirements and trace satisfaction through the system hierarchy.
+
+**Dependency Analysis**: Identify which requirements depend on others and understand the impact of changes.
+
+**Gap Identification**: Spot requirements without implementing components or components without requirements by analyzing the graph structure.
+
+**Design Reviews**: Present requirement relationships and traceability to stakeholders in an intuitive visual format.
+
+**Impact Assessment**: Understand which requirements will be affected by changes to specific system elements.
+
+**Verification Planning**: See which requirements are satisfied and which need additional work.
+
+## Building a Digital Thread
+
+The Digital Thread automatically includes:
+
+1. **The focused requirement** (root)
+2. **Child requirements** (hierarchical structure)
+3. **Related requirements** (via relationships)
+4. **Constraint children** of each requirement
+5. **Connected objects** that satisfy or impact requirements
+
+As you build relationships between requirements and other objects (parts, constraints, etc.), the digital thread grows to show the complete traceability network.
+
+<Note>
+The Digital Thread View is most effective when requirements have well-defined relationships. Use relationships like "satisfies", "derives", and "refines" to build comprehensive traceability.
+</Note>
+
+## Best Practices
+
+**Clear Naming**: Use descriptive requirement names to make the graph easier to understand at a glance.
+
+**Relationship Types**: Use appropriate relationship types to clearly indicate the nature of connections between requirements.
+
+**Hierarchical Structure**: Organize requirements in a clear parent-child hierarchy for better visualization.
+
+**Documentation**: Add documentation to requirements to provide context when viewing nodes in the graph.
+
+**Regular Review**: Use the Digital Thread View during design reviews to verify complete traceability and identify missing connections.
+
+## Export
+
+The Digital Thread diagram can be exported as an image for documentation, presentations, and design reviews.
