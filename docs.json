@@ -2,6 +2,10 @@
     "$schema": "https://mintlify.com/docs.json",
     "name": "Davinci",
     "theme": "mint",
+    "appearance": {
+        "default": "dark",
+        "strict": false
+    },
     "logo": {
         "dark": "/logo/logo_small_dark.svg",
         "light": "/logo/logo_small_bright.svg"
@@ -11,6 +15,28 @@
         "primary": "#000000",
         "light": "#FFFFFF",
         "dark": "#000000"
+    },
+    "banner": {
+        "content": "Davinci Version 4 is now available! [Learn more](/pages/release-notes/v4.0.0)",
+        "dismissible": true
+    },
+    "footer": {
+        "socials": {
+            "bluesky": "https://bsky.app/profile/celedon.solutions",
+            "x": "https://x.com/Celedon_inc",
+            "linkedin": "https://www.linkedin.com/company/celedon-solutions-inc"
+        },
+        "links": [
+            {
+                "header": "Copyright",
+                "items": [
+                    {
+                        "label": "© 2026 Celedon",
+                        "href": "https://celedon.solutions"
+                    }
+                ]
+            }
+        ]
     },
     "navbar": {
         "links": [
