@@ -9,11 +9,36 @@ Packages organize model elements into logical groups, providing namespace manage
 
 Packages facilitate modularity and maintainability by allowing engineers to partition large models into manageable sections. They can contain any type of model element including other packages, creating hierarchical structures that reflect the organization of the system or the structure of the engineering team. Packages also support model reuse and configuration management by enabling clear ownership boundaries and version control at the package level.
 
-<Note>All Davinci projects have two reserved top-level packages: `LIBRARY` and `MODEL`. By default `LIBRARY` is where all included packages from other projects exist. In general model elements will get placed under `MODEL` and uploaded files default to `LIBRARY`</Note>
+All Davinci projects have two reserved top-level packages: `LIBRARY` and `MODEL`. By default `LIBRARY` is where all included packages from other projects exist. In general model elements will get placed under `MODEL` and uploaded files default to `LIBRARY`.
 
-Packages also can be defined as `private` or `public`, if public collaborators can import these packages (and their owned elements) into other projects for reuse. By default all packages are private.
+<Note>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy. Packages should typically be organized at the top level or nested within other packages.</Note>
 
-<Warning>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy.</Warning>
+
+## Package Access and Sharing
+
+Packages can be configured as either `private` or `public`, controlling whether they can be included in other projects. This feature enables powerful model reuse and collaboration capabilities across your organization.
+
+### Private Packages (Default)
+
+By default, all packages are created as `private`, meaning they are only accessible within their source project. Private packages cannot be included in other projects and their contents remain isolated to the project they were created in.
+
+### Public Packages
+
+When a package is marked as `public`, it becomes available for inclusion in other Davinci projects. This allows collaborators with access to view and include the package (along with all its owned elements) in their own projects, enabling component and object reuse.
+
+### Configuring Package Access
+
+To make a package available for inclusion in other projects:
+
+1. Open the package in the Properties view
+2. Locate the `Access` field next to the Package Name
+3. Change the value from `private` to `public`
+4. Save the changes
+
+Once a package is set to `public`, users with access to your project can include it in their own projects by right-clicking in their Library section and selecting "Include Package".
+
+<Info>When you include a public package from another project, all elements owned by that package are brought into your project's Library. The included package maintains a link to its source, allowing for updates and version management.</Info>
+
 
 ## View Types
 
@@ -37,7 +62,12 @@ Short name of the object.
 </ParamField>
 
 <ParamField path="Access" type="string">
-Defines if the package is either `private` or `public`. If public this package (and its owned elements) can be imported into other projects.
+Defines whether the package is `private` or `public`.
+
+- **Private** (default): The package is only accessible within its source project and cannot be included in other projects
+- **Public**: The package (and all its owned elements) can be included in other Davinci projects, enabling model reuse and collaboration
+
+Set this to `public` when you want to share component libraries, standards, or templates across multiple projects.
 </ParamField>
 
 <ParamField path="Documentation" type="string">
