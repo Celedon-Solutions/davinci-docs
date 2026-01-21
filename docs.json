@@ -110,7 +110,8 @@
                                 "group": "Overview",
                                 "pages": [
                                     "pages/modeling/overview/systemmodeling",
-                                    "pages/modeling/overview/language"
+                                    "pages/modeling/overview/language",
+                                    "pages/modeling/overview/mentions"
                                 ]
                             },
                             {
@@ -254,6 +255,7 @@
                         "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [
+                            "pages/release-notes/v4.0.1",
                             "pages/release-notes/v4.0.0",
                             "pages/release-notes/v3.7.2",
                             "pages/release-notes/v3.6.2",

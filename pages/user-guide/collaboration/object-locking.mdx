@@ -4,33 +4,14 @@ title: Object Locking
 
 ## Description
 
-Object locking allows you to protect important objects from accidental or unauthorized changes. When you lock an object from the Properties view, it becomes read-only for all users, including yourself, until explicitly unlocked. This feature is essential for maintaining the integrity of approved designs, baseline requirements, and other critical model elements.
+Object locking allows you to protect important objects from accidental or unauthorized changes. When you lock an object from the Properties view, it becomes read-only for all users and the Davinci Agent until explicitly unlocked by a user. This feature is essential for maintaining the integrity of approved designs, baseline requirements, and other critical model elements.
 
 ## What Object Locking Does
 
-### Prevents All Editing
-
-When you lock an object:
 - The object becomes completely read-only
 - All properties, attributes, and values cannot be modified
 - All children of the locked object are also locked
-- Neither users nor the Davinci Agent can edit the object or its contents until unlocked
-
-### Protects Model Integrity
-
-Locking serves several important purposes:
-- **Baseline Protection**: Freeze approved designs at specific milestones
-- **Requirements Control**: Prevent changes to approved requirements
-- **Change Management**: Control when and how critical elements can be modified
-- **Accidental Changes**: Protect important objects from unintended modifications
-
-### Visual Indication
-
-Locked objects are clearly marked:
-- Lock icon appears next to the object name
-- Lock icon visible in the index/tree
-- Locked objects appear disabled when attempting to edit
-- Tooltips indicate the object is locked
+- Neither users nor the Davinci Agent can edit the object or its contents until unlocked by a user
 
 ## How to Lock Objects
 
@@ -76,115 +57,3 @@ Locking cascades down the hierarchy:
 
 **Example**: If you lock a Part object, all attributes, constraints, ports, and child parts within it also become locked.
 
-## Common Use Cases
-
-### Baseline Management
-
-Lock objects that represent approved baselines:
-- Approved requirements that have passed review
-- Design configurations that have been validated
-- Test procedures that have been verified
-- Documentation that has been released
-
-### Milestone Freezing
-
-At project milestones, lock relevant portions of the model:
-- Preliminary Design Review (PDR) baseline
-- Critical Design Review (CDR) baseline
-- Requirements freeze before implementation
-- Interface specifications after agreement
-
-### Critical Element Protection
-
-Protect high-stakes model elements:
-- Safety-critical requirements
-- Regulatory compliance constraints  
-- Interface definitions between teams
-- Key performance parameters
-
-### Preventing Accidental Changes
-
-Lock objects that shouldn't be modified during routine work:
-- Standard templates and libraries
-- Reference designs
-- Shared component specifications
-- Project-wide constants
-
-## Working with Locked Objects
-
-### Viewing Locked Objects
-
-You can still view locked objects normally:
-- Open in any view (Properties, Tree, etc.)
-- Read all properties and documentation
-- View relationships and connections
-- Export data
-
-### What You Cannot Do
-
-With locked objects, you cannot:
-- Edit any properties or values
-- Add or remove children
-- Delete the object
-- Move the object to a different location
-- Create relationships to/from the object (in some cases)
-
-### Requesting Changes
-
-If you need to modify a locked object:
-- Contact the person who locked it (if known)
-- Discuss the change through team communication
-- Unlock the object (if you have permission)
-- Make necessary changes
-- Re-lock if appropriate
-
-## Lock Management Best Practices
-
-**Lock Purposefully**: Only lock objects that genuinely need protection. Over-locking makes the model inflexible.
-
-**Document Lock Reasons**: Add comments or documentation explaining why an object is locked and under what conditions it can be unlocked.
-
-**Communicate Locks**: Inform team members when locking shared objects to prevent confusion.
-
-**Review Periodically**: Regularly review locked objects to ensure they still need protection.
-
-**Unlock When Appropriate**: Don't leave objects locked longer than necessary. Unlock when the protection period ends.
-
-**Lock at Right Level**: Lock at the appropriate hierarchy level—locking too high affects too many objects, too low provides insufficient protection.
-
-## Troubleshooting
-
-### Cannot Edit an Object
-
-If you cannot edit an object:
-1. Check for a lock icon next to the object name
-2. Check if a parent object is locked (child objects inherit locks)
-3. Verify you have edit permissions for the project
-4. Try unlocking the object if you locked it
-
-### Cannot Unlock an Object
-
-If the unlock button doesn't work:
-- Verify you have the necessary permissions
-- Check if someone else locked it (permissions may restrict unlocking)
-- Contact a project owner or administrator
-- Refresh the browser and try again
-
-### Locked by Mistake
-
-If you accidentally locked an object:
-- Simply click the lock icon again to unlock it
-- Changes take effect immediately
-- No harm done—locking and unlocking are reversible
-
-<Note>Object locking is a manual action—objects do not lock automatically. You must explicitly click the lock icon to protect an object.</Note>
-
-## Lock Permissions
-
-Lock permissions depend on your project role:
-
-**Project Owners**: Can lock and unlock any object
-**Collaborators**: Can typically lock and unlock objects they created or have permission to edit
-**View-Only Users**: Cannot lock or unlock objects (cannot edit at all)
-
-<Info>For information about managing project roles and permissions, see [Collaboration Settings](/pages/user-guide/project-settings/collaboration).</Info>
