@@ -1,0 +1,297 @@
+---
+title: Matrix
+---
+
+<img height="20" noZoom src="/images/objecticons/matrix.svg" /> 
+
+## Description
+Matrices provide a powerful grid-based view for analyzing large sections of your model data in a tabular format. They automatically query and display objects based on configured scope, depth, and filters, with customizable columns showing different aspects of each object. Matrices are commonly used for requirements traceability, interface analysis (N-squared diagrams), attribute roll-ups, and constraint verification.
+
+Unlike manual tables, matrices dynamically update as your model changes—objects are automatically added or removed from rows based on your filters, and column data refreshes to show current values. This makes them ideal for maintaining living documentation and analysis views that scale with your model.
+
+<Note>Matrices must be properly configured to display useful data. Take time to set up the scope, filters, and columns to match your analysis needs.</Note>
+
+## Setting Up a Matrix
+
+Proper matrix configuration is essential for getting meaningful results. Configuration happens through the settings bar at the top of the matrix view.
+
+### Scope Configuration
+
+The scope defines which objects appear as rows in your matrix.
+
+#### Scope Object
+The **Scope** selector chooses the starting point for the matrix query. Select any object in your model—the matrix will find objects contained within or related to this scope based on your depth and filter settings.
+
+
+#### Depth
+The **Depth** setting controls how many levels deep the matrix queries from the scope object.
+
+- **Depth 1**: Only immediate children of the scope object
+- **Depth 2**: Children and their children  
+- **Depth 3+**: Continue traversing deeper into the hierarchy
+
+<Note>Higher depth values query more objects and may slow matrix loading for large models. Start with depth 1-2 and increase as needed.</Note>
+
+### Row Filters
+
+Filters refine which objects appear as rows in the matrix.
+
+#### Type Filters
+The **Types** dropdown lets you select which object types to include. By default, "Show All" includes every type. Check specific types to include only those types.
+
+#### Tag Filters  
+The **Tags** dropdown filters rows by object tags. This powerful filter narrows results to specific categories.
+
+<Info>Both type and tag filters combine (AND logic)—objects must match both the selected types AND selected tags to appear.</Info>
+
+## Adding and Configuring Columns
+
+Columns display different data fields for each row object. The matrix automatically includes a name column; you add additional columns to show the data you need.
+
+### Adding Columns
+
+To add a column:
+1. Click the "+" button in the column headers
+2. A new column appears with default settings
+3. Click the column header to select it
+4. Use the settings bar to configure the column
+
+### Column Configuration
+
+When a column is selected, the bottom row of the settings bar shows column-specific options.
+
+#### Field Type
+
+The **Field** dropdown determines what data the column displays. Available field types:
+
+**Object Properties:**
+- **name**: The object's name
+- **documentation**: The object's documentation text
+- **value**: The object's value (for attributes, parameters, etc.)
+- **tags**: The object's tags
+
+**Related Data:**
+- **attributes**: The object's attributes (properties defined on it)
+- **constraints**: The object's constraints (rules and requirements)
+- **children**: Objects contained within this object
+- **references**: Referenced objects (files, images, etc.)
+- **relationships**: Related objects through defined relationships
+
+<Warning>Field type selection determines which additional configuration options appear. Choose the right field type before configuring display and filter options.</Warning>
+
+## Field-Specific Configuration
+
+Different field types have different configuration options:
+
+### Attributes Columns
+
+When **Field** is set to "attributes", additional options appear:
+
+#### Attribute Tags Filter
+Select which attribute tags to display. This filters which attributes appear in the column cells:
+- **Show All**: Display all attributes
+- **Specific Tags**: Display only attributes with selected tags (e.g., "Performance", "Cost")
+- **Untagged**: Display attributes without tags
+
+#### Display Type
+Controls how attributes are displayed:
+- **both**: Show both attribute name and value (e.g., "mass: 10 kg")
+- **name**: Show only attribute names
+- **value**: Show only attribute values
+- **tags**: Show attribute tags
+
+**Example configuration:**
+- Field: attributes, Tags: "Performance", Display: both → Shows performance attributes with names and values
+- Field: attributes, Tags: Show All, Display: name → Lists all attribute names
+
+### Constraints Columns
+
+When **Field** is set to "constraints", additional options appear:
+
+#### Constraint Tags Filter
+Select which constraint tags to display, similar to attribute filtering.
+
+#### Display Type
+Controls how constraints are displayed:
+- **all**: Show complete constraint information (name, value, and status)
+- **status**: Show only constraint verification status
+- **name**: Show only constraint names
+- **value**: Show only constraint values
+- **tags**: Show constraint tags
+
+**Example configuration:**
+- Field: constraints, Tags: "Safety", Display: all → Shows all safety constraint details
+- Field: constraints, Tags: Show All, Display: status → Shows verification status for all constraints
+
+### Children, References, and Relationships Columns
+
+When **Field** is set to "children", "references", or "relationships":
+
+#### Type Filters
+Select which object types to display in the column cells. This narrows results to specific types.
+
+#### Tag Filters
+Select which tags to filter by, showing only objects with selected tags.
+
+#### Display Type
+Controls how related objects are displayed:
+- **name**: Show only object names
+- **value**: Show only object values
+- **both**: Show both names and values
+
+**Example configuration:**
+- Field: children, Types: "Component", Display: name → Lists names of child components
+- Field: relationships, Types: "Requirement", Tags: "Critical", Display: both → Shows critical requirements with names and values
+
+### Name, Documentation, Value, and Tags Columns
+
+These field types have no additional configuration—they simply display the requested data for each row object.
+
+## Column Names
+
+Matrix columns have automatic naming that reflects their configuration.
+
+### Auto-Generated Names
+
+Column names update automatically based on field type and filters:
+- "Attributes" → Shows all attributes
+- "Performance Attributes" → Shows attributes tagged "Performance"
+- "Constraint Status" → Shows constraint status
+- "Children" → Shows all children
+- "Component Children" → Shows children of type Component
+
+### Custom Names
+
+You can rename any column by editing its header:
+1. Double-click the column header
+2. Type your custom name
+3. Press Enter to save
+
+Once renamed, the column keeps your custom name even if you change its configuration.
+
+To restore auto-generated naming:
+1. Select the column
+2. Click "Reset Name" in the settings bar
+
+<Note>Auto-generated names help identify column content at a glance. Only use custom names when you need specific terminology.</Note>
+
+## Understanding Matrix Data
+
+Matrices display dynamic, live data from your model.
+
+### Rows
+
+Each row represents an object that matches your scope and filters. Objects automatically appear or disappear as they move in/out of scope or gain/lose matching tags.
+
+### Cells
+
+Each cell shows the configured data for that row's object and column's field. Cell contents update automatically when the underlying model data changes.
+
+### Sub-Rows
+
+Some columns create sub-rows:
+- **Attributes columns**: Each attribute becomes a sub-row showing its name/value
+- **Constraints columns**: Each constraint becomes a sub-row showing its details
+
+This allows a single object (main row) to display multiple related items (sub-rows) within the same matrix.
+
+### Empty Cells
+
+Empty cells appear when an object doesn't have the requested data:
+- No attributes with matching tags
+- No constraints
+- No children of the specified type
+- No documentation text
+
+Empty cells are normal—not every object has every type of data.
+
+## Refreshing Matrix Data
+
+Matrices automatically update when underlying model data changes through the reactive system. However, you can manually refresh to ensure current data:
+
+Click the **Refresh** button (↻ icon) in the settings bar to reload all matrix data.
+
+<Note>Automatic updates should keep the matrix data current. Manual refresh should not be necessary but can be used if issues are noticed.</Note>
+
+## Example Matrix Configurations
+
+### Requirements Traceability Matrix
+
+**Setup:**
+- Scope: Requirements package
+- Depth: 2-3
+- Types: Requirement
+- Columns:
+  1. Name (auto-included)
+  2. Documentation
+  3. Relationships (Types: Test Case, Display: name)
+  4. Constraints (Tags: Verification, Display: status)
+
+Shows which requirements are linked to test cases and their verification status.
+
+### Component Attribute Roll-Up
+
+**Setup:**
+- Scope: System root
+- Depth: 3
+- Types: Component, Part
+- Columns:
+  1. Name (auto-included)
+  2. Attributes (Tags: Mass, Display: value)
+  3. Attributes (Tags: Cost, Display: value)
+  4. Attributes (Tags: Power, Display: value)
+
+Creates a bill of materials showing mass, cost, and power for all components.
+
+### Interface Matrix (N-Squared)
+
+**Setup:**
+- Scope: Subsystem
+- Depth: 2
+- Types: Component
+- Columns:
+  1. Name (auto-included)
+  2. Relationships (Types: Component, Display: name)
+  3. Children (Types: Port, Display: both)
+
+Shows component-to-component interfaces and their ports.
+
+## Tips for Effective Matrices
+
+**Start Simple**: Begin with scope, one or two columns, and limited depth. Add complexity after verifying basic setup works.
+
+**Use Filters Strategically**: Combine type and tag filters to focus on exactly what you need. Overly broad filters create overwhelming matrices.
+
+**Name Columns Clearly**: When auto-generated names aren't clear, rename columns to reflect their purpose for your analysis.
+
+**Watch Depth**: Higher depth values exponentially increase queried objects. Use the minimum depth that captures your needed scope.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Matrix](#matrix-artifact) | Analyze relationships in a grid format. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+

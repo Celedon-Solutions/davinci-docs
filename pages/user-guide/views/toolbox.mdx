@@ -2,12 +2,10 @@
 title: Toolbox View
 ---
 
+<img width="50" noZoom src="/images/toolbox-icon.png" />
+
 ## Description  
 The Toolbox View enables users to create custom tools for design agents to use. Toolboxes function follows the MCP format that expose specific functionality through defined interfaces. The view consists of three panes: the left pane contains the summary. The middle pane contains the code editor. The right pane serves as the testing area.
-
-<Frame>
-    <img height="400" noZoom src="/images/toolbox/toolbox.png" />  
-</Frame>
 
 ## Creating Custom Tools
 Toolboxes allow you to create specialized functions that design agents can use to accomplish tasks. Each toolbox can expose multiple tools, each with specific parameters and functionality. For example, you might create a WeatherDataTool that provides weather alerts and forecasts by interacting with external APIs.
@@ -61,5 +59,16 @@ async def make_nws_request(url: str) -> dict[str, Any] | None:
 In the code above each tool is defined with the `davinci.tool()` decorator. This decorator is used to mark the function as a tool. The list on the left panel will display each tool as gathered by the decorators.
 
 This toolbox could be used by design agents to fetch and format weather data for various locations. To have data passed directly from the tool to the database, you can use the `save()` and `update()` functions as in regular code.
+
+## Export Options
+
+Toolbox objects support exporting in formats suitable for sharing and integration.
+
+| Format | Description |
+|--------|-------------|
+| PY | Export toolbox code as a Python file for use in external environments |
+| MCP | Export toolbox in Model Context Protocol format for integration with MCP-compatible systems |
+
+These export options enable toolbox reuse across projects and integration with external tools.
 
 

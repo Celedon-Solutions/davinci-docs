@@ -1,0 +1,76 @@
+---
+title: Item
+---
+
+<img height="20" noZoom src="/images/objecticons/item.svg" /> 
+
+## Description
+Items represent individual elements or units that flow through a system, such as data packets, physical materials, energy, or information. In SysML v2, items are specialized objects used to model things that are created, transformed, consumed, or transferred between system components during operations.
+
+Items are particularly useful for modeling the inputs and outputs of actions, the contents of flows between ports, and the resources that move through a system. Unlike parts which have persistent existence in the system structure, items typically represent transient entities that are processed, transmitted, or transformed as the system operates. Items can have attributes that define their properties (such as size, priority, or content) and can be composed of other items to represent complex data structures or material assemblies.
+
+<Note>Items are commonly used in flow-based modeling to specify what is being transferred between system components through ports and interfaces.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing item composition. |
+| [History](/pages/user-guide/navigating/model) | Track changes of attributes. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the item.
+</ParamField>
+
+<ParamField path="Items" type="object">
+
+<a href="/pages/modeling/objects/item" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/item.svg" /> </a>
+
+  A list of all sub-item objects owned by this item.
+
+  Sub-items can be viewed and deleted, allowing hierarchical composition of complex items.
+
+  [Read more about Items](/pages/modeling/objects/item)
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this item.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this item.
+
+  Constraint Equations and Analysis Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

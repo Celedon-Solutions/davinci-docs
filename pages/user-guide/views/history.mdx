@@ -1,0 +1,75 @@
+---
+title: History View
+---
+
+<img width="50" noZoom src="/images/history-icon.png" />
+
+The History View displays how an object's values have changed over time across git commits, providing a visual timeline of value evolution throughout your project's development.
+
+## Overview
+
+The History View generates charts showing how attribute and constraint values have changed across the version control history. This allows you to track parameter evolution, understand when values changed, and identify trends in your model's development.
+
+For objects with multiple attributes or constraints, the History View can display multiple value timelines simultaneously, grouped by unit compatibility.
+
+## What Gets Tracked
+
+The History View displays history for:
+
+- **Attributes**: Track how parameter values have evolved over time
+- **Constraints**: Monitor constraint value changes across commits
+- **Parent Objects**: When viewing a Part, Package, or other parent object, the view shows history for all child attributes and constraints
+
+## How It Works
+
+The History View retrieves the object's state from each commit in the current branch and extracts the resolved values at each point in time. Values are automatically converted to the current unit when possible, ensuring consistent comparisons across the timeline.
+
+<Note>
+History is only available for attributes and constraints that have resolved numeric values. Text, boolean, or errored values are not plotted.
+</Note>
+
+## Chart Display
+
+The History View displays line charts with:
+
+- **X-Axis**: Time (based on commit timestamps)
+- **Y-Axis**: Value (in the current unit)
+- **Multiple Lines**: When viewing a parent object, each child attribute/constraint appears as a separate line
+- **Grouping**: Attributes are grouped by compatible units for meaningful comparison
+- **Commit Points**: Each point on the line represents a commit where the value changed
+
+### Unit Compatibility
+
+Values are grouped by unit compatibility. For example:
+- All length measurements (meters, kilometers, feet) can be plotted together
+- All power measurements (watts, kilowatts, megawatts) can be plotted together
+- Incompatible units (e.g., mass and length) are shown in separate charts
+
+## Interactive Features
+
+**Hover Over Points**: See the exact value, unit, commit hash, and commit message at each data point.
+
+**Legend**: Click on items in the legend to show/hide specific attributes in the chart.
+
+**Zoom and Pan**: Use mouse controls to zoom into specific time ranges or pan across the timeline.
+
+## Use Cases
+
+**Track Parameter Evolution**: Understand how critical parameters have changed during design iterations.
+
+**Identify Trends**: Spot patterns in value changes over time, such as gradual increases or sudden shifts.
+
+**Design Reviews**: Document and present how key values evolved throughout the project lifecycle.
+
+**Regression Analysis**: Identify when and why a value changed to troubleshoot issues or track design decisions.
+
+<Note>
+The History View only shows commits on the current branch. Switch branches to see history for different development paths.
+</Note>
+
+## Limitations
+
+- Only displays numeric attributes and constraints with resolved values
+- Requires git commit history to be available
+- Values must have compatible units to be plotted together
+- Limited to the current branch's commit history

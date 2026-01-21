@@ -1,0 +1,85 @@
+---
+title: Tasks
+---
+
+<img height="20" noZoom src="/images/objecticons/task.svg" /> 
+
+## Description
+Task objects represent discrete units of work or activities that need to be performed to achieve a specific objective. In a project management and systems engineering context, tasks have defined durations, start and end dates, and may depend on other tasks or require resources. They are the building blocks of project schedules and work breakdown structures.
+
+Tasks support prerequisite relationships with other tasks, allowing you to define dependencies where one task must complete before another can begin. Prerequisites can include time offsets, enabling flexible scheduling such as "start 2 days after Task A completes." The duration field specifies how long a task takes to complete, with configurable units (Days, Hours, etc.). Tasks automatically calculate their start and end dates based on their duration, prerequisites, and the project timeline.
+
+The ordering of tasks is based on the ordering in the [index](/pages/user-guide/navigating/model#index). To change top to bottom ordering of tasks in the [Gantt view](/pages/user-guide/views/gantt) rearrange the tasks using the index.
+
+<Note>If the task has owned sub tasks as children, then the parent task will inherit the start and end date of its children and is not editable.</Note>
+
+<Info>Use the properties view to edit the start/ end dates or durations. To view tasks in context use the Gantt view. Can also edit duration and dates from the Gantt view as well.</Info>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Gantt](#gantt-chart) | Visualize tasks and dependencies on a timeline. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Start Date" type="string">
+  The start date of the task. Can be specified as a date string or calculated based on prerequisites and project timeline.
+</ParamField>
+
+<ParamField path="End Date" type="string">
+  The end date of the task. Can be specified as a date string or calculated based on the start date and duration.
+</ParamField>
+
+<ParamField path="Duration" type="object">
+  The duration of the task, consisting of:
+  - `value`: The numeric duration value (string)
+  - `unit`: The time unit (default: "Days")
+  - `kind`: The value type (default: "number")
+  
+  Duration is used to calculate the end date when a start date is known, or vice versa.
+</ParamField>
+
+<ParamField path="Prerequisites" type="object">
+  A record of prerequisite tasks that must complete before this task can begin. Each prerequisite is keyed by the task ID and contains:
+  - `offset`: Time offset after the prerequisite completes (string)
+  - `offsetUnit`: Unit for the offset (default: "Days")
+  - `offsetKind`: Type of offset value (always "number")
+  
+  Prerequisites enable dependency chains where tasks wait for other tasks to complete, optionally with a time delay.
+</ParamField>
+
+<ParamField path="Tasks" type="object">
+
+<a href="/pages/modeling/objects/task" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/task.svg" /> </a>
+
+  A list of all sub-task objects owned by this task.
+
+  Sub-tasks can be viewed and deleted.
+
+  [Read more about Tasks](/pages/modeling/objects/task)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+

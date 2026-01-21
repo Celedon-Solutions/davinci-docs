@@ -2,42 +2,897 @@
 title: Code
 ---
 
-<img height="20" noZoom src="/images/objecticons/action.svg" /> 
+<img height="20" noZoom src="/images/objecticons/code.svg" /> 
 
 ## Description
-Actions describe the behavior of a system. This can be constructed using nested levels of actions to refine the action in detail. 
+Code objects contain executable code that integrates directly with your model. They support multiple programming languages, with Python being the only browser-executable language through the built-in Pyodide runtime. Code can read attribute values, update model data, generate plots, and perform complex analysis—all while maintaining live connections to your model objects.
+
+Code objects are ideal for parametric studies, design optimization, analysis automation, and model-driven calculations that need to access and manipulate model data programmatically.
+
+## Language Support
+
+### Browser-Executable
+
+**Python** is the main language that executes directly in the browser without requiring server-side infrastructure. The Pyodide runtime provides a full Python environment with scientific computing libraries including NumPy, SciPy, and Matplotlib.
+
+**When to use Python:**
+- Parametric analysis and optimization
+- Model-driven calculations
+- Data visualization and plotting
+- Automation scripts that read/write model data
+- Design space exploration
+
+**C/C++** and **JavaScript** is supported but more limited and does not support the model integration capabilities of Python at this time.
+
+<Note>When creating code through the AI agent, Python is used by default unless you explicitly specify another language.</Note>
+
+### Non-Executable Languages
+
+Other programming languages are supported for storage and syntax highlighting but do not execute in the browser:
+
+- **Java**
+- **MATLAB**
+- **Other languages**: Formatting and/or syntax highlighting may not function correctly
+
+<Info>Non-executable languages are useful for storing implementation code, generated code, or reference implementations alongside your model. They provide syntax highlighting but no execution capabilities.</Info>
+
+## Referencing Model Objects
+
+Code can reference any model object using `@` notation, creating live connections between your code and model data.
+
+### Basic Object References
+
+Type `@` in the code editor to insert a reference to a model object:
+
+1. Type `@` in the code
+2. Select an object from the dropdown
+3. A reference anchor is inserted at that location
+
+The reference resolves to the object when the code executes, allowing you to access its data.
+
+### Reading Attribute Values
+
+Attribute references return the resolved numeric value when the code runs:
+
+```python
+# Get attribute value in default units
+base_value = @MyAttribute
+
+# Get attribute value converted to specific units
+converted_value = @MyAttribute("mg")
+```
+
+<Note>Once an Object's value is assigned to a variable, you cannot perform unit conversions on it—conversions must happen at reference time using the `unit` notation.</Note>
 
 
-<Info>As of the Beta, the actions are only described in the documentation and by its subactions.</Info>
+**Unit conversion example:**
+```python
+# If @MassAttribute is "1 kg" in the model
+mass_kg = @MassAttribute        # Returns: 1
+mass_g = @MassAttribute("g")     # Returns: 1000
+mass_mg = @MassAttribute("mg")   # Returns: 1000000
+```
 
-## Fields
 
+<Warning>Unit conversions must use compatible units. Attempting to convert incompatable units (such as mass `g` to length `m`) will cause an error.</Warning>
+
+## Updating Model Objects
+
+Code can write data back to the model, updating attributes, constraints, resources, tasks, and risks programmatically.
+
+### Updating Attributes
+
+Use the `update()` or `update_attribute()` function to write attribute values:
+
+```python
+# Update attribute with unit
+new_value = 1500
+update(@MassAttribute, new_value, "kg", "number")
+
+# Update unitless attribute
+count = 42
+update(@CountAttribute, count, "", "number")
+```
+
+**Update function signature:**
+```python
+update(object_reference, value, unit="", kind="number")
+```
+
+**Parameters:**
+- `object_reference`: The `@ObjectName` reference to update
+- `value`: The new numeric value
+- `unit`: The unit string (e.g., "kg", "m", "s") or `""` for unitless (default: `""`)
+- `kind`: The value type - `"number"`, `"integer"`, `"boolean"`, or `"string"` (default: `"number"`)
+
+**Supported value kinds:**
+- `"number"`: Floating-point numbers
+- `"integer"`: Whole numbers
+- `"boolean"`: True/False values
+- `"string"`: Text values
+
+### Updating Constraints
+
+Use `update_constraint()` to update constraint values:
+
+```python
+# Update constraint value
+update_constraint(@SafetyConstraint, 0.95, "")
+
+# Constraint status updates automatically based on the value
+```
+
+**Function signature:**
+```python
+update_constraint(uuid, value, unit="")
+```
+
+### Updating Resources
+
+Use `update_resource()` to update resource allocations:
+
+```python
+# Update resource allocation
+update_resource(@TeamSize, 5, "people")
+
+# Update budget
+update_resource(@Budget, 50000, "USD")
+```
+
+**Function signature:**
+```python
+update_resource(uuid, value, unit="")
+```
+
+### Updating Tasks
+
+Use `update_task()` to update task durations:
+
+```python
+# Update task duration
+update_task(@DesignPhase, 3, "weeks")
+
+# Update with different time units
+update_task(@Testing, 120, "hours")
+```
+
+**Function signature:**
+```python
+update_task(uuid, value, unit="")
+```
+
+**Supported time units:**
+- `milliseconds`, `ms`, `msec`
+- `seconds`, `s`, `sec`
+- `minutes`, `m`, `min`
+- `hours`, `h`, `hr`
+- `days`, `d`, `day`
+- `weeks`, `w`, `wk`
+- `months`, `mo`, `mon`
+- `years`, `y`, `yr`
+
+### Updating Risks
+
+Use `update_risk()` to update risk assessments with multiple fields:
+
+```python
+# Update multiple risk fields
+update_risk(@SecurityRisk, {
+    "probability": 0.3,
+    "impact": 0.8,
+    "mitigation": "Implement encryption"
+})
+
+# Update single field
+update_risk(@ScheduleRisk, {
+    "probability": 0.5
+})
+```
+
+**Function signature:**
+```python
+update_risk(uuid, updates)
+```
+
+**Available fields:**
+- `probability`: Likelihood of occurrence (0.0 to 1.0)
+- `impact`: Severity if it occurs (0.0 to 1.0)
+- `mitigation`: Mitigation strategy (string)
+- `status`: Current status (string)
+
+### Example: Parametric Update
+
+```python
+# Read current values
+length = @Length("m")
+width = @Width("m")
+
+# Calculate new area
+area = length * width
+
+# Update area attribute
+update(@Area, area, "m^2", "number")
+
+print(f"Updated area: {area} m²")
+```
+
+## Available Python Modules
+
+The Pyodide runtime includes essential scientific computing packages:
+
+| Package | Import As | Description |
+|---------|-----------|-------------|
+| numpy | `numpy` | Numerical computing and arrays |
+| matplotlib | `matplotlib.pyplot as plt` | Plotting and visualization |
+| scipy | `scipy` | Scientific algorithms |
+| Pillow | `PIL` | Image processing |
+| pandas | `pandas` | Data manipulation (limited) |
+
+**Example usage:**
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create plot
+plt.figure()
+plt.plot(x, y)
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.title('Sine Wave')
+plt.show()
+```
+
+<Note>Use `plt.show()` to display plots in the output terminal. Plots appear in the terminal and can be saved as figures to your model.</Note>
+
+## Davinci Python Function Reference
+
+The following custom functions are available in all Python code objects:
+
+### Model Update Functions
+
+| Function | Description | Signature |
+|----------|-------------|-----------|
+| `update()` | Update an attribute value | `update(uuid, value, unit="", kind="number")` |
+| `update_attribute()` | Explicit attribute update | `update_attribute(uuid, value, unit="", kind="number")` |
+| `update_resource()` | Update a resource | `update_resource(uuid, value, unit="")` |
+| `update_constraint()` | Update a constraint | `update_constraint(uuid, value, unit="")` |
+| `update_task()` | Update task duration | `update_task(uuid, value, unit="")` |
+| `update_risk()` | Update risk fields | `update_risk(uuid, updates)` |
+
+### File Operations
+
+| Function | Description | Signature |
+|----------|-------------|-----------|
+| `davinci_save_file()` | Save file to model | `davinci_save_file(file, name, id=None)` |
+| `davinci_open_file()` | Load file from model | `davinci_open_file(path, mode='rb', encoding='utf-8')` |
+
+### Monitoring Functions
+
+| Function | Description | Signature |
+|----------|-------------|-----------|
+| `monitor()` | Record a value | `monitor(name, attribute)` |
+| `getMonitor()` | Retrieve recorded values | `getMonitor(name)` |
+
+### State Machine Functions
+
+| Function | Description | Signature |
+|----------|-------------|-----------|
+| `activate()` | Activate a state | `activate(state_id, execute_entry=True)` |
+| `time_loop()` | Time-aware iterator | `time_loop(iterable)` |
+
+<Info>All Davinci functions are automatically available in the global namespace. No import statements are required.</Info>
+
+## File Operations
+
+Code can save and load files to/from your model using specialized Davinci file functions.
+
+### Saving Files
+
+Save data to the model using `davinci_save_file()`:
+
+```python
+# Save text file
+davinci_save_file("Analysis complete", "results.txt")
+
+# Save binary data
+binary_data = b'\x89PNG\r\n\x1a\n...'
+davinci_save_file(binary_data, "image.png")
+
+# Save matplotlib figure
+import matplotlib.pyplot as plt
+fig = plt.figure()
+plt.plot([1, 2, 3], [1, 4, 9])
+davinci_save_file(fig, "plot.png")
+
+# Save JSON data
+data = {"temperature": 25, "pressure": 101.3}
+davinci_save_file(data, "measurements.json")
+```
+
+**Function signature:**
+```python
+davinci_save_file(file, name, id=None)
+```
+
+**Parameters:**
+- `file`: Data to save (string, bytes, matplotlib figure, dict, list, or file-like object)
+- `name`: Filename for the saved reference
+- `id`: Optional identifier (defaults to filename if not provided)
+
+**Supported content types:**
+- **Text**: Strings are saved as text files
+- **Binary**: Bytes/bytearray are saved as binary files
+- **Figures**: Matplotlib figures are automatically saved as PNG, PDF, or SVG based on file extension
+- **JSON**: Dictionaries and lists are serialized to JSON
+- **File objects**: Any object with a `.read()` method
+
+The function creates a Reference object in your model with the saved content.
+
+### Loading Files
+
+Load reference files using `davinci_open_file()`:
+
+```python
+# Load text file
+content = davinci_open_file("@ParentObject/config.txt", mode='r')
+print(content)
+
+# Load binary file
+binary_data = davinci_open_file("@ParentObject/image.png", mode='rb')
+
+# Specify encoding for text files
+text = davinci_open_file("@ParentObject/data.csv", mode='r', encoding='utf-8')
+```
+
+**Function signature:**
+```python
+davinci_open_file(path, mode='rb', encoding='utf-8')
+```
+
+**Parameters:**
+- `path`: File path using `@` notation to reference objects
+- `mode`: File mode - `'r'` or `'rt'` for text, `'rb'` for binary (default: `'rb'`)
+- `encoding`: Text encoding for text mode (default: `'utf-8'`)
+
+**Returns:**
+- Text mode (`'r'`, `'rt'`): Returns string
+- Binary mode (`'rb'`): Returns bytes
+
+<Note>Files must be preloaded into the execution context. Use `@` notation to reference objects containing files. The system will search for matching file paths in the preloaded cache.</Note>
+
+## Importing Code Objects
+
+Import functions and classes from other code objects in your model using multiple import patterns. The system supports both UUID-based references and name-based imports with automatic resolution.
+
+### Quick Reference
+
+| Pattern | Syntax | Use Case |
+|---------|--------|----------|
+| **UUID wildcard** | `import @Module` | Import all functions from a code object by UUID |
+| **UUID with alias** | `import @Module as m` | Import with custom name using UUID |
+| **UUID specific** | `from @Module import func1, func2` | Import specific items by UUID |
+| **Name-based** | `import module_name` | Import by name (searches siblings, Model, Library) |
+| **Name with alias** | `import module_name as m` | Import by name with alias |
+| **Name specific** | `from module_name import func` | Import specific items by name |
+| **Relative** | `from . import sibling` | Import from parent container |
+| **Relative up** | `from .. import uncle` | Import from grandparent container |
+| **Direct call** | `[@Module].function()` | Call function without import statement |
+| **Multi-line** | `from @Module import (`<br/>`    func1, func2`<br/>`)` | Break long imports across lines |
+
+### Import Patterns
+
+#### 1. UUID-Based Imports
+
+Reference code objects directly using their UUID with `@` notation:
+
+```python
+# Import all functions from a code object (wildcard import)
+import @UtilityFunctions
+
+# Import with alias
+import @UtilityFunctions as utils
+
+# Import specific items
+from @UtilityFunctions import calculate_mass, calculate_volume
+
+# Import specific items with aliases
+from @UtilityFunctions import calculate_mass as calc_mass
+```
+
+#### 2. Name-Based Imports
+
+Reference code objects by their name. The system searches for matching code objects in:
+1. Sibling objects (same parent container)
+2. Top-level Model objects
+3. Top-level Library objects
+
+```python
+# Simple import by name
+import utils
+
+# Import with alias
+import utils as u
+
+# Import specific items
+from utils import calculate_mass, calculate_volume
+
+# Import with aliases
+from utils import calculate_mass as calc_mass
+```
+
+#### 3. Relative Imports
+
+Use Python's relative import syntax to reference code objects relative to the current object's location in the hierarchy:
+
+```python
+# Import from parent container
+from . import sibling_module
+
+# Import from grandparent container
+from .. import uncle_module
+
+# Import specific items from parent
+from . import helper_function, utility_class
+
+# Import from named module in parent
+from .calculations import compute_stress
+```
+
+**Relative import levels:**
+- `.` - Current parent container
+- `..` - Grandparent container
+- `...` - Great-grandparent container (and so on)
+
+#### 4. Direct Method Calls (No Import)
+
+Call functions from other code objects directly without importing, using the `[uuid].function()` syntax:
+
+```python
+# Call function directly using UUID
+result = [@UtilityFunctions].calculate_mass(volume, density)
+
+# Multiple calls without import statement
+mass = [@physics_utils].calculate_mass(vol, density)
+stress = [@stress_analysis].calculate_stress(force, area)
+```
+
+This pattern automatically imports the code object behind the scenes and makes its functions available in the global namespace. It's useful for one-off function calls where you don't want to add an import statement.
+
+#### 5. Multi-line Imports
+
+Break long import statements across multiple lines using parentheses:
+
+```python
+from @UtilityFunctions import (
+    calculate_mass,
+    calculate_volume,
+    calculate_density,
+    calculate_stress
+)
+```
+
+### Import Resolution
+
+The import system resolves references in the following order:
+
+**For UUID-based imports (`@`):**
+- Directly resolves to the referenced object by UUID
+- Most reliable method when you know the exact object
+
+**For name-based imports:**
+1. **Siblings**: Searches objects with the same parent
+2. **Model root**: Searches top-level objects in Model
+3. **Library root**: Searches top-level objects in Library
+
+**For relative imports (`.` and `..`):**
+- Navigates up the object hierarchy based on dot count
+- Searches for the named module at the target level
+
+### Complete Example
+
+**Code Object 1: `physics_utils` (in Model/Calculations/)**
+```python
+def calculate_mass(volume, density):
+    """Calculate mass from volume and density."""
+    return volume * density
+
+def calculate_volume(length, width, height):
+    """Calculate volume of a rectangular prism."""
+    return length * width * height
+
+def calculate_density(mass, volume):
+    """Calculate density from mass and volume."""
+    return mass / volume
+
+# Physical constants
+STEEL_DENSITY = 7850  # kg/m³
+ALUMINUM_DENSITY = 2700  # kg/m³
+```
+
+**Code Object 2: `stress_analysis` (in Model/Calculations/)**
+```python
+import numpy as np
+
+def calculate_stress(force, area):
+    """Calculate stress from force and area."""
+    return force / area
+
+def calculate_strain(stress, elastic_modulus):
+    """Calculate strain from stress and elastic modulus."""
+    return stress / elastic_modulus
+```
+
+**Code Object 3: `beam_analysis` (in Model/Calculations/)**
+```python
+# Import using relative imports (same parent)
+from . import physics_utils
+from . import stress_analysis
+
+# Or import using names
+# import physics_utils
+# import stress_analysis
+
+# Or import using UUID references
+# import @physics_utils
+# import @stress_analysis
+
+# Import specific items
+from physics_utils import STEEL_DENSITY
+
+# Read model attributes
+length = @BeamLength("m")
+width = @BeamWidth("m")
+height = @BeamHeight("m")
+applied_force = @AppliedForce("N")
+
+# Calculate volume using imported function
+volume = physics_utils.calculate_volume(length, width, height)
+
+# Calculate mass using imported constant
+mass = physics_utils.calculate_mass(volume, STEEL_DENSITY)
+
+# Calculate stress
+cross_section_area = width * height
+stress = stress_analysis.calculate_stress(applied_force, cross_section_area)
+
+# Update results
+update(@CalculatedMass, mass, "kg", "number")
+update(@CalculatedStress, stress, "Pa", "number")
+
+print(f"Volume: {volume:.4f} m³")
+print(f"Mass: {mass:.2f} kg")
+print(f"Stress: {stress/1e6:.2f} MPa")
+```
+
+**Code Object 4: `report_generator` (in Model/Reports/)**
+```python
+# Import from different parent using relative import
+from ..Calculations import physics_utils, stress_analysis
+
+# Or import using name-based resolution
+# import physics_utils
+# import stress_analysis
+
+# Generate analysis report
+def generate_report():
+    print("=== Analysis Report ===")
+    print(f"Steel Density: {physics_utils.STEEL_DENSITY} kg/m³")
+    # ... rest of report
+```
+
+### Import Best Practices
+
+**Use UUID references (`@`) when:**
+- You need guaranteed resolution to a specific object
+- The code object might move in the hierarchy
+- You want explicit, unambiguous imports
+
+**Use name-based imports when:**
+- You want more readable, maintainable code
+- The code object names are unique and stable
+- You're following Python conventions
+
+**Use relative imports when:**
+- Organizing related code objects in containers
+- Building reusable module hierarchies
+- You want imports that adapt to container moves
+
+**Avoid wildcard imports (`import @module`) when:**
+- You only need specific functions
+- You want to keep the namespace clean
+- You need to understand dependencies clearly
+
+<Note>All import patterns are resolved at parse time. Circular imports are not supported—ensure your code objects form a directed acyclic graph (DAG) of dependencies.</Note>
+
+## Monitoring and Data Collection
+
+Track attribute values over time during simulations and analyses using the monitoring system.
+
+### Recording Values
+
+Use `monitor()` to record attribute values:
+
+```python
+import numpy as np
+
+# Initialize simulation
+time_steps = np.linspace(0, 10, 100)
+
+for t in time_steps:
+    # Calculate values
+    velocity = @InitialVelocity + @Acceleration * t
+    position = @InitialPosition + velocity * t
+    
+    # Monitor values
+    monitor("velocity", velocity)
+    monitor("position", position)
+    monitor("time", t)
+```
+
+**Function signature:**
+```python
+monitor(name, attribute)
+```
+
+**Parameters:**
+- `name`: String identifier for this monitor
+- `attribute`: Value to record (can be any numeric or string value)
+
+Values are appended to an array each time `monitor()` is called with the same name.
+
+### Retrieving Monitored Data
+
+Use `getMonitor()` to retrieve recorded values:
+
+```python
+# Get monitored arrays
+velocities = getMonitor("velocity")
+positions = getMonitor("position")
+times = getMonitor("time")
+
+# Plot results
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 6))
+plt.subplot(2, 1, 1)
+plt.plot(times, velocities)
+plt.ylabel('Velocity (m/s)')
+plt.grid(True)
+
+plt.subplot(2, 1, 2)
+plt.plot(times, positions)
+plt.xlabel('Time (s)')
+plt.ylabel('Position (m)')
+plt.grid(True)
+
+plt.show()
+```
+
+**Function signature:**
+```python
+getMonitor(name)
+```
+
+**Returns:**
+- List of monitored values if monitor exists
+- `None` if monitor name not found
+
+<Note>Monitors persist throughout the code execution but are cleared when the code runs again. Use monitors for parametric studies, optimization loops, and time-series analysis.</Note>
+
+## State Machine Functions
+
+Code can interact with state machines for simulation and behavioral modeling:
+
+### activate(state_id, execute_entry=True)
+
+Activate a state machine:
+
+```python
+# Activate a state and execute its entry action
+activate(@IdleState)
+
+# Activate without executing entry action
+activate(@RunningState, execute_entry=False)
+```
+
+### time_loop(iterable)
+
+Create a time-aware iterator that triggers state machine updates:
+
+```python
+import numpy as np
+
+# Activate initial state
+activate(@InitialState)
+
+# Time loop automatically processes state machines
+for t in time_loop(np.linspace(0, 10, 100)):
+    # Update system attributes
+    update(@CurrentTime, t, "s", "number")
+    
+    # Monitor state variables
+    monitor("time", t)
+    monitor("state", @CurrentState)
+```
+
+The `time_loop()` wrapper ensures that:
+- State machine transitions are evaluated at each time step
+- Active state `do` actions execute according to their intervals
+- State changes trigger entry/exit actions appropriately
+
+<Note>State machine functions are primarily used for behavioral simulation. See [States](/pages/modeling/objects/state) and [Transitions](/pages/modeling/objects/transition) for more information on state machine modeling.</Note>
+
+## Executing Code
+
+### Running Scripts
+
+Click the **Run** button to execute the entire code object from top to bottom. This runs all code and displays output in the terminal.
+
+### Running Functions
+
+Select a specific function from the function dropdown to execute only that function:
+
+1. Select function from dropdown (e.g., `calculate_mass()`)
+2. Click **Run**
+3. Only the selected function executes
+
+<Info>Functions must be defined at the top level (not nested) to appear in the function dropdown.</Info>
+
+### Output Terminal
+
+The output terminal displays:
+- Print statements
+- Plots and figures
+- Error messages and stack traces
+- Execution status
+
+**Terminal features:**
+- **Auto-opens**: Terminal opens automatically when code runs
+- **Toggle visibility**: Click "Output" to show/hide the terminal
+- **Save figures**: Click "Save Figure" beneath plots to save them as Reference objects
+- **No persistence**: Terminal clears when workspace closes or code reruns
+
+<Note>Use `plt.show()` to display matplotlib plots in the terminal. Each `plt.show()` call creates a separate figure in the output.</Note>
+
+## Example: Parametric Analysis with Monitoring
+
+This example demonstrates reading model data, performing analysis, updating results, and monitoring values over time:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read component properties
+length = @BeamLength("m")
+width = @BeamWidth("m")
+height = @BeamHeight("m")
+material_density = @MaterialDensity("kg/m^3")
+elastic_modulus = @ElasticModulus("Pa")
+
+# Calculate volume and mass
+volume = length * width * height
+mass = volume * material_density
+
+# Update mass attribute
+update(@CalculatedMass, mass, "kg", "number")
+
+# Parametric study: vary load and monitor results
+loads = np.linspace(100, 1000, 20)  # N
+
+for load in loads:
+    # Calculate stress
+    area = width * height
+    stress = load / area
+    
+    # Calculate max deflection
+    moment_of_inertia = (width * height**3) / 12
+    max_deflection = (load * length**3) / (3 * elastic_modulus * moment_of_inertia)
+    
+    # Monitor values
+    monitor("load", load)
+    monitor("stress", stress)
+    monitor("deflection", max_deflection * 1000)  # mm
+
+# Update with final values
+update(@StressResult, stress, "Pa", "number")
+update(@MaxDeflection, max_deflection, "m", "number")
+
+# Retrieve monitored data
+loads_array = getMonitor("load")
+stresses_array = getMonitor("stress")
+deflections_array = getMonitor("deflection")
+
+# Generate visualization
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+
+ax1.plot(loads_array, np.array(stresses_array) / 1e6)
+ax1.set_xlabel('Load (N)')
+ax1.set_ylabel('Stress (MPa)')
+ax1.set_title('Stress vs Load')
+ax1.grid(True)
+
+ax2.plot(loads_array, deflections_array)
+ax2.set_xlabel('Load (N)')
+ax2.set_ylabel('Deflection (mm)')
+ax2.set_title('Deflection vs Load')
+ax2.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+# Save figure to model
+davinci_save_file(fig, "beam_analysis.png")
+
+# Print summary
+print(f"Parametric Analysis Results:")
+print(f"  Volume: {volume:.4f} m³")
+print(f"  Mass: {mass:.2f} kg")
+print(f"  Load range: {min(loads):.1f} - {max(loads):.1f} N")
+print(f"  Stress range: {min(stresses_array)/1e6:.2f} - {max(stresses_array)/1e6:.2f} MPa")
+print(f"  Max deflection: {max(deflections_array):.3f} mm")
+```
+
+This code performs a parametric study by varying the applied load, monitoring stress and deflection at each step, and generating comprehensive visualization of the results.
+
+## Tips for Effective Code
+
+**Use References Liberally**: Reference model objects instead of hardcoding values. This keeps your analysis connected to model updates.
+
+**Document Functions**: Add docstrings to functions so their purpose is clear when selected in the dropdown.
+
+**Handle Units Carefully**: Always specify units when reading and updating attributes to avoid confusion and errors.
+
+**Organize with Imports**: Split complex analysis into multiple code objects and import them as needed for maintainability.
+
+**Save Important Results**: Use `davinci_save_file()` to store analysis results, plots, and data files as Reference objects in your model.
+
+**Monitor Key Variables**: Use `monitor()` and `getMonitor()` for parametric studies and time-series analysis to track how values change.
+
+**Use Specific Update Functions**: Choose the appropriate update function (`update_attribute()`, `update_resource()`, `update_task()`, `update_risk()`) for the object type you're modifying.
+
+**Check Output**: Always review the output terminal for warnings and errors, especially after model changes.
+
+**Leverage State Machines**: For behavioral simulations, use `activate()` and `time_loop()` to integrate with state machine models.
+
+**Test Incrementally**: When developing complex analysis, test each section independently before combining them.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Code](/pages/user-guide/views/code) | Edit source code with syntax highlighting and execution. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
-<ParamField path="Sequence" type="list">
-  List of owned action sequences that comprise the main action's flow. The list follows the format of:
+<ParamField path="Language" type="string">
+  The programming language of the code.
+</ParamField>
 
-  `Action Name` `(instance)` -> `Action Name` `(instance)`
+<ParamField path="Code" type="string">
+  The code content.
+</ParamField>
 
-  Where action name is a reference to a specific action and the instance refers to if the action is repeated during the flow. Instances can be given as numbers.
+<ParamField path="Relationships" type="connection">
 
-  <Info>All objects of the same instance are assumed connected.</Info>
-  
+  A list of all Relationships this object has with other model objects.
 
-### Merged Flow
-    Merged actions can be described as:
-
-  `Action Name One` `()` `&&` `Action Name Two` `()` -> `Action Name Three` `()`
-
-### Branching Flow
-  Branching actions can be described as:
-
-  `Action Name One` `()` -> `Action Name Two` `()` `&&` `Action Name Three` `()`
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

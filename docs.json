@@ -28,7 +28,7 @@
     "navigation": {
         "versions": [
             {
-                "version": "3.8.0",
+                "version": "4.0.0",
                 "dropdowns": [
                     {
                         "dropdown": "Overview",
@@ -44,37 +44,26 @@
                                     "pages/overview/get-started/account",
                                     "pages/overview/terms-policy/termsofservice"
                                 ]
+                            },
+                            {
+                                "group": "Quick Start",
+                                "pages": [
+                                    "pages/user-guide/common/quick-start",
+                                    "pages/faqs/common-faqs"
+                                ]
                             }
                         ]
                     },
                     {
-                        "dropdown": "User Guide",
-                        "icon": "user",
+                        "dropdown": "Interface",
+                        "icon": "window",
                         "groups": [
-                            {
-                                "group": "Overview",
-                                "pages": [
-                                    "pages/user-guide/overview/quick-start"
-                                ]
-                            },
                             {
                                 "group": "General Navigation",
                                 "pages": [
-                                    "pages/user-guide/navigating/ui",
                                     "pages/user-guide/navigating/home",
                                     "pages/user-guide/navigating/model",
-                                    "pages/user-guide/navigating/project"
-                                ]
-                            },
-                            {
-                                "group": "The Workspace",
-                                "pages": [
-                                    "pages/user-guide/views/properties",
-                                    "pages/user-guide/views/artifact",
-                                    "pages/user-guide/views/code",
-                                    "pages/user-guide/views/toolbox",
-                                    "pages/user-guide/views/reference",
-                                    "pages/user-guide/views/renderviews"
+                                    "pages/user-guide/navigating/ui"
                                 ]
                             },
                             {
@@ -82,23 +71,32 @@
                                 "pages": [
                                     "pages/user-guide/right-panel/right-panel-overview",
                                     "pages/user-guide/right-panel/agent-chat",
+                                    "pages/user-guide/right-panel/version-control",
                                     "pages/user-guide/right-panel/search-view",
                                     "pages/user-guide/right-panel/comment-view",
                                     "pages/user-guide/right-panel/validation-view"
                                 ]
                             },
                             {
-                                "group": "Extra Features",
+                                "group": "Project Settings",
                                 "pages": [
-                                    "pages/user-guide/overview/snapshots",
-                                    "pages/user-guide/overview/collaboration",
-                                    "pages/user-guide/overview/files"
+                                    "pages/user-guide/project-settings/project",
+                                    "pages/user-guide/project-settings/files",
+                                    "pages/user-guide/project-settings/toolboxes",
+                                    "pages/user-guide/project-settings/collaboration",
+                                    "pages/user-guide/project-settings/unit-settings",
+                                    "pages/user-guide/project-settings/relationship-settings",
+                                    "pages/user-guide/project-settings/secrets",
+                                    "pages/user-guide/project-settings/dependencies",
+                                    "pages/user-guide/project-settings/tags",
+                                    "pages/user-guide/project-settings/risk",
+                                    "pages/user-guide/project-settings/persona-settings",
+                                    "pages/user-guide/project-settings/mcp"
                                 ]
                             },
                             {
-                                "group": "Common",
+                                "group": "Extra Features",
                                 "pages": [
-                                    "pages/user-guide/common/q&a",
                                     "pages/user-guide/common/hotkeys"
                                 ]
                             }
@@ -112,13 +110,8 @@
                                 "group": "Overview",
                                 "pages": [
                                     "pages/modeling/overview/systemmodeling",
-                                    "pages/modeling/overview/objects"
-                                ]
-                            },
-                            {
-                                "group": "Objects",
-                                "pages": [
-                                    "pages/modeling/objects/objects"
+                                    "pages/modeling/overview/language",
+                                    "pages/modeling/overview/mentions"
                                 ]
                             },
                             {
@@ -127,6 +120,87 @@
                                     "pages/modeling/common/equations",
                                     "pages/modeling/common/relationships",
                                     "pages/modeling/common/units"
+                                ]
+                            },
+                            {
+                                "group": "Object Views",
+                                "pages": [
+                                    "pages/user-guide/views/activity",
+                                    "pages/user-guide/views/artifact",
+                                    "pages/user-guide/views/block",
+                                    "pages/user-guide/views/code",
+                                    "pages/user-guide/views/connectome",
+                                    "pages/user-guide/views/design-space-explorer",
+                                    "pages/user-guide/views/digital-thread",
+                                    "pages/user-guide/views/gantt",
+                                    "pages/user-guide/views/help",
+                                    "pages/user-guide/views/history",
+                                    "pages/user-guide/views/package",
+                                    "pages/user-guide/views/pie",
+                                    "pages/user-guide/views/plot",
+                                    "pages/user-guide/views/properties",
+                                    "pages/user-guide/views/reference",
+                                    "pages/user-guide/views/risk",
+                                    "pages/user-guide/views/rollup",
+                                    "pages/user-guide/views/sequence",
+                                    "pages/user-guide/views/slide",
+                                    "pages/user-guide/views/state",
+                                    "pages/user-guide/views/table",
+                                    "pages/user-guide/views/toolbox",
+                                    "pages/user-guide/views/tree"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Object Types",
+                        "icon": "cube",
+                        "groups": [
+                            {
+                                "group": "Model-Based Systems Engineering",
+                                "pages": [
+                                    "pages/modeling/objects/parts",
+                                    "pages/modeling/objects/attributes",
+                                    "pages/modeling/objects/requirements",
+                                    "pages/modeling/objects/constraints",
+                                    "pages/modeling/objects/ports",
+                                    "pages/modeling/objects/interface",
+                                    "pages/modeling/objects/entities",
+                                    "pages/modeling/objects/packages",
+                                    "pages/modeling/objects/linkages"
+                                ]
+                            },
+                            {
+                                "group": "Project Management",
+                                "pages": [
+                                    "pages/modeling/objects/resource",
+                                    "pages/modeling/objects/task",
+                                    "pages/modeling/objects/risk"
+                                ]
+                            },
+                            {
+                                "group": "Artifacts",
+                                "pages": [
+                                    "pages/modeling/objects/documents",
+                                    "pages/modeling/objects/tables",
+                                    "pages/modeling/objects/slide",
+                                    "pages/modeling/objects/matrix"
+                                ]
+                            },
+                            {
+                                "group": "Simulation & Behavior",
+                                "pages": [
+                                    "pages/modeling/objects/code",
+                                    "pages/modeling/objects/actions",
+                                    "pages/modeling/objects/states",
+                                    "pages/modeling/objects/transitions"
+                                ]
+                            },
+                            {
+                                "group": "Data & Tools",
+                                "pages": [
+                                    "pages/modeling/objects/reference",
+                                    "pages/modeling/objects/toolbox"
                                 ]
                             }
                         ]
@@ -138,8 +212,25 @@
                             {
                                 "group": "Design Agent",
                                 "pages": [
+                                    "pages/user-guide/design-agent/workspaces",
                                     "pages/user-guide/design-agent/agents",
+                                    "pages/user-guide/design-agent/persona",
+                                    "pages/user-guide/design-agent/agent-tools",
                                     "pages/user-guide/design-agent/tips"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Collaboration",
+                        "icon": "users",
+                        "groups": [
+                            {
+                                "group": "Working Together",
+                                "pages": [
+                                    "pages/user-guide/collaboration/overview",
+                                    "pages/user-guide/collaboration/real-time-editing",
+                                    "pages/user-guide/collaboration/object-locking"
                                 ]
                             }
                         ]
@@ -161,10 +252,21 @@
                         ]
                     },
                     {
-                        "dropdown": "Changelog",
+                        "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [
-                            "pages/changelog"
+                            "pages/release-notes/v4.0.1",
+                            "pages/release-notes/v4.0.0",
+                            "pages/release-notes/v3.7.2",
+                            "pages/release-notes/v3.6.2",
+                            "pages/release-notes/v3.5.2",
+                            "pages/release-notes/v3.4.1",
+                            "pages/release-notes/v3.3.0",
+                            "pages/release-notes/v3.2.0",
+                            "pages/release-notes/v3.1.0",
+                            "pages/release-notes/v3.0.1",
+                            "pages/release-notes/v3.0.0",
+                            "pages/release-notes/v2.0.0"
                         ]
                     }
                 ]

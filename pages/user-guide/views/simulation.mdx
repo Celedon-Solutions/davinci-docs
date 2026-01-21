@@ -1,0 +1,70 @@
+---
+title: Simulation View
+---
+
+## Description
+
+The Simulation View provides setup and results visualization for Simulation objects. This view has two modes: Simulation Setup for configuring simulations, and Simulation Result for viewing and analyzing simulation outputs.
+
+## Simulation Setup View
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_simulation_setup.png" />  
+</Frame>
+
+The Setup View provides an interactive 3D environment for configuring computational fluid dynamics (CFD) and finite element analysis (FEA) simulations. This includes mesh generation, boundary condition assignment, and material property definition.
+
+### Geometry Display
+
+The 3D viewer shows the geometry to be simulated, including:
+- **Mesh Visualization**: View the computational mesh with elements and nodes
+- **Boundary Surfaces**: Identify surfaces where boundary conditions are applied
+- **Material Regions**: See different material zones within the geometry
+
+**3D Interaction**: Click and drag to rotate the view. Right-click and drag to pan. Scroll to zoom in and out.
+
+### Setup Controls
+
+**Mesh Settings**: Configure mesh density, refinement regions, and element types.
+
+**Boundary Conditions**: Assign inlet, outlet, wall, and symmetry conditions to appropriate surfaces.
+
+**Material Selection**: Choose materials from the material library or define custom material properties for each region.
+
+**Physics Settings**: Configure simulation type (CFD, thermal, structural, etc.) and relevant physics parameters.
+
+**Run Simulation**: Execute the simulation with current settings. Progress is displayed in the interface.
+
+## Simulation Result View
+
+<Frame>
+    <img height="400" noZoom src="/images/workspace_simulation_result.png" />  
+</Frame>
+
+The Result View displays simulation outputs with advanced visualization capabilities, including contour plots, vector fields, and streamlines.
+
+### Result Visualization
+
+**Field Selection**: Choose which result field to display (pressure, velocity, temperature, stress, etc.).
+
+**Visualization Mode**: Select visualization type:
+- **Contour**: Color-mapped scalar fields showing value distribution
+- **Vector**: Arrow fields showing vector quantities like velocity or force
+- **Streamlines**: Flow paths through vector fields
+- **Isosurfaces**: 3D surfaces of constant value
+
+**Color Bar**: A color legend shows the mapping between colors and field values, with min/max indicators.
+
+### Analysis Tools
+
+**Slice Planes**: Create cutting planes through the geometry to view internal fields.
+
+**Probes**: Place point probes to read exact values at specific locations.
+
+**Plot Generation**: Extract data along lines or across surfaces for quantitative analysis.
+
+## Use Cases
+
+**Flow Analysis**: Set up and analyze fluid flow problems including aerodynamics, hydrodynamics, and internal flows.
+
+**Structural Analysis**: Configure and evaluate structural simulations for stress, strain, and deformation under various loading conditions.

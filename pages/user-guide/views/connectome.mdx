@@ -1,0 +1,52 @@
+---
+title: Connectome View
+---
+
+<img width="50" noZoom src="/images/connectome-icon.png" />
+
+
+## Description
+
+The Connectome View visualizes relationships between objects in an interactive 3D space, positioning objects based on the number and strength of their connections. This view provides a network perspective of your model, revealing patterns, clusters, and hubs of connectivity.
+
+Objects are represented as nodes in 3D space, with lines connecting related objects. The 3D layout algorithm positions highly connected objects near the center and arranges clusters of related objects near each other, making relationship patterns immediately visible.
+
+## View Controls
+
+### Depth
+
+Specifies how many relationship hops away from the focus object to include. Depth 1 shows only directly connected objects, while higher depths reveal extended networks of relationships.
+
+### 3D Navigation
+
+**Rotate**: Click and drag to rotate the 3D view.
+
+**Pan**: Right-click and drag (or Shift + click and drag) to pan.
+
+**Zoom**: Use mouse wheel or pinch gestures to zoom in and out.
+
+### Home Button
+
+Returns the view to a centered position focused on the root object, with default zoom level.
+
+## Network Elements
+
+**Nodes**: Spheres or other shapes representing objects. Node size or color may indicate object type or properties.
+
+**Edges**: Lines connecting nodes represent relationships between objects. Edge thickness or color may indicate relationship strength or type.
+
+**Layout**: The 3D force-directed layout naturally groups related objects together and separates unrelated clusters.
+
+## Interaction
+
+**Click Nodes**: Click on any node to open that object.
+
+## Use Cases
+
+**Relationship Analysis**: Identify highly connected "hub" objects that play central roles in your system architecture.
+
+**Impact Assessment**: See which objects are closely connected to a particular object, useful for understanding change impacts or dependencies.
+
+## Export Options
+
+Connectome visualizations cannot currently be exported. Use screenshot tools if you need to capture the 3D network view.

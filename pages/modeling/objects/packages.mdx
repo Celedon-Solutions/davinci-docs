@@ -5,19 +5,104 @@ title: Packages
 <img height="20" noZoom src="/images/objecticons/package.svg" /> 
 
 ## Description
-Packages are used to organize objects in the model.
+Packages organize model elements into logical groups, providing namespace management and structural organization for complex system models. In SysML v2, packages are fundamental organizational containers that help manage model complexity by grouping related elements together, defining their scope and visibility, and establishing clear boundaries between different aspects of the system model.
 
-  <Note>All projects have two reserved packages of "Elements" and "Artifacts".</Note>
+Packages facilitate modularity and maintainability by allowing engineers to partition large models into manageable sections. They can contain any type of model element including other packages, creating hierarchical structures that reflect the organization of the system or the structure of the engineering team. Packages also support model reuse and configuration management by enabling clear ownership boundaries and version control at the package level.
 
-<Warning>Packages under parts or other elements will break the chain of ownership.</Warning>
+All Davinci projects have two reserved top-level packages: `LIBRARY` and `MODEL`. By default `LIBRARY` is where all included packages from other projects exist. In general model elements will get placed under `MODEL` and uploaded files default to `LIBRARY`.
 
-## Fields
+<Note>Placing packages under parts or other structural elements can break ownership chains and create ambiguities in the model hierarchy. Packages should typically be organized at the top level or nested within other packages.</Note>
+
+
+## Package Access and Sharing
+
+Packages can be configured as either `private` or `public`, controlling whether they can be included in other projects. This feature enables powerful model reuse and collaboration capabilities across your organization.
+
+### Private Packages (Default)
+
+By default, all packages are created as `private`, meaning they are only accessible within their source project. Private packages cannot be included in other projects and their contents remain isolated to the project they were created in.
+
+### Public Packages
+
+When a package is marked as `public`, it becomes available for inclusion in other Davinci projects. This allows collaborators with access to view and include the package (along with all its owned elements) in their own projects, enabling component and object reuse.
+
+### Configuring Package Access
+
+To make a package available for inclusion in other projects:
+
+1. Open the package in the Properties view
+2. Locate the `Access` field next to the Package Name
+3. Change the value from `private` to `public`
+4. Save the changes
+
+Once a package is set to `public`, users with access to your project can include it in their own projects by right-clicking in their Library section and selecting "Include Package".
+
+<Info>When you include a public package from another project, all elements owned by that package are brought into your project's Library. The included package maintains a link to its source, allowing for updates and version management.</Info>
+
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the object. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Access" type="string">
+Defines whether the package is `private` or `public`.
+
+- **Private** (default): The package is only accessible within its source project and cannot be included in other projects
+- **Public**: The package (and all its owned elements) can be included in other Davinci projects, enabling model reuse and collaboration
+
+Set this to `public` when you want to share component libraries, standards, or templates across multiple projects.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
+</ParamField>
+
+<ParamField path="Elements" type="object">
+
+<div style={{ display: 'flex', flexDirection: 'row', gap: '10px', flexWrap: 'wrap' }}>
+  <a href="/pages/modeling/objects/packages" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/package.svg" /> </a>
+  <a href="/pages/modeling/objects/parts" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/part.svg" /> </a>
+  <a href="/pages/modeling/objects/requirements" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/requirement.svg" /> </a>
+  <a href="/pages/modeling/objects/actions" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/action.svg" /> </a>
+  <a href="/pages/modeling/objects/entities" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/entity.svg" /> </a>
+  <a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+  <a href="/pages/modeling/objects/ports" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/port.svg" /> </a>
+  <a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/interface.svg" /> </a>
+  <a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+  <a href="/pages/modeling/objects/code" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/code.svg" /> </a>
+  <a href="/pages/modeling/objects/documents" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/document.svg" /> </a>
+  <a href="/pages/modeling/objects/tables" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/table.svg" /> </a>
+  <a href="/pages/modeling/objects/reference" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/reference.svg" /> </a>
+  <a href="/pages/modeling/objects/geometry" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/geometry.svg" /> </a>
+  <a href="/pages/modeling/objects/assembly" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/assembly.svg" /> </a>
+  <a href="/pages/modeling/objects/toolbox" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/toolbox.svg" /> </a>
+</div>
+
+  A list of all model objects owned by this package.
+
+  Packages can contain most object types including other packages, parts, requirements, actions, entities, and more.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

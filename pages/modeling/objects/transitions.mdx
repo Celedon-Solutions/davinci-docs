@@ -1,0 +1,133 @@
+---
+title: Transition
+---
+
+<img height="20" noZoom src="/images/objecticons/transition.svg" /> 
+
+## Description
+Transitions define the paths and conditions that cause a system to move from one state to another in a state machine. In SysML v2, transitions are the connective elements that specify when and how state changes occur, capturing the dynamic behavior and control flow of state-based systems.
+
+A transition specifies a source state (fromState), one or more target states (toStates), and the conditions or events that trigger the state change. Transitions can include guard conditions that must be satisfied for the transition to occur, and they can be classified by kind to represent different types of state changes such as default transitions, triggered transitions, or failure transitions. Transitions enable modeling of complex control logic, event-driven behavior, and probabilistic state changes in systems ranging from simple controllers to sophisticated autonomous systems.
+
+<Note>Transitions can specify multiple target states, enabling non-deterministic or probabilistic state machines where the system can move to different states based on runtime conditions or probability distributions.</Note>
+
+
+## Transition Types
+
+### Default Transitions
+
+Default transitions are the standard type used for most state changes. They are evaluated continuously while the system is in the source state, and the transition occurs when the conditional expression becomes true.
+
+<Note>Default transition types will cause the `fromState` to deactivate and `toStates` to activate.</Note>
+
+### Trigger Transitions
+
+Trigger transitions are used to show how one state will activate other states. Use this to indicate how software states impact physical states or how states between different hierarchies interact. This type of transition is used to render the tree view of how states activate other states. The trigger is also special in that it will not deactivate the fromState.
+
+<Note>Trigger transition types will only activate `toStates` and leave `fromStates` activate.</Note>
+
+### Failure Transitions
+
+Failure transitions represent error handling and fault recovery paths. They are the same as a trigger transition and used specifically to mark error conditions or failures, with special rendering features.
+
+<Note>Failure transition types will only activate `toStates` and leave `fromStates` activate.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing transition connections. |
+| [History](/pages/user-guide/navigating/model) | Track changes to attributes of the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the transition and the conditions that trigger it.
+</ParamField>
+
+<ParamField path="Kind" type="enum">
+  The type of transition, which determines its behavior and triggering semantics.
+
+  **Options:**
+  - **default**: Standard transition that occurs when its condition is satisfied
+  - **trigger**: Event-triggered transition activated by specific signals or events
+  - **failure**: Transition that occurs when an error or failure condition is detected
+
+  Default value: `default`
+</ParamField>
+
+<ParamField path="Conditional" type="string">
+  A boolean expression that must evaluate to true for the transition to occur.
+
+  The conditional can reference attributes using the `@` notation and use standard comparison and logical operators.
+
+  **Examples:**
+  - `@temperature > 100`
+  - `and(@mode == "active", @battery_level > 20)`
+  - `or(@error_count >= 3, @timeout_occurred)`
+
+  If empty, the transition always occurs when triggered (for trigger kind) or is always available (for default kind). Transition conditionals use standard syntax with attribute references. See [Equations](/pages/modeling/common/equations) for complete syntax reference.
+
+  <Note>"t" is a global variable that is used in code simulations. Using "t > 30" will link to simulations automatically.</Note>
+</ParamField>
+
+<ParamField path="From State" type="reference">
+  Reference to the State object from which this transition originates.
+
+  This is the source state that the system must be in for this transition to be considered.
+
+  [Read more about States](/pages/modeling/objects/state)
+</ParamField>
+
+<ParamField path="To States" type="array">
+  Array of references to State objects that are the potential targets of this transition.
+
+  **Single Target**: Most transitions specify one target state, creating deterministic behavior.
+
+  **Multiple Targets**: When multiple target states are specified, the transition will trigger all of them at once.
+
+  [Read more about States](/pages/modeling/objects/state)
+</ParamField>
+
+<ParamField path="Probability" type="number">
+  Probability value (0.0 to 1.0) used for probabilistic state transitions.
+
+  When multiple transitions from the same state have probability values, the system selects which transition to take based on these probabilities. This enables modeling of stochastic systems and reliability analysis.
+
+  **Example**: A transition with probability 0.95 represents a 95% chance of taking that path, while a parallel transition with probability 0.05 represents a 5% chance (failure case).
+
+  Default value: `0` (not probabilistic)
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this transition.
+
+  Attributes can store metadata about the transition such as execution counts, timing information, or configuration parameters.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+

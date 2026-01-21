@@ -1,0 +1,76 @@
+---
+title: Geometric View
+---
+
+## Description
+
+The Geometric View provides a 3D visualization and editing environment for Geometry objects. This view uses a three-pane layout with code editor, 3D viewer, and output terminal, supporting both programmatic geometry definition and imported CAD files.
+
+The left pane contains a code editor for defining geometry using a scripting language, the middle pane displays a 3D rendering of the geometry, and the right pane shows compilation output and messages.
+
+## View Controls
+
+### Code Editor (Left Pane)
+
+For script-based geometries, define 3D shapes, assemblies, and operations using geometry scripting syntax. The editor provides syntax highlighting and auto-completion.
+
+For STEP file imports, the left pane displays information about the imported geometry instead of a code editor.
+
+### Wrap
+
+Toggle line wrapping in the code editor for better readability of long lines.
+
+### Compile
+
+Generates the 3D geometry from your script code. This validates your geometry definition and reports any errors in the terminal pane. The compiled geometry appears in the 3D viewer.
+
+### Wireframe Mode
+
+Toggle between visualization modes:
+- **Solid**: Shaded 3D geometry with surfaces
+- **Wireframe**: Line rendering showing edges and structure
+- **Transparent**: Semi-transparent surfaces with visible internal structure
+
+### 3D Viewer (Middle Pane)
+
+Displays the rendered 3D geometry with interactive controls.
+
+**Rotate**: Click and drag to rotate the view around the geometry.
+
+**Pan**: Right-click and drag (or Shift + click and drag) to pan the view.
+
+**Zoom**: Use mouse wheel or pinch gestures to zoom in and out.
+
+**Home**: Reset view to default position and zoom level.
+
+### Output Terminal (Right Pane)
+
+Shows compilation messages, errors, geometry statistics, and other output from geometry operations.
+
+## Geometry Definition
+
+Geometry scripts can include:
+- **Primitive Shapes**: Boxes, spheres, cylinders, cones, and other basic shapes
+- **Boolean Operations**: Union, intersection, subtraction to combine shapes
+- **Transformations**: Translation, rotation, scaling, and mirroring
+- **Imported Geometry**: Reference to external CAD files or other geometry objects
+
+## Supported Formats
+
+**Script-Based**: Define geometry programmatically using built-in geometry language.
+
+**STEP Files**: Import standard ISO 10303 STEP CAD files for viewing and integration.
+
+## Use Cases
+
+**3D Modeling**: Create parametric 3D geometry for parts, assemblies, and systems directly within Davinci.
+
+**CAD Integration**: Import STEP files from external CAD tools and integrate them into system models with associated properties and relationships.
+
+## Export Options
+
+Geometric objects can be exported for use in CAD and manufacturing tools.
+
+| Format | Description |
+|--------|-------------|
+| STEP | Export geometry as ISO 10303 STEP file for CAD tool compatibility |

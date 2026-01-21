@@ -1,0 +1,384 @@
+---
+title: Slides
+---
+
+<img height="20" noZoom src="/images/objecticons/slide.svg" /> 
+
+## Description
+Slides provide a presentation environment for creating visual communications directly connected to your model data. They combine the flexibility of traditional slide software with dynamic links to model objects, enabling presentations that automatically update as your design evolves. Slides support multiple element types, custom layouts, templates, and full-screen presentation mode.
+
+Presentations use a 16:9 aspect ratio by default (853×480 pixels) but support custom dimensions including 4:3 and document-style layouts. Each slide contains positioned elements like text boxes, images, figures, tables, shapes, and lines that you can freely arrange and style.
+
+<Info>Slides are edited from the slide view only</Info>
+
+## Slide Elements
+
+Slides are composed of positioned elements that you can place anywhere on the slide canvas. Each element type serves a specific purpose:
+
+### Text Box Elements
+Text box elements contain formatted text content with full styling capabilities. Text boxes support paragraphs, numbered lists, and bulleted lists, each with independent formatting.
+
+**Text boxes support:**
+- Multiple paragraphs with individual alignment
+- Font styling (bold, italic, underline)
+- Font size and color customization
+- Numbered and bulleted lists
+- Vertical alignment (top, middle, bottom)
+- Background fill color
+- Border styling with thickness, color, and radius
+
+Text boxes can be resized and repositioned anywhere on the slide. They automatically wrap text to fit the box dimensions.
+
+### Image Elements
+Image elements display images from Reference objects in your model. You can insert images by:
+
+1. Using the Insert menu and selecting an image reference
+2. **Dragging and dropping** images directly from the index onto the slide
+
+When you drag an image from the index onto a slide, it automatically uploads the image and adds it to the slide. Dragging multiple images is supported.
+
+### Figure Elements
+Figure elements are images with associated captions and automatic numbering. They work similarly to figures in documents, maintaining sequential numbering (Figure 1, Figure 2, etc.) across all slides in the presentation.
+
+Figures are useful when you need to formally reference images in presentation notes or documentation.
+
+### Table Elements
+Table elements embed data tables within slides. These tables support basic data display with text and reference cells, making them ideal for showing specifications, comparisons, or traceability information.
+
+<Note>Slide tables are designed for data display, not calculation. For spreadsheet functionality, use standalone [Table objects](/pages/modeling/objects/tables).</Note>
+
+### Shape Elements
+
+#### Circle Elements
+Circle elements create circular or elliptical shapes that can be styled with fill colors and borders. Circles are useful for callouts, diagrams, or decorative elements.
+
+#### Line Elements
+Line elements draw straight lines between two points. Lines support extensive customization:
+
+- **Stroke Color**: Choose any color for the line
+- **Stroke Width**: Control line thickness (in pixels)
+- **Line Style**: Select solid, dashed, or dotted patterns
+- **Start Arrow**: Add arrow, circle, or square endpoints to the start
+- **End Arrow**: Add arrow, circle, or square endpoints to the end
+
+Lines are perfect for creating diagrams, flowcharts, or emphasizing connections between slide elements.
+
+## Templates
+
+Templates provide reusable slide layouts that ensure consistent design across your presentation. Templates define background elements, decorative shapes, and layout guidelines that appear on content slides.
+
+### Creating Templates
+
+1. Switch to the **Templates** view in your presentation
+2. Create template slides with your desired layout elements
+3. Add decorative elements (shapes, lines, logos, static text)
+4. Name each template (e.g., "Title Slide", "Content Slide", "Conclusion")
+
+### Using Templates
+
+When creating content slides, you can assign a template:
+- Template elements appear as non-editable background layers
+- Content elements you add appear on top of the template
+- If you update the template, all slides using it update automatically
+
+### Template Placeholder Types
+
+Templates recognize three special placeholder element types that content slides can override:
+- **Title**: Main slide heading
+- **Subtitle**: Secondary heading
+- **Content**: Body text area
+
+When a content slide uses a template, these placeholders are replaced by the slide's actual content while other template elements (logos, decorative shapes, borders) remain visible.
+
+<Note>Templates are shared across all slides in a presentation. Updating a template instantly updates all slides that use it.</Note>
+
+## Text Formatting
+
+Slide text elements provide comprehensive formatting controls.
+
+### Font Styling
+
+#### Bold, Italic, and Underline
+Apply standard text decorations to emphasize content. These can be combined (e.g., bold italic text).
+
+**Keyboard shortcuts:**
+- Bold: `Ctrl/Cmd + B`
+- Italic: `Ctrl/Cmd + I`
+- Underline: `Ctrl/Cmd + U`
+
+#### Font Size
+Adjust text size for headings, body text, or emphasis. Font sizes are specified in points.
+
+#### Font Color
+Apply custom colors to text selections using the color picker.
+
+<Note>Text formatting applies to the current selection. If no text is selected, formatting becomes active for subsequently typed text.</Note>
+
+### Text Alignment
+
+Four horizontal alignment options control how text aligns within its text box:
+
+- **Left Align**: Text aligns to the left edge
+- **Center Align**: Text centers horizontally
+- **Right Align**: Text aligns to the right edge
+- **Justify**: Text stretches to align with both edges
+
+### Vertical Alignment
+
+Text boxes also support vertical alignment, controlling where text appears within the box's height:
+
+- **Top**: Text starts at the top of the box
+- **Middle**: Text centers vertically
+- **Bottom**: Text aligns to the bottom
+
+Vertical alignment is especially useful for title slides and ensuring consistent text positioning across slides.
+
+### Block Transformations
+
+Convert text between different structural types:
+
+- **Transform to Paragraph**: Convert lists to standard paragraphs
+- **Transform to Numbered List**: Convert paragraphs to numbered items
+- **Transform to Bulleted List**: Convert paragraphs to bulleted items
+
+## Model Object References
+
+Like documents, slides support inline references to model objects using `@` notation. These references dynamically update when the underlying model changes.
+
+### Creating References
+
+1. Type `@` in any text box element
+2. Select an object from the dropdown
+3. Choose to display the object's name or a specific attribute value
+
+### Reference Display Options
+
+**Display Name**: Shows the object's name as a link
+```
+Component: @MyPart
+```
+
+**Display Value**: Shows an attribute value
+```
+Mass: @MyPart.mass kg
+Cost: $@MyPart.cost
+```
+
+References automatically update when objects are renamed or attribute values change, ensuring your presentation always reflects current data.
+
+
+
+## Element Styling
+
+### Fill Colors
+
+Most elements (text boxes, shapes) support background fill colors. Select elements and use the Fill color picker to choose any color. Use "transparent" for see-through backgrounds.
+
+### Borders
+
+Elements support customizable borders with three properties:
+
+- **Border Thickness**: Width in pixels (0px for no border)
+- **Border Color**: Any color from the picker
+- **Border Radius**: Corner rounding in pixels (0px for sharp corners)
+
+### Line Styling
+
+For line elements specifically, styling options include stroke color, width, style (solid/dashed/dotted), and endpoint arrows or shapes.
+
+## Resizing and Rotating Elements
+
+Elements on slides can be freely resized and rotated to achieve the desired layout and composition.
+
+### Resizing Elements
+
+To resize an element:
+
+1. Click to select the element
+2. Corner grab points appear on all four corners
+3. Click and drag any corner grab point to resize
+4. The element scales proportionally while maintaining its aspect ratio
+
+Resizing works for all element types including text boxes, images, figures, tables, and shapes. Text boxes will reflow text content to fit the new dimensions.
+
+<Note>Hold `Shift` while dragging a corner to resize without maintaining aspect ratio (if supported by the element type).</Note>
+
+### Rotating Elements
+
+To rotate an element:
+
+1. Click to select the element
+2. A rotation grab point appears at the top center of the element
+3. Click and drag the rotation grabber to rotate the element around its center
+4. The element rotates freely to any angle
+
+Rotation applies to all element types, allowing you to create dynamic layouts, angled callouts, or artistic compositions. Rotated text boxes maintain text readability while the container rotates.
+
+**Rotation Tips:**
+- Rotate images and shapes to create visual interest
+- Angle text boxes for emphasis or stylistic effect
+- Combine rotation with positioning for diagram creation
+
+<Info>Element rotation and size are preserved when exporting to PDF or PPTX formats.</Info>
+
+## Element Stacking Order
+
+When multiple elements overlap on a slide, their stacking order (z-order) determines which elements appear in front of or behind others. You can control this layering through the right-click context menu.
+
+### Changing Stack Order
+
+To adjust an element's position in the stack:
+
+1. Right-click on the element
+2. Choose from the stacking options:
+
+**Order Up**: Moves the element one layer forward, swapping positions with the element directly above it.
+
+**Order Down**: Moves the element one layer backward, swapping positions with the element directly below it.
+
+**Bring to Front**: Moves the element to the very top of the stack, placing it above all other elements.
+
+**Send to Back**: Moves the element to the very bottom of the stack, placing it behind all other elements.
+
+<Note>Templates automatically layer template elements behind content elements, ensuring your content always appears on top of the template design.</Note>
+
+## Slide Layout
+
+### Slide Background
+
+Set the presentation-wide background color using the Slide Background color picker. This applies to all slides unless overridden by templates.
+
+### Slide Dimensions
+
+Configure slide size through the Slide Size menu:
+
+**Preset Sizes:**
+- **16:9 (853 × 480)**: Standard widescreen format (default)
+- **4:3 (640 × 480)**: Traditional presentation format
+- **8.5 × 11 (816 × 1056)**: Document/letter format for printed handouts
+
+**Custom Sizes:**
+Enter specific width and height dimensions in pixels for specialized formats. Click "Apply Changes" to resize all slides in the presentation.
+
+<Note>Changing slide dimensions affects all slides in the presentation and may require repositioning elements.</Note>
+
+## Insert Options
+
+The Insert menu provides access to all element types you can add to slides:
+
+### Elements
+- **Text Box**: Add a formatted text container
+- **Image**: Insert an image from a model Reference object
+- **Figure**: Insert a numbered figure with caption
+- **Table**: Embed a data table
+- **Circle**: Add a circular/elliptical shape
+- **Line**: Draw a connecting line
+
+### Text Content (within text boxes)
+- **Paragraph**: Insert a new paragraph block
+- **Numbered List**: Add a numbered list item
+- **Bulleted List**: Add a bulleted list item
+
+<Info>Elements insert at the center of the slide. Drag them to reposition and resize using the corner handles.</Info>
+
+## Slide Management
+
+### Slide Preview Panel
+
+The left preview panel shows thumbnails of all slides in order:
+
+- Click any thumbnail to edit that slide
+- Drag thumbnails to reorder slides
+- Thumbnails update automatically as you edit
+
+### Adding Slides
+
+While slide templates are available (Title Slide, Content Slide, Blank Slide), new slides are typically added through the presentation interface, allowing you to choose or create layouts as needed.
+
+### Zoom Controls
+
+Adjust the editor view with zoom controls:
+
+- **Zoom Range**: 10% to 300%
+- **Zoom In/Out**: Use + and - buttons
+- **Manual Entry**: Type a zoom percentage and press Enter
+- **Fit to Screen**: Auto-scale the slide to fit the editor window
+- **Keyboard**: `Ctrl/Cmd + Mouse Wheel`
+
+<Note>Zoom affects only the editing view—it doesn't change slide dimensions or export size.</Note>
+
+## Presentation Mode
+
+Launch full-screen presentation mode using the "Present" button:
+
+- **Navigation**: Use arrow keys or click to advance/go back
+- **Full Screen**: Presentations fill the screen with no interface elements
+- **Exit**: Press `Esc` to return to editing mode
+
+Presentation mode displays slides at their actual proportions, making it perfect for stakeholder reviews and design presentations.
+
+## Refreshing Figures
+
+Figures in slides cache their rendered images for performance. When diagrams or visualizations update in your model, refresh figures to show current data:
+
+- **Refresh Current Slide**: Updates all figures on the active slide
+- **Refresh All Slides**: Updates figures throughout the entire presentation
+
+The refresh operation clears cached figure images and re-renders them from current model data.
+
+## Exporting Presentations
+
+### Export to PDF
+
+Export presentations as PDF files for sharing and printing:
+
+1. Click the export button
+2. Select "PDF" format
+3. Click "Download"
+
+PDF export preserves slide layout, fonts, colors, and images. Each slide becomes a page in the PDF, maintaining exact proportions and positioning.
+
+### Export to PPTX
+
+Export to Microsoft PowerPoint format (.pptx):
+
+1. Click the export button
+2. Select "PPTX" format  
+3. Click "Download"
+
+PPTX export converts slides to PowerPoint format, preserving:
+- Text content and basic formatting
+- Images and shapes
+- Slide layout and dimensions
+
+<Warning>Dynamic model references convert to their current display values in exports. Exported presentations don't maintain live connections to model data.</Warning>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Slide Editor](#slide-editor) | Edit slide content and layout. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+

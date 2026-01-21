@@ -1,0 +1,92 @@
+---
+title: Plot View
+---
+
+<img width="50" noZoom src="/images/plot-icon.png" />
+
+The Plot View visualizes resource expenditure over time, allowing you to analyze and track resource consumption patterns across your project timeline.
+
+## Overview
+
+The Plot View is specifically designed for Resource objects, providing visual analysis of how resources are consumed over time. You can view resource usage as either cumulative totals or momentary rates, helping you understand resource demands and identify peak usage periods.
+
+## View Controls
+
+The Plot View includes several configurable options to customize your visualization:
+
+### Depth
+
+Controls how many levels of child resources to include in the plot. Resource objects can contain nested child resources, and the depth setting determines how deep into this hierarchy to traverse.
+
+- **Depth 1**: Only the current resource
+- **Depth 2**: Current resource plus immediate children
+- **Depth 3+**: Includes multiple levels of nested resources
+
+Higher depth values provide more comprehensive resource tracking but may include more data in the visualization.
+
+### Time Scale
+
+Choose the time unit for the X-axis:
+
+- **Days**: View resource usage across daily intervals
+- **Months**: View resource usage across monthly intervals
+- **Years**: View resource usage across yearly intervals
+
+The time scale determines how resource data is binned and displayed on the chart.
+
+### Cumulative Toggle
+
+Switch between two visualization modes:
+
+- **Cumulative (checked)**: Shows total accumulated resource usage from the start date to each point in time. The line trends upward as resources are consumed.
+- **Momentary (unchecked)**: Shows the rate of resource usage at each time period. This displays peaks and valleys in resource demand.
+
+## Chart Display
+
+The Plot View shows:
+
+- **Line Chart**: Resource values plotted over time
+- **Legend**: List of all resources included in the plot (on the left side)
+  - Click legend items to show/hide specific resources
+  - Resource names are displayed with color indicators
+- **Interactive Controls**: Zoom, pan, and hover to explore the data
+
+### Legend Panel
+
+The legend panel on the left displays:
+- Resource names
+- Color coding for each resource line
+- Toggle visibility for individual resources
+- Resizable width (drag the edge to adjust)
+
+## Use Cases
+
+**Budget Tracking**: Monitor cumulative spending against project budgets and timelines.
+
+**Resource Planning**: Identify when resources will be needed and in what quantities.
+
+**Peak Analysis**: Find periods of maximum resource demand using momentary view.
+
+**Allocation Optimization**: Understand resource distribution across project phases.
+
+**Trend Analysis**: Spot patterns in resource consumption over time.
+
+## Supported Resource Types
+
+The Plot View works with:
+- Cost/budget resources (monetary values)
+- Material resources (inventory quantities)
+- Labor resources (man-hours, person-months)
+- Any resource with time-based allocation data
+
+<Note>
+Resources must have time-based data (dates, durations, or time allocations) to appear meaningfully in the Plot View.
+</Note>
+
+## Example Scenarios
+
+**Cumulative View**: See total project spending from start to finish, useful for tracking against overall budget.
+
+**Momentary View**: Identify months with highest labor requirements, useful for staffing and resource allocation planning.
+
+**Multi-Resource**: Compare multiple resource streams (e.g., labor costs vs. material costs) to understand composition of project expenses.

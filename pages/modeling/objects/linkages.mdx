@@ -1,0 +1,67 @@
+---
+title: Linkages
+---
+
+<img height="20" noZoom src="/images/objecticons/linkage.svg" /> 
+
+## Description
+Linkages represent mechanical connections and kinematic relationships between physical components in a system. In SysML v2, linkages are parts, in Davinci they are parts used for specialized structural elements to model joints, cables, couplings, and other physical connections that constrain the relative motion or provides flow of an interface between parts.
+
+<Note>Linkages are particularly important for modeling cables, working with ports and interfaces to define the physical thing which flows the interfaces.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the linkage. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing linkage connections. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the linkage, including the type of mechanical connection and its purpose in the system.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this linkage.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this linkage.
+
+  Constraint Equations and Analysis Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+

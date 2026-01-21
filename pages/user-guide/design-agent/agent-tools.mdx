@@ -1,0 +1,194 @@
+---
+title: Agent Tools
+---
+
+## Description
+
+The Davinci agent has access to a comprehensive set of tools that extend its capabilities beyond conversation. These tools enable the agent to interact with your model, search the web, source parts, and perform specialized operations automatically during conversations.
+
+Tools are invoked automatically by the agent when needed to complete tasks. You don't need to manually select tools—the agent determines which tools to use based on your requests and the context of the conversation.
+
+## Core Tools (Always Available)
+
+Core tools are fundamental capabilities that are always available to the agent regardless of project settings.
+
+### Web Search
+
+**Description**: Search the internet for up-to-date information, technical documentation, research papers, and current data.
+
+**Usage**: The agent automatically searches the web when it needs information not available in the model or when asked to find current data.
+
+**Example**: "Search for the latest NASA Mars mission specifications" triggers a web search to find current information.
+
+### Project Inspection
+
+**Description**: Query and explore the project structure, find objects, and retrieve detailed information about model elements.
+
+**Capabilities:**
+- **Get Project Tree**: View the complete hierarchy of objects in the project
+- **Find Objects**: Search for objects by name, type, or properties
+- **Get Object Details**: Retrieve comprehensive information about specific objects
+- **Get Object Context**: Understand how objects relate to surrounding model elements
+
+**Usage**: Used automatically when the agent needs to understand the model structure or find specific objects to work with.
+
+### Model Manipulation
+
+**Description**: Create, update, move, and delete objects within the model.
+
+**Capabilities:**
+- Create new objects of any type
+- Update object properties, attributes, and relationships
+- Move objects to different locations in the hierarchy
+- Delete objects when requested
+- Rename objects and update documentation
+
+**Usage**: Invoked when you ask the agent to modify the model, such as "Create a requirement for sensor accuracy" or "Update the mass attribute."
+
+### Toolbox Management
+
+**Description**: Control which built-in and custom toolboxes are available during agent sessions.
+
+**Capabilities:**
+- **Open Toolbox**: Activate additional domain-specific toolboxes
+- **Close Toolbox**: Deactivate toolboxes to reduce context and improve focus
+
+**Usage**: The agent opens relevant toolboxes automatically when specialized capabilities are needed, then closes them afterward to maintain efficiency.
+
+## Built-in Domain Toolboxes
+
+Davinci includes specialized toolboxes for different engineering domains. These are activated automatically by the agent when working in specific areas.
+
+### Parts & Components
+Tools for creating and managing part hierarchies, assemblies, and component specifications.
+
+### Documents & Artifacts
+Tools for generating documents, tables, slides, and other artifacts from model data.
+
+### Geometries
+Tools for working with 3D geometry, CAD models, and spatial relationships.
+
+### Resources & Scheduling
+Tools for resource allocation, project scheduling, and timeline management.
+
+### Behavior Modeling
+Tools for defining system behavior, state machines, and activity flows.
+
+### Software Engineering
+Tools for software architecture, code generation, and software component modeling.
+
+### Simulation
+Tools for setting up and running simulations, analysis, and performance evaluation.
+
+### Requirements Engineering
+Tools for creating, linking, and verifying requirements throughout the model.
+
+### Risk Management
+Tools for identifying, assessing, and tracking project risks.
+
+### Attributes & Analysis
+Tools for managing parametric models, equations, and calculated values.
+
+### Tasks & Project Management
+Tools for task breakdown, dependencies, and project tracking.
+
+### Tags & Organization
+Tools for organizing model elements with tags and metadata.
+
+### Constraints & Verification
+Tools for defining and checking constraints, validating designs.
+
+### Comments & Collaboration
+Tools for adding comments, notes, and collaborative annotations.
+
+### Entities & Relationships
+Tools for modeling entities, connections, and relationship networks.
+
+### Circuits & Electronics
+Tools for electronic circuit design, schematic capture, and component selection.
+
+## Part Sourcing Tools
+
+The agent can search for and retrieve specifications for physical components from major suppliers.
+
+### Digikey Integration
+
+**Description**: Search Digikey's catalog for electronic components and retrieve detailed specifications.
+
+**Capabilities:**
+- Search by part number, description, or specifications
+- Retrieve datasheets and technical parameters
+- Get current pricing and availability
+- Extract specifications into model attributes
+
+**Example**: "Find a 10kΩ resistor on Digikey" searches the catalog and can create component objects with specifications.
+
+### Additional Sourcing (When Available)
+
+- **McMaster-Carr**: Industrial parts, hardware, materials
+- **SatCatalog**: Satellite components and space hardware
+
+<Note>Part sourcing tools require appropriate API credentials configured in your Davinci deployment.</Note>
+
+## Custom Tools
+
+Beyond built-in tools, you can create custom tools specific to your organization's needs.
+
+### Creating Custom Toolboxes
+
+Custom toolboxes are created using Toolbox objects in your project. See the [Toolbox documentation](/pages/modeling/objects/toolbox) for detailed information on:
+- Defining tool functions in Python
+- Connecting to proprietary APIs
+- Creating organization-specific workflows
+- Sharing toolboxes across projects
+
+### Activating Custom Tools
+
+Custom toolboxes must be explicitly enabled to make them available to the agent:
+
+1. Create a Toolbox object in your project
+2. Define tools using the `davinci.tool()` decorator
+3. Toggle the toolbox to "Active" in the Toolbox view
+4. Tools become available to the agent automatically
+
+## How the Agent Uses Tools
+
+### Automatic Tool Selection
+
+The agent analyzes your requests and automatically determines which tools are needed:
+
+1. **Task Analysis**: Understands what you're asking for
+2. **Tool Selection**: Chooses appropriate tools based on required capabilities
+3. **Sequential Execution**: Calls multiple tools in sequence if needed
+4. **Result Integration**: Combines tool outputs into coherent responses
+
+### Tool Usage Visibility
+
+You can see when the agent uses tools in the chat interface:
+
+- Tool invocations appear in the conversation log
+- Tool names and parameters are shown
+- Tool outputs are displayed or summarized
+- Multiple tool calls are grouped chronologically
+
+### Tool Parameters
+
+The agent automatically determines tool parameters based on context:
+- Extracts object references from your messages
+- Infers search queries from natural language
+- Determines appropriate scopes and filters
+- Provides sensible defaults when needed
+
+<Info>The agent is designed to use tools transparently. Most tool usage happens behind the scenes, with only significant operations visible in the chat log.</Info>
+
+## Best Practices
+
+**Be Specific**: Clear requests help the agent select the right tools. Instead of "find information," say "search the web for recent publications on carbon fiber composites."
+
+**Provide Context**: Mention relevant objects or areas of the model so the agent can use inspection tools effectively.
+
+**Review Tool Actions**: Check what the agent did with model manipulation tools, especially for bulk operations or deletions.
+
+**Custom Tools for Repetitive Tasks**: If you find yourself repeatedly asking for the same type of information, consider creating a custom tool for it.
+
+**Trust but Verify**: The agent is powerful, but always review important changes it makes to your model before proceeding.

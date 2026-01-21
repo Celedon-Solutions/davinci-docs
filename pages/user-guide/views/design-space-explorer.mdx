@@ -1,0 +1,105 @@
+---
+title: Design Space Explorer
+---
+
+<img width="50" noZoom src="/images/design-space-icon.png" />
+
+The Design Space Explorer is an interactive tool that allows you to explore how changing input parameters affects computed values throughout your model, without permanently modifying your data.
+
+## Overview
+
+The Design Space Explorer creates an interactive sandbox where you can adjust independent variables using sliders and immediately see how those changes propagate through dependent calculations. This enables rapid "what-if" analysis and design space exploration without committing changes to your model.
+
+All changes made in the Design Space Explorer are temporary and local until you explicitly apply them to your model.
+
+## View Layout
+
+The Design Space Explorer uses a two-panel layout:
+
+### Left Panel: Independent Variables
+
+The left panel displays attributes that have no dependencies (independent variables). These are the inputs you can control:
+
+- **Sliders**: Adjust values by dragging sliders
+- **Direct Input**: Type exact values into input fields
+- **Range Configuration**: Min, max, and step values are automatically determined based on the current value
+
+**Intermediate Variables** section (collapsible):
+- Shows upstream dependent variables that have their own dependencies
+- These update automatically based on independent variable changes
+- Cannot be directly adjusted (they're computed from other values)
+
+### Right Panel: Dependent Variables
+
+The right panel displays:
+
+- **Focused Object**: The main attribute you're exploring (shown at top if it has dependencies)
+- **Downstream Dependents**: All objects that depend on the focused object
+- Values update in real-time as you adjust sliders
+
+## How It Works
+
+The Design Space Explorer:
+
+1. Analyzes the dependency graph for the focused object
+2. Identifies independent variables (leaves with no dependencies)
+3. Identifies dependent variables (nodes that rely on others)
+4. Creates an isolated computation environment
+5. Recalculates values locally as you adjust sliders
+6. Shows real-time propagation of changes through the dependency chain
+
+<Note>
+All calculations happen locally in your browser. No changes are saved to the database until you apply them.
+</Note>
+
+## Using the Design Space Explorer
+
+### Adjusting Values
+
+1. **Drag Sliders**: Move the slider handle to adjust values continuously
+2. **Type Values**: Click the value display to type exact numbers
+3. **Observe Changes**: Watch dependent values update in real-time
+
+### Applying Changes
+
+When you find a desirable configuration:
+
+1. Review the updated values in both panels
+2. Click the **Apply Changes** button (if available)
+3. Changes will be committed to your model
+
+### Resetting Changes
+
+To discard all changes and return to original values:
+- Close the Design Space Explorer view
+- All temporary changes are discarded automatically
+
+## Supported Object Types
+
+The Design Space Explorer works with:
+- **Attributes** with numeric values and equations
+- Objects that have attribute dependencies
+- Parametric models with equation-based relationships
+
+## Use Cases
+
+**Design Optimization**: Explore different parameter combinations to find optimal designs.
+
+**Trade-Off Analysis**: Understand how changes in one parameter affect multiple dependent values.
+
+**Sensitivity Analysis**: Identify which input parameters have the most significant impact on outputs.
+
+**Constraint Validation**: Verify that parameter changes stay within acceptable ranges.
+
+**What-If Scenarios**: Test hypothetical configurations without modifying your model.
+
+## Limitations
+
+- Only works with numeric attributes and constraints
+- Requires evaluatable equations (not TBD or error states)
+- Changes are temporary until explicitly applied
+- Complex circular dependencies may not be supported
+
+<Note>
+The Design Space Explorer is most effective when working with well-structured parametric models where dependencies are clearly defined through equations.
+</Note>

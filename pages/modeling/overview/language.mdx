@@ -1,0 +1,31 @@
+---
+title: System Modeling Language
+---
+
+## Language
+
+Davinci follows a modeling standard based on the System Modeling Language (SysML) v2 schema to represent concepts in its digital model. This schema is encapsulated within a database method that supports graphical interactions, with an intuitive search and traversal interface. At the core of this schema are `Objects`, which represent specific elements of the system being modeled. Each object has its own set of parameters, which can be defined, as well as child objects that further specify these parameters. Objects also interact with one another through various relationships, outlining how they connect and influence each other across the model.
+
+### Properties
+
+Objects have intrinsic properties that vary depending on their type. For instance, `Attributes` have a `Value` field that holds the data associated with the attribute. `Interfaces`, on the other hand, define the connections between `Ports`, detailing how these Ports interact with other elements in the system. These properties are crucial in shaping the behavior and functionality of Objects within the Model.
+
+### Parent-Child Relationships
+
+Objects can contain other objects of specific types, which further define the nature of the parent object. For example, a `Part Object` might contain the Attribute "Mass", or other Parts that contribute to defining the structure of its `Part Tree`. These Child Objects serve to clarify and expand on the characteristics of the Parent Object, helping to Model the System in more detail.
+
+### Relationships
+
+Objects can form connections with one another, signifying various types of interactions. For example, an "Engine" object may be linked to a "Fuel Tank" object, indicating the Engine's reliance on fuel provided by the tank. Alternatively, an object might have a specific owned port, which interfaces with other ports in the system.
+
+Relationships between objects can be directional and given a type:
+
+- `In Relationships` represent a flow of data or control into an Object. For example, a "Sensor" Object might have an "in" relationship with an "Actuator," allowing it to receive data from the Actuator about its current position.
+- `Out Relationships` signify the flow of data or control from an Object. For example, a "Controller" Object may have an "out" relationship with an "Actuator," enabling it to control the Actuator’s behavior through a data connection.
+- `InOut relationships` represent two-way interactions. For instance, a "Communication Module" Object might have an "inout" relationship with a "Radio Antenna" Object, where it can broadcast commands as well as receive communications from other systems.
+
+Relationships are categorized by their type and direction, ensuring clear definitions of object interactions within the system.
+
+### Extensions for Document-Based Artifacts
+
+In addition to the core SysML schema, there are several extensions available to facilitate the creation of custom document-based artifacts derived from the digital model. These extensions allow for the seamless integration of model objects into various document types. For example, variables within the model can be referenced in code, text within documents can include inline references to model objects, and table cells can object values based on the model’s current state. These extensions help bridge the gap between the model and real-world documentation, ensuring that the model data is consistently reflected across all generated artifacts seamlessly.

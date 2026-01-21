@@ -1,0 +1,39 @@
+---
+title: Dependencies
+---
+
+Dependencies allow you to extend the functionality of your [Code Objects](/pages/modeling/objects/code) by importing external Python libraries. These libraries are pulled from PyPI or a direct URL and made available to the project's Python environment.
+
+## Managing Dependencies
+
+### Adding Dependencies
+
+To add a new library to your project:
+
+1. Click the **New Dependency** button.
+2. Enter the **PyPI package name** (e.g., `pandas`, `requests`) OR the **URL** pointing to a specific package distribution.
+3. The system will attempt to resolve and install the package.
+
+<Note>
+Davinci runs Python code directly in the browser using a WebAssembly environment. Not all Python packages are compatible, particularly those that rely on C-extensions not compiled for WebAssembly (WASM).
+</Note>
+
+### Removing Dependencies
+
+To remove a package that is no longer needed:
+1. Find the package in the dependencies list.
+2. Click the **trash can icon** on the right side of the row.
+
+## Pre-installed Packages
+
+Davinci comes with a set of commonly used scientific and utility packages pre-installed. You do not need to add these as dependencies.
+
+See the [Code View documentation](/pages/user-guide/views/code#python-modules) for a full list of available pre-installed packages (including `numpy`, `scipy`, `matplotlib`, and more).
+
+## Version Control
+
+Dependencies are tracked as part of your project configuration in [Version Control](/pages/user-guide/right-panel/version-control). 
+
+- **Branch Consistency**: Different branches can have different sets of installed dependencies. If code works on one branch but not another, check the Dependencies list to ensure required packages are installed.
+- **Merging**: Dependency configurations are merged automatically. Unlike model objects, dependencies **cannot** generate merge conflicts; the system handles the reconciliation of package lists during a merge.
+

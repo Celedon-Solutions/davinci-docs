@@ -10,29 +10,36 @@ Objects in the model have defined relationships with each other that establish a
 ### Base Relationships
 | Property | Description                           |
 | -------- | ------------------------------------- |
-| `Uses`  | Specifies the attribute referenced into equations of other attributes. Can be `in` and `out`. |
-| `Reference`   | Used for between reference object and any other object type. Is `out` from the reference object and `in` to its target. |
+| `Uses`  | Indicates that one element makes use of another within the model. Can be `in` and `out`. |
+| `Reference`   | Denotes that a reference points to another element in the model. Is `out` from the reference object and `in` to its target. |
+| `Performs`     | Represents that a part or entity is responsible for performing a specific action. Is `out` from the part and `in` to the action. |
+| `Connect`   | Defines a connection between interfaces or ports. Is `inout`.|
+| `Realized`      | Indicates that the object realizes some intent, design, or function of another object. Can be `in` and `out`. |
+| `Subject`      | Defines the subject of a requirement, linking it to relevant parts, actions, or entities. Is `out` from the requirement and `in` to the target object. |
+| `Mitigation` | Indicates that one element mitigates a risk, issue, or other problem related to another element. Can be `in` and `out`. |
+| `Source` | Indicates the source or origin of the object or its intent. Can be `in` and `out`. |
+| `Impact` | Represents the impact that one element has on another. Can be `in` and `out`. |
+| `Dependency` | Indicates that one element depends on another. Can be `in` and `out`. |
+| `Resource` | Indicates that one element uses a resource. Can be `in` and `out`. |
+| `Validation` | Indicates that the element is validated by another element. Is `out` from the constraint and `in` to the target. |
+| `Transition` | Indicates a transition between states. Is `out` from one state and `in` to another state. |
+| `Result` | Indicates a result of one object occurring as a consequence of another object. Can be `in` and `out`. |
 
 
-### SysML Standard Relationships
-| Property | Description                           |
-| -------- | ------------------------------------- |
-| `Performs`     | Specifies what object performs the intent of an action.  Is `out` from the part and `in` to the action                 |
-| `Subject`      | Specifies the object that realizes a requirement.  Is `out` from the requirement and `in` to the target object                          |
-| `Connect`   | Used for interface relationships between ports as defined by interface objects. Is `inout`.|
 
+### Standard Custom Relationships
+New projects always start with set of base custom relationships. You can choose to remove these from the [project settings view](/user-guide/project-settings/relationship-settings). 
 
-
-### Part Specific Relationships
 <Note>All of the following are defined as `inout`.</Note>
 
 | Property        | Description                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------- |
-| `Data`            | Refers to the object that carries or provides the necessary information to perform an action.     |
-| `Power`           | Denotes the object that supplies energy or force to enable or achieve a desired effect or action. |
-| `Mechanical`      | Relates to physical systems and processes that involve motion, force, or mechanical interaction.   |
-| `Optical`        | Describes actions or interactions related to light, vision, or the properties of optical systems.  |
-| `Chemical`        | Refers to the relationships and interactions involving chemical substances or processes.          |
-| `Electromagnetic` | Defines the interactions or connections involving electromagnetic forces, such as electricity or magnetism. |
-| `Thermal`         | Pertains to heat-related interactions or processes, such as temperature changes or thermal energy transfer. |
+| `Data`            | Represents the exchange of data between parts.     |
+| `Power`           | Indicates a power connection between parts. |
+| `Mechanical`      | Denotes a mechanical connection between parts.   |
+| `Optical`        | Represents an optical link between parts.  |
+| `Chemical`        | Describes a chemical interaction between parts.          |
+| `Electromagnetic` | Represents an electromagnetic relationship between parts. |
+| `Thermal`         | Indicates a thermal exchange between parts. |
+| `Fluid`           | Indicates a fluid connection between parts. |
 

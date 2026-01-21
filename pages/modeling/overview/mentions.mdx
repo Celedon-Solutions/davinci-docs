@@ -1,0 +1,136 @@
+---
+title: The @ System
+---
+
+## Description
+
+The `@` system is Davinci's universal method for referencing model objects throughout the application. By typing `@` followed by an object name, you can create direct links and references between different parts of your model, enabling traceability, reusability, and dynamic calculations.
+
+The `@` system works consistently across multiple contexts—from agent chat to documents, tables, attributes, and more—providing a unified way to connect and reference any object in your model.
+
+<Info>When you type `@`, a search interface appears showing all objects in your model. You can filter by name, type, or tags to quickly find the object you need.</Info>
+
+## Where You Can Use @
+
+### Agent Chat
+
+In agent chat, use `@` to reference model objects and provide context to the AI agent. This helps the agent understand exactly which objects are relevant to your request.
+
+**Example uses:**
+- `"Update the mass attribute of @Satellite_Bus to 500 kg"`
+- `"Create a requirements traceability matrix for @Mission_Requirements"`
+- `"Analyze the design trade-offs between @Design_Option_A and @Design_Option_B"`
+
+When you reference an object using `@` in chat, the agent receives detailed information about that object, including its properties, attributes, relationships, and content. This ensures the agent has the full context needed to complete your task accurately.
+
+[Read more about Agent Chat](/pages/user-guide/right-panel/agent-chat)
+
+### Documents
+
+Documents support `@` references in two primary ways:
+
+#### Inline Text References
+You can also use `@` within document text to create inline references to model objects. These references are displayed as hyperlinks that open the referenced object when clicked.
+
+**Example:** "The satellite mass budget is documented in @Mass_Budget_Table and must not exceed the value specified in @Max_Launch_Mass."
+
+#### Reference Cells in Document Tables
+When creating tables inside documents, you can use reference cells to link to model objects. Type `@` in a cell and select an object to create a clickable link that displays key information about the referenced object.
+
+[Read more about Documents](/pages/modeling/objects/documents)
+
+### Tables
+
+Tables (standalone spreadsheet objects) support `@` references in two ways:
+
+#### Reference Cells
+Similar to document tables, standalone table reference cells display information about the linked object and provide navigation. Type `@` and select an object to convert the cell into a reference cell. From here, you can edit what information from the reference is shown, such as Name, Value, Documentation, and more.
+
+#### Equation References
+In equation cells, you can reference attributes and properties of model objects directly in formulas. This enables dynamic calculations that automatically update when the referenced objects change.
+
+**Examples:**
+- `=@Payload.mass + @Structure.mass` - Sum masses from two part objects
+- `=@Length_m * @Width_m` - Multiply attribute values
+- `=@Component.cost * 1.15` - Apply markup to a referenced cost value
+- `=SUM(A1:A10) + @Contingency_Mass` - Combine cell ranges with object references
+
+<Note>When referencing attributes in equations, use dot notation: `@ObjectName.attributeName`. The system automatically retrieves the current value of that attribute.</Note>
+
+[Read more about Tables](/pages/modeling/objects/tables)
+
+### Attributes
+
+Attributes can reference other attributes in their value field, creating calculated relationships between system properties. This is one of the most powerful uses of the `@` system, enabling parametric models where changes propagate automatically throughout your design.
+
+**Examples:**
+- `@Total_Mass` - Reference the value of another attribute
+- `@Length * @Width * @Height` - Calculate volume from three dimension attributes
+- `@Dry_Mass + @Propellant_Mass` - Sum multiple mass attributes
+- `@Base_Cost * (1 + @Risk_Factor)` - Apply risk-adjusted calculations
+
+The system supports automatic unit conversion when referencing attributes with different units. For example, if one attribute is in meters and another references it with units specified as feet, Davinci automatically performs the conversion.
+
+<Warning>If the units of referenced attributes are incompatible (e.g., trying to add length to mass), an error will be displayed. Hover over the error indicator to see details.</Warning>
+
+[Read more about Attributes](/pages/modeling/objects/attributes)
+
+### Constraints
+
+Constraints can use `@` references to create validation rules based on other objects in your model. This enables you to enforce design requirements and relationships dynamically.
+
+**Examples:**
+- `@Component_Mass <= @Mass_Limit` - Ensure a component doesn't exceed its mass budget
+- `@Total_Power < @Power_Supply_Capacity` - Verify power requirements are within limits
+- `@Design_Temperature >= @Min_Operating_Temp and @Design_Temperature <= @Max_Operating_Temp` - Check operating range
+
+[Read more about Constraints](/pages/modeling/objects/constraints)
+
+## Reference Syntax
+
+### Basic Reference
+```
+@ObjectName
+```
+Simply type `@` followed by the object name. The search interface will help you find and select the exact object.
+
+### Attribute Reference
+```
+@ObjectName.attributeName
+```
+To reference a specific attribute of an object, use dot notation. This is commonly used in equations and calculations.
+
+**Example:** `@Spacecraft.mass` references the `mass` attribute of the `Spacecraft` object.
+
+### Nested Attribute Reference
+```
+@ObjectName.subobject.attributeName
+```
+For complex hierarchies, you can chain references to access nested attributes.
+
+## Best Practices
+
+### Use @ for Traceability
+Create explicit links between requirements, designs, and verification items using `@` references. This builds traceability into your model from the start.
+
+### Build Parametric Models
+Use `@` references in attributes to create parametric models where changes automatically propagate. This reduces manual updates and keeps your model consistent.
+
+### Reference Early and Often
+Don't hard-code values that exist elsewhere in your model. Use `@` references instead to maintain a single source of truth.
+
+### Leverage Search Filters
+When the `@` search appears, use type filters and tags to quickly find the objects you need in large models.
+
+### Check Units
+When referencing attributes in equations, pay attention to units. While Davinci handles many unit conversions automatically, incompatible units will cause errors.
+
+### Use Descriptive Names
+Since objects are searched by name when you type `@`, use clear, descriptive names for your objects to make them easier to find and reference.
+
+## Related Documentation
+
+- [Search and Reference Guide](/pages/user-guide/navigating/model) - Learn more about searching and navigating your model
+- [Equations](/pages/modeling/common/equations) - Mathematical operations and syntax for calculations
+- [Relationships](/pages/modeling/common/relationships) - Understanding object relationships
+- [Object Types](/pages/modeling/objects/objects) - Complete overview of all object types

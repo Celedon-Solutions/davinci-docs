@@ -1,0 +1,59 @@
+---
+title: Object Locking
+---
+
+## Description
+
+Object locking allows you to protect important objects from accidental or unauthorized changes. When you lock an object from the Properties view, it becomes read-only for all users and the Davinci Agent until explicitly unlocked by a user. This feature is essential for maintaining the integrity of approved designs, baseline requirements, and other critical model elements.
+
+## What Object Locking Does
+
+- The object becomes completely read-only
+- All properties, attributes, and values cannot be modified
+- All children of the locked object are also locked
+- Neither users nor the Davinci Agent can edit the object or its contents until unlocked by a user
+
+## How to Lock Objects
+
+### Locking an Object
+
+From the Properties view:
+
+1. Open the object you want to lock
+2. In the name header at the top of the Properties view, locate the lock icon
+3. Click the lock icon (appears as an open padlock)
+4. The lock icon changes to a closed padlock
+5. The object and all its children are now locked
+
+### Unlocking an Object
+
+To unlock a previously locked object:
+
+1. Open the locked object in Properties view
+2. Click the closed lock icon in the name header
+3. The lock icon changes back to an open padlock
+4. The object and its children are now editable again
+
+<Warning>Only users with appropriate permissions can lock and unlock objects. Once locked, the object cannot be edited by anyone until unlocked.</Warning>
+
+## What Gets Locked
+
+### The Object Itself
+
+All properties of the locked object become read-only:
+- Name and short name
+- Documentation
+- Type-specific fields (values, equations, etc.)
+- Attributes and constraints
+- Relationships
+
+### All Children Objects
+
+Locking cascades down the hierarchy:
+- All objects contained within the locked object are also locked
+- Children cannot be edited, moved, or deleted
+- New children cannot be added to locked objects
+- The entire subtree becomes read-only
+
+**Example**: If you lock a Part object, all attributes, constraints, ports, and child parts within it also become locked.
+

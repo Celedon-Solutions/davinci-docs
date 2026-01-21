@@ -1,0 +1,63 @@
+---
+title: Block View
+---
+
+<img width="50" noZoom src="/images/block-icon.png" />
+
+## Description
+
+The Block View illustrates relationships between parts and their port interfaces in a block diagram format. This view automatically generates diagrams showing system architecture, component connections, and interface relationships.
+
+Parts are represented as rectangular blocks, with ports shown on block edges. Relationships between parts are visualized as lines connecting the relevant blocks or ports, providing a clear picture of system connectivity.
+
+## View Controls
+
+### Depth
+
+Controls how many levels of hierarchy to include in the block diagram. Shallow depth shows only top-level parts, while deeper settings reveal nested subsystems and components.
+
+### Orientation
+
+Choose between horizontal and vertical layout for the diagram. This affects how blocks are arranged and how connection lines are routed.
+
+### Show Documentation
+
+Toggle to display or hide documentation text for parts and interfaces within the diagram.
+
+### Refresh
+
+Regenerates the block diagram layout. Use this if the diagram needs updating after model changes or if blocks appear misaligned.
+
+## Diagram Elements
+
+**Blocks**: Rectangular boxes representing parts or subsystems. Block size and color may vary based on object type or properties.
+
+**Ports**: Small markers on block edges representing interface points. Port positions indicate connection locations.
+
+**Relationships**: Lines connecting blocks show relationships between parts. Line style may vary based on relationship type (connects, uses, etc.).
+
+**Inferred Relationships**: Relationships that exist at lower-level children are inferred when viewing upper-level objects. These appear as dotted lines in the diagram.
+
+<Note>Only relationships that specifically exist between parts are displayed in this view.</Note>
+
+## Interaction
+
+**Pan and Zoom**: Click and drag to pan around large diagrams. Use mouse wheel to zoom in and out.
+
+**Click Blocks**: Click on any block to open that part object.
+
+**Click Ports**: Click on ports to view or edit port details.
+
+## Use Cases
+
+**Architecture Visualization**: Understand system architecture by seeing how major subsystems and components connect and relate to each other.
+
+**Interface Analysis**: Identify all interfaces between parts, useful for integration planning and interface control documentation.
+
+## Export Options
+
+Block diagrams can be exported as images.
+
+| Format | Description |
+|--------|-------------|
+| PNG | Export block diagram as a high-resolution image |

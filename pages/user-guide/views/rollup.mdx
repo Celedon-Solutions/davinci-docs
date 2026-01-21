@@ -1,0 +1,56 @@
+---
+title: Rollup View
+---
+
+<img width="50" noZoom src="/images/tree-icon.png" />
+
+## Description
+
+The Rollup View is a special variant of the Tree View specific to Attribute Objects.
+
+The Rollup View visualizes the equation rollup tree for Attribute objects, showing how attribute values are calculated from referenced values and equations. Unlike the standard Tree View which shows ownership hierarchy, the Rollup View shows the computational dependency tree.
+
+This view is specifically designed for attributes with equations. It displays all the attribute values referenced in the equation, creating a tree that traces back through all dependencies to the leaf nodes where values are directly specified.
+
+## View Structure
+
+The tree representation shows:
+- **Root Node**: The attribute whose rollup you're viewing
+- **Branch Nodes**: Attributes referenced in equations at each level
+- **Leaf Nodes**: Attributes with directly specified values (no equation dependencies)
+
+Each node displays:
+- Attribute name
+- Current resolved value
+- Unit of measurement
+- Equation (if applicable)
+
+## Tracing Dependencies
+
+Following the tree from root to leaves shows exactly how a calculated value is derived. This is particularly useful for:
+- Understanding complex multi-level calculations
+- Debugging unexpected attribute values
+- Verifying calculation chains
+- Documenting computational models
+
+## Interaction
+
+**Expand/Collapse**: Click nodes to expand or collapse their dependency trees.
+
+**Click Attributes**: Click on any attribute to open that attribute object for detailed viewing or editing.
+
+**Value Propagation**: Changes to leaf node values automatically propagate up through the tree, updating dependent calculated values.
+
+## Use Cases
+
+**Calculation Verification**: Trace through multi-level calculations to verify that equations reference the correct attributes and produce expected results.
+
+**Debugging Models**: When an attribute has an unexpected value, use the rollup view to identify which input value or equation is causing the issue.
+
+## Export Options
+
+Rollup trees can be exported as images.
+
+| Format | Description |
+|--------|-------------|
+| PNG | Export rollup tree diagram as a high-resolution image |

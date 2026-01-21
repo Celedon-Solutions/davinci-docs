@@ -5,17 +5,67 @@ title: Constraints
 <img height="20" noZoom src="/images/objecticons/constraint.svg" /> 
 
 ## Description
-Constraints define a logical true or false statement. Typically used in requirements.
+Constraints define conditions, restrictions, or relationships among model elements that must be maintained to ensure system compliance with requirements and design criteria. In SysML v2, constraints are mathematical or logical expressions that specify rules the system must adhere to, such as performance thresholds, safety limits, physical laws, or design boundaries.
 
+Constraints are evaluable statements that return true or false, enabling automated verification of system properties. They can represent equations, inequalities, or logical conditions that govern system behavior and ensure that design decisions satisfy specified criteria. Constraints are commonly used within requirements to define the specific testable conditions for requirement verification, and within parametric analyses to express relationships between system properties for performance evaluation.
 
-## Fields
+## Unit Conversion and Validation
+
+### Automatic Unit Conversion in Constraint Equations
+
+Constraint expressions can reference attributes with different units, and Davinci automatically converts between compatible units during evaluation. This enables you to write constraints that compare or relate quantities in different unit systems.
+
+**Example:** A constraint checking whether a mass limit is satisfied can be written as:
+```
+@ComponentMass < @MassLimit
+```
+Even if `@ComponentMass` is in kilograms and `@MassLimit` is in pounds, Davinci converts both to a common unit before performing the comparison.
+
+Unit conversion applies to all mathematical operations within constraint equations:
+- Arithmetic operations: addition, subtraction, multiplication, division
+- Comparison operators: less than, greater than, equal to
+- Complex expressions involving multiple attributes with different units
+
+### Unit Validation in Constraints
+
+The system validates unit compatibility in constraint expressions to ensure physically meaningful comparisons and operations. When units are incompatible, the constraint shows an error state.
+
+**Invalid constraint expressions:**
+- Comparing incompatible units: `@Length > @Mass` (length vs mass)
+- Operations mixing incompatible types: `@Temperature + @Pressure`
+- Non-physical relationships: `@Time == @Distance`
+
+**Error reporting:**
+- Constraint status shows error indicator (red)
+- Hover over the constraint to see detailed unit mismatch information
+- Error message identifies which terms have incompatible units
+- Constraint evaluates as false when unit errors are present
+
+Unit validation ensures that constraints represent valid physical or logical relationships, helping maintain model integrity and catching specification errors.
+
+<Info>Unit conversions use the same unit system as attributes. See [Unit Settings](/pages/user-guide/project-settings/unit-settings) for custom unit definitions.</Info>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
@@ -23,3 +73,9 @@ Name of the object.
   Equation string that can be evaluated as true or false.
 </ParamField>
 
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

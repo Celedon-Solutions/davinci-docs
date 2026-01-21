@@ -1,0 +1,95 @@
+---
+title: Interfaces
+---
+
+<img height="20" noZoom src="/images/objecticons/interface.svg" /> 
+
+## Description
+Interfaces define the connections and relationships between ports, specifying how system components interact and communicate with each other. In SysML v2, interfaces represent the contracts for interactions between components, defining sets of operations, signals, and flows that components provide or require for proper system integration.
+
+Interfaces model the communication paths between systems by linking their ports together, indicating that components are connected and can exchange information, energy, or materials. Multiple ports can be connected through a single interface, creating complex interaction networks that represent how the system's internal architecture enables its functionality. Interfaces ensure compatibility and interoperability between components by defining what each component expects from the others and what it provides in return.
+
+### Working with Linkages
+
+Interfaces are often realized through physical linkages (cables, wires, hoses, etc.). The relationship between interfaces and linkages:
+
+- **Interface**: Defines the logical connection between any port and what flows between ports
+- **Linkage**: Represents the physical cable, wire, or conduit that implements the interface
+
+For example, to model a USB cable, you would use a combination of linkages, ports, and interfaces. The physical connection (the cable itself) would be represented as a linkage with ports at each end. Each port, in turn, connects to multiple interfaces that define the ground, power, and data lines running through the system. In this arrangement, the interface specifies what is being connected and how it flows across ports, often spanning across systems, while the linkage captures the physical aspect that implements the connection.
+
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing parts and connections. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Connect" type="array">
+  Array of port UUIDs that are connected by this interface.
+
+  This field lists all the ports that participate in this interface connection. Ports from different parts can be connected through a single interface, establishing communication paths between components.
+
+  **Example:**
+  An interface connecting a sensor to a processor would list both the sensor's output port and the processor's input port.
+</ParamField>
+
+<ParamField path="Topology" type="array">
+  Array of connection topology definitions specifying how ports are interconnected.
+
+  The topology field defines the specific connection patterns between ports in the interface. Each topology entry is an array of port UUIDs that form a connection group.
+
+  **Structure:**
+  ```
+  [
+    [@port1_uuid, @port2_uuid],      // Connection 1
+    [@port3_uuid, @port4_uuid],      // Connection 2
+    [@port5_uuid, @port6_uuid, ...]  // Connection N
+  ]
+  ```
+
+  Each group connects to the other based on the order of the groups. For simple linear chains, as is most common, use single uuids in each group. 
+
+  <Note>The topology field provides fine-grained control over how ports are interconnected, enabling complex connection patterns. They are critical to specify how data flows and to render diagrams properly.</Note>
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this interface.
+
+  Attributes can define interface characteristics such as bandwidth, voltage levels, impedance, flow rates, or other performance parameters.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+

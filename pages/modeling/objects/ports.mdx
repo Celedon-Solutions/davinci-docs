@@ -5,18 +5,63 @@ title: Ports
 <img height="20" noZoom src="/images/objecticons/port.svg" /> 
 
 ## Description
-Ports define the specific connection points between objects. 
+Ports specify interaction points on system components that define how parts interface with their environment and with each other. In SysML v2, ports are essential modeling elements that facilitate communication and interaction between system components, defining the interfaces through which information, energy, or material flows.
 
-  <Note>Ports should be used on the lowest level of a logical decomposition of a system that makes the interface.</Note>
+Ports encapsulate the interaction details of a component, hiding internal implementation while exposing only the necessary interface points. They specify what flows in and out of a component, what protocols are used, and what properties characterize the interactions. This enables modular system design where components can be developed independently as long as they satisfy their port specifications, ensuring proper integration and interoperability.
 
+Nesting a port can be used to model a connector housing with the children ports as the specific pinouts. At this time only one level of nesting is supported in the block render view.
 
-## Fields
+<Note>Ports should be defined at the lowest level of logical decomposition where the interface is actually implemented. They represent the physical or logical connection points where components interact with the system or with each other.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this port.
+
+  Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Interfaces" type="object">
+
+<a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/interface.svg" /> </a>
+
+  A list of all Interface objects owned by this port.
+
+  Interfaces can be viewed and deleted.
+
+  [Read more about Interfaces](/pages/modeling/objects/interface)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>

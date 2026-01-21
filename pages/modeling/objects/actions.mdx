@@ -5,39 +5,253 @@ title: Actions
 <img height="20" noZoom src="/images/objecticons/action.svg" /> 
 
 ## Description
-Actions describe the behavior of a system. This can be constructed using nested levels of actions to refine the action in detail. 
+Actions describe the behavior of a system using a subset textual syntax from SysML v2. Actions can be composed using nested levels to refine behavior in detail, with sequences defined using standard Python control flow and specialized action functions.
+
+## Syntax for Action Modeling
+
+Actions in Davinci use a Python-based syntax that aligns with SysML v2 action modeling principles. This approach provides:
+
+- **Executable Behavior**: Actions are defined as executable Python code that can be simulated and tested
+- **Hierarchical Composition**: Actions can call nested sub-actions to build complex behaviors from simple components
+- **Standard Control Flow**: Use familiar Python constructs (if/else, for, while) for action sequencing
+
+### Key Concepts
+
+**Actions as Functions**: Each action is a function that can be called by parent actions or executed directly.
 
 
-<Info>As of the Beta, the actions are only described in the documentation and by its subactions.</Info>
+**Attribute Binding**: Attributes referenced in action sequences are global variables, enabling data flow between actions and physics simulations.
 
-## Fields
+**Flow Modeling**: The `flow()` function explicitly models message passing and data routing between system components, critical for architectural definition.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Activity](#activity-view) | Visually represent action flow and logic. |
+| [Sequence](#sequence-view) | Visualize interactions over time. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the object. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
 
 
 <ParamField path="Name" type="string">
 Name of the object.
 </ParamField>
 
-<ParamField path="Description" type="string">
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
   Description of the object.
 </ParamField>
 
-<ParamField path="Sequence" type="list">
-  List of owned action sequences that comprise the main action's flow. The list follows the format of:
-
-  `Action Name` `(instance)` -> `Action Name` `(instance)`
-
-  Where action name is a reference to a specific action and the instance refers to if the action is repeated during the flow. Instances can be given as numbers.
-
-  <Info>All objects of the same instance are assumed connected.</Info>
-  
-
-### Merged Flow
-    Merged actions can be described as:
-
-  `Action Name One` `()` `&&` `Action Name Two` `()` -> `Action Name Three` `()`
-
-### Branching Flow
-  Branching actions can be described as:
-
-  `Action Name One` `()` -> `Action Name Two` `()` `&&` `Action Name Three` `()`
+<ParamField path="Sequence" type="code">
+  Code that defines the action's behavior and flow. The sequence uses standard Python syntax with specialized functions and reference notation for modeling behaviors.
 </ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this action.
+
+  Attribute Equations, Units and Type can be edited here, as well as recalculated and deleted entirely.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this action.
+
+  Constraint Equations and Analysis Type can be editied here, as well as recalculated and deleted entirely.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
+
+### Action References
+Actions are referenced using the `@` system (which get resolved into elements in the code):
+```python
+@Initialize_System
+@Configure_Parameters
+```
+
+### Attribute References
+Attributes can be linked with `@` system and represent single scalar values:
+```python
+if @status_code == 200:
+    print(f"Current value is {@temperature}")
+    @output_value = @input_value * 2
+```
+
+<Warning>Attributes are ALWAYS single scalar values, not arrays or lists. Use multiple scalar attributes for vectors (e.g., `@pos_x`, `@pos_y`, `@pos_z`).</Warning>
+
+### Control Flow
+Standard Python control structures are supported:
+
+**Sequential Execution:**
+```python
+@Initialize_System
+@Load_Configuration
+@Start_Services
+```
+
+**Conditional Execution:**
+```python
+if @system_status == "OK":
+    @Normal_Startup
+else:
+    @Recovery_Mode
+    end()
+```
+
+**Loops:**
+```python
+for i in range(int(@retry_count)):
+    @Attempt_Connection
+    if @connection_status == "success":
+        break
+```
+
+### Action Control Functions
+
+**fork([actions])** - Execute actions in parallel:
+```python
+fork([@Data_Collection, @System_Monitoring, @Log_Events])
+```
+
+**end()** - Exit the current action flow:
+```python
+if @critical_error:
+    @Log_Error
+    end()
+```
+
+**stop()** - Immediately halt all actions in the hierarchy:
+```python
+if @emergency_condition:
+    @Emergency_Shutdown
+    stop()
+```
+
+**flow(port1, port2, label, items)** - Define message/data routing between ports or entities:
+```python
+# Simple flow between ports
+flow(@sensor_port, @processor_port, "sensor_data", [@Temperature_Data])
+
+# Conditional routing
+if @data_quality == "high":
+    flow(@source_port, @primary_port, "raw_data", [@Measurement, @Timestamp])
+else:
+    flow(@source_port, @backup_port, "degraded_data", [@Filtered_Data])
+```
+
+### Code Object References
+Call functions from code objects using the `@` symbol:
+```python
+# Call a function from a code object
+@calculated_torque = @PD_Control_Algorithm.compute_torque(@current_attitude, @target_attitude)
+
+# Import and use code modules
+import @Utilities_Code
+result = @Utilities_Code.helper_function(@input_data)
+```
+
+### Complete Example
+```python
+# System initialization
+@System_Initialization
+
+if @system_status == "OK":
+    # Load configuration
+    @Load_Configuration
+    
+    # Start services in parallel
+    fork([@Security_Services, @Database, @Network_Services])
+    
+    # Main operation loop
+    for i in range(int(@operation_cycles)):
+        @Perform_Health_Check
+        
+        if @health_status == "critical":
+            @Emergency_Protocol
+            end()
+        elif @health_status == "warning":
+            @Recovery_Action
+    
+    # Clean shutdown
+    @Save_System_State
+else:
+    # Recovery mode
+    @Log_Errors
+    @Notify_Administrator
+    end()
+```
+
+## Message Flow Modeling
+
+Use `flow()` statements to explicitly model data and message routing between system components:
+
+```python
+# Simple message flow
+flow(@command_port, @actuator_port, "command", [@Control_Signal])
+
+# Conditional routing based on system state
+if @mode == "autonomous":
+    flow(@sensor_port, @ai_processor_port, "sensor_data", [@Image_Data, @Telemetry])
+    @AI_Decision_Making
+    flow(@ai_processor_port, @command_port, "decision", [@Command])
+else:
+    flow(@sensor_port, @operator_display_port, "sensor_data", [@Image_Data])
+    flow(@operator_input_port, @command_port, "manual_command", [@Command])
+
+# Execute action after flow setup
+@Execute_Command
+```
+
+## Best Practices
+
+### Action Composition
+
+- **Single Responsibility**: Each action should have a clear, focused purpose
+- **Hierarchical Design**: Break complex behaviors into nested sub-actions
+- **Reusability**: Design actions to be reusable across different contexts
+
+### Sequence Definition
+
+- **Clear Flow**: Use comments to explain complex logic
+- **Proper Indentation**: Follow Python indentation rules strictly
+- **Error Handling**: Use conditional logic to handle edge cases and failures
+- **Termination**: Ensure all execution paths reach `end()` or the final line
+
+### Performance Considerations
+
+- **Parallel Execution**: Use `fork()` for independent actions that can run concurrently
+- **Efficient Loops**: Avoid unnecessary iterations; use appropriate loop bounds
+- **Attribute Access**: Minimize redundant attribute reads in tight loops
+
+
+## Technical Implementation
+
+### Parse-Time Resolution
+
+When an action sequence is executed, the system performs several parse-time transformations:
+
+1. **UUID Resolution**: References like `[Action Name]` are resolved to actual function calls like `action_abc123_def456()`
+2. **Attribute Binding**: Attribute references are converted to global variable names and bound to their current values
+3. **Code Import Resolution**: References to code objects are resolved to module imports
+4. **Unit Conversion**: Attribute values with units are automatically converted to the target unit system

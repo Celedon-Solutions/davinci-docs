@@ -5,17 +5,430 @@ title: Documents
 <img height="20" noZoom src="/images/objecticons/document.svg" /> 
 
 ## Description
-Documents are a containing object that holds text sections, tables, and figures that are assembled to build a traditional document structure.
+Documents provide a professional word-processing environment for creating structured technical documentation, reports, and specifications within your model. They support rich text formatting, multiple block types, page layout controls, and automatic numbering—enabling everything from simple notes to complex multi-page reports with tables, figures, and cross-references.
 
-<Note>The ordering of the text sections in the index define the section ordering. Sections can be nested to build subsections.</Note>
+Documents use a paginated layout with configurable page dimensions, margins, headers, and footers. Content automatically flows across pages as you edit, and all formatting is preserved when exporting to PDF or DOCX formats.
 
-<Info>This is edited from the document view only</Info>
+<Info>Documents are edited from the document view only</Info>
 
+## Block Types
 
-## Fields
+Documents are composed of different block types, each serving a specific purpose in building structured content:
+
+### Paragraph Blocks
+Paragraph blocks contain standard body text and support all text formatting options including font styling (bold, italic, underline), color, size, and alignment. Paragraphs automatically wrap to fit the page width and split across pages when necessary.
+
+### Heading Blocks
+Heading blocks create document structure and hierarchy. Four heading levels are available (Heading 1 through Heading 4), each with configurable font sizes in the document styles. Headings can be automatically numbered based on the document's numbering scheme and appear in the table of contents.
+
+### List Blocks
+
+#### Numbered Lists
+Numbered lists create sequentially numbered items that automatically maintain their numbering as items are added or removed. Lists use the document's numbering format (configurable as "1, 2, 3", "I, II, III", etc.) and support automatic continuation across pages.
+
+#### Bulleted Lists  
+Bulleted lists create items marked with bullet points. Like numbered lists, they automatically flow across pages and maintain consistent indentation.
+
+### Table Blocks
+Tables embedded in documents provide a simple grid structure for displaying data in rows and columns. Tables automatically split across pages when they exceed the available space, ensuring data remains visible across page boundaries.
+
+#### Table Cell Types
+Document tables support two cell types:
+
+**Text Cells**: Contain plain or formatted text content. Text cells support standard formatting like bold, italic, and color.
+
+**Reference Cells**: Link to model objects using `@` notation. Reference cells display key information about the linked object and open that object when clicked, useful for creating traceability matrices and navigable documentation.
+
+<Note>Document tables are designed for data display, not calculation. For spreadsheet functionality with formulas and equations, use standalone [Table objects](/pages/modeling/objects/tables).</Note>
+
+### Figure Blocks
+Figure blocks contain images with optional captions. Figures are automatically numbered (Figure 1, Figure 2, etc.) and can be cross-referenced from text. When a figure with caption splits across pages, the system intelligently keeps the caption with the image.
+
+### Image Blocks
+Image blocks display images without the automatic numbering and caption functionality of figures. They're useful for decorative images, logos, or illustrations that don't need formal referencing.
+
+### Caption Blocks
+Caption blocks provide descriptive text for tables and figures. Captions support full text formatting and automatically display the appropriate "Table X:" or "Figure X:" prefix based on their association.
+
+### Special Blocks
+
+#### Table of Contents
+The Table of Contents block automatically generates a navigable list of all headings in the document, complete with page numbers. The TOC updates automatically as content changes.
+
+#### Bibliography
+Bibliography blocks collect and format all citations used throughout the document. Citations can be referenced from text using `@` notation.
+
+#### Math Blocks
+Math blocks render mathematical equations using LaTeX notation. They support complex formulas, symbols, and expressions formatted for professional technical documentation.
+
+#### Page Break
+Page break blocks force content following them to begin on a new page, useful for starting sections on fresh pages or controlling document flow.
+
+## Model Object References
+
+Documents support inline references to model objects using `@` notation, enabling dynamic links between your documentation and the underlying model data. These references automatically update when the referenced objects change, ensuring your documents always reflect the current state of your model.
+
+### Creating References
+
+To insert a reference to a model object:
+
+1. Type `@` in any text block (paragraph, heading, list item, etc.)
+2. A dropdown appears showing available objects in your model
+3. Start typing to filter the list by object name
+4. Select the desired object from the dropdown
+
+The reference is inserted as a live link that updates automatically.
+
+### Reference Display Options
+
+When you insert a reference, you can control what information is displayed by clicking the reference and selecting from the dropdown menu:
+
+**Display Name**: Shows the object's name as a clickable link (default)
+```
+The @MyPart component has been updated.
+```
+
+**Display Value**: Shows a specific attribute value from the object
+```
+The mass is @MyPart.mass kg.
+```
+
+When displaying values, you can select any attribute from the object. The dropdown shows all available attributes like `mass`, `cost`, `status`, or any custom attributes you've defined.
+
+<Note>References appear with distinct styling to differentiate them from regular text. Clicking a reference opens the referenced object.</Note>
+
+### Dynamic Updates
+
+References update automatically when the underlying model changes:
+
+- **Name changes**: If an object is renamed, all references to it update instantly throughout the document
+- **Value changes**: When displaying attribute values, the document shows the current value. If the attribute is recalculated or edited, the document updates automatically
+- **Object deletion**: If a referenced object is deleted, the reference converts to plain text to preserve document readability
+
+This dynamic behavior ensures your documentation remains synchronized with your model without manual updates.
+
+<Warning>Be careful when renaming or deleting objects that are referenced in documents. While the system handles updates gracefully, widespread references may require review to ensure context remains clear.</Warning>
+
+## Text Formatting
+
+The document editor provides comprehensive text formatting controls similar to professional word processors.
+
+### Font Styling
+
+#### Bold, Italic, and Underline
+Apply standard text decorations to emphasize content. These can be combined (e.g., bold italic text).
+
+**Keyboard shortcuts:**
+- Bold: `Ctrl/Cmd + B`
+- Italic: `Ctrl/Cmd + I`  
+- Underline: `Ctrl/Cmd + U`
+
+#### Font Size
+Adjust text size for selected content. While document styles define default sizes for each block type, you can override sizes for specific text selections.
+
+#### Font Color
+Apply custom colors to text selections. The color picker provides access to the full color palette.
+
+<Note>Text formatting is applied to the current selection. If no text is selected, the formatting becomes active and applies to subsequently typed text.</Note>
+
+### Text Alignment
+
+Four alignment options control how text aligns within its block:
+
+- **Left Align**: Text aligns to the left margin (default for most content)
+- **Center Align**: Text centers between margins  
+- **Right Align**: Text aligns to the right margin
+- **Justify**: Text stretches to align with both left and right margins
+
+Alignment applies to entire blocks (paragraphs, list items, headings) rather than individual text selections.
+
+### Block Transformations
+
+You can convert blocks between different types using transformation buttons:
+
+- **Transform to Paragraph**: Convert headings or lists to standard paragraphs
+- **Transform to Heading**: Convert paragraphs to heading blocks (prompts for level)
+- **Transform to Numbered List**: Convert paragraphs or other lists to numbered items
+- **Transform to Bulleted List**: Convert paragraphs or other lists to bulleted items
+
+<Note>Transforming blocks preserves the text content and inline formatting while changing the block's structural type.</Note>
+
+## Page Layout
+
+Documents provide fine-grained control over page dimensions and layout.
+
+### Page Dimensions
+
+Configure page size through the Page Setup dialog:
+
+- **Height**: Page height in inches (default: 11 in)
+- **Width**: Page width in inches (default: 8.5 in)
+
+Standard paper sizes like Letter (8.5" × 11") and A4 (8.27" × 11.69") can be achieved by entering the appropriate dimensions.
+
+### Page Margins
+
+Control whitespace around page edges:
+
+- **Top Margin**: Space between page top and content
+- **Bottom Margin**: Space between content and page bottom  
+- **Side Margins**: Space on left and right edges
+
+Margins are specified in inches with 0.1-inch precision. Typical margins range from 0.5 to 1.5 inches depending on document style requirements.
+
+### Headers and Footers
+
+Documents support headers and footers that repeat on each page. These regions can contain:
+
+- Static text and formatting
+- Page numbers (current and total)
+- Document title or section information
+- Logos or other branding elements
+
+<Note>Headers and footers are configured separately from the main body content and automatically appear on each page.</Note>
+
+## Document Styles
+
+The Styles panel configures document-wide defaults for fonts, spacing, and numbering, ensuring consistent formatting throughout the document.
+
+### Font Sizes
+
+Set default font sizes for each block type:
+
+- **Heading 1**: Typically 18-24 pt
+- **Heading 2**: Typically 16-20 pt  
+- **Heading 3**: Typically 14-18 pt
+- **Heading 4**: Typically 12-16 pt
+- **Paragraph**: Typically 10-12 pt
+- **Caption**: Typically 9-11 pt  
+- **Table**: Font size for table cell content
+
+These defaults apply when creating new blocks. Individual text can still be resized for specific needs.
+
+### Font Family
+
+Choose between available font families:
+
+- **Helvetica**: Clean sans-serif font (default)
+- **Times New Roman**: Traditional serif font for formal documents
+
+The font family applies to all text in the document unless specifically overridden.
+
+### Spacing Settings
+
+Control vertical spacing and line height:
+
+#### Paragraph Spacing
+- **Paragraph Before**: Space added before each paragraph (in points)
+- **Paragraph After**: Space added after each paragraph (in points)
+
+#### Line Height
+Line height multiplier controls spacing between lines within paragraphs. Values typically range from 1.0 (single-spaced) to 2.0 (double-spaced).
+
+#### Indent Size  
+The indent size (in points) controls how far list items and nested content indent from the margin.
+
+### Numbering Schemes
+
+Select the numbering format for automatic heading numbering:
+
+- **1, 2, 3**: Arabic numerals (default)
+- **I, II, III**: Roman numerals  
+- **A, B, C**: Letters
+- Other custom formats as configured
+
+The numbering scheme automatically applies to all headings in the document, creating a consistent hierarchy (e.g., 1, 1.1, 1.1.1).
+
+<Note>After changing document styles, click "Apply Changes" to update the document. This triggers a complete re-render with the new settings.</Note>
+
+## Document Information
+
+### Word Count
+The document info button (ⓘ icon) displays the total word count across all body content, excluding headers and footers. Word counts update dynamically as you edit.
+
+### Page Count  
+The page count indicator shows:
+- **Current Page**: The page currently visible in the viewport
+- **Total Pages**: Total number of pages in the document
+
+Page numbers update automatically as content reflows during editing.
+
+### Zoom Control
+
+Zoom in and out to adjust the document view:
+
+- **Zoom Range**: 10% to 300%
+- **Zoom Controls**: Use + and - buttons or the percentage display
+- **Keyboard Shortcut**: `Ctrl/Cmd + Mouse Wheel`
+
+Zoom affects only the viewing scale—it doesn't change the actual page layout or export size.
+
+<Note>Zoom level is preserved per document, so each document remembers its viewing preference.</Note>
+
+## Insert Options
+
+The Insert menu provides access to all insertable block types:
+
+### Content Blocks
+- **Table**: Insert a new embedded spreadsheet table
+- **Table Caption**: Add or update a table's caption  
+- **Image**: Insert an image file
+- **Figure**: Insert an image as a numbered figure
+- **Figure Caption**: Add or update a figure's caption
+
+### Structural Blocks  
+- **Paragraph**: Insert a new paragraph block
+- **Heading**: Insert a new heading (prompts for level)
+- **Numbered List**: Insert a numbered list item
+- **Bulleted List**: Insert a bulleted list item
+
+### Special Blocks
+- **Bibliography**: Insert a bibliography block that collects all citations
+- **Table of Contents**: Insert an auto-generated table of contents
+- **Math**: Insert a LaTeX math equation block
+- **Page Break**: Force a page break at the current location
+
+### Dynamic References
+When editing a paragraph block, two special insertion options become available:
+
+- **Page Number**: Inserts `@PAGE_NUMBER`, which displays the current page number  
+- **Total Page Number**: Inserts `@TOTAL_PAGE_NUMBER`, which displays the total page count
+
+These update automatically and are commonly used in headers/footers for page numbering like "Page @PAGE_NUMBER of @TOTAL_PAGE_NUMBER".
+
+## Cross-References and Numbering
+
+Documents automatically maintain numbering for figures, tables, equations, and headings. This enables professional technical documentation with accurate cross-references.
+
+### Automatic Numbering
+
+The following elements receive automatic sequential numbering:
+
+- **Figures**: Figure 1, Figure 2, Figure 3...
+- **Tables**: Table 1, Table 2, Table 3...  
+- **Equations**: Equation 1, Equation 2, Equation 3...
+- **Headings**: Hierarchical numbering based on document numbering scheme (1.1, 1.2, 1.2.1...)
+
+Numbering updates automatically when items are added, removed, or reordered.
+
+### Table of Contents
+
+The Table of Contents automatically indexes all heading blocks in the document, displaying their text and page numbers. Readers can click TOC entries to jump directly to sections.
+
+The TOC updates automatically when:
+- Headings are added, removed, or modified
+- Content reflows and changes page numbers  
+- Heading hierarchy changes
+
+### Citations and Bibliography
+
+Reference external sources using `@` notation in text (e.g., `@SmithStudy2023`). All cited references automatically appear in the Bibliography block, which formats them according to the configured citation style.
+
+## Exporting Documents
+
+Documents can be exported to multiple formats for sharing and publication.
+
+### Export to DOCX
+
+Export to Microsoft Word format (.docx) preserves:
+- All text content and formatting (bold, italic, underline, color, size)
+- Block structure (headings, paragraphs, lists)  
+- Tables with data and formulas converted to values
+- Images and figures
+- Page layout and margins
+
+**To export to DOCX:**
+1. Click the export button in the document toolbar
+2. Select "DOCX" from the format dropdown
+3. Click "Download" to generate and save the file
+
+<Note>DOCX export converts dynamic elements like equations and formulas to their evaluated values, as Word doesn't support the same formula syntax.</Note>
+
+### Export to PDF  
+
+Export to PDF format (.pdf) creates a pixel-perfect representation of the document as it appears on screen:
+
+- Page layout is preserved exactly
+- All fonts, colors, and formatting are embedded  
+- Headers and footers appear on each page
+- Page numbers, table of contents, and cross-references are functional
+- Tables, figures, and images render at high quality
+
+**To export to PDF:**
+1. Click the export button in the document toolbar  
+2. Select "PDF" from the format dropdown
+3. Click "Download" to generate and save the file
+
+PDF export is ideal for final distribution where the recipient needs read-only access with guaranteed formatting consistency.
+
+<Warning>Large documents with many images may take several seconds to export to PDF. A progress indicator shows export status.</Warning>
+
+## Importing Content
+
+Documents support importing content from external sources:
+
+### From Word Documents
+Drag and drop .docx files into your workspace to import them as Davinci documents. The import process converts:
+
+- Paragraphs and headings to corresponding Davinci blocks
+- Bold, italic, and underline formatting  
+- Basic text colors
+- Lists (numbered and bulleted)
+- Embedded tables become Davinci table blocks
+
+<Note>Complex Word formatting like styles, themes, and advanced layout features may not transfer perfectly. Review imported documents for formatting consistency.</Note>
+
+### From Plain Text
+Plain text (.txt) files import as a series of paragraph blocks, with line breaks preserved as block boundaries.
+
+## Navigation
+
+The document navigator (left sidebar) provides a hierarchical view of the document structure based on headings. Click any heading in the navigator to jump directly to that section.
+
+The navigator:
+- Updates automatically as headings change  
+- Shows the heading hierarchy with visual indentation
+- Highlights the current section based on scroll position
+- Collapses and expands to show or hide subsections
+
+<Note>Toggle the navigator visibility using the collapse/expand button if you need more horizontal space for editing.</Note>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Document](#document-view) | WYSIWYG editor for document content. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
 
 <ParamField path="Title" type="string">
 Title of the document which also the displayed name of the object. 
 </ParamField>
 
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
 
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Tables" type="object">
+
+<a href="/pages/modeling/objects/tables" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/table.svg" /> </a>
+
+  A list of all Table objects owned by this document.
+
+  Tables can be viewed and deleted.
+
+  [Read more about Tables](/pages/modeling/objects/tables)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
