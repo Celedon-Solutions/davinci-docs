@@ -37,6 +37,13 @@ Short name of the object.
   Description of the object.
 </ParamField>
 
+<ParamField path="Kind" type="enum">
+  Specifies the direction of flow through the port. Options:
+  - `in` - Input port (flows into the component)
+  - `out` - Output port (flows out of the component)
+  - `inout` - Bidirectional port (flows in both directions, default)
+</ParamField>
+
 <ParamField path="Attributes" type="object">
 
 <a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
@@ -46,17 +53,6 @@ Short name of the object.
   Attribute Equations, Units and Type can be editied here, as well as recalculated and deleted entirely.
 
   [Read more about Attributes](/pages/modeling/objects/attributes)
-</ParamField>
-
-<ParamField path="Interfaces" type="object">
-
-<a href="/pages/modeling/objects/interface" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/interface.svg" /> </a>
-
-  A list of all Interface objects owned by this port.
-
-  Interfaces can be viewed and deleted.
-
-  [Read more about Interfaces](/pages/modeling/objects/interface)
 </ParamField>
 
 <ParamField path="Relationships" type="connection">
