@@ -62,6 +62,9 @@ base_value = @MyAttribute
 converted_value = @MyAttribute("mg")
 ```
 
+<Note>Once an Object's value is assigned to a variable, you cannot perform unit conversions on it—conversions must happen at reference time using the `unit` notation.</Note>
+
+
 **Unit conversion example:**
 ```python
 # If @MassAttribute is "1 kg" in the model
@@ -70,9 +73,8 @@ mass_g = @MassAttribute("g")     # Returns: 1000
 mass_mg = @MassAttribute("mg")   # Returns: 1000000
 ```
 
-<Note>Once assigned to a variable, the value is a number. You cannot perform unit conversions on the variable—conversions must happen at reference time using the `("unit")` notation.</Note>
 
-<Warning>Unit conversions must use compatible units. Attempting to convert mass to length will cause an error.</Warning>
+<Warning>Unit conversions must use compatible units. Attempting to convert incompatable units (such as mass `g` to length `m`) will cause an error.</Warning>
 
 ## Updating Model Objects
 
