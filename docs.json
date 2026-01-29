@@ -281,6 +281,12 @@
                         "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [
+                            "pages/release-notes/v4.0.7",
+                            "pages/release-notes/v4.0.6",
+                            "pages/release-notes/v4.0.5",
+                            "pages/release-notes/v4.0.4",
+                            "pages/release-notes/v4.0.3",
+                            "pages/release-notes/v4.0.2",
                             "pages/release-notes/v4.0.1",
                             "pages/release-notes/v4.0.0",
                             "pages/release-notes/v3.7.2",
