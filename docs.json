@@ -278,6 +278,18 @@
                         ]
                     },
                     {
+                        "dropdown": "API",
+                        "icon": "code-bracket",
+                        "groups": [
+                            {
+                                "group": "Programmatic API",
+                                "pages": [
+                                    "pages/api/getting-started"
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [

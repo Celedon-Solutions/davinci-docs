@@ -1,0 +1,319 @@
+---
+title: Programmatic API - Getting Started
+description: 'Connect AI agents and automation scripts to Davinci using the Programmatic API'
+---
+
+## Overview
+
+The Davinci Programmatic API enables non-human users (AI agents, automation scripts, CI/CD pipelines) to interact with Davinci projects programmatically. With this API, you can:
+
+- **Create and manage projects** – List, create, and delete projects
+- **Open sessions** – Connect to projects and interact with the Davinci agent
+- **Send messages** – Instruct the agent to perform modeling tasks
+- **Receive events** – Get real-time updates on agent progress and completions
+- **Access project data** – Retrieve project tree, objects, and git information
+- **Collaborate** – Share projects and manage collaborators
+
+<Note>The Programmatic API requires a **service account** with an API key. Service accounts are tied to a human user account for billing purposes.</Note>
+
+## Quick Start
+
+### 1. Create a Service Account
+
+First, log in to your Davinci account and create a service account:
+
+```bash
+# Login to get an access token
+curl -X POST "https://your-davinci-instance.com/api/v2/auth/signin" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"your@email.com","password":"your-password"}'
+
+# Create a service account (use the accessToken from login)
+curl -X POST "https://your-davinci-instance.com/api/v1/service-accounts" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My Automation Bot"}'
+```
+
+### 2. Create an API Key
+
+Create an API key for your service account:
+
+```bash
+curl -X POST "https://your-davinci-instance.com/api/v1/service-accounts/SERVICE_ACCOUNT_ID/keys" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Production Key",
+    "scopes": ["projects:read", "projects:write", "sessions:manage", "agent:message"]
+  }'
+```
+
+<Warning>**Store your API key securely!** The full key is only shown once at creation time.</Warning>
+
+### 3. Use the SDK
+
+Install the official SDK for your language:
+
+<CodeGroup>
+
+```bash JavaScript
+npm install @celedon/davinci-sdk
+```
+
+```bash Python
+pip install davinci-sdk
+```
+
+</CodeGroup>
+
+## JavaScript/TypeScript Example
+
+```typescript
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+async function main() {
+  // Initialize client
+  const client = new DavinciClient({
+    apiKey: 'dav_sk_live_your_api_key_here',
+    baseUrl: 'https://your-davinci-instance.com',
+  });
+
+  // List projects
+  const { owned, shared } = await client.listProjects();
+  console.log(`Found ${owned.length} projects`);
+
+  // Create a session for a project
+  const session = await client.createSession({
+    projectId: owned[0].id,
+    branchName: 'main',
+  });
+
+  console.log(`Session created: ${session.sessionId}`);
+
+  // Listen for agent events
+  session.on('agent.reply', (event) => {
+    console.log('Agent says:', event.data.message);
+  });
+
+  // Start polling for events
+  session.startPolling(1000);
+
+  // Send a message to the agent
+  const response = await session.message('What objects exist in this project?');
+  console.log(`Message sent: ${response.messageId}`);
+
+  // Wait for response
+  await new Promise(resolve => setTimeout(resolve, 60000));
+
+  // Get project tree
+  const { objectCount, tree } = await session.getProjectTree();
+  console.log(`Project has ${objectCount} objects`);
+
+  // Close session when done
+  await session.close();
+}
+
+main().catch(console.error);
+```
+
+## Python Example
+
+```python
+import asyncio
+from davinci_sdk import DavinciClient
+
+async def main():
+    async with DavinciClient(
+        api_key="dav_sk_live_your_api_key_here",
+        base_url="https://your-davinci-instance.com"
+    ) as client:
+        # List projects
+        projects = await client.list_projects()
+        print(f"Found {len(projects['owned'])} projects")
+
+        # Create a session
+        session = await client.create_session(
+            project_id=projects['owned'][0].id,
+            branch_name="main"
+        )
+
+        print(f"Session created: {session.session_id}")
+
+        # Track replies
+        got_reply = asyncio.Event()
+
+        def on_reply(event):
+            print(f"Agent says: {event.data.get('message', '')[:200]}")
+            got_reply.set()
+
+        session.on("agent.reply", on_reply)
+        session.start_polling(interval_seconds=1.0)
+
+        # Send message
+        response = await session.message("What objects exist in this project?")
+        print(f"Message sent: {response.message_id}")
+
+        # Wait for response
+        try:
+            await asyncio.wait_for(got_reply.wait(), timeout=60.0)
+        except asyncio.TimeoutError:
+            print("Timeout waiting for response")
+
+        # Get project tree
+        tree = await session.get_project_tree()
+        print(f"Project has {tree.object_count} objects")
+
+        # Cleanup
+        await session.close()
+
+asyncio.run(main())
+```
+
+## API Key Scopes
+
+When creating an API key, you can specify which permissions it has:
+
+| Scope | Description |
+|-------|-------------|
+| `projects:read` | Read project data (tree, objects, git info) |
+| `projects:write` | Create and delete projects, commit changes |
+| `sessions:manage` | Create, close, and manage sessions |
+| `agent:message` | Send messages to the Davinci agent |
+| `webhooks:receive` | Required for webhook event delivery |
+
+## Core Concepts
+
+### Sessions
+
+A **session** represents an active connection to a project. Sessions:
+- Load the project into the Design Engine
+- Enable message passing to the agent
+- Provide access to project data
+- Have a 30-minute idle timeout (use `keepalive` to extend)
+- Maximum duration of 24 hours
+
+### Event Polling
+
+The SDK uses polling to receive events from the agent. Events include:
+- `session.connected` – Session is ready
+- `agent.reply` – Agent has responded
+- `agent.thinking` – Agent is processing
+- `agent.error` – An error occurred
+- `session.disconnect` – Session ended
+
+### Project Tree
+
+The project tree provides the structure of all objects in the project:
+
+```typescript
+const { objectCount, tree } = await session.getProjectTree();
+
+// tree is an array of TreeNode objects:
+// {
+//   id: "uuid",
+//   name: "Part Name",
+//   type: "part",
+//   parent: "parent-uuid",
+//   childrenCount: 5
+// }
+```
+
+## API Endpoints Reference
+
+### Health Check
+```
+GET /api/v1/programmatic/health
+```
+
+### Projects
+```
+GET  /api/v1/programmatic/projects          # List projects
+POST /api/v1/programmatic/projects          # Create project
+GET  /api/v1/programmatic/projects/:id      # Get project details
+DELETE /api/v1/programmatic/projects/:id    # Delete project
+```
+
+### Sessions
+```
+POST   /api/v1/programmatic/sessions                    # Create session
+GET    /api/v1/programmatic/sessions/:id                # Get session status
+DELETE /api/v1/programmatic/sessions/:id                # Close session
+POST   /api/v1/programmatic/sessions/:id/keepalive      # Extend timeout
+GET    /api/v1/programmatic/sessions/:id/events         # Poll for events
+GET    /api/v1/programmatic/sessions/:id/tree           # Get project tree
+GET    /api/v1/programmatic/sessions/:id/objects/:oid   # Get object details
+```
+
+### Agent
+```
+POST /api/v1/programmatic/sessions/:id/agent/message    # Send message
+POST /api/v1/programmatic/sessions/:id/agent/stop       # Stop agent
+GET  /api/v1/programmatic/sessions/:id/agent/status     # Get agent status
+```
+
+### Git Operations
+```
+GET  /api/v1/programmatic/sessions/:id/git/branches     # List branches
+GET  /api/v1/programmatic/sessions/:id/git/history      # Commit history
+GET  /api/v1/programmatic/sessions/:id/git/changes      # Uncommitted changes
+POST /api/v1/programmatic/sessions/:id/git/commit       # Commit changes
+POST /api/v1/programmatic/sessions/:id/git/branch       # Create branch
+DELETE /api/v1/programmatic/sessions/:id/git/branch/:name  # Delete branch
+```
+
+### Collaboration
+```
+GET    /api/v1/programmatic/sessions/:id/collaborators  # List collaborators
+POST   /api/v1/programmatic/sessions/:id/share          # Share project
+DELETE /api/v1/programmatic/sessions/:id/share/:email   # Remove collaborator
+```
+
+## Best Practices
+
+1. **Use appropriate timeouts** – Agent responses can take 30-60+ seconds for complex projects
+2. **Handle events asynchronously** – Don't block waiting for responses
+3. **Close sessions when done** – Free up resources for other users
+4. **Store API keys securely** – Use environment variables, never commit to git
+5. **Use scopes wisely** – Only request the permissions you need
+
+## Rate Limits
+
+API keys have a default rate limit of **60 requests per minute**. This can be customized when creating the key (max 10,000 rpm).
+
+## Error Handling
+
+All API responses follow this format:
+
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+Or on error:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message"
+  }
+}
+```
+
+Common error codes:
+- `INVALID_API_KEY` – API key is invalid or expired
+- `INSUFFICIENT_SCOPES` – API key lacks required permissions
+- `SESSION_NOT_FOUND` – Session doesn't exist or expired
+- `PROJECT_NOT_FOUND` – Project doesn't exist or access denied
+- `RATE_LIMIT_EXCEEDED` – Too many requests
+
+## Next Steps
+
+- Explore the [JavaScript SDK source](https://github.com/celedon/davinci-sdk-js)
+- Explore the [Python SDK source](https://github.com/celedon/davinci-sdk-python)
+- Learn about [Davinci modeling concepts](/modeling/overview/systemmodeling)
+- Join the [community](/community) for support
