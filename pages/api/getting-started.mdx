@@ -269,6 +269,97 @@ POST   /api/v1/programmatic/sessions/:id/share          # Share project
 DELETE /api/v1/programmatic/sessions/:id/share/:email   # Remove collaborator
 ```
 
+### Files
+```
+GET    /api/v1/programmatic/sessions/:id/files                      # List files
+POST   /api/v1/programmatic/sessions/:id/files/upload               # Upload file
+GET    /api/v1/programmatic/sessions/:id/files/download/:fileName   # Download file
+DELETE /api/v1/programmatic/sessions/:id/files/:fileId              # Delete file
+```
+
+## File Operations
+
+Upload and download files (PDFs, documents, images) to your projects programmatically.
+
+### Upload a File
+
+<CodeGroup>
+
+```typescript JavaScript
+const fs = require('fs');
+
+// Read file
+const fileBuffer = fs.readFileSync('./document.pdf');
+
+// Upload to project
+const result = await session.uploadFile(
+  fileBuffer,
+  'document.pdf',
+  { mimeType: 'application/pdf' }
+);
+
+console.log(`Uploaded: ${result.fileName} (${result.size} bytes)`);
+```
+
+```python Python
+# Read file
+with open("document.pdf", "rb") as f:
+    file_data = f.read()
+
+# Upload to project
+result = await session.upload_file(
+    file_data,
+    "document.pdf",
+    mime_type="application/pdf"
+)
+
+print(f"Uploaded: {result.file_name} ({result.size} bytes)")
+```
+
+</CodeGroup>
+
+### Download a File
+
+<CodeGroup>
+
+```typescript JavaScript
+// Download file by UUID filename
+const fileBuffer = await session.downloadFile('abc123-uuid.pdf');
+
+// Save to disk
+fs.writeFileSync('./downloaded.pdf', fileBuffer);
+```
+
+```python Python
+# Download file by UUID filename
+file_data = await session.download_file("abc123-uuid.pdf")
+
+# Save to disk
+with open("downloaded.pdf", "wb") as f:
+    f.write(file_data)
+```
+
+</CodeGroup>
+
+### List Files
+
+<CodeGroup>
+
+```typescript JavaScript
+const files = await session.listFiles();
+for (const file of files) {
+  console.log(`${file.name} (${file.id})`);
+}
+```
+
+```python Python
+files = await session.list_files()
+for file in files:
+    print(f"{file.name} ({file.id})")
+```
+
+</CodeGroup>
+
 ## Best Practices
 
 1. **Use appropriate timeouts** – Agent responses can take 30-60+ seconds for complex projects
