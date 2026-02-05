@@ -1,0 +1,90 @@
+---
+title: Capability
+---
+
+<img height="20" noZoom src="/images/objecticons/capability.svg" /> 
+
+## Description
+Capability objects represent time-bounded features, skills, or capacities that a system, component, or resource possesses during a specific time period. In systems engineering, capabilities define what a system can do and when it can do it, making them essential for timeline-based planning, resource allocation, use cases, and operational scheduling.
+
+Capabilities support flexible temporal modeling through their start and end date properties. Each date can be specified either as a direct date string or as a reference to a [Task](/pages/modeling/objects/task) object, with the option to use either the task's start or end date. This allows capabilities to be dynamically linked to project schedules and task completions. When both start and end dates are defined, the capability's duration is automatically calculated, representing the time window during which the capability is available.
+
+The resolved value contains calculated temporal information including the actual start date, end date, and duration. If constraints or equations cannot be resolved, error states are captured with descriptive messages to help troubleshoot issues.
+
+<Note>If only a start date is provided without an end date, the capability is assumed to exist at any point after the start date (open-ended capability).</Note>
+
+<Info>Use the properties view to configure capability timing. The Gantt view provides visual timeline representation of when capabilities are available.</Info>
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View the hierarchical structure of the object. |
+| [Block](/pages/user-guide/views/renderviews#block-view) | Visualize the capability in a block diagram context. |
+| [Gantt](/pages/user-guide/views/gantt) | Visualize capability availability on a timeline. |
+| [Connectome](/pages/user-guide/views/renderviews#connectome-view) | Explore connections between capabilities and other objects. |
+| [Thread](/pages/user-guide/views/renderviews#digital-thread-view) | Visualize traceability and connection density in 3D. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+
+## Properties Fields
+
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Start Date" type="object">
+  The start date of the capability, defining when the capability becomes available. Contains:
+  - `value`: Either a date string or a UUID reference to a task object
+  - `useEnd`: Boolean flag indicating whether to use the task's end date (true) or start date (false) when referencing a task
+  
+  If not provided, no assumption is made about when the capability begins.
+</ParamField>
+
+<ParamField path="End Date" type="object">
+  The end date of the capability, defining when the capability is no longer available. Contains:
+  - `value`: Either a date string or a UUID reference to a task object
+  - `useEnd`: Boolean flag indicating whether to use the task's end date (true) or start date (false) when referencing a task
+  
+  If not provided, the capability is assumed to exist indefinitely after the start date.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+
+<a href="/pages/modeling/objects/attributes" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/attribute.svg" /> </a>
+
+  A list of all Attribute objects owned by this capability.
+
+  Attributes define quantifiable properties of the capability such as performance metrics or capacity measures.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
+</ParamField>
+
+<ParamField path="Constraints" type="object">
+
+<a href="/pages/modeling/objects/constraints" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/constraint.svg" /> </a>
+
+  A list of all Constraint objects owned by this capability.
+
+  Constraints define conditions or limitations on the capability's operation or availability.
+
+  [Read more about Constraints](/pages/modeling/objects/constraints)
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>
