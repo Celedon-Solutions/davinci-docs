@@ -188,6 +188,7 @@
                                     "pages/modeling/objects/parts",
                                     "pages/modeling/objects/attributes",
                                     "pages/modeling/objects/requirements",
+                                    "pages/modeling/objects/capability",
                                     "pages/modeling/objects/constraints",
                                     "pages/modeling/objects/ports",
                                     "pages/modeling/objects/interface",
