@@ -1,0 +1,567 @@
+---
+title: Git Operations
+description: 'Manage branches, commit changes, and view version history within a session'
+---
+
+## Overview
+
+The Git Operations endpoints provide version control capabilities for Davinci projects within an active session. You can list branches, view commit history, check for uncommitted changes, commit changes, and create or delete branches.
+
+All git endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## List Branches
+
+Returns all git branches in the project.
+
+```
+GET /api/v1/programmatic/sessions/:id/git/branches
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/branches" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const branches = await session.gitBranches();
+console.log('Branches:', branches);
+// Output: Branches: ['main', 'feature/propulsion', 'experiment/new-design']
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    branches = await session.git_branches()
+    print("Branches:", branches)
+    # Output: Branches: ['main', 'feature/propulsion', 'experiment/new-design']
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "branches": [
+      "main",
+      "feature/propulsion",
+      "experiment/new-design"
+    ]
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed |
+| `LIST_BRANCHES_FAILED` | 500 | Internal error listing branches |
+
+---
+
+## Get Commit History
+
+Returns the commit history for the current branch.
+
+```
+GET /api/v1/programmatic/sessions/:id/git/history
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/history" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const history = await session.gitHistory();
+for (const commit of history) {
+  console.log(`${commit.hash.substring(0, 7)} - ${commit.message} (${commit.author})`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    history = await session.git_history()
+    for commit in history:
+        print(f"{commit.hash[:7]} - {commit.message} ({commit.author})")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "history": [
+      {
+        "hash": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+        "message": "Add power subsystem attributes",
+        "author": "automation-bot",
+        "timestamp": "2026-02-10T12:10:00.000Z"
+      },
+      {
+        "hash": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+        "message": "Initial project creation",
+        "author": "system",
+        "timestamp": "2026-02-10T12:00:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed |
+| `GET_HISTORY_FAILED` | 500 | Internal error retrieving history |
+
+---
+
+## Get Uncommitted Changes
+
+Returns a summary of all uncommitted changes in the current session.
+
+```
+GET /api/v1/programmatic/sessions/:id/git/changes
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/changes" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const changes = await session.gitChanges();
+console.log('Uncommitted changes:', changes);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    changes = await session.git_changes()
+    print("Uncommitted changes:", changes)
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "changes": {
+      "added": ["obj_motor001", "obj_attr001"],
+      "modified": ["obj_power001"],
+      "deleted": []
+    },
+    "hasChanges": true
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed |
+| `GET_CHANGES_FAILED` | 500 | Internal error retrieving changes |
+
+---
+
+## Commit Changes
+
+Commits all uncommitted changes in the current session to the active branch.
+
+```
+POST /api/v1/programmatic/sessions/:id/git/commit
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `message` | string | Yes | Commit message describing the changes |
+| `author` | string | No | Author name for the commit (default: service account name) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/commit" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Add Motor part with power, weight, and efficiency attributes",
+    "author": "ci-pipeline"
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Make changes via agent...
+await session.message('Create a Motor part with power and weight attributes');
+
+// Wait for agent to complete, then commit
+const commit = await session.gitCommit(
+  'Add Motor part with power, weight, and efficiency attributes',
+  'ci-pipeline'
+);
+
+console.log(`Commit ${commit.hash.substring(0, 7)}: ${commit.message}`);
+console.log(`Stats: +${commit.stats.additions} ~${commit.stats.modifications} -${commit.stats.deletions}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Make changes via agent...
+    await session.message("Create a Motor part with power and weight attributes")
+
+    # Wait for agent to complete, then commit
+    commit = await session.git_commit(
+        message="Add Motor part with power, weight, and efficiency attributes",
+        author="ci-pipeline",
+    )
+
+    print(f"Commit {commit.hash[:7]}: {commit.message}")
+    print(f"Stats: +{commit.additions} ~{commit.modifications} -{commit.deletions}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "commit": {
+      "hash": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+      "message": "Add Motor part with power, weight, and efficiency attributes",
+      "author": "ci-pipeline",
+      "timestamp": "2026-02-10T12:15:00.000Z",
+      "branch": "main",
+      "stats": {
+        "additions": 3,
+        "modifications": 1,
+        "deletions": 0,
+        "total": 4
+      }
+    }
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `MISSING_MESSAGE` | 400 | Commit message is required |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed |
+| `COMMIT_FAILED` | 500 | Internal error committing changes |
+
+---
+
+## Create Branch
+
+Creates a new git branch in the project.
+
+```
+POST /api/v1/programmatic/sessions/:id/git/branch
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `branchName` | string | Yes | Name of the new branch |
+| `sourceBranch` | string | No | Branch to create from (default: current branch) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/branch" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "branchName": "feature/propulsion-system",
+    "sourceBranch": "main"
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const result = await session.gitCreateBranch('feature/propulsion-system', 'main');
+console.log(`Branch created: ${result.name}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    result = await session.git_create_branch(
+        name="feature/propulsion-system",
+        from_branch="main",
+    )
+    print(f"Branch created: {result['name']}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "name": "feature/propulsion-system",
+    "created": true
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `MISSING_BRANCH_NAME` | 400 | Branch name is required |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed (e.g., branch already exists) |
+| `CREATE_BRANCH_FAILED` | 500 | Internal error creating branch |
+
+---
+
+## Delete Branch
+
+Deletes a git branch from the project. You cannot delete the branch that the current session is connected to.
+
+```
+DELETE /api/v1/programmatic/sessions/:id/git/branch/:branchName
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+| `branchName` | string | Yes | Name of the branch to delete |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/git/branch/feature%2Fpropulsion-system" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+await session.gitDeleteBranch('feature/propulsion-system');
+console.log('Branch deleted');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    await session.git_delete_branch("feature/propulsion-system")
+    print("Branch deleted")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": true
+  }
+}
+```
+
+<Warning>You cannot delete the current branch (the branch the session is connected to). Switch to a different branch first.</Warning>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `CANNOT_DELETE_CURRENT_BRANCH` | 400 | Cannot delete the branch the session is on |
+| `SERVER_NOT_AVAILABLE` | 503 | Git service is unavailable |
+| `GIT_ERROR` | 500 | Git operation failed |
+| `DELETE_BRANCH_FAILED` | 500 | Internal error deleting branch |

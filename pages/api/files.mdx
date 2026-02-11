@@ -1,0 +1,412 @@
+---
+title: Files
+description: 'Upload, download, list, and delete files attached to Davinci projects'
+---
+
+## Overview
+
+The Files endpoints let you manage files (PDFs, images, documents, etc.) attached to Davinci projects. Files are uploaded to the project's storage and can be referenced by objects within the model.
+
+All file endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## List Files
+
+Returns all files attached to the project.
+
+```
+GET /api/v1/programmatic/sessions/:id/files
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/files" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const files = await session.listFiles();
+console.log(`Files: ${files.length}`);
+for (const file of files) {
+  console.log(`- ${file.name} (${file.id})`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    files = await session.list_files()
+    print(f"Files: {len(files)}")
+    for file in files:
+        print(f"- {file.name} ({file.id})")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "files": [
+      {
+        "id": "obj_file001",
+        "name": "requirements-spec.pdf",
+        "parent": "obj_root001"
+      },
+      {
+        "id": "obj_file002",
+        "name": "system-diagram.png",
+        "parent": "obj_root001"
+      }
+    ],
+    "count": 2
+  }
+}
+```
+
+### File Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | The reference object ID in the project model |
+| `name` | string | Original file name |
+| `parent` | string | Parent object ID in the project tree |
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `SERVER_NOT_AVAILABLE` | 503 | File service is unavailable |
+| `LIST_FILES_FAILED` | 500 | Internal error listing files |
+
+---
+
+## Upload File
+
+Uploads a file to the project. The file is stored in the project's storage and a reference object is created in the project model.
+
+```
+POST /api/v1/programmatic/sessions/:id/files/upload
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Request Body (Multipart Form Data)
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | file | Yes | The file to upload (max 100 MB) |
+| `name` | string | No | Display name for the file. Defaults to the original filename. |
+| `parentId` | string | No | Parent object ID to attach the file to |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/files/upload" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -F "file=@./requirements-spec.pdf" \
+  -F "name=requirements-spec.pdf" \
+  -F "parentId=obj_root001"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+import fs from 'fs';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Read file from disk
+const fileBuffer = fs.readFileSync('./requirements-spec.pdf');
+
+// Upload to project
+const result = await session.uploadFile(
+  fileBuffer,
+  'requirements-spec.pdf',
+  {
+    parentId: 'obj_root001',
+    mimeType: 'application/pdf',
+  }
+);
+
+console.log(`Uploaded: ${result.fileName} (${result.size} bytes)`);
+console.log(`MIME type: ${result.mimeType}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Read file from disk
+    with open("requirements-spec.pdf", "rb") as f:
+        file_data = f.read()
+
+    # Upload to project
+    result = await session.upload_file(
+        file_data=file_data,
+        file_name="requirements-spec.pdf",
+        parent_id="obj_root001",
+        mime_type="application/pdf",
+    )
+
+    print(f"Uploaded: {result.file_name} ({result.size} bytes)")
+    print(f"MIME type: {result.mime_type}")
+```
+
+</CodeGroup>
+
+### Response `201 Created`
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "File uploaded successfully",
+    "fileName": "requirements-spec.pdf",
+    "size": 245760,
+    "mimeType": "application/pdf",
+    "result": { ... }
+  }
+}
+```
+
+<Note>The `fileName` field is the display name (either the provided `name` or the original filename). The `result` object contains additional details from the Design Engine, including the internal storage filename needed for downloads.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `NO_FILE` | 400 | No file was included in the request |
+| `NO_PARENT` | 400 | Parent ID is required but was not provided |
+| `SERVER_NOT_AVAILABLE` | 503 | File service is unavailable |
+| `UPLOAD_FAILED` | 500 | Internal error uploading the file |
+
+---
+
+## Download File
+
+Downloads a file from the project by its UUID filename.
+
+```
+GET /api/v1/programmatic/sessions/:id/files/download/:fileName
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+| `fileName` | string | Yes | The UUID filename (returned from upload or list) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/files/download/a1b2c3d4-requirements-spec.pdf" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  --output requirements-spec.pdf
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+import fs from 'fs';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Download file
+const fileBuffer = await session.downloadFile('a1b2c3d4-requirements-spec.pdf');
+
+// Save to disk
+fs.writeFileSync('./downloaded-spec.pdf', fileBuffer);
+console.log(`Downloaded ${fileBuffer.length} bytes`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Download file
+    file_data = await session.download_file("a1b2c3d4-requirements-spec.pdf")
+
+    # Save to disk
+    with open("downloaded-spec.pdf", "wb") as f:
+        f.write(file_data)
+
+    print(f"Downloaded {len(file_data)} bytes")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+The response is the raw file content with appropriate headers:
+
+```
+Content-Type: application/pdf
+Content-Disposition: attachment; filename="a1b2c3d4-requirements-spec.pdf"
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `FILE_NOT_FOUND` | 404 | File does not exist in the project |
+| `SERVER_NOT_AVAILABLE` | 503 | File service is unavailable |
+| `DOWNLOAD_FAILED` | 500 | Internal error downloading the file |
+
+---
+
+## Delete File
+
+Deletes a file from the project. This removes both the stored file and the reference object in the project model.
+
+```
+DELETE /api/v1/programmatic/sessions/:id/files/:fileId
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+| `fileId` | string | Yes | The reference object ID of the file (from list files response) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/files/obj_file001" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// List files to get the file ID
+const files = await session.listFiles();
+const targetFile = files.find(f => f.name === 'old-spec.pdf');
+
+// Delete the file
+await session.deleteFile(targetFile.id);
+console.log(`Deleted file: ${targetFile.name}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # List files to get the file ID
+    files = await session.list_files()
+    target_file = next(f for f in files if f.name == "old-spec.pdf")
+
+    # Delete the file
+    await session.delete_file(target_file.id)
+    print(f"Deleted file: {target_file.name}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "File deleted successfully"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `FILE_NOT_FOUND` | 404 | File does not exist in the project |
+| `SERVER_NOT_AVAILABLE` | 503 | File service is unavailable |
+| `DELETE_FAILED` | 500 | Internal error deleting the file |

@@ -1,0 +1,268 @@
+---
+title: Collaboration
+description: 'Manage project collaborators -- list, share, and remove access'
+---
+
+## Overview
+
+The Collaboration endpoints let you manage who has access to a project. You can list current collaborators, share the project with new users, and remove collaborators -- all from within an active session.
+
+All collaboration endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## List Collaborators
+
+Returns all collaborators for the project.
+
+```
+GET /api/v1/programmatic/sessions/:id/collaborators
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/collaborators" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const collaborators = await session.getCollaborators();
+for (const collab of collaborators) {
+  console.log(`${collab.email} - ${collab.role}`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    collaborators = await session.get_collaborators()
+    for collab in collaborators:
+        print(f"{collab['email']} - {collab['role']}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "collaborators": {
+      "collaboratorData": {
+        "collaborators": [
+          {
+            "email": "alice@company.com",
+            "role": "editor"
+          },
+          {
+            "email": "bob@company.com",
+            "role": "viewer"
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_COLLABORATORS_FAILED` | 500 | Internal error retrieving collaborators |
+
+---
+
+## Share Project
+
+Shares the project with a new collaborator by email address.
+
+```
+POST /api/v1/programmatic/sessions/:id/share
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `email` | string | Yes | Email address of the user to share with |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/share" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "alice@company.com"
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+await session.share('alice@company.com');
+console.log('Project shared with alice@company.com');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    await session.share("alice@company.com")
+    print("Project shared with alice@company.com")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Project shared successfully"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `MISSING_EMAIL` | 400 | Email address is required |
+| `ALREADY_SHARED` | 409 | Project is already shared with this user |
+| `SHARE_FAILED` | 500 | Internal error sharing the project |
+
+---
+
+## Remove Collaborator
+
+Removes a collaborator's access to the project.
+
+```
+DELETE /api/v1/programmatic/sessions/:id/share/:email
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+| `email` | string | Yes | Email address of the collaborator to remove (URL-encoded) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/share/alice%40company.com" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+await session.unshare('alice@company.com');
+console.log('Collaborator removed');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    await session.unshare("alice@company.com")
+    print("Collaborator removed")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Collaborator removed successfully"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `UNSHARE_FAILED` | 500 | Internal error removing the collaborator |

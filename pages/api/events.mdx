@@ -1,0 +1,236 @@
+---
+title: Events
+description: 'Poll for real-time events from the Davinci agent and session lifecycle'
+---
+
+## Overview
+
+Events provide real-time updates about agent activity and session lifecycle. When you send a message to the agent, responses and progress updates are delivered as events that you can retrieve by polling.
+
+The polling endpoint supports long-polling -- you can specify a timeout to wait for new events before returning an empty response. This reduces unnecessary requests while keeping latency low.
+
+All event endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## Poll for Events
+
+Retrieves pending events for a session. Supports long-polling with a configurable timeout.
+
+```
+GET /api/v1/programmatic/sessions/:id/events
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `timeout` | number | No | Long-polling timeout in milliseconds. Max 30,000 (30s). Default: `0` (return immediately). |
+| `maxEvents` | number | No | Maximum number of events to return. Max 50. Default: `10`. |
+| `cursor` | number | No | Only return events with an `eventId` greater than this value. Use the `cursor` from the previous response to avoid re-fetching already-seen events. |
+| `eventTypes` | string | No | Comma-separated list of event types to return. Example: `agent.reply,agent.error`. If omitted, all event types are returned. |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+# Immediate poll (returns instantly)
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc789/events" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+
+# Long poll (waits up to 10 seconds for events)
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc789/events?timeout=10000&maxEvents=20" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+
+# Cursor-based polling (only get events after cursor 42)
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc789/events?cursor=42&timeout=10000" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+
+# Filter by event type (only agent replies and errors)
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc789/events?eventTypes=agent.reply,agent.error&timeout=10000" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Option 1: Manual polling
+const events = await client.getEvents(session.sessionId, {
+  timeout: 10000,
+  maxEvents: 20,
+});
+
+for (const event of events) {
+  console.log(`[${event.event}] ${JSON.stringify(event.data)}`);
+}
+
+// Option 2: Automatic polling with event handlers (recommended)
+session.on('agent.reply', (event) => {
+  console.log('Agent says:', event.data.message);
+});
+
+session.on('agent.thinking', (event) => {
+  console.log('Agent is thinking...');
+});
+
+session.on('agent.error', (event) => {
+  console.error('Agent error:', event.data.error);
+});
+
+session.on('session.connected', () => {
+  console.log('Session ready!');
+});
+
+// Start automatic polling at 1-second intervals
+session.startPolling(1000);
+
+// Later, stop polling
+session.stopPolling();
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Option 1: Manual polling
+    events = await client.get_events(
+        session.session_id,
+        timeout=10000,
+        max_events=20,
+    )
+
+    for event in events:
+        print(f"[{event.event}] {event.data}")
+
+    # Option 2: Automatic polling with event handlers (recommended)
+    def on_reply(event):
+        print(f"Agent says: {event.data.get('message', '')}")
+
+    def on_thinking(event):
+        print("Agent is thinking...")
+
+    def on_error(event):
+        print(f"Agent error: {event.data.get('error', '')}")
+
+    session.on("agent.reply", on_reply)
+    session.on("agent.thinking", on_thinking)
+    session.on("agent.error", on_error)
+
+    # Start automatic polling at 1-second intervals
+    session.start_polling(interval_seconds=1.0)
+
+    # Later, stop polling
+    session.stop_polling()
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "events": [
+      {
+        "event": "agent.thinking",
+        "data": {
+          "messageId": "msg_abc123",
+          "taskId": "programmatic-ses_abc789"
+        },
+        "eventId": 42,
+        "receivedAt": "2026-02-10T12:05:01.100Z"
+      },
+      {
+        "event": "agent.reply",
+        "data": {
+          "messageId": "msg_abc123",
+          "replyId": "reply_def456",
+          "replyType": "progress",
+          "message": "Creating the Motor part with the specified attributes..."
+        },
+        "eventId": 43,
+        "receivedAt": "2026-02-10T12:05:05.100Z"
+      },
+      {
+        "event": "agent.reply",
+        "data": {
+          "messageId": "msg_abc123",
+          "replyId": "reply_ghi789",
+          "replyType": "completion",
+          "message": "Done! I've created the Motor part with power (100 W), weight (2.5 kg), and efficiency (0.95)."
+        },
+        "eventId": 44,
+        "receivedAt": "2026-02-10T12:05:15.100Z"
+      }
+    ],
+    "cursor": 44,
+    "hasMore": false
+  }
+}
+```
+
+## Event Types
+
+| Event | Description |
+|-------|-------------|
+| `session.connected` | Session has finished loading and is ready for interaction |
+| `session.reconnected` | An inactive/closed session was reconnected |
+| `session.disconnect` | Session has been disconnected |
+| `session.error` | A session-level error occurred |
+| `agent.thinking` | Agent has started processing a message (fires before the first LLM call) |
+| `agent.reply` | Agent has produced a response |
+| `agent.error` | An error occurred while the agent was processing |
+
+## Reply Types
+
+The `agent.reply` event includes a `replyType` field:
+
+| Reply Type | Description |
+|------------|-------------|
+| `progress` | Intermediate update while the agent is still working |
+| `completion` | Final response -- the agent has finished the task |
+| `question` | Agent is asking a clarifying question |
+| `error` | An error occurred during processing |
+
+## Polling Best Practices
+
+1. **Use cursor-based polling** -- Pass the `cursor` from the previous response to avoid re-processing events you've already seen
+2. **Use long-polling** -- Set `timeout` to 5,000-10,000ms to reduce request overhead while keeping responses snappy
+3. **Check `hasMore`** -- If `true`, immediately poll again to get remaining events
+4. **Filter with `eventTypes`** -- If you only care about agent replies, pass `eventTypes=agent.reply,agent.error,agent.thinking` to skip session lifecycle events
+5. **Use the SDK** -- The SDK's `startPolling()` method handles cursor tracking and all polling logic automatically
+6. **Handle reconnections** -- If a poll fails, retry with exponential backoff
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_EVENTS_FAILED` | 500 | Internal error retrieving events |

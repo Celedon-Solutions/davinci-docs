@@ -1,0 +1,355 @@
+---
+title: Projects
+description: 'List, create, retrieve, and delete Davinci projects via the Programmatic API'
+---
+
+## Overview
+
+The Projects endpoints let you manage Davinci projects programmatically. You can list all projects accessible to your service account, create new projects, retrieve project details, and delete projects.
+
+All project endpoints require authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## List Projects
+
+Returns all projects accessible to the service account. Supports pagination via `page` and `limit` query parameters.
+
+```
+GET /api/v1/programmatic/projects
+```
+
+**Required scope:** `projects:read`
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | number | No | Page number (default: `1`) |
+| `limit` | number | No | Number of projects per page (default: `50`) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/projects?page=1&limit=20" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const result = await client.listProjects();
+
+console.log(`Total projects: ${result.count}`);
+console.log(`Page ${result.page} of ${result.totalPages}`);
+
+for (const project of result.projects) {
+  console.log(`- ${project.name} (${project.id})`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    result = await client.list_projects()
+
+    print(f"Total projects: {result['count']}")
+    print(f"Page {result['page']} of {result['totalPages']}")
+
+    for project in result["projects"]:
+        print(f"- {project['name']} ({project['id']})")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "projects": [
+      {
+        "id": "proj_abc123",
+        "name": "Satellite System Model",
+        "owner": "usr_your_license_key",
+        "created": "2026-01-15T08:00:00.000Z",
+        "lastModified": "2026-02-10T14:30:00.000Z"
+      },
+      {
+        "id": "proj_def456",
+        "name": "Propulsion Subsystem",
+        "owner": "usr_other_user_key",
+        "created": "2026-01-20T10:00:00.000Z",
+        "lastModified": "2026-02-09T16:00:00.000Z"
+      }
+    ],
+    "count": 82,
+    "page": 1,
+    "limit": 50,
+    "totalPages": 2
+  }
+}
+```
+
+<Note>The `projects` array is a flat, paginated list combining both owned and shared projects. The `count` field reflects the total number of projects across all pages.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | Invalid or expired API key |
+| `INSUFFICIENT_SCOPES` | 403 | Key lacks `projects:read` scope |
+| `LIST_PROJECTS_FAILED` | 500 | Internal error listing projects |
+
+---
+
+## Get Project
+
+Retrieves details for a specific project.
+
+```
+GET /api/v1/programmatic/projects/:id
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The project ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/projects/proj_abc123" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+// First list projects, then access by ID
+const { owned } = await client.listProjects();
+const project = owned.find(p => p.id === 'proj_abc123');
+console.log(`Project: ${project.name}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    projects = await client.list_projects()
+    project = next(p for p in projects["owned"] if p.id == "proj_abc123")
+    print(f"Project: {project.name}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "proj_abc123",
+    "name": "Satellite System Model",
+    "owner": "usr_your_license_key",
+    "created": "2026-01-15T08:00:00.000Z",
+    "lastModified": "2026-02-10T14:30:00.000Z"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | Invalid or expired API key |
+| `INSUFFICIENT_SCOPES` | 403 | Key lacks `projects:read` scope |
+| `PROJECT_NOT_FOUND` | 404 | Project does not exist or you lack access |
+| `GET_PROJECT_FAILED` | 500 | Internal error retrieving the project |
+
+---
+
+## Create Project
+
+Creates a new empty project.
+
+```
+POST /api/v1/programmatic/projects
+```
+
+**Required scope:** `projects:write`
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Project name. Allows alphanumeric characters, underscores, dashes, and spaces. Must contain at least one alphanumeric character. |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/projects" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "New Satellite Model"
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const project = await client.createProject({
+  name: 'New Satellite Model',
+});
+
+console.log(`Created project: ${project.name} (${project.id})`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    project = await client.create_project(
+        name="New Satellite Model",
+    )
+
+    print(f"Created project: {project['name']} ({project['id']})")
+```
+
+</CodeGroup>
+
+### Response `201 Created`
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "proj_new789",
+    "name": "New Satellite Model"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | Invalid or expired API key |
+| `INSUFFICIENT_SCOPES` | 403 | Key lacks `projects:write` scope |
+| `INVALID_NAME` | 400 | Name is missing, not a string, or contains invalid characters |
+| `CREATE_PROJECT_FAILED` | 500 | Internal error creating the project |
+
+---
+
+## Delete Project
+
+Permanently deletes a project and all its data. This action cannot be undone.
+
+<Warning>This action is irreversible. All project data, files, and version history will be permanently deleted.</Warning>
+
+```
+DELETE /api/v1/programmatic/projects/:id
+```
+
+**Required scope:** `projects:write`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The project ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE "https://your-davinci-instance.com/api/v1/programmatic/projects/proj_abc123" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+// Use a direct HTTP request for delete
+const response = await fetch(
+  'https://your-davinci-instance.com/api/v1/programmatic/projects/proj_abc123',
+  {
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer dav_sk_live_your_api_key',
+    },
+  }
+);
+// Returns 204 No Content on success
+```
+
+```python Python SDK
+import httpx
+
+async with httpx.AsyncClient() as client:
+    response = await client.delete(
+        "https://your-davinci-instance.com/api/v1/programmatic/projects/proj_abc123",
+        headers={"Authorization": "Bearer dav_sk_live_your_api_key"},
+    )
+    # Returns 204 No Content on success
+```
+
+</CodeGroup>
+
+### Response `204 No Content`
+
+No response body.
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | Invalid or expired API key |
+| `INSUFFICIENT_SCOPES` | 403 | Key lacks `projects:write` scope |
+| `DELETE_PROJECT_FAILED` | 500 | Internal error deleting the project |

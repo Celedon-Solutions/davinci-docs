@@ -1,0 +1,300 @@
+---
+title: Agent
+description: 'Send messages to the Davinci modeling agent, stop execution, and check status'
+---
+
+## Overview
+
+The Agent endpoints allow you to interact with the Davinci modeling agent within an active session. You can send natural-language instructions, stop a running agent, and check the agent's current status.
+
+Messages are processed asynchronously -- when you send a message, it is queued and the agent processes it in the background. Responses are delivered via [event polling](/api/events) or webhooks.
+
+All agent endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## Send Message
+
+Sends a message to the Davinci agent. The agent will process the instruction and perform modeling actions on the project. This is a fire-and-forget operation -- the response confirms the message was queued, and results arrive asynchronously via events.
+
+```
+POST /api/v1/programmatic/sessions/:id/agent/message
+```
+
+**Required scope:** `agent:message`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `message` | string | Yes | The instruction for the agent (natural language) |
+| `messageId` | string | No | Client-provided message ID for correlation. If not provided, one is generated. |
+| `context` | object | No | Optional metadata to include with the message |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/agent/message" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Create a part called Motor with attributes: power (100 W), weight (2.5 kg), and efficiency (0.95)",
+    "context": {
+      "requestedBy": "ci-pipeline",
+      "ticket": "PROJ-1234"
+    }
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const response = await session.message(
+  'Create a part called Motor with attributes: power (100 W), weight (2.5 kg), and efficiency (0.95)',
+  { context: { requestedBy: 'ci-pipeline', ticket: 'PROJ-1234' } }
+);
+
+console.log(`Message queued: ${response.messageId}`);
+console.log(`Status: ${response.status}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    response = await session.message(
+        "Create a part called Motor with attributes: power (100 W), weight (2.5 kg), and efficiency (0.95)",
+        context={"requestedBy": "ci-pipeline", "ticket": "PROJ-1234"},
+    )
+
+    print(f"Message queued: {response.message_id}")
+    print(f"Status: {response.status}")
+```
+
+</CodeGroup>
+
+### Response `202 Accepted`
+
+```json
+{
+  "success": true,
+  "data": {
+    "messageId": "msg_abc123",
+    "status": "queued",
+    "timestamp": "2026-02-10T12:05:00.000Z"
+  }
+}
+```
+
+<Note>A `202 Accepted` response means the message was successfully queued. The agent will process it asynchronously. Use [event polling](/api/events) or webhooks to receive the agent's response.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `INVALID_MESSAGE` | 400 | Message is missing or not a string |
+| `SEND_MESSAGE_FAILED` | 500 | Internal error sending the message |
+
+---
+
+## Stop Agent
+
+Requests the agent to stop its current task. The agent will attempt to halt gracefully.
+
+```
+POST /api/v1/programmatic/sessions/:id/agent/stop
+```
+
+**Required scope:** `agent:message`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/agent/stop" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Send a message
+await session.message('Build the entire satellite system model');
+
+// Decide to stop
+await session.stopAgent();
+console.log('Agent stop requested');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Send a message
+    await session.message("Build the entire satellite system model")
+
+    # Decide to stop
+    await session.stop_agent()
+    print("Agent stop requested")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "stop_requested",
+    "timestamp": "2026-02-10T12:06:00.000Z"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `STOP_AGENT_FAILED` | 500 | Internal error stopping the agent |
+
+---
+
+## Get Agent Status
+
+Returns the current status of the agent in a session.
+
+```
+GET /api/v1/programmatic/sessions/:id/agent/status
+```
+
+**Required scope:** `agent:message`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/agent/status" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const agentStatus = await session.getAgentStatus();
+console.log(`Agent status: ${agentStatus.status}`);
+if (agentStatus.taskId) {
+  console.log(`Current task: ${agentStatus.taskId}`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    agent_status = await session.get_agent_status()
+    print(f"Agent status: {agent_status['status']}")
+    if agent_status.get("taskId"):
+        print(f"Current task: {agent_status['taskId']}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "running",
+    "taskId": "programmatic-ses_abc789",
+    "lastMessageId": "msg_xyz789"
+  }
+}
+```
+
+### Agent Status Values
+
+| Status | Description |
+|--------|-------------|
+| `idle` | Agent is not processing any task |
+| `running` | Agent is actively processing a message |
+| `paused` | Agent has been paused |
+| `completed` | Agent finished its most recent task |
+| `failed` | Agent encountered a fatal error |
+| `unknown` | Agent status could not be determined |
+| `disconnected` | Design Engine is not reachable |
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_STATUS_FAILED` | 500 | Internal error retrieving agent status |

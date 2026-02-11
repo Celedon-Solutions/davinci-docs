@@ -7,10 +7,11 @@ description: 'Connect AI agents and automation scripts to Davinci using the Prog
 
 The Davinci Programmatic API enables non-human users (AI agents, automation scripts, CI/CD pipelines) to interact with Davinci projects programmatically. With this API, you can:
 
-- **Create and manage projects** – List, create, and delete projects
-- **Open sessions** – Connect to projects and interact with the Davinci agent
+- **Create and manage projects** – List, create, and delete projects with pagination
+- **Open persistent sessions** – Connect to projects with persistent chat history that survives restarts
 - **Send messages** – Instruct the agent to perform modeling tasks
-- **Receive events** – Get real-time updates on agent progress and completions
+- **Receive events** – Get real-time updates with cursor-based polling and event type filtering
+- **Reconnect sessions** – Resume inactive sessions with full chat context
 - **Access project data** – Retrieve project tree, objects, and git information
 - **Collaborate** – Share projects and manage collaborators
 
@@ -186,21 +187,34 @@ When creating an API key, you can specify which permissions it has:
 
 ### Sessions
 
-A **session** represents an active connection to a project. Sessions:
+A **session** represents a persistent connection to a project. Sessions:
 - Load the project into the Design Engine
 - Enable message passing to the agent
 - Provide access to project data
-- Have a 30-minute idle timeout (use `keepalive` to extend)
-- Maximum duration of 24 hours
+- **Persist metadata and chat history** -- sessions survive server restarts
+- Have a 30-minute idle timeout (moves to `inactive`; use `keepalive` to extend)
+- Maximum active duration of 24 hours
+- Can be **reconnected** after becoming inactive or closed, resuming with full chat context
+
+### Session Lifecycle
+
+```
+connected → (idle timeout) → inactive → (reconnect) → connected
+connected → (close) → closed → (reconnect) → connected
+connected → (DE unavailable) → degraded
+```
 
 ### Event Polling
 
 The SDK uses polling to receive events from the agent. Events include:
 - `session.connected` – Session is ready
+- `session.reconnected` – Session was restored from an inactive/closed state
+- `agent.thinking` – Agent has started processing (fires before LLM calls)
 - `agent.reply` – Agent has responded
-- `agent.thinking` – Agent is processing
 - `agent.error` – An error occurred
 - `session.disconnect` – Session ended
+
+Events include a monotonically increasing `eventId`. Use cursor-based polling (`?cursor=<lastEventId>`) to avoid re-processing events. Use `eventTypes` to filter for specific event types.
 
 ### Project Tree
 
@@ -236,13 +250,16 @@ DELETE /api/v1/programmatic/projects/:id    # Delete project
 
 ### Sessions
 ```
-POST   /api/v1/programmatic/sessions                    # Create session
-GET    /api/v1/programmatic/sessions/:id                # Get session status
-DELETE /api/v1/programmatic/sessions/:id                # Close session
-POST   /api/v1/programmatic/sessions/:id/keepalive      # Extend timeout
-GET    /api/v1/programmatic/sessions/:id/events         # Poll for events
-GET    /api/v1/programmatic/sessions/:id/tree           # Get project tree
-GET    /api/v1/programmatic/sessions/:id/objects/:oid   # Get object details
+GET    /api/v1/programmatic/sessions                          # List all sessions
+POST   /api/v1/programmatic/sessions                          # Create session
+GET    /api/v1/programmatic/sessions/:id                      # Get session status
+DELETE /api/v1/programmatic/sessions/:id                      # Close session
+POST   /api/v1/programmatic/sessions/:id/keepalive            # Extend timeout
+POST   /api/v1/programmatic/sessions/:id/reconnect            # Reconnect inactive session
+GET    /api/v1/programmatic/sessions/:id/history              # Get chat history
+GET    /api/v1/programmatic/sessions/:id/events               # Poll for events
+GET    /api/v1/programmatic/sessions/:id/tree                 # Get project tree
+GET    /api/v1/programmatic/sessions/:id/objects/:oid         # Get object details
 ```
 
 ### Agent

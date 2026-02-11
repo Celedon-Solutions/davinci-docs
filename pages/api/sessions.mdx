@@ -1,0 +1,654 @@
+---
+title: Sessions
+description: 'Create and manage sessions to interact with Davinci projects programmatically'
+---
+
+## Overview
+
+A **session** represents an active connection to a Davinci project. Sessions load the project into the Design Engine, enabling you to send messages to the agent, query project data, and perform git operations.
+
+Key behaviors:
+- Sessions are **persistent** -- metadata and chat history survive server restarts
+- Sessions have a **30-minute idle timeout** (moves to `inactive` status; use keepalive to extend)
+- Maximum active session duration is **24 hours**
+- Inactive or closed sessions can be **reconnected** to resume work with chat history intact
+
+All session endpoints require authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## List Sessions
+
+Returns all sessions (active, inactive, and closed) for the authenticated service account.
+
+```
+GET /api/v1/programmatic/sessions
+```
+
+**Required scope:** `sessions:manage`
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `status` | string | No | Filter by status: `active`, `inactive`, `closed`, `connected`, or `degraded` |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions?status=inactive" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const { sessions } = await client.listSessions();
+for (const s of sessions) {
+  console.log(`${s.sessionId} — ${s.status} — ${s.projectId}`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    result = await client.list_sessions()
+    for s in result["sessions"]:
+        print(f"{s['sessionId']} — {s['status']} — {s['projectId']}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessions": [
+      {
+        "sessionId": "ses_abc123",
+        "projectId": "proj_abc123",
+        "branchName": "main",
+        "status": "connected",
+        "createdAt": "2026-02-10T12:00:00.000Z",
+        "lastActivity": "2026-02-10T14:30:00.000Z",
+        "messageCount": 12,
+        "chatId": "programmatic_ses_abc123"
+      },
+      {
+        "sessionId": "ses_def456",
+        "projectId": "proj_def456",
+        "branchName": "feature-branch",
+        "status": "inactive",
+        "createdAt": "2026-02-09T08:00:00.000Z",
+        "lastActivity": "2026-02-09T10:00:00.000Z",
+        "messageCount": 5,
+        "chatId": "programmatic_ses_def456"
+      }
+    ],
+    "count": 2
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `INVALID_API_KEY` | 401 | Invalid or expired API key |
+| `INSUFFICIENT_SCOPES` | 403 | Key lacks `sessions:manage` scope |
+| `LIST_SESSIONS_FAILED` | 500 | Internal error listing sessions |
+
+---
+
+## Create Session
+
+Opens a new session for a project, loading it into the Design Engine.
+
+```
+POST /api/v1/programmatic/sessions
+```
+
+**Required scope:** `sessions:manage`
+
+### Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `projectId` | string | Yes | The project ID to open |
+| `branchName` | string | No | Git branch to open (default: `"main"`) |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectId": "proj_abc123",
+    "branchName": "main"
+  }'
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({
+  projectId: 'proj_abc123',
+  branchName: 'main',
+});
+
+console.log(`Session created: ${session.sessionId}`);
+console.log(`Status: ${session.status}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(
+        project_id="proj_abc123",
+        branch_name="main",
+    )
+
+    print(f"Session created: {session.session_id}")
+    print(f"Status: {session.status}")
+```
+
+</CodeGroup>
+
+### Response `201 Created`
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessionId": "ses_abc789",
+    "projectId": "proj_abc123",
+    "branchName": "main",
+    "status": "connected",
+    "createdAt": "2026-02-10T12:00:00.000Z"
+  }
+}
+```
+
+<Note>The session is returned with status `"connected"` once the project is loaded into the Design Engine. If the Design Engine is unavailable, the status will be `"degraded"`. A `session.connected` event is also queued for polling.</Note>
+
+### Session Statuses
+
+| Status | Description |
+|--------|-------------|
+| `connected` | Session is active and ready for interaction |
+| `degraded` | Session was created but the Design Engine connection failed. Retry or reconnect later. |
+| `inactive` | Session timed out due to inactivity. Can be reconnected. |
+| `closed` | Session was explicitly closed by the client. Can be reconnected. |
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `MISSING_PROJECT_ID` | 400 | `projectId` was not provided |
+| `PROJECT_NOT_FOUND` | 404 | Project does not exist or you lack access |
+| `SERVICE_UNAVAILABLE` | 503 | No Design Engine instances available |
+| `CREATE_SESSION_FAILED` | 500 | Internal error creating the session |
+
+---
+
+## Get Session Status
+
+Retrieves the current status and metadata for a session.
+
+```
+GET /api/v1/programmatic/sessions/:id
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+const status = await session.getStatus();
+
+console.log(`Status: ${status.status}`);
+console.log(`Messages sent: ${status.messageCount}`);
+console.log(`Last activity: ${status.lastActivity}`);
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+    status = await session.get_status()
+
+    print(f"Status: {status.status}")
+    print(f"Messages sent: {status.message_count}")
+    print(f"Last activity: {status.last_activity}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessionId": "ses_abc789",
+    "projectId": "proj_abc123",
+    "branchName": "main",
+    "status": "connected",
+    "createdAt": "2026-02-10T12:00:00.000Z",
+    "lastActivity": "2026-02-10T12:05:30.000Z",
+    "messageCount": 3,
+    "chatId": "programmatic_ses_abc789"
+  }
+}
+```
+
+<Note>The `chatId` links to the persistent chat history for this session. Use the [Get Chat History](#get-chat-history) endpoint to retrieve past messages.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_SESSION_FAILED` | 500 | Internal error retrieving session status |
+
+---
+
+## Close Session
+
+Closes a session, disconnecting from the Design Engine and freeing resources. The session metadata and chat history are preserved -- you can reconnect later using the [Reconnect Session](#reconnect-session) endpoint.
+
+```
+DELETE /api/v1/programmatic/sessions/:id
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// ... do work ...
+
+// Close when done
+await session.close();
+console.log('Session closed');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # ... do work ...
+
+    # Close when done
+    await session.close()
+    print("Session closed")
+
+    # Or use as async context manager for automatic cleanup:
+    async with await client.create_session(project_id="proj_abc123") as session:
+        pass  # Session automatically closes on exit
+```
+
+</CodeGroup>
+
+### Response `204 No Content`
+
+No response body.
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or already closed |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `CLOSE_SESSION_FAILED` | 500 | Internal error closing the session |
+
+---
+
+## Keepalive
+
+Extends the session idle timeout. Sessions automatically expire after 30 minutes of inactivity. Call this endpoint periodically to keep the session alive.
+
+```
+POST /api/v1/programmatic/sessions/:id/keepalive
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/keepalive" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+// Send keepalive to extend timeout
+await session.keepalive();
+console.log('Session timeout extended');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    # Send keepalive to extend timeout
+    await session.keepalive()
+    print("Session timeout extended")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessionId": "sess_xyz789",
+    "lastActivity": "2026-02-10T12:30:00.000Z",
+    "expiresAt": "2026-02-10T13:00:00.000Z"
+  }
+}
+```
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `KEEPALIVE_FAILED` | 500 | Internal error sending keepalive |
+
+---
+
+## Reconnect Session
+
+Reconnects to a previously inactive or closed session. This re-establishes the Design Engine connection and restores access to the project. The agent will automatically reload chat history from the previous session on the next message.
+
+```
+POST /api/v1/programmatic/sessions/:id/reconnect
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID to reconnect |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X POST "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc123/reconnect" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+// List inactive sessions
+const { sessions } = await client.listSessions({ status: 'inactive' });
+
+// Reconnect to the first one
+const session = await client.reconnectSession(sessions[0].sessionId);
+console.log(`Reconnected: ${session.sessionId} (${session.status})`);
+
+// Continue where you left off
+await session.message('Continue the previous task');
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    # List inactive sessions
+    result = await client.list_sessions(status="inactive")
+
+    # Reconnect to the first one
+    session = await client.reconnect_session(result["sessions"][0]["sessionId"])
+    print(f"Reconnected: {session.session_id} ({session.status})")
+
+    # Continue where you left off
+    await session.message("Continue the previous task")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessionId": "ses_abc123",
+    "projectId": "proj_abc123",
+    "branchName": "main",
+    "status": "connected",
+    "createdAt": "2026-02-09T08:00:00.000Z",
+    "lastActivity": "2026-02-10T15:00:00.000Z",
+    "messageCount": 5,
+    "chatId": "programmatic_ses_abc123",
+    "reconnected": true
+  }
+}
+```
+
+<Note>If the session is already active in memory, the response includes `"reconnected": false` and the current session state. A `session.reconnected` event is queued for polling on successful reconnection.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | No persisted session found with this ID |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `PROJECT_NOT_FOUND` | 404 | The session's project is no longer accessible |
+| `RECONNECT_FAILED` | 500 | Internal error reconnecting the session |
+
+---
+
+## Get Chat History
+
+Retrieves the persistent chat history for a session, including messages sent and agent responses.
+
+```
+GET /api/v1/programmatic/sessions/:id/history
+```
+
+**Required scope:** `sessions:manage`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/ses_abc123/history" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const history = await client.getSessionHistory('ses_abc123');
+console.log(`${history.messageCount} messages in chat`);
+
+for (const msg of history.messages) {
+  console.log(`[${msg.role}] ${msg.message}`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    history = await client.get_session_history("ses_abc123")
+    print(f"{history['messageCount']} messages in chat")
+
+    for msg in history["messages"]:
+        print(f"[{msg['role']}] {msg['message']}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "messages": [
+      {
+        "role": "user",
+        "message": "Create a part called Motor with power 100W",
+        "timestamp": "2026-02-10T12:05:00.000Z"
+      },
+      {
+        "role": "assistant",
+        "message": "Done! I've created the Motor part with a power attribute set to 100 W.",
+        "timestamp": "2026-02-10T12:05:15.000Z"
+      }
+    ],
+    "messageCount": 2,
+    "agentName": "default",
+    "lastSaved": "2026-02-10T12:05:15.000Z"
+  }
+}
+```
+
+<Note>Chat history is saved when the agent completes or is terminated. If the agent is still actively processing, the most recent exchange may not yet appear in the history.</Note>
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_HISTORY_FAILED` | 500 | Internal error retrieving chat history |

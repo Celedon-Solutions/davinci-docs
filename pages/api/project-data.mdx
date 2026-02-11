@@ -1,0 +1,250 @@
+---
+title: Project Data
+description: 'Retrieve the project tree and detailed object information from a session'
+---
+
+## Overview
+
+The Project Data endpoints provide read-only access to the structure and contents of a Davinci project within an active session. You can retrieve the full project tree (hierarchy of all objects) and get detailed information about individual objects.
+
+All project data endpoints require an active session and authentication with a service account API key.
+
+```
+Authorization: Bearer dav_sk_live_your_api_key
+```
+
+---
+
+## Get Project Tree
+
+Returns the full hierarchical structure of all objects in the project.
+
+```
+GET /api/v1/programmatic/sessions/:id/tree
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/tree" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const { objectCount, tree } = await session.getProjectTree();
+
+console.log(`Project has ${objectCount} objects`);
+for (const node of tree) {
+  console.log(`- [${node.type}] ${node.name} (${node.id})`);
+  if (node.childrenCount > 0) {
+    console.log(`  └── ${node.childrenCount} children`);
+  }
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    tree = await session.get_project_tree()
+
+    print(f"Project has {tree.object_count} objects")
+    for node in tree.tree:
+        print(f"- [{node.type}] {node.name} ({node.id})")
+        if node.children_count > 0:
+            print(f"  └── {node.children_count} children")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "objectCount": 12,
+    "tree": [
+      {
+        "id": "obj_root001",
+        "name": "Satellite System",
+        "type": "part",
+        "parent": "",
+        "childrenCount": 3
+      },
+      {
+        "id": "obj_power001",
+        "name": "Power Subsystem",
+        "type": "part",
+        "parent": "obj_root001",
+        "childrenCount": 2
+      },
+      {
+        "id": "obj_batt001",
+        "name": "Battery Pack",
+        "type": "part",
+        "parent": "obj_power001",
+        "childrenCount": 0
+      },
+      {
+        "id": "obj_req001",
+        "name": "Power Requirements",
+        "type": "requirement",
+        "parent": "obj_root001",
+        "childrenCount": 5
+      }
+    ]
+  }
+}
+```
+
+### Tree Node Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique identifier for the object |
+| `name` | string | Display name of the object |
+| `type` | string | Object type (e.g., `part`, `requirement`, `attribute`, `port`, `constraint`) |
+| `parent` | string | ID of the parent object (empty string for root objects) |
+| `childrenCount` | number | Number of direct children |
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `GET_TREE_FAILED` | 500 | Internal error retrieving the project tree |
+
+---
+
+## Get Object Details
+
+Retrieves full details for a specific object, including its properties, documentation, and metadata.
+
+```
+GET /api/v1/programmatic/sessions/:id/objects/:objectId
+```
+
+**Required scope:** `projects:read`
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | The session ID |
+| `objectId` | string | Yes | The object ID to retrieve |
+
+### Example
+
+<CodeGroup>
+
+```bash curl
+curl -X GET "https://your-davinci-instance.com/api/v1/programmatic/sessions/sess_xyz789/objects/obj_power001" \
+  -H "Authorization: Bearer dav_sk_live_your_api_key"
+```
+
+```typescript JavaScript SDK
+import { DavinciClient } from '@celedon/davinci-sdk';
+
+const client = new DavinciClient({
+  apiKey: 'dav_sk_live_your_api_key',
+  baseUrl: 'https://your-davinci-instance.com',
+});
+
+const session = await client.createSession({ projectId: 'proj_abc123' });
+
+const object = await session.getObject('obj_power001');
+
+console.log(`Name: ${object.name}`);
+console.log(`Type: ${object.type}`);
+console.log(`Documentation: ${object.documentation}`);
+if (object.children) {
+  console.log(`Children: ${object.children.length}`);
+}
+```
+
+```python Python SDK
+from davinci_sdk import DavinciClient
+
+async with DavinciClient(
+    api_key="dav_sk_live_your_api_key",
+    base_url="https://your-davinci-instance.com"
+) as client:
+    session = await client.create_session(project_id="proj_abc123")
+
+    obj = await session.get_object("obj_power001")
+
+    print(f"Name: {obj.name}")
+    print(f"Type: {obj.type}")
+    print(f"Documentation: {obj.documentation}")
+    if obj.children:
+        print(f"Children: {len(obj.children)}")
+```
+
+</CodeGroup>
+
+### Response `200 OK`
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "obj_power001",
+    "type": "part",
+    "name": "Power Subsystem",
+    "documentation": "Manages power generation and distribution for the satellite system.",
+    "parent": "obj_root001",
+    "children": [
+      "obj_batt001",
+      "obj_solar001"
+    ]
+  }
+}
+```
+
+<Note>The response may include additional type-specific properties depending on the object type. For example, attributes include `value` and `unit` fields, requirements include `text` and `priority` fields.</Note>
+
+### Common Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique identifier |
+| `type` | string | Object type |
+| `name` | string | Display name |
+| `documentation` | string | Optional documentation/description text |
+| `parent` | string | Parent object ID |
+| `children` | string[] | List of child object IDs |
+
+### Errors
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `SESSION_NOT_FOUND` | 404 | Session does not exist or has expired |
+| `FORBIDDEN` | 403 | You do not own this session |
+| `OBJECT_NOT_FOUND` | 404 | Object does not exist in the project |
+| `GET_OBJECT_FAILED` | 500 | Internal error retrieving the object |
