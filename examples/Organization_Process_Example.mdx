@@ -1,0 +1,242 @@
+---
+title: "Organization Process Modeling"
+description: "Learn how to model complex organizational processes in Davinci by extracting entities, requirements, actions, and states from documentation to model and optimize workflows"
+icon: "sitemap"
+---
+
+## Background
+
+### The Challenge of Process Modeling
+
+Organizations often struggle to document and optimize their internal processes. Standard operating procedures (SOPs) and workflow descriptions are frequently:
+
+- **Static and Buried**: Contained in lengthy PDFs or manuals that are rarely updated or referenced
+- **Disconnected**: Separated from the actual people, tools, and requirements involved in the work
+- **Hard to Analyze**: Difficult to identify bottlenecks, missing steps, or compliance gaps
+- **Inconsistent**: Different departments use different terminology and modeling approaches
+- **Manual Reporting**: Requiring significant effort to generate status reports or compliance artifacts
+
+<Warning>
+Traditional process modeling often results in "shelfware"—beautiful diagrams and documents that don't reflect how work actually happens and provide no automation or analytical value to the organization.
+</Warning>
+
+### Why Process Modeling in Davinci Matters
+
+Davinci transforms process modeling from static documentation into a dynamic, integrated system model:
+
+1. **AI-Powered Extraction**: Automatically extract entities, requirements, and states from existing PDF standards
+2. **Integrated Digital Thread**: Link process states directly to the entities that manage them and the requirements they satisfy
+3. **Continuous Improvement**: Use AI to analyze existing processes and suggest optimizations and improvements
+4. **Automated Artifacts**: Generate report templates and documentation directly from the optimized process model
+5. **Single Source of Truth**: Maintain a living model of "how we work" that evolves with the organization
+
+<Info>
+In Davinci, an organization's process isn't just a flowchart—it's a collection of connected model elements (Entities, Requirements, and States) that can be analyzed, simulated, and used to automate documentation.
+</Info>
+
+### States vs. Actions: Modeling Non-Linearity
+
+While it might be tempting to model a process as a sequence of **Actions**, **States** can be great for organizational workflows with flows that link back to prior steps.
+
+- **Actions** are inherently linear and imperative. They represent "doing" something in a specific order (Step 1, then Step 2). This is often too rigid for human-centric processes where steps might be skipped, repeated, or handled out of order.
+- **States** represent the "status" or "condition" of the process at any given time. They are declarative and handle non-linearity naturally. A process can transition from "In Review" back to "Draft" or jump straight to "Approved" based on complex conditional logic.
+
+By modeling states and transitions, you capture the true flexibility of how organizations operate, providing a more resilient model than a simple linear checklist.
+
+## Modeling with Davinci
+
+### Step 1: Extract Process Elements from Documentation
+
+The most efficient way to start modeling an organization's process is by leveraging existing documentation. Upload your process manual or standard (PDF) and ask Davinci to identify the core components.
+
+#### Method: AI-Assisted Extraction from PDF
+
+Reference your process document and prompt Davinci to identify the key entities involved in the process. In this example we are working from a public Air Force engineering assistance process that is documented currently as a PDF.
+
+<Frame>
+  <img src="/images/examples/organization_process_example/afmc_document_reference.png" alt="Example process PDF." />
+</Frame>
+
+From this reference source we will then build out the different elements. In this case, the core aspects of this process are the roles that perform it, the flow of states, and the requirements that the process must meet. We will capture this using different model objects:
+
+- **Entities:** Model the roles or persons involved in the process.
+- **Requirements:** Model any instructive or constraining statement in the process as a requirement.
+- **States:** Model the different statuses and the transition flow between them.
+- **Attributes:** Capture any values of the process that matter and might be used in conditional steps or to define aspects of the roles and requirements.
+
+We can build out the three major aspects of Entities, Requirements, and States as a series of instructions for Davinci. 
+
+**Example: Identifying Entities**
+
+```
+From @afmcman63-1202 build the entities and stakeholders
+involved in the process
+```
+With this instruction Davinci is guided to read the PDF reference and focus on capturing what roles, teams, persons are performing the actions of the process. Once complete it will create a hierarchy of any identified elements linked to the reference sections.
+
+<Frame>
+  <img src="/images/examples/organization_process_example/original_entities.png" alt="Prompting Davinci to extract entities from a process PDF" />
+</Frame>
+
+*Davinci identifies roles like Disposition Engineer, Lead System Engineer, and others along with organizational units and external partners. For each the source used for that from the PDF is provided. Clicking on references will take you to the source page and highlight information (as applicable).*
+
+### Step 2: Define Process Requirements and States
+
+Once the entities are established, the next step is to define what the process must achieve (Requirements) and the specific states through which it progresses (States).
+
+#### Extracting Requirements and States
+
+
+After building out the roles we can continue with requirements:
+
+```
+Create the process requirements from @afmcman63-1202.
+```
+<Frame>
+  <img src="/images/examples/organization_process_example/OldRequirementsExample.png" alt="Davinci modeling the process as requirements." />
+</Frame>
+*Often a process will have a set of statements describing what must happen, its durations, data needs, etc. Using requirements captures these statements formally and allow them to eventually be traced to the roles (Entities), the steps (States), and activites (Actions) explicitly with clear performance value (Attributes).*
+
+After modeling the roles and requirements, we can then model the states to capture the process itself:
+
+```
+Model the process state flow from @afmcman63-1202.
+```
+<Frame>
+  <img src="/images/examples/organization_process_example/OldProcessStates.png" alt="Davinci modeling the process as a state machine, showing only the nominal flow paths." />
+</Frame>
+*Davinci modeling the process as a state machine, showing only the nominal flow paths. States are connected to each other via a Transition object which contains information about the condition of the transitions and which states it transitions to under that condition. For each State object, it contains entry, do, and exit triggerable actions.*
+
+With each state the model captured activities (Actions) that run during that state. For example in first state of `Draft` it has a do action of `ETAR Initiation Phase`:
+
+<Frame>
+  <img src="/images/examples/organization_process_example/ActionFlow.png" alt="In action as a sequence flow." />
+</Frame>
+In this specific action it describes the flow of information and data elements required between the roles (Entities) and what information they are sending ([Read more about Action objects](/pages/modeling/objects/actions)). Each data element is defined as an Item object, which can be used to describe what that content is (e.g., forms, data packages, etc.).
+
+Once both of these structures are setup, we can then cross link them via Subject and Performs relationships
+
+<Info>
+Relationships allow for linking objects across the model. In this example, we are using the base SysML v2 relationships of Subject and Performs, where Subject links a requirement to any object which is the subject of it, and Performs links a Part or Entity to a State that it manages or occupies.
+</Info>
+
+<Tip>
+Linking states to requirements ensures that every phase in your process has a clear purpose. If a state doesn't support a requirement, it may be a candidate for removal during optimization.
+</Tip>
+
+<Frame>
+  <img src="/images/examples/organization_process_example/OldProcess_matrix.png" alt="The perform relationships between the actors of the process." />
+</Frame>
+*The perform relationships between the actors of the process (Entity objects) with the specific actions occurring in the state machines (Action objects).*
+
+Once modeled you can then explore the relationships and cross review with the PDF reference. For example, we could define relationships between states and requirements or entities. As needed you can also define custom relationships to link across model elements to build full traceability based on your organization's modeling and terminology preference.
+
+### Step 3: Optimize and Improve the Process
+
+With the "as-is" process modeled, you can now leverage Davinci's AI to suggest improvements, identify bottlenecks, or simplify complex workflows.
+
+#### Prompting for Process Improvement
+
+Ask Davinci to analyze the modeled process and suggest a more efficient "to-be" state.
+
+```
+Analyze the current process states and requirements. Show me 
+some possible improvements to reduce cycle time and eliminate 
+redundant transitions between entities.
+```
+
+From the model more clear actionable things can be identified. You can work back and forth with Davinci to resolve a plan together. If you like these ideas ask to save them to the model:
+
+```
+Save this plan as a document under a folder called "New Process".
+```
+
+<Frame>
+  <img src="/images/examples/organization_process_example/improvement_doc.png" alt="AI-suggested improvements to the process workflow" />
+</Frame>
+*Davinci's suggestions on how we can improve the flow summarized into a helpful document. Here we made a document to reference and iterate on to finalize a plan of action.*
+
+Once ready, you can make a new set of roles, states, and updated requirements model to capture these changes. 
+
+```
+From this plan, lets build the updated process with the modified 
+roles, reduced requirements, and faster state transitions.
+```
+<Frame>
+  <img src="/images/examples/organization_process_example/NewProcessStates.png" alt="AI-suggested improvements to the process workflow" />
+</Frame>
+*Davinci's improved flow defines new escalation tiers to speed up processes by risk levels.*
+
+
+### Compare and Contrast
+With both models set up we can then ask Davinci to compare the differences and link that back to the model. For example:
+
+<Frame>
+  <img src="/images/examples/organization_process_example/NewProcessQuestionExample.png" alt="Comparison of the old and new process as modeled." />
+</Frame>
+*In this example chat, we prompted Davinci to summarize its response in the chat instead of writing a document. You can also take a chat response and ask Davinci to convert that into a document to be saved with the model and shareable with collaborators in the project.*
+
+## Why This Matters
+
+Modeling organizational processes provides several critical advantages:
+
+**Clarity and Searchability**: Modeling roles and processes provides a precise, interconnected representation that goes beyond what traditional documents offer. With a formal model, you can easily ask targeted questions, conduct thorough reviews, and perform in-depth analyses that static documents simply cannot support.
+
+**Operational Clarity**: Everyone understands their role (Entity), the state they are responsible for (State), and what success looks like (Requirement) and the specifics of communication lines (Actions). With a model you can trace all of these relationships from different perspectives and get better insights.
+
+**Scalability**: For large organizations, many processes can exist simultaneously each with different roles and needs. Using models you can map how these different process models overlap with each other, to existing roles, and the higher level organization needs. For complex hierarchies a digital model is far more efficient at capturing the emergent complexity than what can be hidden inside of imprecise document summaries.
+
+**Evidence-Based Optimization**: Improvements are based on a formal model of the process, allowing for systematic analysis rather than guesswork.
+
+**Knowledge Retention**: Organizational knowledge is captured in a living model rather than being lost when key personnel leave or when PDFs become outdated. Reuse this model with the agent chat for end-users to understand the roles.
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start with Entities" icon="users">
+    Always define the actors first to ensure every state in the process has a clear owner
+  </Card>
+  
+  <Card title="Trace to Requirements" icon="link">
+    Every process state should satisfy at least one requirement to avoid "process for process's sake"
+  </Card>
+  
+  <Card title="Iterative Improvement" icon="arrows-rotate">
+    Use AI to suggest small improvements regularly rather than waiting for a major process overhaul
+  </Card>
+  
+  <Card title="Model the 'Happy Path' First" icon="star">
+    Start by modeling the standard successful workflow before adding complex exception handling
+  </Card>
+</CardGroup>
+
+## Tips for Better Process Modeling
+
+1. **Use Clear State Names**: Define states as nouns or status indicators (e.g., "In Review," "Approved," "Distributed") for clarity.
+2. **Define Transitions**: Clearly specify what conditions cause the process to move from one state to the next.
+3. **Socialize the Model**: Use Davinci's visual views to review the process with the actual stakeholders to ensure accuracy.
+
+
+## Common Workflows
+
+### Process Audit and Validation
+
+1. **Compare modeled process** against actual execution logs or interviews
+2. **Identify "shadow processes"** where the real work diverges from the documented standard
+3. **Update the model** to reflect reality or reinforce the standard
+
+### Onboarding New Personnel
+
+1. **Select the relevant process model** for the new hire's role
+2. **Generate a role-specific checklist** of states they are responsible for
+3. **Link to requirements** to provide context on why their work matters
+4. **Provide the report templates** they will need to use as part of the process
+
+## Next Steps
+
+After modeling your organization's process:
+
+- **Simulate Workflows**: Use Davinci to identify potential resource conflicts or bottlenecks
+- **Connect to Tools**: Link process states to the external tools and agents used to manage them
+- **Establish Metrics**: Add Technical Performance Measures (TPMs) to track process efficiency
+
