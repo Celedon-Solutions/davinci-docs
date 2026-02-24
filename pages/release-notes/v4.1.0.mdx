@@ -1,0 +1,95 @@
+---
+title: 'Version 4.1.0 - Programmatic API, Agent Overhaul & Observability'
+description: 'February 5 2026'
+---
+
+## Version 4.1.0 - Programmatic API, Agent Overhaul & Observability
+
+Version 4.1.0 is a major feature release introducing a programmatic API with official SDKs, a redesigned agent chat experience, new image generation and presentation capabilities, capability objects, and a full observability stack for self-hosted deployments.
+
+### Programmatic API & SDKs
+
+Davinci models can now be created and manipulated programmatically without the UI.
+
+- **JavaScript SDK**: Official TypeScript SDK with session management, webhook support, and full type definitions
+- **Python SDK**: Official Python SDK with async support, error handling, and webhook integration
+- Enables scripting, automation, and integration with external tools and CI/CD pipelines
+
+### Agent Chat Redesign
+
+The agent chat experience has been substantially improved.
+
+- **Session Summary Panel**: Live summary showing agent progress, tool usage, and current plan status
+- **Thinking Visualization**: See the agent's reasoning process with collapsible thinking sections
+- **Progress Tracking**: Long-running agent operations now show real-time progress updates
+- **Improved Message Handling**: Better message ordering with recovery for interrupted sessions
+- **Richer Responses**: Improved markdown rendering for agent messages
+
+### [Capability](/pages/modeling/objects/capability) Objects
+
+A new object type for modeling system capabilities.
+
+- New capability object with dedicated icon, properties, and help documentation
+- The agent can build capabilities, connect them to subjects, and trace relationships between them
+- Capabilities render in tree views with derived relationship support
+
+### Agent Image Generation
+
+The agent can now generate and manipulate images directly within your model.
+
+- Generate CAD-style visualizations, concept of operations graphics, and technical diagrams
+- Auto-generate themed slide backgrounds for presentations
+- Convert raster images to structured SVG representations
+- Modify and replace image backgrounds
+
+### Presentation Improvements
+
+The agent's ability to build and edit presentations has been significantly expanded.
+
+- Add, delete, move, and replace individual slides
+- Edit individual slide elements and text blocks
+- Generate and apply layout templates with automatic space allocation
+- Better violation detection and automatic correction during slide generation
+
+### [Task](/pages/modeling/objects/task) Management
+
+- Create individual tasks or full task lists through the agent
+- Improved task tree generation with better dependency handling
+- Added decade scale to the [Gantt](/pages/user-guide/views/gantt) timeline
+
+### Agent Version Control
+
+The agent can now interact with the [version control](/pages/user-guide/right-panel/version-control) system directly — comparing branches and commits, reviewing history for individual objects, and checking uncommitted changes.
+
+### SysML v1.x Import (Preview)
+
+Initial support for importing SysML v1.x XMI files from MagicDraw/Cameo, including activity diagrams, interaction diagrams, state machines, and relationships.
+
+### Observability Stack
+
+Self-hosted deployments now include a full monitoring stack.
+
+- **Grafana Dashboards**: Pre-built dashboards for LLM usage, system health, tool usage, and user metrics
+- **Prometheus Metrics**: Metric collection across all services
+- **Loki Logging**: Centralized log aggregation with support for local, AWS, and GCS storage
+
+### UI Improvements
+
+- Rebuilt filter dropdown with improved selection and layout
+- New status dropdown for tasks and other objects
+- Expanded [digital thread](/pages/user-guide/views/digital-thread) view with richer relationship visualization
+- Improved [rollup](/pages/user-guide/views/rollup) tree rendering
+- New [OpenRouter](https://openrouter.ai/) support for AI model routing
+
+### New & Updated Agent Tools
+
+BuildCapabilities, BuildSystemCapability, ConnectCapabilitySubjects, ConnectCapabilityTraces, UpdateCapability, GenerateCADImage, GenerateConOpsGraphic, GenerateTechnicalDiagram, GenerateSVGFromImage, GeneratePresentationBackgrounds, AdjustImageBackground, GenerateGenericImage, AddSlide, DeleteSlide, MoveSlide, ReplaceSlide, AddSlideElement, ReplaceSlideElement, UpdateSlideBlocks, ApplyLayoutToSlide, CreateTask, CreateTaskList, GetAllTBDs, GetModelErrors, ReplyToAgent
+
+### Bug Fixes
+
+- Fixed task recalculation issues
+- Fixed flash of unstyled content in the settings bar
+- Fixed ordering issues in task expansion
+- Corrected relationship record handling
+- Improved null handling in the document editor
+- Various slide editing and presentation mode fixes

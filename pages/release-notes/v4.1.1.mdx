@@ -1,0 +1,80 @@
+---
+title: 'Version 4.1.1 - Keyboard Shortcuts, Document Sections & MFA'
+description: 'February 12 2026'
+---
+
+## Version 4.1.1 - Keyboard Shortcuts, Document Sections & MFA
+
+This release introduces a rebuilt keyboard shortcut system, document section support, multi-factor authentication, an account management page, expanded cloud AI provider support, and server-side code execution.
+
+### Keyboard Shortcuts
+
+The keyboard shortcut system has been completely rebuilt.
+
+- Context-aware shortcuts that adjust based on what you're currently editing
+- Open views directly via keyboard shortcuts
+- Dedicated hotkey for triggering agent runs
+- Ctrl/Cmd+S now shows an autosave confirmation notification
+- New workspace navigation shortcut
+
+### [Document](/pages/modeling/objects/documents) Sectioning
+
+Documents now support structural sections for better organization.
+
+- Insert section breaks to divide documents into distinct sections
+- Apply styles and formatting at the section level
+- New insert buttons for adding section breaks and other structural elements
+
+### Multi-Factor Authentication
+
+- MFA support for enhanced account security
+- New dedicated login page with MFA flow
+
+### Account Management
+
+- New account management page for profile settings, security, and API key management
+- Interface for creating and managing programmatic API keys
+
+### Cloud AI Provider Expansion
+
+- **Google Cloud / Vertex AI**: Native support for Google Cloud and Vertex AI model endpoints
+- **Anthropic on Vertex**: Support for Anthropic models through Google Vertex AI
+- **LiteLLM Passthrough**: Route requests to any compatible model provider via an external LiteLLM proxy
+
+### Server-Side Code Execution
+
+Code objects now execute on the server rather than in the browser, providing faster and more reliable code runs with better dependency support for Python, JavaScript, and C++.
+
+### Agent Improvements
+
+- The agent can now interact with version control — comparing branches, viewing commit history, and reviewing object changes over time
+- Improved presentation builder with better outline generation
+- Better citation and reference formatting in agent responses
+- Agent can now duplicate model objects
+- Loading spinner shown while undo operations are processed
+
+### SysML Import Updates
+
+- Improved MagicDraw .mdzip importer with better element resolution
+- Fixed documentation toggle in the state view during import
+
+### UI & Styling
+
+- Sticky index panel for better navigation while scrolling
+- Improved panel resizing with proper collapse behavior
+- Updated chat interface styling with better message layouts
+- Tooltip added to redo checkpoint controls
+
+### Import & Export
+
+- Fixed DOCX import handling for better format preservation
+- Fixed PowerPoint export generation issues
+
+### Bug Fixes
+
+- Fixed tag changes incorrectly marking objects as uncommitted modifications
+- Fixed rendering of child states in the state view
+- Fixed layout error handling in block diagrams
+- Fixed save popup to wait for file save completion
+- Fixed agent stopping behavior when running multiple agents
+- Fixed shortName display in the diff view

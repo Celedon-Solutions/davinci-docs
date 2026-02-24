@@ -1,0 +1,78 @@
+---
+title: 'Version 4.1.5 - SysML Interoperability & Modeling Enhancements'
+description: 'February 23 2026'
+---
+
+## Version 4.1.5 - SysML Interoperability & Modeling Enhancements
+
+This release delivers a major overhaul of SysML import and export capabilities, introduces ReqIF import support, and includes improvements to state machines, port modeling, search, and server reliability.
+
+### SysML v2 Export
+
+The SysML v2 export now covers significantly more of your model with higher fidelity.
+
+- **Sequences & Actions**: Full export of action sequences including message passing, control flows, and nested structures
+- **State Machines**: Export state diagrams with entry, do, and exit behaviors
+- **Units & Values**: Measurement units and value types are now preserved during export
+- **Constraints, Risks & Capabilities**: Expanded export coverage for these object types
+- **Interfaces & Connections**: Improved interface export with port binding and connection definitions
+- **Preflight Validation**: A new pre-export check warns about potential issues before generating SysML output
+
+### SysML v1.x Import
+
+The MagicDraw/XMI import pipeline has been significantly improved.
+
+- Broader support for activity diagrams, interaction diagrams, and behavioral constructs
+- More consistent type and relationship mapping across SysML and UML elements
+- Improved import progress feedback with status updates
+- New popup for resolving ambiguous element types during import
+- Added a non-AI conversion option for fully deterministic imports
+
+### ReqIF Import
+
+Added support for importing ReqIF (Requirements Interchange Format) files, enabling interoperability with DOORS and other requirements management tools.
+
+### [State Machine](/pages/modeling/objects/states) Enhancements
+
+- States now display entry, do, and exit action behaviors
+- Improved state diagram layout
+
+### [Port](/pages/modeling/objects/ports) Modeling
+
+- Ports can now be nested inside other ports for hierarchical interface modeling
+- Port rendering respects user-defined index ordering
+
+### Search & Navigation
+
+- Improved search result relevance and scoping
+- The index now highlights the current scope when navigating search results
+- Better drop target indicators for drag-and-drop in the index
+
+### [Sequence](/pages/user-guide/views/sequence) & Action Views
+
+- Improved action graph layout for complex control flows
+- Refined sequence diagram rendering and spacing
+
+### Server Connection & Reliability
+
+- New connection monitoring system that tracks connectivity and handles reconnection automatically
+
+### UI & Usability
+
+- New contextual tooltips across the interface
+- Added a 10th view keybind slot for faster view switching
+- Fixed resource table rendering and interaction issues
+- Fixed account profile picture alignment
+- Various table view fixes for rendering, column sizing, and tags
+- CSS cleanup and alignment fixes
+
+### Git & Version Control
+
+- Improved branch deletion flow
+- Various version control view improvements
+
+### Bug Fixes
+
+- Fixed rendering and interaction issues in resource tables
+- Corrected duplicate CSS classes and alignment inconsistencies
+- Updated safety triangle rendering

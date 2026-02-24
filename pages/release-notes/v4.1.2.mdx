@@ -1,0 +1,67 @@
+---
+title: 'Version 4.1.2 - System Reviews, Validation & Action Graphs'
+description: 'February 17 2026'
+---
+
+## Version 4.1.2 - System Reviews, Validation & Action Graphs
+
+This release introduces agent-driven system reviews for automated model quality assessment, a validation framework for catching modeling errors, major improvements to action graph visualization, and a new allocation matrix view.
+
+### System Reviews
+
+The agent can now systematically review and score model quality. Ask the agent to review your project and it will evaluate object completeness, relationship correctness, document quality, organizational structure, reference accuracy, and naming conventions — then generate a comprehensive report with scores and improvement suggestions.
+
+### Model Validation
+
+A new validation framework helps catch modeling errors.
+
+- The agent can run validation checks across your project to find missing fields, broken references, inconsistencies, and syntax errors
+- Validation covers all object types including documents, tables, formulas, code blocks, and DSL expressions
+- Table validation pinpoints specific cell locations for issues
+
+### [Action](/pages/modeling/objects/actions) Graphs & Sequences
+
+- Completely reworked action graph visualization with better traceability — duplicate action nodes are shown where needed so every connection path is visible
+- The agent can now build complete action sequences in a single operation
+- Improved sequence diagram layout and rendering
+- Long parent names in code view are now truncated for readability
+
+### Allocation [Matrix](/pages/modeling/objects/matrix) View
+
+- New matrix view for visualizing relationships between any two object types in a grid format
+- Configure which object types appear on each axis to create cross-reference matrices
+
+### [Block Diagram](/pages/user-guide/views/block) Improvements
+
+- Improved diagram layout and SVG rendering
+- Aggregate labels for sub-interfaces
+
+### [State](/pages/modeling/objects/states) Machine Updates
+
+- Failure states no longer require conditional statements
+- Improved state generation quality when using the agent
+
+### Reference & Search
+
+- Expanded reference display with richer context and navigation
+- References now support multi-page documents
+- Object indentation in the index when moving objects via drag-and-drop
+
+### Agent Improvements
+
+- The agent can now provide improvement suggestions during reviews
+- Improved constraint, interface, and linkage modeling
+- Better optimization tool for multidisciplinary design exploration
+- Per-tool token usage tracking visible in session summaries
+
+### New & Updated Agent Tools
+
+Linter, BuildSequence, ExportProjectReview, BuildOptimization (reworked), DuplicateObjects (updated)
+
+### Bug Fixes
+
+- Fixed a bug where documents would only load the first page
+- Fixed border color and header table styling
+- Fixed z-index layering issue in chat
+- Fixed chat thinking display rendering
+- Corrected position values when importing projects
