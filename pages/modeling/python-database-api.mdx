@@ -50,7 +50,7 @@ Both the global `database` object and `davinci.database` point to the same API.
 Anywhere an object reference is expected, bracketed UUID strings are the preferred style:
 
 ```python
-parent="[00000000-0000-0000-0000-0000000model]"
+parent="<uuid>"
 ```
 
 Plain UUID strings are still accepted for compatibility:
@@ -89,14 +89,11 @@ When `fields="common"` is used (the default), objects are projected to a standar
 | `risk` | `probability`, `impact`, `detectability`, `combinator` |
 | `requirement` | `satisfied` |
 | `code` | `language` |
-| `reference` | `location` |
 | `table` | `rowCount`, `colCount` (derived) |
 
 **`resolvedValue`** is included as a read-only nested object representing the system-computed result:
 - For `attribute`/`constraint`/`state`: `{ value, error, errorMsg, equationString }` — the inner `value` is the computed numeric or string result.
 - For `task`: `{ startDate, endDate, duration, progression, error, errorMsg }`.
-
-**Always hidden from common:** `pos`, `extends`, `references`, `relationship`, `tags`, `comments`, `styles`, `rows`, `columns`, `cells`, `stateValues`, `ganttSettings`, `prerequisites`.
 
 ## Writable Fields
 `database.update()` and `database.save()` enforce a per-type allowlist. Attempting to write a read-only field raises an error.
@@ -119,8 +116,6 @@ Guidance:
 | `requirement` | `satisfied` |
 | `reference` | `location.type`, `location.value`, `citation.*` |
 | `code` | *(none — `language` and `code` are read-only)* |
-
-**Always read-only:** `id`, `type`, `parent`, `children`, `resolvedValue`, `stateValues`, `relationship`, `references`, `rows`, `columns`, `cells`, `pos`, `extends`, `ganttSettings`, `prerequisites`, `language`, `code`
 
 ## Methods
 
@@ -172,7 +167,7 @@ vals = await database.search(
     graph={
         "relationshipType": "uses",
         "direction": "out",
-        "connectedTo": "[00000000-0000-0000-0000-0000000model]",
+        "connectedTo": "<uuid>",
     },
     fields=["id", "name"],
 )
@@ -213,7 +208,7 @@ Load by id:
 
 ```python
 obj = await database.load(
-    target={"id": "[00000000-0000-0000-0000-0000000model]"},
+    target={"id": "<uuid>"},
     fields=["id", "name", "children"],
 )
 print(obj)
@@ -234,7 +229,7 @@ Create is idempotent by default for named objects. If an object with the same `p
 
 ```python
 created = await database.create(
-    parent="[00000000-0000-0000-0000-0000000model]",
+    parent="<uuid>",
     objects=[
         {
             "type": "attribute",
@@ -325,7 +320,7 @@ tree = make_part("Spacecraft", children=[
 ])
 
 created = await database.create(
-    parent="[00000000-0000-0000-0000-0000000model]",
+    parent="<uuid>",
     objects=[tree],
 )
 print(len(created))
@@ -737,7 +732,7 @@ for owner_name, process_text in rows:
     })
 
 created = await database.create(
-    parent="[00000000-0000-0000-0000-0000000model]",
+    parent="<uuid>",
     objects=objects,
 )
 print(created)
@@ -826,7 +821,7 @@ Create a full parts tree in one call:
 
 ```python
 created = await database.create(
-    parent="[00000000-0000-0000-0000-0000000model]",
+    parent="<uuid>",
     objects=[
         {
             "type": "part",
