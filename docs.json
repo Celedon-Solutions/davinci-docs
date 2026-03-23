@@ -149,6 +149,12 @@
                                 ]
                             },
                             {
+                                "group": "Scripts",
+                                "pages": [
+                                    "pages/modeling/python-database-api"
+                                ]
+                            },
+                            {
                                 "group": "Object Views",
                                 "pages": [
                                     "pages/user-guide/views/activity",

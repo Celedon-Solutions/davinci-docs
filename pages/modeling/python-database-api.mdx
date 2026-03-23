@@ -1,0 +1,905 @@
+---
+title: Python Database API
+---
+
+# Python Database API
+
+<Note>
+  The Python Database API is currently in **Beta**. Methods, parameters, and behavior are subject to change as we refine the interface.
+</Note>
+
+## Overview
+The Python Database API provides live read and write access to model objects from Davinci Python code. It is available through the global `database` object and the equivalent `davinci.database` alias.
+
+The API supports:
+
+- Searching model objects by name, type, fields, path, and graph relationships
+- Loading full objects or selected fields
+- Creating objects under a parent, including full nested trees
+- Updating editable fields on matching objects
+- Saving objects with create-or-update behavior
+- Deleting objects, optionally recursively
+- Reading and writing table cells with A1 notation
+- Adding and removing relationships between objects
+- Retrieving project-level configuration
+
+The API is implemented in shared runtime code and is available in both Pyodide and backend execution.
+
+## Runtime Use
+You can write code in either of these styles:
+
+```python
+vals = await database.search(where={"name": {"contains": "Mass"}}, fields=["id", "name"])
+print(vals)
+```
+
+```python
+async def main():
+    vals = await database.search(where={"name": {"contains": "Mass"}}, fields=["id", "name"])
+    print(vals)
+
+result = await main()
+```
+
+For stored Davinci code objects, prefer top-level `await` or `result = await main()`.
+Do not use `asyncio.run(main())` there, because the runtime already provides an active event loop.
+
+Both the global `database` object and `davinci.database` point to the same API.
+
+## Object References
+Anywhere an object reference is expected, bracketed UUID strings are the preferred style:
+
+```python
+parent="[00000000-0000-0000-0000-0000000model]"
+```
+
+Plain UUID strings are still accepted for compatibility:
+
+```python
+parent="00000000-0000-0000-0000-0000000model"
+```
+
+Named path references are also supported in many places:
+
+```python
+target={"path": "My Package.My Table"}
+```
+
+## Common Return Shape
+When `fields="common"` is used (the default), objects are projected to a standardised set of fields. The exact fields depend on the object type.
+
+**Base fields (all types):**
+
+| Field | Description |
+|---|---|
+| `id` | Object UUID |
+| `type` | Object type string |
+| `parent` | Parent UUID |
+| `name` | Display name |
+| `shortName` | Abbreviated name |
+| `documentation` | Description text |
+| `children` | List of child UUIDs |
+
+**Type-specific fields included in common:**
+
+| Type | Extra fields |
+|---|---|
+| `attribute`, `constraint`, `state` | `value`, `unit`, `kind`, `resolvedValue` |
+| `task` | `status`, `startDate`, `endDate`, `duration`, `resolvedValue` |
+| `risk` | `probability`, `impact`, `detectability`, `combinator` |
+| `requirement` | `satisfied` |
+| `code` | `language` |
+| `reference` | `location` |
+| `table` | `rowCount`, `colCount` (derived) |
+
+**`resolvedValue`** is included as a read-only nested object representing the system-computed result:
+- For `attribute`/`constraint`/`state`: `{ value, error, errorMsg, equationString }` — the inner `value` is the computed numeric or string result.
+- For `task`: `{ startDate, endDate, duration, progression, error, errorMsg }`.
+
+**Always hidden from common:** `pos`, `extends`, `references`, `relationship`, `tags`, `comments`, `styles`, `rows`, `columns`, `cells`, `stateValues`, `ganttSettings`, `prerequisites`.
+
+## Writable Fields
+`database.update()` and `database.save()` enforce a per-type allowlist. Attempting to write a read-only field raises an error.
+
+**Writable on all types:** `name`, `shortName`, `documentation`
+
+Guidance:
+
+- Use `name` for the human-readable object label
+- Use `shortName` for numbering, identifiers, diagram numbers, and compact codes
+- Example: `name="Mission Analysis"` and `shortName="1.2.3"`
+
+**Type-specific writable fields:**
+
+| Type | Writable |
+|---|---|
+| `attribute`, `constraint`, `state` | `value`, `unit`, `kind` |
+| `task` | `status`, `startDate`, `endDate`, `duration.value`, `duration.unit`, `duration.kind` |
+| `risk` | `probability`, `impact`, `detectability`, `combinator` |
+| `requirement` | `satisfied` |
+| `reference` | `location.type`, `location.value`, `citation.*` |
+| `code` | *(none — `language` and `code` are read-only)* |
+
+**Always read-only:** `id`, `type`, `parent`, `children`, `resolvedValue`, `stateValues`, `relationship`, `references`, `rows`, `columns`, `cells`, `pos`, `extends`, `ganttSettings`, `prerequisites`, `language`, `code`
+
+## Methods
+
+### `database.search(...)`
+Search returns a list of matching objects.
+
+```python
+vals = await database.search(
+    where={"name": {"contains": "New Attribute"}},
+    fields=["id", "name", "type"],
+)
+print(vals)
+```
+
+Supported parameters:
+
+- `path="Package.Part.Attribute"` — dot-path resolution
+- `type="attribute"` or `type=["attribute", "constraint"]`
+- `where={...}` — field filters
+- `graph={...}` — graph filters
+- `fields="common"` or `fields=[...]`
+- `limit=50` — max results (default 50, max 500)
+
+#### `where` operators
+
+| Operator | Meaning |
+|---|---|
+| `equals` | Exact match |
+| `notEquals` | Not equal |
+| `contains` | Case-insensitive substring |
+| `notContains` | Does not contain |
+| `regex` | Regular expression |
+| `notRegex` | Does not match regex |
+| `exists` | Field is non-empty |
+| `notExists` | Field is empty or missing |
+
+```python
+vals = await database.search(
+    where={"name": {"contains": "Mass"}},
+    fields=["id", "name"],
+)
+```
+
+#### Graph search
+
+```python
+vals = await database.search(
+    type="attribute",
+    graph={
+        "relationshipType": "uses",
+        "direction": "out",
+        "connectedTo": "[00000000-0000-0000-0000-0000000model]",
+    },
+    fields=["id", "name"],
+)
+```
+
+Hierarchy search:
+
+```python
+children = await database.search(
+    graph={
+        "hierarchy": {
+            "relation": "children",   # children | descendants | parent | ancestors | siblings
+            "of": "some-part-uuid",
+        }
+    },
+    fields=["id", "name", "type"],
+)
+```
+
+### `database.load(...)`
+Load returns full object data or selected fields. If no table cell selector is used:
+
+- one match returns a single object dict
+- multiple matches return a list
+- if the returned object is a table, it is a dict-like table object that also supports A1 reads such as `await table["B2"]`
+
+Load by path:
+
+```python
+obj = await database.load(
+    target={"path": "My Package.My Part"},
+    fields=["id", "name", "children"],
+)
+print(obj)
+```
+
+Load by id:
+
+```python
+obj = await database.load(
+    target={"id": "[00000000-0000-0000-0000-0000000model]"},
+    fields=["id", "name", "children"],
+)
+print(obj)
+```
+
+Load reference data:
+
+```python
+ref = await database.load(
+    target={"path": "My Package.results.csv"},
+    include_reference_data=True,
+)
+print(ref)
+```
+
+### `database.create(...)`
+Create is idempotent by default for named objects. If an object with the same `parent + name + type` already exists, that existing object is reused and updated instead of creating a duplicate with a new UUID.
+
+```python
+created = await database.create(
+    parent="[00000000-0000-0000-0000-0000000model]",
+    objects=[
+        {
+            "type": "attribute",
+            "name": "Mass",
+            "value": "42",
+            "unit": "kg",
+            "kind": "number",
+        }
+    ],
+)
+print(created)
+```
+
+Notes:
+
+- Use `type`, not `objectType`
+- `parent` is a top-level call argument on `database.create(...)`, not a field inside each object
+- Good: `await database.create(parent=package_id, objects=[{"type": "item", "name": "X"}])`
+- Bad: `await database.create(objects=[{"type": "item", "name": "X", "parent": package_id}])`
+- If an object has a number/code/hierarchy label, put that in `shortName`
+- Example: `{"type": "item", "name": "Mission Analysis", "shortName": "1.2.3"}`
+- Writable fields may be supplied either directly on the object or under `fields`
+- Example: `{"type": "item", "name": "X", "shortName": "1.2"}`
+- Example: `{"type": "item", "name": "X", "fields": {"shortName": "1.2"}}`
+- If both are provided, values inside `fields` win
+- Nested creation is supported through `children`
+- Re-running the same payload under the same parent will generally reuse the same object IDs
+- Explicit `id` still wins when provided
+- For `reference` objects, this reuse applies to the metadata object. Separately stored reference file/blob content remains attached to the reused reference ID rather than creating a duplicate metadata object.
+
+#### Creating a parts tree
+The `children` key on any node is recursively processed. The entire tree is created in a single operation with all parent/child relationships wired automatically.
+
+```python
+created = await database.create(
+    parent="<uuid>",
+    objects=[
+        {
+            "type": "part",
+            "name": "Spacecraft",
+            "children": [
+                {
+                    "type": "part",
+                    "name": "Payload",
+                    "children": [
+                        {"type": "attribute", "name": "Mass", "fields": {"value": "10", "unit": "kg"}},
+                        {"type": "attribute", "name": "Power", "fields": {"value": "50", "unit": "W"}},
+                    ],
+                },
+                {
+                    "type": "part",
+                    "name": "Bus",
+                    "children": [
+                        {"type": "attribute", "name": "Mass", "fields": {"value": "30", "unit": "kg"}},
+                        {
+                            "type": "part",
+                            "name": "ADCS",
+                            "children": [
+                                {"type": "attribute", "name": "Mass", "fields": {"value": "5", "unit": "kg"}},
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
+    ],
+)
+print(len(created))  # all created objects, each with id and parent set
+```
+
+You can also build trees programmatically:
+
+```python
+def make_part(name, attributes=None, children=None):
+    obj = {"type": "part", "name": name}
+    kids = [
+        {"type": "attribute", "name": attr, "fields": {"value": val, "unit": unit}}
+        for attr, val, unit in (attributes or [])
+    ]
+    kids.extend(children or [])
+    if kids:
+        obj["children"] = kids
+    return obj
+
+tree = make_part("Spacecraft", children=[
+    make_part("Payload", attributes=[("Mass", "10", "kg"), ("Power", "50", "W")]),
+    make_part("Bus", attributes=[("Mass", "30", "kg")]),
+])
+
+created = await database.create(
+    parent="[00000000-0000-0000-0000-0000000model]",
+    objects=[tree],
+)
+print(len(created))
+```
+
+### `database.update(...)`
+Update applies field changes to matching objects. Only writable fields are accepted (see Writable Fields above).
+
+Important:
+
+- Use `fields={...}`, not `updates={...}`
+- `target={"id": ...}` expects a single id string, not a list of ids
+
+```python
+updated = await database.update(
+    target={"id": "<uuid>"},
+    fields={
+        "name": "Updated Mass",
+        "value": "45",
+        "unit": "kg",
+    },
+)
+print(updated)
+```
+
+Update by search target:
+
+```python
+updated = await database.update(
+    target={
+        "where": {"name": {"equals": "Mass"}},
+        "type": "attribute",
+    },
+    fields={"value": "50"},
+    limit=1,
+)
+print(updated)
+```
+
+### `database.save(...)`
+Save performs create-or-update behavior and returns the saved objects.
+
+Default identity behavior:
+
+- If `id` is provided and exists, that object is updated
+- Otherwise, if an object with the same `parent + name + type` already exists, that object is reused and updated
+- Otherwise, a new object is created
+- For `reference` objects, the metadata object is reused by identity; separately stored reference content stays associated with the reused reference ID unless updated through the file-specific save path
+- `parent` is a top-level call argument on `database.save(...)`, not a field inside each object
+- Good: `await database.save(parent=package_id, objects=[{"type": "item", "name": "X"}])`
+- Bad: `await database.save(objects=[{"type": "item", "name": "X", "parent": package_id}])`
+- Writable fields may be supplied either directly on the object or under `fields`
+- If both are provided, values inside `fields` win
+
+Save new object under a parent:
+
+```python
+saved = await database.save(
+    parent="<uuid>",
+    objects=[
+        {
+            "type": "attribute",
+            "name": "Mass",
+            "value": "42",
+            "unit": "kg",
+            "kind": "number",
+        }
+    ],
+)
+print(saved)
+```
+
+Save by id:
+
+```python
+saved = await database.save(
+    objects=[
+        {
+            "id": "<uuid>",
+            "name": "Mass",
+            "fields": {
+                "value": "45",
+                "unit": "kg",
+            },
+        }
+    ],
+)
+print(saved)
+```
+
+Save by path:
+
+```python
+saved = await database.save(
+    parent="My Package",
+    match="path",
+    objects=[
+        {
+            "type": "attribute",
+            "name": "Mass",
+            "fields": {"value": "45"},
+        }
+    ],
+)
+print(saved)
+```
+
+### `database.delete(...)`
+Delete removes matching objects.
+
+Important:
+
+- `target={"id": ...}` expects a single id string
+- If you have many ids, do not pass a list into `target.id`; use another supported target form or issue separate batched deletes at a higher level
+
+```python
+deleted_ids = await database.delete(
+    target={"id": "<uuid>"},
+)
+print(deleted_ids)
+```
+
+Recursive delete:
+
+```python
+deleted_ids = await database.delete(
+    target={"path": "My Package.Payload"},
+    recursive=True,
+)
+print(deleted_ids)
+```
+
+### `database.move(...)`
+Move re-parents existing objects into a different package or parent object.
+
+Use `move(...)` for hierarchy changes. Do not try to move objects by writing `parent` through `database.update(...)`.
+
+Basic move:
+
+```python
+moved = await database.move(
+    target={"id": "<uuid>"},
+    parent="<uuid>",
+)
+print(moved)
+```
+
+Move a batch selected by search criteria:
+
+```python
+moved = await database.move(
+    target={
+        "type": "entity",
+        "where": {"name": {"contains": "Owner"}},
+    },
+    parent="My Package.Owners",
+)
+print(len(moved))
+```
+
+Move a single object relative to a neighbour:
+
+```python
+moved = await database.move(
+    target={"id": "<uuid>"},
+    parent="<uuid>",
+    neighbour="<uuid>",
+    offset="before",   # or "after"
+)
+print(moved[0]["parent"])
+```
+
+Important:
+
+- `parent` is required and is the destination parent/package
+- `target={"id": ...}` expects a single id string
+- `neighbour` ordering is currently for single-target moves only
+- return value is a list of moved objects
+- `database.move(...)` raises an error if the selector matches 0 objects instead of silently succeeding
+- when debugging a move, print the selected ids or names before the move call and compare them to the returned moved objects
+
+Debug example:
+
+```python
+selected_ids = [obj["id"] for obj in office_entities]
+print("Office ids to move:", selected_ids)
+
+moved = await database.move(
+    target={"where": {"id": {"in": selected_ids}}},
+    parent=office_pkg["id"],
+)
+
+print("Moved office ids:", [obj["id"] for obj in moved])
+```
+
+### `database.relate(...)`
+Add or remove a relationship between two objects.
+
+```python
+result = await database.relate(
+    source="part-uuid-or-path",
+    target="requirement-uuid-or-path",
+    relationship="satisfies",
+    action="add",            # or "remove"
+)
+print(result)
+# {'success': True, 'focusId': '...', 'targetId': '...', 'relationship': 'satisfies', 'action': 'add'}
+```
+
+Standard relationship types include: `uses`, `satisfies`, `verify`, `allocate`, `subject`, `realize`, `derive`, `trace`, `performs`, `actor`, `mitigation`, `source`, `impact`, `result`, `resource`, `dependency`. Custom relationship types defined in the project are also accepted.
+
+Both `source` and `target` accept UUIDs or dot-path strings.
+They may also be arrays for batched relationship updates.
+
+```python
+# Link an attribute as the source of a requirement
+await database.relate(
+    source="My Package.Spacecraft.Mass",
+    target="My Package.Mass Budget",
+    relationship="satisfies",
+)
+
+# Remove the link
+await database.relate(
+    source="My Package.Spacecraft.Mass",
+    target="My Package.Mass Budget",
+    relationship="satisfies",
+    action="remove",
+)
+```
+
+Batch relate from one source to many targets:
+
+```python
+results = await database.relate(
+    source="My Package.Spacecraft.Mass",
+    target=[
+        "My Package.Requirement A",
+        "My Package.Requirement B",
+    ],
+    relationship="satisfies",
+)
+print(results)
+```
+
+Batch relate many sources to many targets:
+
+```python
+results = await database.relate(
+    source=[
+        "My Package.Attribute A",
+        "My Package.Attribute B",
+    ],
+    target=[
+        "My Package.Requirement A",
+        "My Package.Requirement B",
+    ],
+    relationship="satisfies",
+)
+print(results)
+```
+
+If both `source` and `target` are arrays, `database.relate(...)` applies the
+Cartesian product in one batched call. The return value is:
+
+- a single dict for one source + one target
+- a list of dicts for batched array input
+
+### `database.get_project_info()`
+Returns project-level configuration as a dict.
+
+```python
+info = await database.get_project_info()
+
+# Available keys
+print(info["relationships"])    # dict of relationship type definitions
+print(info["units"])            # dict of unit definitions
+print(info["riskCategories"])   # dict of risk categories
+print(info["personas"])         # dict of personas
+print(info["dashboards"])       # list of public dashboard IDs
+```
+
+Use this to discover what relationship types are defined in the current project:
+
+```python
+info = await database.get_project_info()
+for name, defn in info["relationships"].items():
+    print(name, "-", defn["description"])
+```
+
+## Tables
+Tables can be loaded and updated through the same `database` API.
+
+### Read cells with A1 notation
+Cell queries return a **2D list** (grid) for easy processing. Each entry is the cell content value.
+
+Read one cell:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="B2",
+)
+print(grid)        # [["hello"]]
+print(grid[0][0])  # "hello"
+```
+
+You can also load the table object once and then use A1 indexing directly:
+
+```python
+table = await database.load(target={"path": "New Table"})
+value = await table["B2"]
+print(value)  # "hello"
+```
+
+If the cell is empty, printing the result may show a blank line. That still means
+the read succeeded and the cell value is `""`.
+
+Read a range:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="A1:C3",
+)
+for row in grid:
+    print(row)
+```
+
+The same range can be read from the loaded table object:
+
+```python
+table = await database.load(target={"path": "New Table"})
+grid = await table["A1:C3"]
+for row in grid:
+    print(row)
+```
+
+Read a row:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="2:2",
+)
+print(grid[0])   # contents of row 2
+```
+
+Read a column:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="B:B",
+)
+for row in grid:
+    print(row[0])  # contents of column B
+```
+
+Read the whole table:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="all",
+)
+for row in grid:
+    print(row)
+```
+
+If you need cell metadata (type, format, etc.) alongside content, pass `cell_fields`:
+
+```python
+grid = await database.load(
+    target={"path": "New Table"},
+    cells="A1:B2",
+    cell_fields=["cell", "value", "type"],
+)
+print(grid[0][0])           # {"cell": "A1", "value": "A1", "type": "text"}
+print(grid[0][0]["cell"])   # "A1"
+```
+
+The loaded table object supports the same metadata reads:
+
+```python
+table = await database.load(target={"path": "New Table"})
+meta = await table.read("A1:B2", cell_fields=["cell", "value", "type"])
+print(meta[0][0]["value"])
+```
+
+### Use table data to build model objects
+Tables are a valid input source for model generation. A common pattern is:
+
+1. load a table range with A1 notation
+2. transform the rows into object payloads
+3. create or save the objects in one batched call
+
+```python
+table = await database.load(target={"path": "Owners Table"})
+rows = await table["A2:B20"]
+
+objects = []
+for owner_name, process_text in rows:
+    if not owner_name:
+        continue
+    objects.append({
+        "type": "entity",
+        "name": str(owner_name).strip(),
+    })
+
+created = await database.create(
+    parent="[00000000-0000-0000-0000-0000000model]",
+    objects=objects,
+)
+print(created)
+```
+
+If a cell contains newline-delimited text, split it normally in Python:
+
+```python
+rows = await table["A13:B15"]
+for owner_name, process_blob in rows:
+    processes = [line.strip() for line in str(process_blob or "").splitlines() if line.strip()]
+    print(owner_name, processes)
+```
+
+### Read table structure
+The common projection for a table now includes `rowCount` and `colCount` directly:
+
+```python
+table = await database.load(target={"path": "New Table"})
+print("rows:", table["rowCount"])
+print("cols:", table["colCount"])
+```
+
+### Update cells
+Update a single cell:
+
+```python
+updated = await database.update(
+    target={"path": "New Table"},
+    cells={"B2": "hello"},
+)
+print(updated)
+```
+
+Update a range with a 2D list:
+
+```python
+updated = await database.update(
+    target={"path": "New Table"},
+    cells={
+        "A1:B2": [
+            ["A1", "B1"],
+            ["A2", "B2"],
+        ]
+    },
+)
+print(updated)
+```
+
+## References
+Reference loading works through `database.load(..., include_reference_data=True)`.
+
+```python
+ref = await database.load(
+    target={"path": "My Package.results.json"},
+    include_reference_data=True,
+)
+print(ref)
+```
+
+Reference creation is still primarily done through `davinci_save_file(...)`. A database-native reference save method is planned.
+
+## Current Notes and Constraints
+
+- The API is async. Use `await`.
+- `fields="common"` is the default and returns the standardised field set described above.
+- `parent` for create/save is a string reference, not `{"id": ...}`.
+- Both `"uuid"` and `"[uuid]"` forms are accepted where object references are expected.
+- Path-based loads hydrate the full object before projection, so nested fields like `rows` and `columns` work when explicitly requested.
+- Database writes are validated and applied through the shared operations pipeline.
+- Attempting to write a read-only field raises: `Field 'resolvedValue' is read-only and cannot be updated on type 'attribute'.`
+
+## Quick Examples
+
+Search by name:
+
+```python
+vals = await database.search(
+    where={"name": {"contains": "Mass"}},
+    fields=["id", "name", "type"],
+)
+print(vals)
+```
+
+Create a full parts tree in one call:
+
+```python
+created = await database.create(
+    parent="[00000000-0000-0000-0000-0000000model]",
+    objects=[
+        {
+            "type": "part",
+            "name": "Spacecraft",
+            "children": [
+                {
+                    "type": "part",
+                    "name": "Payload",
+                    "children": [
+                        {"type": "attribute", "name": "Mass", "fields": {"value": "10", "unit": "kg"}},
+                    ],
+                },
+            ],
+        }
+    ],
+)
+print(len(created))
+```
+
+Read attribute value and its resolved result:
+
+```python
+attrs = await database.search(
+    where={"name": {"equals": "Mass"}},
+    type="attribute",
+)
+attr = attrs[0]
+print("raw value:", attr["value"])
+print("computed:", attr["resolvedValue"]["value"])
+```
+
+Link two objects with a relationship:
+
+```python
+await database.relate(
+    source="My Package.Spacecraft",
+    target="My Package.Mass Budget",
+    relationship="satisfies",
+)
+```
+
+Read a table as a 2D grid:
+
+```python
+grid = await database.load(target={"path": "Budget Table"}, cells="all")
+for row in grid:
+    print(row)
+```
+
+Update an existing attribute:
+
+```python
+updated = await database.update(
+    target={"where": {"name": {"equals": "Mass"}}, "type": "attribute"},
+    fields={"value": "100", "unit": "kg"},
+    limit=1,
+)
+print(updated)
+```
+
+Delete a created object:
+
+```python
+deleted = await database.delete(
+    target={"where": {"name": {"equals": "New Attribute_0"}}},
+)
+print(deleted)
+```
+
+Discover relationship types defined in the project:
+
+```python
+info = await database.get_project_info()
+for name, defn in info["relationships"].items():
+    print(f"{name}: {defn['description']}")
+```
