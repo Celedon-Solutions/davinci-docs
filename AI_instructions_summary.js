@@ -17,7 +17,7 @@ const contextData = `
     A web app connecting users to an AI service and project database. AI agents understand natural language, use tools, and perform tasks.
 
     What are credits? How to refill?
-    Credits are for automated tasks (AI generation, Q&A, file uploads). Subscription Credits refill with your plan; Wallet Credits are purchased from the Account Screen and don't expire. Subscription Credits used first.
+    Credits are for automated tasks (AI generation, Q&A, file uploads). Included Usage refills with your plan; Trial Credits are purchased from the Account Screen and don't expire. Included Usage is used first.
 
     Where is my project stored? How secure?
     Securely in Celedon's US-hosted database. Avoid sensitive data on public. Enterprise options available. Data not shared with third parties except for Davinci services.
