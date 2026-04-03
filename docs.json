@@ -17,7 +17,7 @@
         "dark": "#000000"
     },
     "banner": {
-        "content": "Davinci v4.1.5 is now available! [See what's new](/pages/release-notes/v4.1.5)",
+        "content": "Davinci v4.2 is now available! [See what's new](/pages/release-notes/v4.2.0)",
         "dismissible": true
     },
     "footer": {
@@ -316,6 +316,7 @@
                         "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [
+                            "pages/release-notes/v4.2.0",
                             "pages/release-notes/v4.1.5",
                             "pages/release-notes/v4.1.4",
                             "pages/release-notes/v4.1.3",

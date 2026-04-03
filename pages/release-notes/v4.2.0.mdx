@@ -1,0 +1,105 @@
+---
+title: 'Version 4.2.0 - New Home Experience & Teams'
+description: 'April 2026'
+---
+
+## Version 4.2.0 - New Home Experience & Teams
+
+This release introduces the Davinci Browser — a completely redesigned experience for managing projects, accounts, and teams outside of the editor. It also adds Team plans, billing improvements, and enhancements across tables, actions, and the agent.
+
+### Davinci Browser
+
+The old in-app home screen has been replaced with a full web experience called the Davinci Browser.
+
+- New [Home](/pages/user-guide/navigating/home) page with a sidebar project list, resume cards, and an activity feed
+- Project Pages with an overview (README, collaborators, branches, recent activity), commit history with filtering and an activity graph, and a settings tab
+- Redesigned [Account Settings](/pages/user-guide/navigating/settings) with tabs for General, Billing, Connections, Storage, and About
+- [Notifications](/pages/user-guide/navigating/notifications) system with a top-bar dropdown and a full notifications page
+- [User Profiles](/pages/user-guide/navigating/profile) showing public projects and recent activity
+- Customizable handles for profile URLs, including custom domain verification for paid users
+- Navigation menu drawer with links to Home, Projects, Team, Notifications, and Docs
+- Search from the top bar for finding projects and users
+- Dark mode with a theme toggle
+
+### Team Plans
+
+- Create a team with a name and billing frequency, then invite members by email
+- Team Hub at `/team` with tabs for Overview, Members, Billing, and Settings
+- Role-based access with Owner, Admin, Billing, Support, and Member roles
+- Per-member on-demand spending limits
+- Shared credit pool with team-wide included usage and on-demand billing
+- Spend-by-member breakdowns and time-range filtering
+- Option for members to use personal trial credits while on a team
+
+### Billing & Account
+
+- Redesigned billing with usage-based credit tracking, on-demand spending, and reconciliation
+- [Upgrade page](/pages/overview/get-started/change-tier) for switching between Free, Core, and Max without leaving Davinci
+- In-app password reset
+- Avatar color customization
+- Storage tracking based on billing database for more accurate reporting
+- Email notification preferences (activity emails and marketing emails)
+
+### Agent & Chat
+
+- Agent now respects team-level credit allocations and on-demand limits
+- Improved halting and restarting of agent tasks
+- Better memory limiter to prevent runaway usage during complex tasks
+- Credit meter in the chat bar showing current usage status
+
+### Collaboration & Projects
+
+- New projects can be set as Private or Public at creation time
+- Improved project import with better UUID, reference, and error handling
+- Import button disabled when project count exceeds plan limits
+- Better error feedback when inviting collaborators
+
+### Table & Spreadsheet Improvements
+
+- Table search for finding data within large tables
+- VLOOKUP function support in table cells
+- Fixed SUM() calculations
+- Improved cell equation preservation when converting tables
+- Sort objects by position in table view
+
+### Documents & Slides
+
+- Slide style settings for customizing font sizes across titles, subtitles, paragraphs, captions, and tables
+- Duplicate slide improvements
+- Better document numbering with improved boundary handling between lists
+
+### Activity & Sequence Diagrams
+
+- Graph render mode toggle to switch between "sequence" and "flow" views
+- Value flow display toggle for showing data flows between actions
+- Improved swimlane rendering performance
+
+### Behavior & State Machines
+
+- Action runtime management with duration tracking and retry signals
+- Async support in action sequences with awaitable expressions
+- Implicit conditional fallthrough handling
+- State machine smoke testing tool
+
+### Database API & Code
+
+- New methods: `relate`, `get_project_info`, and enhanced `load` for cell queries
+- Execution budget limits for RPC calls
+- `random` and `math` imports now available in custom Python functions
+
+### Infrastructure
+
+- Improved authentication with SSO improvements and rate limiting
+- Enhanced admin panel for user, project, and billing management
+- Git service optimizations including lazy-loaded recent activity
+- Notification delivery system with actionable notifications and admin broadcasts
+
+### Bug Fixes
+
+- Fixed project rename not refreshing the page
+- Fixed team disband and member viewing issues
+- Fixed overflow scrolling issues in several views
+- Fixed OAuth redirect to preserve query strings
+- Fixed duplicate flow statements in sequence diagrams
+- Fixed cell equation clearing when converting tables
+- Fixed flip setting in matrix allocation
