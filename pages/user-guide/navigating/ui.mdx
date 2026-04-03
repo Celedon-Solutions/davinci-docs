@@ -1,92 +1,79 @@
 ---
-title: Navigating Work Areas
+title: Overview
 ---
 
-Basic Navigation in Davinci uses the Navigation Bar to move between Work Areas.
+Davinci is organized into two distinct surfaces: the **Davinci Browser** and the **Editor**. Each handles a different part of the workflow, and understanding the split is key to navigating Davinci effectively.
 
-## Navigation Bar
-The `Navigation Bar` appears on the far left of the window and has three primary Work Areas:
+## Davinci Browser
 
-1. `Model`: Create, view, and edit the Model from here.
-2. `Project`: Manage elements of the Project such as Collaborators, Files, and Model Completeness.
-3. `Home`: Click here to return to the Home Page.
+The Davinci Browser is a traditional web application that handles everything outside of active modeling work. After signing in, this is the first thing you see. It runs at the root of your Davinci URL (e.g. `davinci-app.com/`).
 
+**What the Davinci Browser handles:**
+- Browsing and managing your project list
+- Creating and importing projects
+- Viewing project details — README, commit history, and settings
+- Managing collaborators, visibility, and project deletion
+- Account settings — profile, billing, connections, storage
+- Team management — members, billing, spending controls
+- Notifications
 
+The Davinci Browser has a **top bar** with:
+- A **hamburger menu** that opens a navigation drawer with links to Home, Projects, Team, Notifications, and Docs
+- A **search bar** for finding projects and users across Davinci
+- A **notification bell** with a dropdown for quick access to recent notifications
+- A **theme toggle** for switching between light and dark mode
+- Your **avatar** which opens a dropdown with links to your Profile, Settings, and Log out
 
-
-## Home
-Home is the first Area viewed when loading into Davinci. Here you can select or create projects.
-
-<Note>Before selecting a project, only the Home Area is visible in the Navigation Bar.</Note>
-
-<Frame>
-  <img height="400" noZoom src="/images/home-with-projects.png" /> 
-</Frame>
-
-<Card title="Home Area" horizontal icon="link" href="/pages/user-guide/navigating/home">
-  Click here to read more about the Home Area
+<Card title="Home" horizontal icon="link" href="/pages/user-guide/navigating/home">
+  Read more about the Home page
 </Card>
 
+## Editor
 
-## Model
-The Model Area appears when a Project is loaded from the Home Area.
+The Editor is a full-featured design workspace that loads when you open a project. It runs at `/app/{owner}/{project}/{branch}` and is a separate application from the Davinci Browser.
 
-<Frame>
-  <img height="400" src="/images/workspace-overview.png" /> 
-</Frame>
+**What the Editor handles:**
+- Browsing and editing the model (Index, Workspace, Tabs)
+- Interacting with the design agent via chat
+- Running code and simulations
+- Managing in-project settings (units, toolboxes, relationships, files, secrets, tags, risk, personas, MCP)
+- Real-time collaboration with other users
+- Version control (snapshots and branches)
+- Searching the model
+- Exporting model data
 
-<Card title="Model Area" horizontal icon="link" href="model" >
-  Click here to read more about the Model Area
+The Editor has its own navigation system with a **Navigation Bar** on the left edge and a **Header Bar** across the top.
+
+<Card title="Editor" horizontal icon="link" href="/pages/user-guide/navigating/editor">
+  Read more about the Editor
 </Card>
 
+## Moving Between the Two
 
+From the **Davinci Browser**, you enter the Editor by clicking `Open Project` on a project's page. This opens the Editor in a new tab.
 
-## Project 
-The Project Area is accessed from the Navigation Pane on the far left of the window. Like Model, this is only active when a project has been selected. In this view you can see the project summary, see collaborators, review snapshots, update custom units, or remove files stored in your project. 
+From the **Editor**, you return to the Davinci Browser by:
+- Clicking the **Home** icon in the Navigation Bar
+- Clicking your avatar and selecting **Settings**
+- Closing the Editor tab (your Davinci Browser tab remains open)
 
-<Frame>
-  <img height="400" noZoom src="/images/project-rename.png" /> 
-</Frame>
+The two surfaces share your login session. You do not need to sign in separately.
 
-<Card title="Project Area" horizontal icon="link" href="/pages/user-guide/navigating/project" >
-  Click here to read more about the Project Area
-</Card>
+## Where Things Live
 
+Some functionality is available in both places. This table clarifies where to find key actions:
 
-## Header Bar
-The Header Bar has several useful functions for interacting with and understanding Davinci:
-
-<Frame>
-  <img height="400" noZoom src="/images/header-bar.png" /> 
-</Frame>
-
-### Documentation
-The Docs button takes you here, to the Davinci Documentation site!
-
-### Davinci Version number
-The Current Davinci Version Number is always displayed here. Reference this number when using the Documentation or talking to Support.
-
-Next to the Version Number in the parentheses is your Subscription Tier. Ensure this matches the Tier you Subscribed to when you purchased Davinci.
-
-### Navigation Buttons
-The Arrows close to the search bar are Back and Forward buttons. Use them like your browser buttons to navigate back and forward in the interface to return to places you just visited. You can also use your built in browser buttons as well as dedicated Back and Forward buttons on your Mouse.
-
-### Connection Indicators
-The Cloud indicates your connection to the Davinci Servers. 
-- A gray cloud indicates a good connection. 
-- A red cloud with a slash through it indicates you are disconnected from the Servers.
-
-### Search Bar
-At the top of the window is a search box. Clicking on this will open up a search menu. Begin typing to search the Model for Model Objects. Clicking on search results will open them up in the main tab. The Search Bar will only search for objects by Name or Short Name. For more refined search querries, use the [Search View](/pages/user-guide/right-panel/search-view)
-
-<Note>The Search Bar is only enabled when a Project is loaded.</Note>
-
-### Invite Collaborators
-Click here to invite collaborators to your project
-
-<Card title="Collaboration" horizontal icon="link" href="/pages/user-guide/overview/collaboration">
-  Click here to read more about the Home Area
-</Card>
-
-### Account Management
-Your User Account can be managed at any time by clicking on your initial in the top right of the screen. This will open the `Account Manager`, where you can access information about your subscription, reset your password, or refill your Credits.
+| Action | Davinci Browser | Editor |
+|--------|-----------|--------|
+| Create a project | Yes (sidebar `New` button) | No |
+| Import a project | Yes (sidebar `Import` button) | Yes (drag-and-drop files into the workspace) |
+| Rename a project | Yes (project Settings tab) | Yes (Project Settings > Summary) |
+| Delete a project | Yes (project Settings tab) | No |
+| Manage collaborators | Yes (project Settings tab) | Yes (Project Settings > Collaboration) |
+| Change project visibility | Yes (project Settings tab) | No |
+| View commit history | Yes (project History tab) | Yes (Version Control panel) |
+| Edit the model | No | Yes |
+| Chat with the design agent | No | Yes |
+| Account settings | Yes (`/~/settings`) | No (links to Davinci Browser) |
+| Team management | Yes (`/team`) | No |
+| Notifications | Yes (`/~/notifications` + bell dropdown) | No |

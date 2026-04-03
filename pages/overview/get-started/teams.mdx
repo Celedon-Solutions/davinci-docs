@@ -1,0 +1,107 @@
+---
+title: Teams
+description: 'Upgrade to a team plan, invite members, and manage shared billing and usage.'
+---
+
+Teams let multiple users share a single Davinci subscription. The team owner manages billing centrally, while members get access to credits and features through the shared plan. Team administrators can control per-member spending, assign roles, and manage invitations.
+
+## Creating a Team
+
+<Steps>
+    <Step title="Open the Team Upgrade page">
+      Go to [https://davinci-app.com/upgrade/team](https://davinci-app.com/upgrade/team), or click `Upgrade to Team` from the team section of your personal Billing settings.
+    </Step>
+    <Step title="Choose a plan">
+      Enter a **Team Name** and select a billing frequency (Monthly or Yearly). If you are upgrading from an existing individual plan (Core or Max), your current subscription will be cancelled with a prorated credit applied to your new team plan.
+    </Step>
+    <Step title="Complete checkout">
+      Click `Continue to Checkout` to be redirected to Stripe. Complete payment to activate your team.
+    </Step>
+</Steps>
+
+After checkout you will be redirected to the Team hub at `/team`.
+
+## Team Hub
+
+Once you are on a team, the Team hub is accessible at `/team` from the navigation menu. Depending on your role and permissions, you will see some or all of the following tabs:
+
+### Overview
+The default landing tab for the team. What you see depends on your permissions:
+- **All members** can see the team name, member count, and their own role.
+- **Members with billing access** also see renewal date, total on-demand spending, and a spend-by-member breakdown.
+
+### Members
+The Members tab shows the full team roster. Depending on your permissions:
+- **All members** can see each member's name, email, and role.
+- **Members with billing access** also see per-member included usage and on-demand usage gauges, and can manage individual member settings through the actions menu.
+- **Members with invite permissions** can invite new members and revoke pending invitations.
+
+### Billing
+The Billing tab is only visible to members with billing read access. It shows:
+- **Current plan** details including plan name, billing frequency, seat count, price, and renewal date.
+- **Manage Subscription** button to open the Stripe Customer Portal (requires billing manage permission).
+- **On-demand usage** controls to enable or disable on-demand spending and set a team-wide spending limit.
+- **Usage charges** table with time-range filtering and per-member spending details.
+
+### Settings
+The Settings tab is only visible to members with billing manage permission. It provides:
+- **Team Name** — rename the team at any time.
+- **Team ID** — a unique identifier for the team, hidden by default.
+- **Disband Team** — permanently dissolve the team.
+
+## Inviting Members
+
+Members with invite permissions can add new users to the team:
+
+1. Go to the **Members** tab at `/team/~/members`.
+2. Click `Invite Member`.
+3. Enter the invitee's **email address** and select a **role** (Member, Admin, Support, or Billing).
+4. Click `Send Invite`.
+
+The invited user will receive an in-app notification. When they accept, they join the team and gain access based on the assigned role. Pending invitations are listed on the Members tab and can be revoked before the invitee accepts.
+
+<Note>Invited users must have a Davinci account. If they do not have one, they will need to create an account first.</Note>
+
+## Joining a Team
+
+When you are invited to a team, you will see a notification in your notification inbox. Clicking accept will show a confirmation dialog explaining what changes when you join:
+- Your billing will be managed by the team.
+- Your credits will come from the team's shared pool.
+- On-demand spending limits may be set by team administrators.
+- Any previous subscription you had will be cancelled and pro-rated to your Stripe account.
+
+After accepting, you will be redirected to the Team hub.
+
+## Roles and Permissions
+
+Team members are assigned roles that control what they can see and do within the team:
+
+| Role | Description |
+|------|-------------|
+| **Owner** | The user who created the team. Has full control over all team settings. Cannot be removed. Shown as Tenant Administrator (Owner). |
+| **Admin** | Can manage members, roles, and team settings. |
+| **Billing** | Can view billing details, manage the Stripe subscription, control on-demand settings, and set per-member spending limits. |
+| **Support** | A support-level role for users who need visibility into team operations. This role will have more uses in the future. |
+| **Member** | Can see the team overview and member roster. Cannot access billing or settings. |
+
+Roles can be changed by team administrators from the Members tab using the actions menu on each member row. The team owner's role cannot be changed.
+
+## Per-Member Spending Limits
+
+Team administrators with billing manage permissions can set individual on-demand spending limits for each member. This is done from the Members tab through the actions menu on each member row. Preset limit options are available, or a custom limit can be entered.
+
+When on-demand spending is enabled for the team, each member's usage beyond the shared included credits is tracked individually and subject to their assigned limit.
+
+## Leaving or Disbanding a Team
+
+### Leaving a Team
+If you are not the team owner, you can leave the team from your personal Billing settings at `/~/settings/billing`. Click `Leave Team` to remove yourself from the team. Your account will revert to an individual free plan.
+
+### Disbanding a Team
+The team owner can disband the team entirely:
+- From **Team Settings** at `/team/~/settings`, scroll to the Danger Zone and click `Disband Team`.
+- Alternatively, the team creator can disband from their personal Billing settings at `/~/settings/billing`.
+
+Disbanding requires typing the team name to confirm. All members will be removed from the team and their accounts will revert to individual free plans.
+
+<Warning>Disbanding a team is permanent and cannot be undone.</Warning>

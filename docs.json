@@ -17,7 +17,7 @@
         "dark": "#000000"
     },
     "banner": {
-        "content": "Davinci Version 4 is now available! [Learn more](/pages/release-notes/v4.0.0)",
+        "content": "Davinci v4.1.5 is now available! [See what's new](/pages/release-notes/v4.1.5)",
         "dismissible": true
     },
     "footer": {
@@ -54,7 +54,7 @@
     "navigation": {
         "versions": [
             {
-                "version": "v4",
+                "version": "v4.2.0",
                 "dropdowns": [
                     {
                         "dropdown": "Overview",
@@ -65,31 +65,64 @@
                                 "pages": [
                                     "pages/overview/get-started/introduction",
                                     "pages/overview/get-started/subscribing",
-                                    "pages/overview/get-started/change-tier",
-                                    "pages/overview/get-started/unsubscribing",
-                                    "pages/overview/get-started/account",
-                                    "pages/overview/terms-policy/termsofservice"
+                                    "pages/user-guide/common/quick-start",
+                                    "pages/faqs/common-faqs"
                                 ]
                             },
                             {
-                                "group": "Quick Start",
+                                "group": "Navigating Davinci",
                                 "pages": [
-                                    "pages/user-guide/common/quick-start",
-                                    "pages/faqs/common-faqs"
+                                    "pages/user-guide/navigating/ui"
+                                ]
+                            },
+                            {
+                                "group": "Legal",
+                                "pages": [
+                                    "pages/overview/terms-policy/termsofservice"
                                 ]
                             }
                         ]
                     },
                     {
-                        "dropdown": "Interface",
+                        "dropdown": "Davinci Browser",
+                        "icon": "house",
+                        "groups": [
+                            {
+                                "group": "Davinci Browser",
+                                "pages": [
+                                    "pages/user-guide/navigating/home",
+                                    "pages/user-guide/navigating/notifications",
+                                    "pages/user-guide/navigating/profile",
+                                    "pages/user-guide/navigating/settings"
+                                ]
+                            },
+                            {
+                                "group": "Account & Billing",
+                                "pages": [
+                                    "pages/overview/get-started/account",
+                                    "pages/overview/get-started/change-tier",
+                                    "pages/overview/get-started/unsubscribing"
+                                ]
+                            },
+                            {
+                                "group": "Plans",
+                                "pages": [
+                                    "pages/overview/get-started/plans",
+                                    "pages/overview/get-started/teams"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "dropdown": "Editor",
                         "icon": "window",
                         "groups": [
                             {
-                                "group": "General Navigation",
+                                "group": "Getting Around",
                                 "pages": [
-                                    "pages/user-guide/navigating/home",
+                                    "pages/user-guide/navigating/editor",
                                     "pages/user-guide/navigating/model",
-                                    "pages/user-guide/navigating/ui"
+                                    "pages/user-guide/common/hotkeys"
                                 ]
                             },
                             {
@@ -118,12 +151,6 @@
                                     "pages/user-guide/project-settings/risk",
                                     "pages/user-guide/project-settings/persona-settings",
                                     "pages/user-guide/project-settings/mcp"
-                                ]
-                            },
-                            {
-                                "group": "Extra Features",
-                                "pages": [
-                                    "pages/user-guide/common/hotkeys"
                                 ]
                             }
                         ]

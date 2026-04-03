@@ -3,55 +3,86 @@ title: Accounts, Credits, and Billing
 description: 'Information about accounts, Credits, and billing'
 ---
 
+## Account Settings
 
+Access your account settings at any time by navigating to `/~/settings` from the Davinci Browser, or by clicking your avatar in the Editor and selecting **Account Settings**.
 
-## Account
-- Access your account anytime by signing in at [https://davinci-app.com/account](https://davinci-app.com/account)
-- Your account information includes your Name and Email Address.
-- A unique license key is provided for your account. Support may need this key to assist you.
-- You can manage your account settings, including logging out, from the Account Screen accessed by clicking your user bubble in the top right of Davinci.
+Your account settings are organized into the following tabs:
 
-<Note>Keep your License Key private. Do not let others access your License Key</Note>
+### General
+The General tab contains your core account information:
+- **Name** — your display name, editable at any time
+- **Avatar Color** — the background color used for your avatar throughout Davinci
+- **Email** — the email address associated with your account
+- **License Key** — a unique identifier for your account. Click the eye icon to reveal it. Support may need this key to assist you.
+- **Password** — change your account password (available if you signed up with email)
+- **Multi-Factor Authentication** — manage MFA settings when enabled by your organization
+- **User Settings** — configure personal preferences such as theme
+
+<Note>Keep your License Key private. Do not share it with others.</Note>
+
+### Billing
+The Billing tab shows your subscription status and credit usage:
+- **Subscription Tier** — your current plan (Free, Core, Max, or Team)
+- **Renewal Date** — when your subscription will next renew (or cancellation date if cancelled)
+- **Upgrade / Change Plan** — links to the [Upgrade page](https://davinci-app.com/~/upgrade) to switch between plans
+- **Stripe Account** — click `Manage` to open the Stripe Customer Portal for invoices, payment methods, and billing history
+- **Credits** — see your current credit balances and usage (details below)
+
+### Connections
+The Connections tab is where you manage **Service Accounts** for programmatic access to Davinci. Service accounts allow AI agents, automation scripts, and CI/CD pipelines to interact with Davinci via the API. Each service account can have multiple API keys with granular permissions.
+
+### Storage
+The Storage tab shows your overall storage usage and breaks out uploaded file sizes by project. Use this to understand which projects are consuming the most space.
+
+### About
+The About tab provides:
+- **Send Feedback** — a quick way to share feedback about your Davinci experience
+- **Links** — links to the Terms of Service, documentation, and support resources
+- **Danger Zone** — the option to permanently delete your account
 
 ## Your Subscription
-- Your current Subscription tier and renewal date are displayed in the Account Screen.
-- You can update your payment method or change your Subscription from the Account Screen.
-- When subscribing, you will be charged for the first month of the Subscription. The Davinci Subscription will renew each month and the same payment method will be charged.
-
+- Your current subscription tier and renewal date are displayed in the Billing tab.
+- To upgrade, downgrade or change your plan, see [Change Your Plan](/pages/overview/get-started/change-tier).
+- To cancel your plan, see [Unsubscribing](/pages/overview/get-started/unsubscribing)
+- To compare plan features and limits, see [Individual Plans](/pages/overview/get-started/plans).
 
 ## Credits
-Credits are used for automated operations within Davinci, such as generating new Model Objects with Davinci, asking and answering questions with Davinci, and uploading files to the Project. 
+Credits are used for automated operations within Davinci, such as generating Model Objects, asking and answering questions with the design agent, and uploading files to a Project.
 
-There are two types of Credits:
+There are three types of Credits:
 
 ### Included Usage
-- Included Usage is included with your Davinci Subscription. These Credits are refilled on your billing date, whether monthly or annual, up to the total provided by your plan.
+- Included Usage is provided with your Davinci subscription. These credits are refilled on your billing date, whether monthly or annual, up to the total provided by your plan.
 
-- For example, if your plan provides 20,000 Credits every month, and you used 15,000 Credits last month, you will be  refilled back to 20,000 Credits on your next billing date.
+- Included Usage is always consumed first.
 
-- Included Usage is always used first. Because it is included in your plan, we will always use Included Usage before any other source.
 
-- Included Usage cannot be purchased separately from a Subscription Plan.
 
-<Note>Included Usage does not roll over between billing periods</Note>
+<Info>Included Usage does not roll over between billing periods.</Info>
+
 
 ### Trial Credits
-Trial Credits hold Credits that are purchased from the Credit Shop. Trial Credits differ from Included Usage in a few key ways:
+Trial Credits are bonus credits that may be provided when you first create an account. Trial Credits differ from Included Usage in a few key ways:
 
-- Credits in Trial Credits do not expire.
+- Trial Credits do not expire.
+- Trial Credits are only consumed after Included Usage is exhausted.
 
-- Trial Credits are only used after Included Usage is exhausted.
+- Trial Credit usage can be enabled when users are on a Team from their Settings page. Trial Credits are not used by default when a user is part of a Team plan.
 
-- Credits can be purchased for Trial Credits at any time in the Account Screen.
+<Info>Credits purchased a la carte before our transition to Usage-Based Billing will be included in the Trial Credits count. They will never expire until used.</Info>
 
-- When upgrading from Free to Core or Max, remaining 
+### On-Demand Credits
+On-Demand credits can be enabled from the Billing tab. 
+- When enabled, usage beyond your Included Usage and Trial Credits will be billed at our standard credit rate of ~$0.003/credit. 
+- On-Demand spending can be capped with a configurable limit. 
+- On-Demand billing cannot be enabled for Free Tier users.
+
+<Note>Credit limits for On-Demand Billing will sometimes overflow slightly. This is due to the fact that credit use is calculated after task completion. You may see charges slightly over the set limit, but further charges will be prevented.</Note>
+
+
 
 ## Billing
-Billing will occur each period on the billing date. This date is listed on the Account Screen in Davinci. It can also be accessed in your [Stripe Customer Portal](https://pay.celedon.solutions/p/login/eVacOJ0ZDfWvdR65kk)
+Billing occurs each period on the billing date. This date is listed in the Billing tab of your Account Settings. It can also be accessed in the Stripe Customer Portal via the `Manage` button.
 
-
-
-
-
-
-<Info>If support is needed for your account, contact us at: support@celedonsolutions.com </Info>
+<Info>If support is needed for your account, contact us at: support@celedonsolutions.com</Info>
