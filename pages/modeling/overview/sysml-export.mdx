@@ -1,0 +1,544 @@
+---
+title: SysML v2 Export
+---
+
+## Overview
+
+Davinci exports a project or selected scope to a single `.sysml` file for downstream SysML v2 workflows, reviews, and analysis.
+
+This export is **deterministic**, but it is not a raw dump of the stored Davinci model. Before text is generated, Davinci applies export-only transformations so the result is more valid, more readable, and more portable across SysML v2 tooling.
+
+<Warning>
+Treat SysML v2 export as a standards-oriented publication format, not as a guaranteed round-trip editor format. Davinci tries to preserve engineering meaning, but some constructs are normalized, relocated, simplified, or preserved as comments to satisfy SysML v2 scoping and syntax constraints.
+</Warning>
+
+## Quick Summary
+
+### Exported Directly
+
+Davinci currently exports these modeled object types directly:
+
+- `part`
+- `entity`
+- `linkage`
+- `attribute`
+- `action`
+- `requirement`
+- `constraint`
+- `port`
+- `connection`
+- `item`
+- `risk`
+- `interface`
+- `capability`
+- `state`
+
+Container scope also exports directly:
+
+- `project` exports as the root `package`
+- `package` exports as `package`
+- unsupported container-like objects that own child packages may still be emitted as a `package` so package structure is preserved
+
+### Not Exported Directly
+
+The active exporter does **not** emit these as standalone SysML v2 elements:
+
+- `task`
+- `resource`
+- standalone `transition`
+- `code` in capability export
+- unsupported non-container types
+
+Important nuance:
+
+- references to `task` and `resource` objects are typically inlined as scalar values rather than exported as standalone elements
+- transitions are still exported semantically, but only through state-machine rendering rather than as independent objects
+
+### Common Transformations
+
+Davinci may change the exported structure in order to keep the output legal and usable:
+
+- attributes may be hoisted upward so references stay valid
+- interfaces and some connections may move to a more appropriate common scope
+- requirements may gain export-only subject aliases or subject aggregate helpers
+- some relationships and connections are preserved as `doc` comments instead of native SysML syntax
+- root-level helper content such as `Davinci_Unit_Defs`, `Davinci_Connection_Defs`, `DavinciPort`, and `TBD` is injected into the exported file
+
+## How Davinci Builds the Export
+
+Davinci does not write SysML directly from the stored tree. It first builds an export-ready model view that fixes scoping, naming, and syntax issues.
+
+### Export-Only Transformations
+
+#### State-container synthesis
+
+If a non-state object directly owns child states, Davinci inserts an export-only synthetic wrapper state such as `MyPart_State` and reparents those states into it.
+
+This matters because SysML v2 expects transitions to live inside a state-machine context. The wrapper lets Davinci export valid state structure even when the original Davinci containment is flatter.
+
+#### Attribute hoisting
+
+If an attribute is referenced by expressions from multiple places, Davinci may hoist that attribute upward to the **lowest common ancestor** of all relevant usages.
+
+This avoids broken references such as:
+
+- constraints that point downward into a sibling scope
+- action or state expressions that refer to attributes buried too deeply
+
+For a systems engineer reading the export, this means:
+
+- the attribute may appear higher in the exported package or part hierarchy than it does in the Davinci editor
+- the value and meaning are preserved, but the exported location may be more general than the original authoring location
+
+#### Interface hoisting
+
+Interfaces are moved to the common scope of the ports they connect. This is necessary because SysML v2 expects interface usages to live where the connected ends are actually accessible.
+
+#### Behavioral connection hoisting
+
+Connections nested directly inside `action` or `use case` style scopes are often not legal or accessible in SysML v2. Davinci therefore hoists those connection usages upward into the nearest non-behavioral ancestor scope when possible.
+
+#### Requirement subject normalization
+
+Requirements with more than one subject are normalized into a single export path using export-only helper elements:
+
+- a synthetic aggregate part is created under the requirement
+- synthetic member usages are created under that aggregate
+- each synthetic member is `bind`-linked back to the real subject target
+
+If a requirement has a single subject but still needs a local alias for legal reference structure, Davinci may create a single export-only alias object and bind it to the real subject.
+
+For the exported file, this means:
+
+- every requirement still exports with a clear `subject`
+- multi-subject requirements may include helper declarations that did not exist as authored objects in Davinci
+
+#### Child deduplication
+
+If the Davinci tree contains the same child listed under multiple parents, Davinci keeps the first depth-first ownership path for export and removes duplicate listings from later parents.
+
+This avoids ambiguous containment and unstable path resolution in the exported text.
+
+#### Name normalization and conflict resolution
+
+Davinci normalizes names for SysML export by:
+
+- replacing spaces with underscores
+- replacing apostrophes and curly quotes with underscores
+- quoting names in declarations and references
+
+Davinci also resolves naming conflicts at export time without changing the stored model:
+
+- sibling name collisions get numeric suffixes
+- short-name collisions get numeric suffixes
+- names that would collide with reserved export helpers such as `Davinci_Unit_Defs`, `Davinci_Connection_Defs`, `DavinciPort`, or `TBD` are renamed for export
+- package-scope state definitions may receive a `Def` suffix when they are promoted into state definitions
+
+### Root Package Additions
+
+When you export a whole project, the root `package` includes more than just your visible model tree.
+
+Davinci injects several export support sections at the project level:
+
+- a unit library package
+- a custom connection-definition package
+- standard imports for quantity calculations and trigonometric functions
+- a generic `port def 'DavinciPort'`
+- an `attribute 'TBD'` placeholder used by some requirement and constraint exports
+
+#### Units package
+
+Davinci creates a package named `Davinci_Unit_Defs` and fills it with unit declarations for:
+
+- built-in units
+- any unit symbols used anywhere in the exported model
+- any project-defined custom units
+
+When possible, unit declarations include conversion metadata:
+
+- project-defined scalar conversions
+- automatically inferred SI-prefix conversions such as `mW` to `W`
+
+This makes the export largely self-contained with respect to unit symbols rather than depending on separate standard library imports for every symbol.
+
+#### Custom relationship definitions
+
+Davinci creates a package named `Davinci_Connection_Defs` when the project contains relationship types that do not have a direct SysML keyword form.
+
+Each such relationship gets a `connection def` with generic `source` and `target` ends typed as `Anything[1]`.
+
+This is how Davinci preserves project-specific or Davinci-specific relationship types as valid typed connections in the exported file.
+
+### Relationship Handling
+
+Davinci relationship export is selective:
+
+- `performs` is emitted through action or part behavior syntax rather than as a generic relationship line
+- `subject` is handled inside requirement export
+- `allocate`, `verify`, and `satisfy` are preserved as `doc` comments
+- `uses` is currently skipped in this export pathway
+- relationships that target packages are dropped from connection-style emission because packages are treated as transparent namespaces, not connectable endpoints
+- non-internal project relationship types without a dedicated SysML keyword form are converted into typed connections through `Davinci_Connection_Defs`
+
+## Object Mapping Reference
+
+## Structural Modeling
+
+### Projects and packages
+
+Projects and packages export as `package` blocks.
+
+Package export has an additional behavior: Davinci treats packages as **transparent containers** and emits imports to make cross-package references easier to resolve.
+
+Each package may include:
+
+- `public import` statements for direct child packages
+- `private import` statements for sibling packages higher in the ancestor chain
+
+For a systems engineer, this means the export intentionally reduces the amount of fully qualified package pathing needed in references.
+
+### Parts, entities, and linkages
+
+`part`, `entity`, and `linkage` currently all export through the same `part` strategy.
+
+Davinci preserves:
+
+- the exported name and optional short name
+- documentation
+- child elements
+- type specialization through `defref`
+- `performs` relationships as `perform action ...;`
+
+Important nuances:
+
+- an entity does **not** export with a separate SysML keyword today; it is emitted as a `part`
+- a linkage also exports as a `part`
+- transition children are never emitted directly here because state export owns them
+- if sibling states exist under a part, they may be wrapped into a synthetic state machine before export
+
+### Attributes
+
+Attributes export as `attribute`.
+
+Davinci handles several common attribute cases:
+
+- simple numeric values remain numeric and are not quoted
+- simple string values are emitted as string literals
+- boolean values such as `true` and `false` stay as booleans
+- leaf attributes export on a single line when possible
+- structured attributes can still carry child content
+
+If an attribute value looks like an expression or contains model references, Davinci exports it as a **derived** attribute where appropriate.
+
+Examples of export behaviors include:
+
+- model references are resolved into SysML paths
+- inline unit text inside expressions is stripped when the unit should instead appear in SysML quantity notation
+- math function names are normalized to SysML-friendly names such as `arctan`, `arcsin`, and `arccos`
+- multi-argument `min` and `max` are folded into nested binary calls
+
+If an attribute has a unit, the unit is emitted using bracket notation such as `['kg']`.
+
+Davinci may use the resolved unit rather than the raw unit field when that produces a better export.
+
+### Ports
+
+Ports export as `port`.
+
+Important nuances:
+
+- untyped ports are automatically typed as `: 'DavinciPort'` because SysML v2 expects ports to have a port definition
+- typed ports preserve their `defref` typing
+
+### Items
+
+Items export as `item` using the generic element strategy.
+
+Depending on how they are modeled, they may appear as:
+
+- simple declarations
+- valued items
+- documented items
+- nested items with child content
+
+## Behavioral Modeling
+
+### Actions
+
+Actions export as `action`.
+
+Davinci preserves:
+
+- documentation
+- relationships
+- structural children such as attributes, ports, constraints, items, and connections
+- hierarchical child actions when they are not already instantiated by the sequence
+
+If the action specializes or performs another action, Davinci emits that as the action type or perform usage.
+
+If an action contains sequence text, Davinci does much more than copy that text over.
+
+The sequence exporter translates Davinci's action DSL into a structured SysML action-flow form with four layers:
+
+- action definitions for reusable action types
+- core action usages typed by those definitions
+- numbered action instances for repeated occurrences
+- control and flow structure for sequencing, branching, and parallelism
+
+The sequence translation supports patterns such as:
+
+- ordered execution
+- parameter passing
+- outputs from `end(...)`
+- `fork(...)` style parallel branches
+- control decisions and merges
+- `flow(...)` statements
+
+Flow export is nuanced:
+
+- if both endpoints are ports, Davinci emits a port-based flow statement
+- otherwise, it falls back to a message-style representation
+
+The result is one of the richer parts of the exporter. If your model relies heavily on procedural behavior, the generated SysML for actions is often significantly more structured than the original free-form sequence text.
+
+### Connections
+
+Connections are one of the most nuanced parts of the exporter.
+
+Davinci does **not** always emit every connection as a native `connect A to B;` statement. The output depends on endpoint legality and scope.
+
+When a connection has exactly two endpoints, no disqualifying scope problems, and no extra complexity, Davinci emits a native `connect ... to ...;` statement.
+
+If the connection corresponds to a custom or non-keyword relationship type, Davinci emits:
+
+- `connection : 'Davinci_Connection_Defs'::'RelationshipType' connect A to B;`
+
+or a block form when documentation or children must be preserved.
+
+Davinci intentionally converts some connections into `doc` comments instead of invalid SysML. This happens when, for example:
+
+- an endpoint is not exportable as a legal connectable feature
+- an endpoint is the enclosing owner itself or one of its ancestors
+- both endpoints are actually the same object
+- the path crosses promoted state-definition boundaries
+- the path goes through behavioral scopes where endpoint accessibility would fail
+
+In those cases, Davinci still preserves the engineering statement in readable text such as:
+
+- connection type
+- source path
+- target path
+- label or documentation
+
+If both endpoints are namespace-like containers, Davinci will export the result as:
+
+- a `dependency from ... to ...;`
+
+with relationship metadata preserved in `doc` comments.
+
+### Interfaces
+
+Interfaces export with a deliberate two-part strategy:
+
+- an `interface def`
+- one or more preserved connection-path statements as `doc` comments
+
+Davinci creates an `interface def` with generic `source` and `target` ends typed as `DavinciPort`.
+
+Child attributes and items of the interface are exported inside that definition.
+
+If the interface contains:
+
+- explicit `topology` pairs, Davinci treats each pair as a pathway
+- only a flat `connect` list with two endpoints, it creates one pathway
+- a flat `connect` list with more than two endpoints, it treats the first as a shared source and the remaining entries as fan-out targets
+
+The exporter currently preserves endpoint connectivity for interfaces as `doc` comments rather than full redefinition bindings because those paths often cross scopes that SysML v2 tools reject.
+
+So the export preserves:
+
+- the interface definition itself
+- the interface-owned data and features
+- the intended connection pathways
+
+but it does **not** always emit those pathways as fully bound interface usages.
+
+### Capabilities
+
+Capabilities export as `use case`.
+
+Davinci preserves:
+
+- documentation
+- nested capabilities
+- child attributes
+- child constraints
+
+Nuance:
+
+- `code` children are intentionally skipped because there is no direct SysML v2 export form for them in this pathway
+
+### States and transitions
+
+State export is holistic. Individual transition objects are not emitted separately; they are rendered inside the relevant state-machine export block.
+
+Leaf states may include:
+
+- `entry`
+- `do`
+- `exit`
+- child scalar content such as attributes and constraints
+
+When a state owns child states, Davinci treats it as a state machine and exports:
+
+- an initial transition to the earliest child state by lexical position
+- an optional container-level `do`
+- scalar children at the state-machine scope
+- sub-state declarations
+- same-machine transitions
+- cross-machine transition summaries
+
+If a state machine lives directly under a package, Davinci promotes its child state machines into package-level `state def` declarations instead of nesting them under an extra wrapper state.
+
+This is why some state names may gain a `Def` suffix in export-only naming.
+
+If a transition goes from one state machine to a different one, Davinci usually preserves it as a `doc` comment instead of a native transition statement because the target path is often not legal from the source state-machine scope.
+
+## Requirements and Analysis
+
+### Requirements
+
+Requirements export as `requirement`.
+
+Davinci preserves:
+
+- documentation
+- subjects
+- relationships
+- child content
+
+Davinci always tries to emit a legal `subject ...;` statement.
+
+If the requirement has:
+
+- one subject, it may export directly or through a local alias
+- multiple subjects, it exports through a synthetic aggregate part and synthetic local members bound back to the real targets
+
+Constraint children of a requirement are rewritten from ordinary nested constraints into:
+
+- `require constraint ...`
+
+This makes the exported requirement align more closely with SysML requirement usage patterns.
+
+### Constraints
+
+Constraints export as `constraint`, but Davinci does a substantial amount of cleanup and normalization before writing the body to preserve the engineering rule while making the expression legal and analyzable in SysML v2.
+
+Constraint expressions may be rewritten to:
+
+- resolve references into qualified names
+- normalize math function names
+- rewrite bare `=` into equality `==` where needed
+- quote literal tokens such as `PASS`, `FAIL`, or `YES`
+- convert quoted quantity literals into SysML quantity syntax
+- normalize trailing bare quantities such as `200 K`
+- normalize compound quantity forms such as units with numerator and denominator
+
+When a constraint compares something to a bare numeric literal, Davinci may extract that literal into a local attribute named `value` and rewrite the expression to compare against that attribute.
+
+This is intentional because SysML v2 constraint structure works better when the comparison target is declared as a feature instead of only appearing as a raw literal.
+
+If the left-hand side of a comparison is a feature path, Davinci may create a local alias such as `attribute target = ...;` and then compare `target` to `value`.
+
+Non-executable or placeholder constraint bodies such as plain `english` or text that simply repeats documentation may be suppressed instead of exported as misleading executable logic.
+
+### Risks
+
+Risks export as `case`, not as `concern`.
+
+Davinci uses a case-style export that preserves risk rollup logic as attributes and equations.
+
+Leaf risks export with direct attributes such as:
+
+- probability
+- impact
+- detectability
+
+Parent risks export rollup equations across child risks. Davinci preserves combinator semantics such as:
+
+- `OR`-style probability accumulation
+- `AND`-style probability accumulation
+
+Child risks export recursively as nested `case` usages.
+
+## Not Exported Directly
+
+The active exporter does not emit these as standalone SysML v2 elements:
+
+- `task`
+- `resource`
+- standalone `transition`
+- `code` in capability export
+- unsupported non-container types
+
+Important nuance:
+
+- if another exported expression references a `task`, Davinci typically resolves that to the task's duration-like scalar value
+- if another exported expression references a `resource`, Davinci typically resolves that to the resource's numeric scalar value
+- transitions are still exported semantically, but only through state-machine rendering rather than as independent objects
+
+## What to Expect in the Output File
+
+### Names, paths, and references
+
+Davinci resolves internal references into relative or qualified SysML paths during export.
+
+Path rendering is scope-aware:
+
+- package-like scopes prefer `::`
+- feature-like scopes prefer `.`
+- imported packages may be omitted from the path when the export has already made them visible
+
+This is why the exported file may look cleaner than a literal fully qualified dump while still remaining referentially correct.
+
+### Why some content becomes `doc` comments
+
+Davinci exports object documentation using SysML `doc` blocks wherever possible.
+
+It also sanitizes comment text so embedded `/*` and `*/` sequences do not break parsing.
+
+In practice, `doc` comments are used for three different preservation levels:
+
+- ordinary object documentation
+- relationship notes that do not map to a native statement
+- fallback preservation when a construct cannot be emitted as legal SysML syntax
+
+### File naming and export scope
+
+If you export:
+
+- a whole project, the downloaded file is named after the project
+- a sub-scope, Davinci still prefers the root project name for the file when that project is present in the exported tree
+
+The exported text itself starts at the selected object or project scope that you chose to export.
+
+### How to read the exported file
+
+When reviewing a Davinci SysML v2 export, use this checklist:
+
+1. Start at the root package and look for the injected support sections: `Davinci_Unit_Defs`, `Davinci_Connection_Defs`, imports, `DavinciPort`, and `TBD`.
+2. Treat packages as namespace helpers, not just as literal containers from the editor.
+3. Expect some attributes, interfaces, and connections to appear at a higher scope than where they were authored.
+4. If a relationship or connection appears as `doc` text, assume Davinci preserved the semantics but avoided illegal SysML syntax.
+5. For requirements, inspect local aggregate or alias helpers before concluding the subject structure changed.
+6. For behavior, read both the action declarations and the generated sequence and control-flow region.
+7. For state machines, look for promoted `state def` declarations and comment-preserved cross-machine transitions.
+
+### How to export
+
+To export your model to SysML v2:
+
+1. Open the project or object you want to export.
+2. Select the export option from the project or object menu.
+3. Choose `SysML v2`.
+4. Davinci downloads a `.sysml` file generated from the selected scope.

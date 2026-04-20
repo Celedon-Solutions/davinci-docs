@@ -1,0 +1,184 @@
+---
+title: Dashboards
+---
+
+## Description
+
+Dashboards are visual artifact objects for assembling live model views into a grid-based layout. A dashboard can combine diagrams, tables, metrics, timelines, images, and formatted text into a single configurable workspace that stays connected to your model data.
+
+Dashboards are especially useful for review pages, status boards, imported diagram views, system overviews, and mixed-analysis reports where you want several different model views shown together in one place.
+
+<Info>Dashboards support both GUI editing and code editing. You can assemble boards and blocks visually in the dashboard view, or edit the underlying `boards` JSON directly when you need precise or bulk changes.</Info>
+
+## Editing Dashboards
+
+Dashboards can be edited in two complementary ways:
+
+- **GUI editing**: Use the dashboard view to add boards, insert blocks, choose scope objects, resize layout regions, and adjust common display settings.
+- **Code editing**: Use the right panel to ddit the `boards` JSON directly instead of the GUI to define board placement, block configuration, sizing, and advanced options in a structured form.
+
+## Dashboard Layout
+
+A dashboard is made of one or more **boards** arranged on a grid. Each board:
+
+- occupies a cell or merged cell range using spreadsheet-style addresses such as `A1` or `B2:C3`
+- can optionally define an explicit pixel size as `[width, height]`
+- contains one or more blocks
+- can apply optional CSS-style overrides for advanced presentation control
+
+At runtime, the dashboard renders each board and its blocks in the configured order.
+
+### Example Board
+
+```json
+[
+  {
+    "cell": "A1",
+    "size": [null, 400],
+    "blocks": [
+      {
+        "tree": "self",
+        "depth": 2,
+        "filter": []
+      }
+    ]
+  },
+  {
+    "cell": "A2",
+    "size": [null, 300],
+    "blocks": [
+      {
+        "table": "self",
+        "columns": [
+          { "query": ["display:name"], "label": "Name", "width": 200 }
+        ]
+      }
+    ]
+  }
+]
+```
+
+<Note>`self` means the dashboard object itself is used as the scope root. In practice, the dashboard editor usually helps you select the relevant scope objects instead of manually typing raw IDs.</Note>
+
+## Block Types
+
+Dashboards support several block types. Each block is a flat configuration object whose type is determined by a key such as `tree`, `table`, `metric`, or `title`.
+
+### Content Blocks
+
+Use these blocks to add explanatory or presentational content:
+
+- `title`: displays a heading with optional alignment
+- `text`: displays markdown or inline-reference text
+- `image`: renders an object as an image
+
+### Diagram and Analysis Blocks
+
+Use these blocks to render live model views:
+
+- `tree`: hierarchical tree view of scoped objects
+- `table`: tabular query view with configurable columns
+- `metric`: computed scalar summary such as counts or boolean checks
+- `history`: time-history plot for tracked values
+- `relationship`: relationship graph view
+- `block`: block-diagram view for parts, ports, and relationships
+- `gantt`: schedule/timeline view
+- `sequence`: sequence-diagram view
+- `activity`: activity-diagram view
+- `state`: state-diagram view
+- `risk`: risk-matrix view
+- `allocationMatrix`: allocation matrix between filtered row and column object sets
+
+## Scope and Filtering
+
+Most render blocks operate on a **scope**. Depending on the block type, the scope may be:
+
+- `self`
+- a single selected model object
+- an array of selected model objects
+
+Some block types can render multiple roots in one block, while others use a single root object.
+
+Many dashboard blocks also support:
+
+- `depth` to control how far the query traverses
+- `filter` to restrict results by type, tag, relationship type, or direction
+- `only` to constrain rendering to a specific set of object IDs
+- `showDocs`, `showFlows`, `showItems`, `showPerformers`, or other display toggles depending on the block type
+
+## Table Blocks
+
+Table blocks query model data and render it as rows and columns. Each column defines a `query` pipeline that is evaluated left-to-right against each row object.
+
+Typical table queries include:
+
+```json
+["display:name"]
+["children", "filter(type:requirement)", "display:name"]
+["relationship(verifies, in)", "sort(name, asc)", "display:shortName"]
+```
+
+This makes dashboard tables useful for lightweight traceability views, rollups, filtered summaries, and imported table-like reports.
+
+## Metric Blocks
+
+Metric blocks compute a scalar value from scoped model data. They support object-based or relationship-based aggregation and are designed for deterministic summary values such as:
+
+- counts
+- existence checks
+- all/none checks
+
+Metric configuration includes:
+
+- a scope object
+- a `source` of either `objects` or `relationships`
+- a structured `query`
+- an `aggregate` operation
+- a `display` configuration for rendering as a stat, badge, or inline value
+
+## Imported Diagrams
+
+Dashboards are also used as a destination format for imported diagrams when Davinci can map the source content into supported dashboard blocks.
+
+<Info>For import-specific behavior, see [How diagrams turn into dashboards](/pages/modeling/overview/imports#how-diagrams-turn-into-dashboards).</Info>
+
+## Public Dashboards
+
+Dashboards have an `isPublic` setting that controls whether the dashboard can be publicly accessible. This is useful when a dashboard is intended as a shared read-only presentation surface rather than an internal modeling artifact.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| Dashboard | Edit and view the board layout and dashboard blocks. |
+| [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
+| [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
+
+## Properties Fields
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+Description of the object.
+</ParamField>
+
+<ParamField path="Boards" type="code">
+JSON definition of the dashboard layout. This contains the list of boards, their grid cell placement, optional sizes, and the blocks rendered in each board. This same structure powers the code editor, while the dashboard GUI provides a visual way to edit the same configuration.
+</ParamField>
+
+<ParamField path="Is Public" type="boolean">
+Controls whether the dashboard is publicly accessible.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+
+  A list of all Relationships this object has with other model objects.
+
+  [Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

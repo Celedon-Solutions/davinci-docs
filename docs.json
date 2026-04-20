@@ -164,7 +164,9 @@
                                 "pages": [
                                     "pages/modeling/overview/systemmodeling",
                                     "pages/modeling/overview/language",
-                                    "pages/modeling/overview/mentions"
+                                    "pages/modeling/overview/mentions",
+                                    "pages/modeling/overview/imports",
+                                    "pages/modeling/overview/sysml-export"
                                 ]
                             },
                             {
@@ -242,6 +244,7 @@
                                 "group": "Artifacts",
                                 "pages": [
                                     "pages/modeling/objects/documents",
+                                    "pages/modeling/objects/dashboard",
                                     "pages/modeling/objects/tables",
                                     "pages/modeling/objects/slide",
                                     "pages/modeling/objects/matrix"

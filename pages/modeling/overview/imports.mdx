@@ -1,0 +1,413 @@
+---
+title: SysML v1.x Import
+---
+
+Use this page to understand what happens when you import a SysML 1.x model into Davinci through `MDZIP` or `XMI`/`XML` uploads.
+
+<Note>
+The importer is strongest on MagicDraw/Cameo-style SysML 1.x exports that preserve standard `xmi:id`, `xmi:type`, UML, and SysML metadata.
+</Note>
+
+<Warning>
+Do not expect a 1:1 mapping between SysML 1.x and SysML v2 in Davinci. Davinci converts SysML 1.x exports into Davinci's object model using best-fit rules, so some concepts are renamed, merged, simplified, or inferred during import.
+</Warning>
+
+## Cheat Sheet
+
+| Topic | What Davinci Does | Important Caveat |
+| :--- | :--- | :--- |
+| Input formats | Imports raw `.xml` / `.xmi`, `.mdzip`, and ZIPs containing model payloads | ZIPs may contain multiple candidate models, and supporting files still matter |
+| Import scope | Builds a wrapper package tagged `sysml-import` and inserts converted objects under it | This is a structural conversion |
+| SysML version gap | Converts SysML 1.x into Davinci objects using best-fit rules | SysML 1.x is **not** a 1:1 match for SysML v2, so expect semantic differences |
+| Packages and blocks | `uml:Model` / `uml:Package` become `package`; most structural classes become `part` | Plain `uml:Class` meaning depends on context and stereotypes |
+| Requirements | Requirement stereotypes and requirement-like classes become `requirement` | MagicDraw often stores requirements as plain `uml:Class` in a requirements package |
+| Behaviors | Activities and interactions become `action` | `UseCase` becomes `capability`, not `action` |
+| State machines | State machines, states, pseudostates, and final states become `state`; transitions become `transition` | State behavior is directly converted into Davinci-native state structures, actions tend to be grouped under the transition if occuring on the transition |
+| Data and values | Structural properties usually become `attribute`; behavior data nodes often become `item` | Mapping is context-sensitive, especially under behaviors and constraint blocks |
+| ValueTypes and DataTypes | Scalar value types usually become attribute/unit-like data; structured data types can become `part` | Scalar ValueTypes may disappear as standalone objects because they are registered as units |
+| Interfaces and flows | `uml:InformationFlow` becomes `interface`; flow/property-style constructs often become `item` | Flow specifications are not always preserved as the same SysML interface definitions |
+| Constraints | Constraints become `constraint`; constraint parameters become `attribute` | Untyped `ConstraintProperty` usage slots are skipped |
+| Relationships | Maps stereotypes and XMI types deterministically; port-to-port connectors become `connect` | Some relationships fall back to generic types like `trace`, and generalization is not imported as a normal edge |
+| Diagrams | Converts importable diagrams into Davinci dashboards | Diagrams with no surviving imported scope are skipped, and some table semantics are dropped |
+| Cross-file references | Uses supporting/shared files for stereotypes, timing, and diagram metadata | Importing only a visible primary XML file can produce incomplete results |
+
+## Supported Inputs
+
+You can import SysML 1.x model content from:
+
+- raw `.xml` or `.xmi` model files
+- `.mdzip` archives
+- `.zip` archives that contain model XML/XMI or embedded `.mdzip` files
+
+If you upload a generic ZIP archive, Davinci first inspects it and lets you choose which detected model payloads to import.
+
+## Import Flow
+
+When you import a SysML 1.x model, Davinci follows this flow:
+
+1. Davinci inspects the file or archive and extracts the model files it can use.
+2. The XML/XMI parser builds an intermediate model from elements, stereotypes, relationships, activities, interactions, diagrams, and metadata.
+3. The deterministic converter maps that intermediate model into Davinci object types.
+4. Davinci creates a wrapper package for the import, validates the result, registers any discovered units or custom relationship types, and inserts the objects into the workspace.
+
+Think of this as a structural conversion. Davinci tries to give you a usable model in Davinci, not a perfect one-to-one copy of every SysML editing construct.
+
+## How Archive Imports Work
+
+Archive imports do more than just unzip everything:
+
+- If a ZIP contains multiple candidate models, you can choose which ones to import.
+- In mixed archives, unselected XML/XMI model files may still be kept as secondary context so cross-file references can resolve.
+- MagicDraw bundles are treated as a grouped model, with primary and supporting files handled differently.
+- If multiple embedded `.mdzip` models are imported together, Davinci injects wrapper packages so content from each embedded source stays separated.
+
+## How Davinci Reads Your Files
+
+Davinci does more than just read one XML file and convert it directly.
+
+### Cross-File Prepass
+
+Before Davinci extracts elements, it scans all model files for cross-file timing and annotation context:
+
+- `uml:TimeEvent` definitions are indexed first so transition triggers can resolve even when the event lives in a different file.
+- stereotype metadata is collected from all files, including profile and shared files
+- diagram metadata is collected from all files, not only the primary model file
+
+### Primary And Supporting Files
+
+Only primary model files contribute the main model elements, relationships, activities, and interactions.
+
+Supporting or shared files still matter because they can provide:
+
+- stereotype definitions
+- diagram ownership and metadata
+- referenced timing information
+- cross-file type/profile context
+
+In other words, a supporting file is still part of the import, even if it does not contribute the main object tree.
+
+### File Dialects
+
+Davinci can detect SysML, UAF, BPMN, and TOGAF-style exports, but this import path is built primarily for SysML/UML content. If you import a non-SysML dialect, expect a best-effort result rather than full support.
+
+## What Davinci Creates
+
+## Structural Objects
+
+Davinci maps these structural objects deterministically:
+
+- `uml:Model` and `uml:Package` become `package`
+- most structural `uml:Class` and block-like elements become `part`
+- actor/stakeholder/external-role style classes become `entity`
+- `uml:Class` inside a requirements package, or with a requirement stereotype, becomes `requirement`
+
+One important edge case: your source model may not store requirements as explicit `sysml:Requirement` nodes. In MagicDraw exports, requirements often come through as plain `uml:Class` elements, so Davinci uses stereotypes and package context to decide whether to import them as requirements.
+
+## Stereotypes Become Tags
+
+Davinci does not preserve SysML stereotypes as a separate editable stereotype system. Instead, imported stereotypes are usually added onto the resulting Davinci objects as tags.
+
+That means a stereotype can matter in two different ways during import:
+
+- it can influence what Davinci object type gets created
+- it can also survive on the imported object as a tag for later reference
+
+This is useful because you often still want to see source-model classification hints even after the object has been translated into Davinci's own object model.
+
+There are a few important cleanup rules:
+
+- some import-only or overly generic stereotype names are filtered out instead of being kept as tags
+- tags that simply duplicate the final Davinci object type are removed
+- the final tag set is normalized from the source stereotype names rather than preserving a full profile/stereotype definition system
+
+## Values, Data Types, And Attributes
+
+Davinci treats scalar and structured data definitions differently:
+
+- scalar `ValueType` or `DataType` definitions are usually treated as attribute/unit-like data
+- structured `DataType` definitions with owned named properties are promoted to `part` so their internal fields survive as children
+- scalar ValueTypes extracted as units are removed from the imported object set and registered as units instead
+
+This is one of the most important behaviors to understand before you import:
+
+- a scalar ValueType may **not** appear as a standalone object after import
+- a structured DataType may survive as a container-like object with children
+
+Davinci also maps properties based on context:
+
+- properties under structural elements usually become `attribute`
+- properties under behavior contexts can become `item`
+- properties under constraint blocks are treated as equation parameters and become `attribute`
+- untyped `ConstraintProperty` elements are skipped because they are considered empty usage slots
+
+## Interfaces, Flows, And Items
+
+Davinci does **not** treat every SysML flow concept as an interface.
+
+Here are the most important deterministic mappings:
+
+- `uml:InformationFlow` becomes `interface`
+- `FlowSpecification`, `ItemFlow`, and `FlowProperty` stereotypes become `item`
+- `uml:Signal` and `uml:InformationItem` become `item`
+- object nodes, central buffers, data stores, and activity parameter nodes also become `item`
+
+This is a key nuance: Davinci usually imports flow specifications and flow properties as data items, not as rich interface definitions.
+
+## Activities, Interactions, And Behavior
+
+Davinci splits behavior across several object types instead of collapsing everything into one generic type.
+
+- `uml:Activity`, `uml:Interaction`, `uml:OpaqueBehavior`, and `uml:FunctionBehavior` become `action`
+- child action nodes inside activities are also forced to `action`
+- nested message or signal classifier content discovered inside activities can become `item`
+- `uml:UseCase` becomes `capability`, not `action`
+
+### How Action Hierarchy Gets Built
+
+When you import behavior, Davinci first creates the action objects themselves and then builds the parent/child step structure underneath them.
+
+What this means for you:
+
+- an imported activity can become an action with nested child actions
+- step-like nodes found inside the activity can show up as child actions under that parent
+- the final parent/child structure may still be adjusted during import if Davinci finds a more useful hierarchy
+
+This matters because the generated behavior code is written against the imported Davinci actions you can actually inspect and edit later, not against raw SysML IDs or diagram-only labels.
+
+### How Sequences Are Generated
+
+Davinci generates an action's sequence code after the main imported objects already exist. By that point, the importer usually knows:
+
+- which Davinci action object corresponds to each SysML activity or interaction
+- which child actions belong under that behavior
+- which related parts, ports, entities, and items are available as references
+- which interaction, if any, should be treated as the matching message view of the same behavior
+
+That lets Davinci generate sequence code that points at the imported objects in your model, instead of depending on temporary XMI identifiers from the source file.
+
+### What Davinci Writes Into The Action
+
+Davinci does not keep raw SysML activity syntax or sequence-diagram syntax. Instead, it writes Davinci action sequence code into the imported action's `sequence` field.
+
+The conversion generally works like this:
+
+1. structural behavior content becomes imported `action` objects
+2. the importer resolves child actions, related structural objects, and relevant data items
+3. activity flows and interaction messages are converted into Davinci sequence statements
+4. the resulting sequence code is written onto the imported action object's `sequence`
+
+When possible, that code uses direct references to imported Davinci objects rather than fragile name-only placeholders.
+
+### What You May See In Imported Sequence Code
+
+Depending on the source behavior, the generated sequence may include:
+
+- direct action-step calls for child actions
+- `flow(...)` statements derived from SysML object flows, pins, and buffer-style data nodes
+- `fork([...])` style parallel execution when the source behavior clearly branches in parallel
+- a final `end()` to terminate the imported action sequence cleanly
+
+For data movement, Davinci can derive `flow(...)` statements from object flows, pins, and intermediate buffer nodes so the imported sequence shows not only step order but also what data or items move between steps.
+
+### Activities And Interactions Are Often Merged
+
+Davinci tries to combine multiple SysML views of the same behavior when it has enough evidence that they belong together.
+
+For example:
+
+- an activity can supply the action-step structure
+- a matching interaction can supply the message/lifeline ordering
+- standalone interactions with useful message content can still become action sequences on their own
+
+So the final imported sequence is often a best-fit Davinci version of the behavior assembled from several SysML sources, not a literal transcription of just one diagram or one XML subtree.
+
+### Important Limits
+
+This sequence generation is intentionally translation-oriented rather than round-trip-preserving:
+
+- imported sequence code is a Davinci interpretation of the SysML behavior
+- lifelines, pins, buffers, and message flows are resolved into Davinci object references where possible
+- actions with no meaningful sub-content may end up with little or no sequence body
+- imported sequences can still need review or cleanup after import
+
+## State Machines And Transitions
+
+Davinci handles state-machine content separately from activity and interaction conversion:
+
+- `uml:StateMachine`, `uml:ProtocolStateMachine`, `uml:State`, `uml:FinalState`, and `uml:Pseudostate` become `state`
+- `uml:Transition` becomes `transition`
+- transition timing can resolve from `uml:TimeEvent` definitions discovered in other files
+
+## Constraints And Parametrics
+
+Davinci also maps constraints deterministically:
+
+- `ConstraintBlock` stereotype becomes `constraint`
+- `uml:Constraint` becomes `constraint`
+- `ConstraintParameter` elements become `attribute`
+- typed `ConstraintProperty` elements become `attribute`
+- untyped `ConstraintProperty` elements are skipped
+
+If a constraint usage slot does not point to a typed constraint block, Davinci drops it to reduce noise in the imported model.
+
+## Comments And Notes
+
+Davinci does not treat all comments the same way.
+
+- annotated comments are usually merged back into the objects they describe
+- some free-floating `uml:Comment` elements can become standalone Davinci objects
+
+For standalone comments, Davinci may infer the object type from the surrounding package name. For example, comments under requirement-like containers may become `requirement`, while comments under behavior-like containers may become `action`.
+
+So depending on how your source model encodes comments, you may see them merged into nearby objects or imported as their own objects.
+
+## How Relationships Come Through
+
+Davinci maps relationships deterministically, but not one-to-one.
+
+### Core Rules
+
+- structural containment relationships are filtered out because parent/child structure is handled separately
+- `Generalization` is not imported as a normal relationship; it is handled through inheritance or `extends`-style structure
+- pre-identified port-to-port connectors become `connect` with `inout` direction
+
+The important nuance is that Davinci starts from the SysML containment tree when building the imported structure, but it does not treat that tree as untouchable final parentage. Later conversion passes can reparent objects when the importer has stronger evidence for a more useful Davinci hierarchy, especially around behavior-derived content and other assembly-time restructuring.
+
+### Relationship Mapping Rules
+
+For other relationships, Davinci applies stereotype and XMI-type rules first:
+
+- known SysML stereotypes map directly to Davinci relationship types
+- known profile relationship stereotypes can map to built-in types or become new custom relationship types
+- if no stronger rule applies, the importer falls back to more generic relationship types such as `trace`
+
+Davinci also applies a name-based physical-flow upgrade:
+
+- relationship names containing terms like `power`, `data`, `signal`, `fluid`, `thermal`, `mechanical`, `optical`, `chemical`, or `radio` can be upgraded from generic mappings into typed physical-flow relationships
+
+Davinci usually treats direction as outgoing from source to target. Port-to-port connectors are the main bidirectional exception.
+
+## How Diagrams Turn Into Dashboards
+
+When possible, Davinci converts imported diagram metadata into dashboards.
+
+During this step, Davinci:
+
+- resolves each diagram's referenced XMI IDs against the objects that actually survived import
+- removes redundant ancestor scope where needed
+- chooses a Davinci block type from the source diagram type
+- creates a dashboard under the diagram owner when a valid owner and scope remain
+
+This gives you useful view objects, but there are important limits:
+
+- diagrams with no resolved imported elements are skipped
+- profile diagrams are not processed into Davinci dashboards
+- relationship-style diagrams may be pruned if no connected imported objects remain
+- some MagicDraw table columns are dropped when there is no Davinci equivalent
+- package diagrams can suppress some scope detail compared to the original source view
+
+## Cleanup Davinci Applies Automatically
+
+Before Davinci inserts the imported objects, it applies several cleanup steps:
+
+- imported objects are wrapped in a package tagged `sysml-import`
+- children are sorted by type and name
+- embedded newlines are stripped from object names
+- empty unnamed packages are removed
+- long names can receive an auto-generated `shortName`
+- self-referencing attribute values are cleared
+- action sequences are forced to end with `end()`
+- tags that simply duplicate the final Davinci type are removed
+
+These are intentional cleanup steps, not import bugs.
+
+## What To Expect After Import
+
+### Export Format Matters
+
+Davinci expects standard XMI/UML/SysML-style exports. If your exporter uses highly customized namespaces, unusual serialization patterns, or tool-specific profile storage, expect some content to be missed, simplified, or downgraded.
+
+### Package Names Can Change The Result
+
+Davinci partly relies on package context when it decides whether a class is really a requirement. If your tool stores requirements as plain classes inside a package named `Requirements`, Davinci can still import them as requirements. If package naming is inconsistent, similar objects may map differently.
+
+### Supporting Files Matter
+
+If your export relies on shared model files, profile files, or cross-file references, importing only one visible XML file may not be enough. Missing supporting files often show up as:
+
+- missing stereotypes
+- broken type context
+- unresolved transition timing
+- diagrams with reduced scope
+
+### Scalar ValueTypes May Not Show Up As Objects
+
+This is expected. Davinci often turns scalar value types into unit metadata instead of keeping them as standalone imported objects.
+
+### Some Parametric Content Is Skipped On Purpose
+
+Davinci discards untyped constraint properties because they do not carry enough useful model semantics on their own.
+
+### Diagrams Are Best-Effort Views
+
+Davinci recreates diagrams as dashboards instead of preserving native SysML diagram definitions. Expect to lose some layout intent, special table semantics, and diagram-only decoration.
+
+### A Successful Import Still Needs Review
+
+Final validation blocks hard structural failures, but an import can still succeed with warnings or simplified content. For example:
+
+- attributes may import without a useful value
+- ports may import with incomplete direction/kind details
+- actions may require sequence cleanup or review
+- relationships may fall back to generic `trace`-style mappings
+
+## Common Import Issues
+
+**Large Parts Of The Model Are Missing**
+
+Common causes:
+
+- the archive did not include the supporting model files
+- the export used non-standard namespaces or profile storage
+- the selected archive entry was not the primary model
+- the content was stored in a dialect or construct this importer only partially supports
+
+**Requirements Imported As Parts Or Generic Objects**
+
+This usually means your source model encoded them as plain classes without requirement stereotypes and without a requirement-like package context.
+
+**Value Types Did Not Show Up**
+
+If they were scalar ValueTypes, Davinci may have extracted them as units instead of keeping them as standalone imported objects.
+
+**Connectors Did Not Become `connect`**
+
+Davinci only promotes connectors to `connect` when it can resolve them cleanly as port-to-port interfaces. Other connectors may fall back to more generic relationship handling.
+
+**Diagrams Did Not Appear**
+
+Davinci skips a diagram if none of its referenced elements survive import or if its resolved scope becomes empty after cleanup.
+
+
+## How To Get The Best Results
+
+To get the cleanest results:
+
+1. Prefer complete `.mdzip` exports or complete XML/XMI bundles, not partial single-file extracts.
+2. Keep shared/profile/supporting files together with the primary model.
+3. Use clear package naming, especially for requirements-heavy sections.
+4. Expect scalar value types to become units rather than standalone objects.
+5. Upload diagram images alongside the XMI or MDZIP when you want Davinci to review, explain, or help update the imported model afterward. The structured model data is useful, but the diagram images preserve visual intent, layout, and notation that do not survive cleanly in XMI alone.
+6. Review imported dashboards, constraints, relationships, and state behavior after import.
+
+## Quick Summary
+
+Davinci's current SysML 1.x importer gives you a deterministic structural conversion pipeline.
+
+- it understands archives, supporting files, and cross-file timing context
+- it maps many common SysML constructs into useful Davinci objects
+- it treats structured vs scalar data definitions differently
+- it converts diagrams into dashboards when enough scope survives
+- it intentionally skips or simplifies constructs that do not translate cleanly
+
+For migration work, you will get the best results if you import complete exports, include diagram images for follow-up review, and plan for a review pass afterward. Most importantly, treat SysML 1.x import as a translation into Davinci, not as a strict SysML 1.x to SysML v2 equivalence.

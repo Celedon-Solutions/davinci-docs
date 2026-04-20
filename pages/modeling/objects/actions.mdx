@@ -83,175 +83,357 @@ Short name of the object.
   [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
 
-### Action References
-Actions are referenced using the `@` system (which get resolved into elements in the code):
+## DSL Syntax
+
+Davinci action sequences use a Python-like DSL. The runtime resolves model references before execution, but this documentation uses the friendlier `@'name'` notation for readability in examples.
+
+<Info>
+In the underlying DSL implementation, model references are transformed into executable calls and bindings during preprocessing. The examples below keep the docs-friendly `@'name'` form, even though the runtime internally uses a lower-level resolved representation.
+</Info>
+
+### Model References
+
+Actions, attributes, ports, and other modeled elements can be referenced using `@'name'`:
+
 ```python
-@Initialize_System
-@Configure_Parameters
+@'Initialize System'
+@'Configure Parameters'
 ```
 
-### Attribute References
-Attributes can be linked with `@` system and represent single scalar values:
 ```python
-if @status_code == 200:
-    print(f"Current value is {@temperature}")
-    @output_value = @input_value * 2
+if @'status_code' == 200:
+    @'output_value' = @'input_value' * 2
 ```
 
-<Warning>Attributes are ALWAYS single scalar values, not arrays or lists. Use multiple scalar attributes for vectors (e.g., `@pos_x`, `@pos_y`, `@pos_z`).</Warning>
+<Warning>Attributes are always single scalar values, not arrays or lists. Use multiple scalar attributes for vectors such as `@'pos_x'`, `@'pos_y'`, and `@'pos_z'`.</Warning>
 
-### Control Flow
-Standard Python control structures are supported:
+### Attribute Runtime Behavior
 
-**Sequential Execution:**
+Attributes act like execution-time scalar variables while an action is running.
+
+When the sequence starts, referenced attributes are bound into the runtime so the action can read their current values:
+
 ```python
-@Initialize_System
-@Load_Configuration
-@Start_Services
+if @'tank_pressure' > @'max_pressure':
+    @'Open Relief Valve'()
 ```
 
-**Conditional Execution:**
+Assignments update the runtime value of that attribute for the remainder of the execution and for any downstream logic that reads it during that run:
+
 ```python
-if @system_status == "OK":
-    @Normal_Startup
-else:
-    @Recovery_Mode
+@'attempt_count' = @'attempt_count' + 1
+
+if @'attempt_count' >= @'max_attempts':
+    end(status="failed")
+```
+
+This is important:
+
+- Reading `@'name'` pulls the current execution-time value for that attribute.
+- Writing `@'name' = ...` updates the runtime value used by later steps in the same execution.
+- These updates do **not** rewrite the modeled attribute definition itself.
+- In other words, action code works with an execution context, not by editing the persistent model.
+
+Use action inputs when a value should be explicitly passed in by the caller. Use attributes when the value is part of the modeled system state that the action should read or update during execution.
+
+### Action Inputs
+
+Actions can be defined in one of two ways:
+
+### No-input actions
+
+If an action does not need inputs, write the sequence directly. No `action(...)` declaration is needed.
+
+```python
+@'Run Pre Checks'()
+@'Load Configuration'()
+@'Start Services'()
+end()
+```
+
+Use this form when the action relies only on local logic, global model state, or previously bound attributes.
+
+### Actions with inputs
+
+If an action needs caller-provided values, declare them at the top with `action(...)`. The declared parameters become normal Python variables inside the action body.
+
+```python
+action(speed, mode="nominal"):
+    if mode == "nominal":
+        @'Run Nominal Sequence'(value=speed)
+    else:
+        @'Run Degraded Sequence'()
     end()
 ```
 
-**Loops:**
 ```python
-for i in range(int(@retry_count)):
-    @Attempt_Connection
-    if @connection_status == "success":
+action(config, threshold):
+    result = @'Analyze Configuration'(config=config)
+    if result.status == "ok" and result.score > threshold:
+        end(status="passed")
+    else:
+        end(status="failed")
+```
+
+Rules for action definitions with inputs:
+
+- `action(...)` must be the first non-comment line in the action sequence.
+- If `action(...)` is present, the full executable body must be indented under it.
+- Parameters are plain Python identifiers, not model references.
+- Parameters without defaults are required at the call site.
+- Parameters with defaults are optional at the call site.
+
+### Calling Actions
+
+Actions are called like functions. Parentheses are optional for no-argument calls and may be used with positional or keyword inputs.
+
+```python
+# No-argument calls
+@'Run Pre Checks'
+@'Run Pre Checks'()
+
+# Positional inputs
+@'Configure System'(@'current_speed', "nominal")
+
+# Keyword inputs
+@'Configure System'(mode="nominal", speed=@'current_speed')
+
+# Mixed inputs
+@'Configure System'(@'current_speed', mode="nominal")
+```
+
+### Returning Outputs with `end()`
+
+Actions return outputs by passing keyword arguments to `end(...)`. `end()` with no arguments is still valid when no outputs are needed.
+
+```python
+# No outputs
+end()
+
+# One output
+end(result=@'computed_value')
+
+# Multiple outputs
+end(velocity=@'computed_velocity', heading=@'computed_heading', status="ok")
+```
+
+### Capturing Outputs
+
+When an action returns outputs, capture the result in a Python variable and access named outputs with dot notation.
+
+```python
+outputs = @'Analyze Plan'(input=@'sensor_data')
+@'analysis_result' = outputs.result
+@'analysis_status' = outputs.status
+```
+
+Inline access is also valid when only one field is needed:
+
+```python
+@'approval_status' = @'Review Test Plan'(plan=@'test_plan').status
+```
+
+### Control Flow
+
+Standard Python control structures remain available:
+
+```python
+if @'system_status' == "OK":
+    @'Normal Startup'()
+else:
+    @'Recovery Mode'()
+    end(status="recovery")
+```
+
+```python
+for i in range(int(@'retry_count')):
+    @'Attempt Connection'()
+    if @'connection_status' == "success":
         break
 ```
 
-### Action Control Functions
+## Runtime Functions
 
-**fork([actions])** - Execute actions in parallel:
+### `fork([...])`
+
+`fork()` executes multiple branches in parallel. A branch may be a single action call or a named `group(...)` block.
+
 ```python
-fork([@Data_Collection, @System_Monitoring, @Log_Events])
+fork([@'Data Collection'(), @'System Monitoring'(), @'Log Events'()])
 ```
 
-**end()** - Exit the current action flow:
+### `trigger(...)`
+
+`trigger()` starts an action or state asynchronously and immediately continues the current flow.
+
 ```python
-if @critical_error:
-    @Log_Error
-    end()
+trigger(@'Health Monitor'())
+trigger(@'Send Alert'(severity="critical", message=@'alert_message'))
 ```
 
-**stop()** - Immediately halt all actions in the hierarchy:
+Use `trigger()` for fire-and-forget behavior. Do not use it when the current action needs the result before continuing.
+
+### `end(...)`
+
+`end()` exits the current action flow and may optionally return outputs.
+
 ```python
-if @emergency_condition:
-    @Emergency_Shutdown
+if @'critical_error':
+    @'Log Error'()
+    end(status="failed")
+```
+
+### `stop()`
+
+`stop()` immediately halts the current action hierarchy.
+
+```python
+if @'emergency_condition':
+    @'Emergency Shutdown'()
     stop()
 ```
 
-**flow(port1, port2, label, items)** - Define message/data routing between ports or entities:
-```python
-# Simple flow between ports
-flow(@sensor_port, @processor_port, "sensor_data", [@Temperature_Data])
+### `checkpoint("name")` and `retry("name")`
 
-# Conditional routing
-if @data_quality == "high":
-    flow(@source_port, @primary_port, "raw_data", [@Measurement, @Timestamp])
-else:
-    flow(@source_port, @backup_port, "degraded_data", [@Filtered_Data])
+Use checkpoints to label a recovery point and `retry()` to resume execution from that named location.
+
+```python
+checkpoint("initialization")
+
+@'Run Pre Checks'()
+@'attempt_result' = @'System Init'(config=@'boot_config').status
+
+if @'attempt_result' == "failed":
+    if @'attempt_count' < @'max_attempts':
+        @'attempt_count' = @'attempt_count' + 1
+        retry("initialization")
+    else:
+        @'Enter Safe Mode'()
+        end(status="safe_mode")
 ```
 
-### Code Object References
-Call functions from code objects using the `@` symbol:
+Guidelines:
+
+- Checkpoint names must be unique within the action.
+- `retry()` may only target a checkpoint defined in the same action.
+- Guard `retry()` with a counter or condition to avoid infinite retry loops.
+
+### `group("name"):` Blocks
+
+Use `group(...)` to define a named sub-flow for a parallel branch. Groups must be declared before the `fork()` call that uses them.
+
 ```python
-# Call a function from a code object
-@calculated_torque = @PD_Control_Algorithm.compute_torque(@current_attitude, @target_attitude)
+group("branch_power"):
+    @'Power Self Check'()
+    if @'battery_level' < @'min_battery':
+        @'Switch To Backup Power'()
+    @'Confirm Power State'()
 
-# Import and use code modules
-import @Utilities_Code
-result = @Utilities_Code.helper_function(@input_data)
-```
+group("branch_comms"):
+    for i in range(int(@'retry_limit')):
+        @'Establish Link'()
+        if @'link_established':
+            break
+    if not @'link_established':
+        end(status="link_failed")
 
-### Complete Example
-```python
-# System initialization
-@System_Initialization
-
-if @system_status == "OK":
-    # Load configuration
-    @Load_Configuration
-    
-    # Start services in parallel
-    fork([@Security_Services, @Database, @Network_Services])
-    
-    # Main operation loop
-    for i in range(int(@operation_cycles)):
-        @Perform_Health_Check
-        
-        if @health_status == "critical":
-            @Emergency_Protocol
-            end()
-        elif @health_status == "warning":
-            @Recovery_Action
-    
-    # Clean shutdown
-    @Save_System_State
-else:
-    # Recovery mode
-    @Log_Errors
-    @Notify_Administrator
-    end()
+fork([branch_power, branch_comms, @'Start Logging'()])
 ```
 
 ## Message Flow Modeling
 
-Use `flow()` statements to explicitly model data and message routing between system components:
+Use `flow()` to explicitly model data and message routing between ports or entities:
 
 ```python
-# Simple message flow
-flow(@command_port, @actuator_port, "command", [@Control_Signal])
+flow(@'command_port', @'actuator_port', "command", [@'Control Signal'])
 
-# Conditional routing based on system state
-if @mode == "autonomous":
-    flow(@sensor_port, @ai_processor_port, "sensor_data", [@Image_Data, @Telemetry])
-    @AI_Decision_Making
-    flow(@ai_processor_port, @command_port, "decision", [@Command])
+if @'mode' == "autonomous":
+    flow(@'sensor_port', @'ai_processor_port', "sensor_data", [@'Image Data', @'Telemetry'])
+    @'AI Decision Making'()
+    flow(@'ai_processor_port', @'command_port', "decision", [@'Command'])
 else:
-    flow(@sensor_port, @operator_display_port, "sensor_data", [@Image_Data])
-    flow(@operator_input_port, @command_port, "manual_command", [@Command])
+    flow(@'sensor_port', @'operator_display_port', "sensor_data", [@'Image Data'])
+    flow(@'operator_input_port', @'command_port', "manual_command", [@'Command'])
+```
 
-# Execute action after flow setup
-@Execute_Command
+## Code Object References
+
+Code objects may be called and imported inside action sequences:
+
+```python
+@'calculated_torque' = @'PD Control Algorithm'.compute_torque(@'current_attitude', @'target_attitude')
+
+import @'Utilities Code'
+result = @'Utilities Code'.helper_function(@'input_data')
+```
+
+## Complete Example
+
+```python
+action(config, max_attempts=3):
+    checkpoint("boot_start")
+
+    trigger(@'Health Monitor'())
+
+    init_outputs = @'System Initialization'(config=config, timeout=30)
+    @'init_status' = init_outputs.status
+
+    if @'init_status' == "ready":
+        group("branch_power"):
+            @'Power Self Check'()
+            if @'battery_level' < @'min_battery':
+                @'Switch To Backup Power'()
+            @'Confirm Power State'()
+
+        group("branch_comms"):
+            plan = @'Build Comms Test Plan'()
+            approval = @'Review Comms Plan'(plan.result)
+            @'comms_approval' = approval.status
+            if @'comms_approval' == "approved":
+                @'Establish Link'()
+            else:
+                end(status="comms_rejected")
+
+        fork([branch_power, branch_comms, @'Start Logging'()])
+        @'Begin Primary Operations'()
+
+    elif @'init_status' == "degraded":
+        if @'attempt_count' < max_attempts:
+            @'attempt_count' = @'attempt_count' + 1
+            retry("boot_start")
+        else:
+            @'Enter Safe Mode'()
+            end(status="safe_mode")
+
+    else:
+        stop()
+
+    end(status="nominal")
 ```
 
 ## Best Practices
 
 ### Action Composition
 
-- **Single Responsibility**: Each action should have a clear, focused purpose
-- **Hierarchical Design**: Break complex behaviors into nested sub-actions
-- **Reusability**: Design actions to be reusable across different contexts
+- **Single Responsibility**: Give each action a clear purpose.
+- **Hierarchical Design**: Decompose complex behavior into smaller reusable actions.
+- **Consistent Outputs**: Prefer consistent output keys across branches when returning data from `end(...)`.
 
 ### Sequence Definition
 
-- **Clear Flow**: Use comments to explain complex logic
-- **Proper Indentation**: Follow Python indentation rules strictly
-- **Error Handling**: Use conditional logic to handle edge cases and failures
-- **Termination**: Ensure all execution paths reach `end()` or the final line
-
-### Performance Considerations
-
-- **Parallel Execution**: Use `fork()` for independent actions that can run concurrently
-- **Efficient Loops**: Avoid unnecessary iterations; use appropriate loop bounds
-- **Attribute Access**: Minimize redundant attribute reads in tight loops
-
+- **Use Inputs Deliberately**: Prefer `action(...)` parameters for local action inputs instead of relying only on global attributes.
+- **Guard Recovery Paths**: Protect `retry()` with explicit retry limits or exit conditions.
+- **Keep Groups Focused**: Use `group(...)` only to express meaningful parallel branches.
+- **End Intentionally**: Use `end()` when you need to terminate early or return outputs; otherwise allow the sequence to reach its natural end.
 
 ## Technical Implementation
 
 ### Parse-Time Resolution
 
-When an action sequence is executed, the system performs several parse-time transformations:
+When an action sequence is executed, the system performs several preprocessing steps before runtime:
 
-1. **UUID Resolution**: References like `[Action Name]` are resolved to actual function calls like `action_abc123_def456()`
-2. **Attribute Binding**: Attribute references are converted to global variable names and bound to their current values
-3. **Code Import Resolution**: References to code objects are resolved to module imports
-4. **Unit Conversion**: Attribute values with units are automatically converted to the target unit system
+1. **Reference Resolution**: Model references such as `@'Initialize System'` are resolved into executable calls and bindings.
+2. **Action Hoisting**: `action(...)` declarations are transformed into callable action entry points with injected parameters.
+3. **Group Hoisting**: `group("name"):` blocks are rewritten into callable branch functions for use by `fork()`.
+4. **Runtime Primitive Wiring**: `trigger()`, `checkpoint()`, and `retry()` are connected to runtime execution semantics.
+5. **Code Import Resolution**: Code-object references are transformed into module imports and callable functions as needed.
