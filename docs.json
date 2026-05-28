@@ -316,6 +316,32 @@
                         ]
                     },
                     {
+                        "dropdown": "Developer API",
+                        "icon": "code",
+                        "groups": [
+                            {
+                                "group": "Programmatic API",
+                                "pages": [
+                                    "pages/api/getting-started",
+                                    "pages/api/service-accounts",
+                                    "pages/api/projects",
+                                    "pages/api/project-data",
+                                    "pages/api/files",
+                                    "pages/api/errors",
+                                    "pages/api/rate-limits"
+                                ]
+                            },
+                            {
+                                "group": "Generated Reference",
+                                "pages": [
+                                    "pages/api/reference",
+                                    "pages/api/reference/Apis/MetaApi",
+                                    "pages/api/reference/Apis/ProjectsApi"
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "dropdown": "Release Notes",
                         "icon": "clock",
                         "pages": [

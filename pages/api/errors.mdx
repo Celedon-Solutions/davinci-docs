@@ -1,0 +1,18 @@
+---
+title: Errors
+description: Error envelopes and common API error codes
+---
+
+All JSON errors use this envelope when returned by the v2 programmatic API:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "PROJECT_NOT_FOUND",
+    "message": "Project not found"
+  }
+}
+```
+
+Common codes include `MISSING_AUTH`, `INVALID_API_KEY`, `INSUFFICIENT_SCOPES`, `PROJECT_NOT_FOUND`, `OBJECT_NOT_FOUND`, `FILE_NOT_FOUND`, `RATE_LIMITED`, `PROJECT_NOT_READY`, and `SERVICE_UNAVAILABLE`.

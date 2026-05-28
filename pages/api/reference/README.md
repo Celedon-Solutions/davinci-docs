@@ -1,0 +1,52 @@
+# API Reference
+
+<a name="documentation-for-api-endpoints"></a>
+## Documentation for API Endpoints
+
+All URIs are relative to *https://davinci-app.com*
+
+| Class | Method | HTTP request | Description |
+|------------ | ------------- | ------------- | -------------|
+| *MetaApi* | [**getApiInfo**](/pages/api/reference/Apis/MetaApi#getApiInfo) | **GET** /api/v2/programmatic | Get programmatic API metadata |
+*MetaApi* | [**getHealth**](/pages/api/reference/Apis/MetaApi#getHealth) | **GET** /api/v2/programmatic/health | Check programmatic API health |
+| *ProjectsApi* | [**downloadProjectFile**](/pages/api/reference/Apis/ProjectsApi#downloadProjectFile) | **GET** /api/v2/programmatic/projects/{projectId}/files/{fileId} | Download a project file |
+*ProjectsApi* | [**getProject**](/pages/api/reference/Apis/ProjectsApi#getProject) | **GET** /api/v2/programmatic/projects/{projectId} | Get project metadata and permissions |
+*ProjectsApi* | [**getProjectObject**](/pages/api/reference/Apis/ProjectsApi#getProjectObject) | **GET** /api/v2/programmatic/projects/{projectId}/objects/{objectId} | Get a project object |
+*ProjectsApi* | [**getProjectTree**](/pages/api/reference/Apis/ProjectsApi#getProjectTree) | **GET** /api/v2/programmatic/projects/{projectId}/tree | Get project tree |
+*ProjectsApi* | [**listProjectFiles**](/pages/api/reference/Apis/ProjectsApi#listProjectFiles) | **GET** /api/v2/programmatic/projects/{projectId}/files | List files attached to a project |
+*ProjectsApi* | [**listProjects**](/pages/api/reference/Apis/ProjectsApi#listProjects) | **GET** /api/v2/programmatic/projects | List accessible projects |
+
+
+<a name="documentation-for-models"></a>
+## Documentation for Models
+
+ - [ErrorEnvelope](/pages/api/reference/Models/ErrorEnvelope)
+ - [ErrorEnvelope_error](/pages/api/reference/Models/ErrorEnvelope_error)
+ - [FileInfo](/pages/api/reference/Models/FileInfo)
+ - [ListFilesEnvelope](/pages/api/reference/Models/ListFilesEnvelope)
+ - [ListFilesResponse](/pages/api/reference/Models/ListFilesResponse)
+ - [ListProjectsEnvelope](/pages/api/reference/Models/ListProjectsEnvelope)
+ - [ListProjectsResponse](/pages/api/reference/Models/ListProjectsResponse)
+ - [ProgrammaticApiInfo](/pages/api/reference/Models/ProgrammaticApiInfo)
+ - [ProgrammaticApiInfoEnvelope](/pages/api/reference/Models/ProgrammaticApiInfoEnvelope)
+ - [ProgrammaticHealth](/pages/api/reference/Models/ProgrammaticHealth)
+ - [ProgrammaticHealthEnvelope](/pages/api/reference/Models/ProgrammaticHealthEnvelope)
+ - [ProjectMetadata](/pages/api/reference/Models/ProjectMetadata)
+ - [ProjectMetadataEnvelope](/pages/api/reference/Models/ProjectMetadataEnvelope)
+ - [ProjectObject](/pages/api/reference/Models/ProjectObject)
+ - [ProjectObjectEnvelope](/pages/api/reference/Models/ProjectObjectEnvelope)
+ - [ProjectSummary](/pages/api/reference/Models/ProjectSummary)
+ - [ProjectTree](/pages/api/reference/Models/ProjectTree)
+ - [ProjectTreeEnvelope](/pages/api/reference/Models/ProjectTreeEnvelope)
+ - [SuccessEnvelope](/pages/api/reference/Models/SuccessEnvelope)
+ - [TreeNode](/pages/api/reference/Models/TreeNode)
+
+
+<a name="documentation-for-authorization"></a>
+## Documentation for Authorization
+
+<a name="ApiKeyBearer"></a>
+### ApiKeyBearer
+
+- **Type**: HTTP Bearer Token authentication (dav_ak_live_... or dav_ak_test_...)
+
