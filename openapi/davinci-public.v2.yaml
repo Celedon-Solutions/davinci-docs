@@ -1,0 +1,867 @@
+openapi: 3.1.0
+info:
+  title: Davinci Public API
+  version: 2.0.0
+  description: Public Routing Server API contract for Davinci integrations and official SDKs.
+servers:
+  - url: https://davinci-app.com
+    description: Production
+tags:
+  - name: Meta
+    description: API metadata and health checks.
+  - name: Projects
+    description: Read project metadata, trees, objects, and attached files.
+security:
+  - ApiKeyBearer: []
+paths:
+  /api/v2/programmatic:
+    get:
+      operationId: getApiInfo
+      tags: [Meta]
+      summary: Get programmatic API metadata
+      description: Returns the current public programmatic API name, version, endpoint map, and authentication hint.
+      x-routing-server-source: RoutingServer/api/v2/programmatic/index.js
+      x-sdk-methods:
+        typescript: client.getInfo
+        python: client.get_info
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const info = await client.getInfo();
+            console.log(info.version);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                info = client.get_info()
+                print(info.version)
+      responses:
+        '200':
+          description: Programmatic API metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammaticApiInfoEnvelope'
+  /api/v2/programmatic/health:
+    get:
+      operationId: getHealth
+      tags: [Meta]
+      summary: Check programmatic API health
+      description: Returns a lightweight health payload for the public programmatic API.
+      x-routing-server-source: RoutingServer/api/v2/programmatic/index.js
+      x-sdk-methods:
+        typescript: client.getHealth
+        python: client.get_health
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const health = await client.getHealth();
+            console.log(health.status);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                health = client.get_health()
+                print(health.status)
+      responses:
+        '200':
+          description: Programmatic API health status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammaticHealthEnvelope'
+  /api/v2/programmatic/projects:
+    get:
+      operationId: listProjects
+      tags: [Projects]
+      summary: List accessible projects
+      description: Returns a flat paginated list of projects visible to the authenticated API-key actor.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/Projects.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.list
+        python: client.projects.list
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { projects } = await client.projects.list({ limit: 10 });
+            for (const project of projects) {
+              console.log(project.id, project.name);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.projects.list(limit=10)
+                for project in result.projects:
+                    print(project.id, project.name)
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Project page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProjectsEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Service or project acquisition unavailable. Common error codes include `SERVICE_UNAVAILABLE`, `PROJECT_NOT_READY`, and `SERVER_NOT_AVAILABLE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /api/v2/programmatic/projects/{projectId}:
+    get:
+      operationId: getProject
+      tags: [Projects]
+      summary: Get project metadata and permissions
+      description: Returns 404 when the project does not exist or is hidden from the caller.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/Projects.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.get
+        python: client.projects.get
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const project = await client.projects.get('project-id');
+            console.log(project.name, project.permissions);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                project = client.projects.get("project-id")
+                print(project.name, project.permissions)
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMetadataEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProjectNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Service unavailable. Common error codes include `SERVICE_UNAVAILABLE` and `SERVER_NOT_AVAILABLE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /api/v2/programmatic/projects/{projectId}/tree:
+    get:
+      operationId: getProjectTree
+      tags: [Projects]
+      summary: Get project tree
+      description: Auto-acquires a Design Engine instance, then returns a flat tree of project objects.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.getTree
+        python: client.projects.get_tree
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const tree = await client.projects.getTree('project-id', { branch: 'main' });
+            console.log(tree.tree.length);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                tree = client.projects.get_tree("project-id", branch="main")
+                print(len(tree.tree))
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: Project tree.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTreeEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProjectNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /api/v2/programmatic/projects/{projectId}/objects/{objectId}:
+    get:
+      operationId: getProjectObject
+      tags: [Projects]
+      summary: Get a project object
+      description: Returns a full object payload. Object shape is type-specific; common fields are documented and extra fields are allowed.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.getObject
+        python: client.projects.get_object
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const object = await client.projects.getObject('project-id', 'object-id', {
+              branch: 'main',
+            });
+            console.log(object.name, object.type);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                obj = client.projects.get_object("project-id", "object-id", branch="main")
+                print(obj.name, obj.type)
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ObjectId'
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: Project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectObjectEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ObjectNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /api/v2/programmatic/projects/{projectId}/files:
+    get:
+      operationId: listProjectFiles
+      tags: [Projects]
+      summary: List files attached to a project
+      description: Files are derived from project reference objects.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.listFiles
+        python: client.projects.list_files
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const files = await client.projects.listFiles('project-id', { branch: 'main' });
+            for (const file of files) {
+              console.log(file.id, file.name);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                files = client.projects.list_files("project-id", branch="main")
+                for file in files:
+                    print(file.id, file.name)
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: Project files.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFilesEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProjectNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /api/v2/programmatic/projects/{projectId}/files/{fileId}:
+    get:
+      operationId: downloadProjectFile
+      tags: [Projects]
+      summary: Download a project file
+      description: Returns raw file bytes with content headers forwarded from Design Engine. Successful download responses are not wrapped in the JSON success envelope used by other project read endpoints.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.downloadFile
+        python: client.projects.download_file
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { writeFile } from 'node:fs/promises';
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const download = await client.projects.downloadFile('project-id', 'file-id', {
+              branch: 'main',
+            });
+            await writeFile('downloaded-file', download.buffer);
+            console.log(download.contentType, download.contentLength);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                download = client.projects.download_file("project-id", "file-id", branch="main")
+                with open("downloaded-file", "wb") as file:
+                    file.write(download.content)
+                print(download.content_type, download.content_length)
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: Raw file bytes. This response is not a JSON envelope.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/FileNotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+components:
+  securitySchemes:
+    ApiKeyBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: dav_ak_live_... or dav_ak_test_...
+      x-default: dav_ak_live_your_token
+      description: Personal access token. Programmatic reads require the projects:read scope.
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Project id. May be compound in the form `{projectId}--{branchName}`.
+    ObjectId:
+      name: objectId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    FileId:
+      name: fileId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Reference object id or storage filename.
+    Branch:
+      name: branch
+      in: query
+      required: false
+      schema:
+        type: string
+        default: main
+  responses:
+    BadRequest:
+      description: Malformed request parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InvalidApiKey:
+      description: Missing, invalid, expired, or inactive API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InsufficientScopes:
+      description: API key lacks a required scope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: Caller is authenticated but not authorized.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ProjectNotFound:
+      description: Project does not exist or is hidden from the caller.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ObjectNotFound:
+      description: Object does not exist in the project.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    FileNotFound:
+      description: File does not exist in the project.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    RateLimited:
+      description: API key request rate exceeded.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InternalError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    SuccessEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data: {}
+      additionalProperties: true
+    ErrorEnvelope:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+          additionalProperties: true
+      additionalProperties: true
+    ProgrammaticApiInfoEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ProgrammaticApiInfo'
+    ProgrammaticApiInfo:
+      type: object
+      required: [name, version, description, documentation, endpoints, authentication]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        documentation:
+          type: string
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+        authentication:
+          type: string
+      additionalProperties: true
+    ProgrammaticHealthEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ProgrammaticHealth'
+    ProgrammaticHealth:
+      type: object
+      required: [status, version, timestamp]
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      additionalProperties: true
+    ListProjectsEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ListProjectsResponse'
+    ListProjectsResponse:
+      type: object
+      required: [projects, count, page, limit, totalPages]
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSummary'
+        count:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        totalPages:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    ProjectSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        name:
+          type: string
+        ownerLicenseKey:
+          type: string
+        ownerUserId:
+          type: string
+        ownerOrgId:
+          type: [string, 'null']
+        visibility:
+          type: [string, 'null']
+        createdAt:
+          type: string
+        modifiedAt:
+          type: string
+      additionalProperties: true
+    ProjectMetadataEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ProjectMetadata'
+    ProjectMetadata:
+      type: object
+      required: [id, name, accessReason, permissions]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ownerUserId:
+          type: [string, 'null']
+        ownerOrgId:
+          type: [string, 'null']
+        slug:
+          type: [string, 'null']
+        visibility:
+          type: [string, 'null']
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        accessReason:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    ProjectTreeEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ProjectTree'
+    ProjectTree:
+      type: object
+      required: [tree]
+      properties:
+        objectCount:
+          type: integer
+          minimum: 0
+        tree:
+          type: array
+          items:
+            $ref: '#/components/schemas/TreeNode'
+      additionalProperties: true
+    TreeNode:
+      type: object
+      required: [id, name, type, parent]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        parent:
+          type: string
+        childrenCount:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    ProjectObjectEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ProjectObject'
+    ProjectObject:
+      type: object
+      required: [id, type]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        parent:
+          type: string
+        children:
+          type: array
+          items:
+            type: string
+        documentation:
+          type: string
+      additionalProperties: true
+    ListFilesEnvelope:
+      allOf:
+        - $ref: '#/components/schemas/SuccessEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ListFilesResponse'
+    ListFilesResponse:
+      type: object
+      required: [files, count]
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileInfo'
+        count:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    FileInfo:
+      type: object
+      required: [id, name, parent]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        parent:
+          type: string
+        fileType:
+          type: [string, 'null']
+        filename:
+          type: [string, 'null']
+      additionalProperties: true
