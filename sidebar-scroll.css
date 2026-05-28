@@ -1,0 +1,10 @@
+#sidebar {
+  top: 4rem !important;
+}
+
+#sidebar-content {
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 2rem;
+}
