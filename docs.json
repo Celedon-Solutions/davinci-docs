@@ -21,21 +21,57 @@
         "dismissible": true
     },
     "footer": {
+        "logo": {
+            "dark": "/logo/dark.svg",
+            "light": "/logo/light.svg"
+        },
+        "copyright": "© 2026 Celedon Solutions, Inc",
         "socials": {
             "bluesky": "https://bsky.app/profile/celedon.solutions",
             "x": "https://x.com/Celedon_inc",
-            "linkedin": "https://www.linkedin.com/company/celedon-solutions-inc"
+            "linkedin": "https://www.linkedin.com/company/celedon-solutions-inc",
+            "github": "https://github.com/Celedon-Solutions"
         },
         "links": [
             {
-                "header": "Copyright",
+                "header": "Company",
                 "items": [
                     {
-                        "label": "© 2026 Celedon",
-                        "href": "https://celedon.solutions"
+                        "label": "About",
+                        "href": "https://celedon.solutions/about"
+                    },
+                    {
+                        "label": "Careers",
+                        "href": "https://celedon.solutions/careers"
+                    },
+                    {
+                        "label": "Contact",
+                        "href": "https://celedon.solutions/contact"
+                    }
+                ]
+            },
+            {
+                "header": "Legal",
+                "items": [
+                    {
+                        "label": "Terms of Service",
+                        "href": "https://celedon.solutions/terms-of-service/"
+                    },
+                    {
+                        "label": "Credit Policy",
+                        "href": "https://celedon.solutions/credit-policy/"
+                    },
+                    {
+                        "label": "Privacy Policy",
+                        "href": "https://celedon.solutions/privacy-policy/"
+                    },
+                    {
+                        "label": "Third Party Policy",
+                        "href": "https://celedon.solutions/third-party-policies/"
                     }
                 ]
             }
+            
         ]
     },
     "navbar": {
@@ -51,15 +87,40 @@
             "label": "Use Davinci"
         }
     },
+    "api": {
+        "openapi": {
+            "source": "openapi/davinci-public.v2.yaml",
+            "directory": "api-reference"
+        },
+        "playground": {
+            "display": "interactive",
+            "proxy": true
+        },
+        "params": {
+            "expanded": "all"
+        },
+        "url": "full",
+        "examples": {
+            "languages": [
+                "bash",
+                "python",
+                "typescript",
+                "javascript"
+            ],
+            "defaults": "required",
+            "prefill": true,
+            "autogenerate": true
+        }
+    },
     "navigation": {
         "versions": [
             {
                 "version": "v4.2.0",
-                "dropdowns": [
+                "groups": [
                     {
-                        "dropdown": "Overview",
+                        "group": "Overview",
                         "icon": "book-open",
-                        "groups": [
+                        "pages": [
                             {
                                 "group": "Get Started",
                                 "pages": [
@@ -74,19 +135,13 @@
                                 "pages": [
                                     "pages/user-guide/navigating/ui"
                                 ]
-                            },
-                            {
-                                "group": "Legal",
-                                "pages": [
-                                    "pages/overview/terms-policy/termsofservice"
-                                ]
                             }
                         ]
                     },
                     {
-                        "dropdown": "Davinci Browser",
+                        "group": "Davinci Browser",
                         "icon": "house",
-                        "groups": [
+                        "pages": [
                             {
                                 "group": "Davinci Browser",
                                 "pages": [
@@ -114,9 +169,9 @@
                         ]
                     },
                     {
-                        "dropdown": "Editor",
+                        "group": "Editor",
                         "icon": "window",
-                        "groups": [
+                        "pages": [
                             {
                                 "group": "Getting Around",
                                 "pages": [
@@ -156,9 +211,9 @@
                         ]
                     },
                     {
-                        "dropdown": "Digital Modeling",
+                        "group": "Digital Modeling",
                         "icon": "code",
-                        "groups": [
+                        "pages": [
                             {
                                 "group": "Overview",
                                 "pages": [
@@ -214,9 +269,9 @@
                         ]
                     },
                     {
-                        "dropdown": "Object Types",
+                        "group": "Object Types",
                         "icon": "cube",
-                        "groups": [
+                        "pages": [
                             {
                                 "group": "Model-Based Systems Engineering",
                                 "pages": [
@@ -269,80 +324,74 @@
                         ]
                     },
                     {
-                        "dropdown": "Modeling Agent",
+                        "group": "Modeling Agent",
                         "icon": "robot",
-                        "groups": [
-                            {
-                                "group": "Design Agent",
-                                "pages": [
-                                    "pages/user-guide/design-agent/workspaces",
-                                    "pages/user-guide/design-agent/agents",
-                                    "pages/user-guide/design-agent/persona",
-                                    "pages/user-guide/design-agent/agent-tools",
-                                    "pages/user-guide/design-agent/tips"
-                                ]
-                            }
+                        "pages": [
+                            "pages/user-guide/design-agent/workspaces",
+                            "pages/user-guide/design-agent/agents",
+                            "pages/user-guide/design-agent/persona",
+                            "pages/user-guide/design-agent/agent-tools",
+                            "pages/user-guide/design-agent/tips"
                         ]
                     },
                     {
-                        "dropdown": "Collaboration",
+                        "group": "Collaboration",
                         "icon": "users",
-                        "groups": [
-                            {
-                                "group": "Working Together",
-                                "pages": [
-                                    "pages/user-guide/collaboration/overview",
-                                    "pages/user-guide/collaboration/real-time-editing",
-                                    "pages/user-guide/collaboration/object-locking"
-                                ]
-                            }
+                        "pages": [
+                            "pages/user-guide/collaboration/overview",
+                            "pages/user-guide/collaboration/real-time-editing",
+                            "pages/user-guide/collaboration/object-locking"
                         ]
                     },
                     {
-                        "dropdown": "Examples",
+                        "group": "Examples",
                         "icon": "book-sparkles",
-                        "groups": [
-                            {
-                                "group": "Examples",
-                                "pages": [
-                                    "examples/index",
-                                    "examples/OV1_example",
-                                    "examples/Technical_Decomposition_Example",
-                                    "examples/Requirements_Management_Example",
-                                    "examples/Document_Templates_Example",
-                                    "examples/Organization_Process_Example"
-                                ]
-                            }
+                        "pages": [
+                            "examples/index",
+                            "examples/OV1_example",
+                            "examples/Technical_Decomposition_Example",
+                            "examples/Requirements_Management_Example",
+                            "examples/Document_Templates_Example",
+                            "examples/Organization_Process_Example"
                         ]
                     },
                     {
-                        "dropdown": "Developer API",
+                        "group": "Developer API",
                         "icon": "code",
-                        "groups": [
+                        "pages": [
                             {
-                                "group": "Programmatic API",
+                                "group": "API Reference",
                                 "pages": [
-                                    "pages/api/getting-started",
-                                    "pages/api/service-accounts",
-                                    "pages/api/projects",
-                                    "pages/api/project-data",
-                                    "pages/api/files",
-                                    "pages/api/errors",
-                                    "pages/api/rate-limits"
+                                    "pages/api/introduction",
+                                    "pages/api/personal-access-tokens"
                                 ]
                             },
                             {
-                                "group": "Generated Reference",
+                                "group": "General",
+                                "icon": "circle-info",
+                                "openapi": "openapi/davinci-public.v2.yaml",
                                 "pages": [
-                                    "pages/api/reference",
-                                    "pages/api/reference/Apis/MetaApi",
-                                    "pages/api/reference/Apis/ProjectsApi"
+                                    "GET /api/v2/programmatic",
+                                    "GET /api/v2/programmatic/health"
+                                ]
+                            },
+                            {
+                                "group": "Projects",
+                                "icon": "folder-tree",
+                                "openapi": "openapi/davinci-public.v2.yaml",
+                                "pages": [
+                                    "GET /api/v2/programmatic/projects",
+                                    "GET /api/v2/programmatic/projects/{projectId}",
+                                    "GET /api/v2/programmatic/projects/{projectId}/tree",
+                                    "GET /api/v2/programmatic/projects/{projectId}/objects/{objectId}",
+                                    "GET /api/v2/programmatic/projects/{projectId}/files",
+                                    "GET /api/v2/programmatic/projects/{projectId}/files/{fileId}"
                                 ]
                             }
                         ]
                     },
                     {
-                        "dropdown": "Release Notes",
+                        "group": "Release Notes",
                         "icon": "clock",
                         "pages": [
                             "pages/release-notes/v4.2.1",

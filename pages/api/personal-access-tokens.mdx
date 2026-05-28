@@ -5,7 +5,13 @@ description: Create a personal access token for SDK and API usage
 
 ## Overview
 
-Programmatic API access uses user-owned personal access tokens. Tokens inherit your project permissions and can be revoked at any time.
+Programmatic API access uses user-owned personal access tokens. A token identifies the user who created it, and API requests made with that token inherit that user's project access and permissions.
+
+Use personal access tokens for user-owned scripts, local tools, CI jobs, and SDK usage. Tokens can be scoped, rate-limited, given an expiration date, and revoked at any time.
+
+<Warning>
+Treat personal access tokens like passwords. Store them in environment variables or a secret manager, never commit them to source control, and revoke any token that may have been exposed.
+</Warning>
 
 ## Create A Token In The UI
 

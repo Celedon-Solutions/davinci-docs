@@ -1,0 +1,93 @@
+---
+title: Introduction
+description: Get started with the Davinci Programmatic API
+---
+
+## Overview
+
+The Davinci Programmatic API lets scripts, CI jobs, reporting tools, and AI systems inspect Davinci project data. The API is organized around a small set of public v2 endpoints documented in the [API Reference](/pages/api/reference).
+
+The current public API sections are:
+
+- [General](/api-reference/meta/get-programmatic-api-metadata) — API metadata and health checks.
+- [Projects](/api-reference/projects/list-accessible-projects) — project metadata, trees, objects, attached files, and file downloads.
+
+We are currently working on expanding the API. Additional API sections and authentication options will appear here as they are released.
+
+## Getting Started
+
+Create a personal access token, then pass it as a bearer token in the `Authorization` header:
+
+```bash
+curl "https://davinci-app.com/api/v2/programmatic/projects?limit=10" \
+  -H "Authorization: Bearer dav_ak_live_your_token"
+```
+
+Davinci also publishes official SDKs for TypeScript/JavaScript and Python:
+
+<CodeGroup>
+
+```bash TypeScript
+npm install @celedon/davinci-sdk
+```
+
+```bash Python
+pip install davinci-sdk
+```
+
+</CodeGroup>
+
+Use the SDKs for application code and longer-running automation. Use raw HTTP for simple scripts, debugging, or environments where installing an SDK is not practical. The generated API reference includes both HTTP examples and SDK examples for each endpoint.
+
+## Personal Access Tokens
+
+Programmatic API access uses user-owned personal access tokens. Tokens identify the user who created them, inherit that user's project permissions, can be scoped, and can be revoked from account settings.
+
+Project read endpoints require the `projects:read` scope. See [Personal Access Tokens](/pages/api/personal-access-tokens) for token creation, expiration, rate limit, and format details.
+
+Store tokens in environment variables or a secret manager. Do not commit tokens to source control, paste them into shared logs, or embed them in client-side code.
+
+## Scopes
+
+Scopes limit what a token can do. The currently implemented public API scope is:
+
+- `projects:read` — read accessible project metadata, project trees, object payloads, attached file metadata, and file downloads.
+
+Future API areas may introduce additional scopes.
+
+## Branches
+
+Project data endpoints that read model contents support a `branch` query parameter. If omitted, SDK calls default to `main`.
+
+Use branch names when you need to inspect project data outside the main branch, such as a review branch or integration branch.
+
+## File Downloads
+
+Most successful API responses return JSON envelopes. File downloads are different: successful download responses return raw file bytes with content headers such as `Content-Type`, `Content-Disposition`, and `Content-Length`.
+
+## Errors
+
+JSON errors use a consistent envelope:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "PROJECT_NOT_FOUND",
+    "message": "Project not found"
+  }
+}
+```
+
+Common error codes include `MISSING_AUTH`, `INVALID_API_KEY`, `INSUFFICIENT_SCOPES`, `PROJECT_NOT_FOUND`, `OBJECT_NOT_FOUND`, `FILE_NOT_FOUND`, `RATE_LIMITED`, `PROJECT_NOT_READY`, and `SERVICE_UNAVAILABLE`.
+
+## Rate Limits
+
+Personal access tokens have per-key request limits. When a token exceeds its limit, the API returns `429 RATE_LIMITED` and includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 5
+```
+
+SDKs surface rate limit responses as typed rate limit errors that include the retry-after value when available.
