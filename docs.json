@@ -16,10 +16,6 @@
         "dark": "#9575cd",
         "light": "#9575cd"
     },
-    "banner": {
-        "content": "Davinci v4.4.0 is now available.",
-        "dismissible": true
-    },
     "footer": {
         "logo": {
             "dark": "/logo/dark.svg",
