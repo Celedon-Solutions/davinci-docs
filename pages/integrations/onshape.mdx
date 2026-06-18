@@ -1,0 +1,76 @@
+---
+title: Onshape Integration
+description: Import, synchronize, configure, and analyze Onshape CAD data in Davinci
+tag: In Testing
+hidden: true
+---
+
+## Overview
+
+The Onshape integration connects Davinci model objects to Onshape CAD documents. It lets teams bring Part Studios, assemblies, drawings, geometry, configuration parameters, mass properties, and rendered CAD context into the Davinci Editor.
+
+Use Onshape integration when CAD geometry needs to stay connected to systems engineering context, requirements, interfaces, reviews, and model-level analysis.
+
+## What Davinci Imports
+
+When importing an Onshape document, Davinci can create model objects for:
+
+- Onshape documents.
+- Part Studios.
+- Assemblies.
+- Drawings.
+- Parts and related geometry.
+- Configuration parameters.
+- Rendered geometry previews.
+- Mass properties and bounding-box data where available.
+
+Imported objects keep Onshape metadata so Davinci can resolve the correct document, element, workspace, part, and configuration IDs later.
+
+## Linked Geometry
+
+Onshape-linked geometries use `kind: "onshape"`. These objects keep a live source relationship to an Onshape element rather than storing only a static CAD file.
+
+Linked geometry can expose:
+
+- An **Open in Onshape** action.
+- Source details in properties.
+- Configuration controls.
+- Rendered geometry in the Geometric View.
+- Mass properties and principal axes from Onshape APIs.
+- Sync status metadata.
+
+See [Geometry object](/pages/modeling/objects/geometry) and [Geometric View](/pages/user-guide/views/geometric) for the modeling reference and view behavior.
+
+## Configuration Sync
+
+Some Onshape documents expose configurable parameters. Davinci can represent those parameters as attributes on imported objects.
+
+When a user edits a linked configuration attribute in Davinci, Davinci can push the new value back to Onshape and then refresh the associated geometry, mass properties, or rendering.
+
+Configuration updates should complete before querying mass properties or rendering the same element.
+
+## Sync State
+
+Davinci tracks sync state for Onshape-linked objects. Sync state helps show whether a linked object is current, updating, stale, or unable to refresh.
+
+Onshape webhook events can trigger refreshes when source CAD changes. Davinci batches and manages these updates to avoid unnecessary work and to stay within Onshape API limits.
+
+## Mass Properties And Analysis
+
+Davinci can query Onshape for mass properties and bounding boxes. These values can help populate model attributes and support downstream review or analysis workflows.
+
+Use these values as CAD-derived context inside the model. They should still be reviewed when they drive important engineering decisions.
+
+## Import And Export
+
+Davinci supports importing Onshape documents into the model and exporting geometry to common CAD formats such as STEP and STL where supported.
+
+Use Onshape-linked geometry when you want a live relationship to the source CAD. Use STEP imports when you need a static CAD snapshot.
+
+## Best Practices
+
+- Import from the intended source document and workspace.
+- Keep Onshape IDs and Davinci object IDs distinct.
+- Use configuration attributes created by the import workflow when possible.
+- Refresh linked geometry after important Onshape changes.
+- Use model relationships and references to connect CAD elements to requirements, interfaces, risks, and reviews.

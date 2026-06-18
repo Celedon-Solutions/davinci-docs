@@ -4,23 +4,75 @@ title: Schema
 
 ## Object Descriptions
 
-Below is a list of Model Object Types in Davinci:
+Model Object Types in Davinci are organized into the following visual categories.
 
-|  Name       | Description                                                                            | Icon         |
-| --------- | ----------------------------------------------------------------------------------------------- | ------- |
-| `Part`      | Represents a physical or logical component in the model. It can have associated attributes and constraints. | <img width="15" noZoom src="/images/objecticons/part.svg" /> |
-| `Attribute` | Represents characteristics of an object, including values which are equations with unit and kind. | <img width="15" src="/images/objecticons/attribute.svg" /> |
-| `Requirement`      | Represents a requirement for the project. Requirements are true or false based on the state of their owned requirements and/or owned constraints being true or false. | <img width="15" noZoom src="/images/objecticons/requirement.svg" /> |
-| `Action`    | Defines operations or behaviors that occur within the system, such as triggering events or changing states. | <img width="15" noZoom src="/images/objecticons/action.svg" /> |
-| `Code`      | Represents executable code snippets. | <img width="15" noZoom src="/images/objecticons/code.svg" /> |
-| `Constraint` | Defines a condition or limitation on the system, expressed as a boolean expression with a mathematical relation. | <img width="15" noZoom src="/images/objecticons/constraint.svg" /> |
-| `Port`      | Used to connect components or objects, typically representing an input or output point for data or signals. | <img width="15" noZoom src="/images/objecticons/port.svg" /> |
-| `Interface` | Defines a set of connections or interactions between objects via ports. | <img width="15" noZoom src="/images/objecticons/interface.svg" /> |
-| `Document`  | Represents a structured document artifact containing sections and tables in a pageful display. | <img width="15" noZoom src="/images/objecticons/document.svg" /> |
-| `Dashboard` | Represents a grid-based artifact that combines live model views, metrics, diagrams, and content blocks into a configurable board layout. | N/A |
-| `Table`     | A structured artifact representation of data in rows and columns, used to organize object data. | <img width="15" noZoom src="/images/objecticons/table.svg" /> |
-| `Reference` | A provided legacy data object used to build the model from, such as a pdf, json, etc.  | <img width="15" noZoom src="/images/objecticons/reference.svg" /> |
-| `Package`   | Organize objects together in a folder structure. | <img width="15" noZoom src="/images/objecticons/package.svg" /> |
+### Structure
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Part](/pages/modeling/objects/parts) | Represents a physical or logical component in the model. It can have associated attributes and constraints. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/part.svg" /> |
+| [Package](/pages/modeling/objects/packages) | Organizes objects together in a folder structure. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/package.svg" /> |
+| [Entity](/pages/modeling/objects/entities) | Represents an external actor, system, or stakeholder that interacts with the model. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/entity.svg" /> |
+| [Requirement](/pages/modeling/objects/requirements) | Represents a requirement for the project. Requirements are true or false based on the state of their owned requirements and/or owned constraints being true or false. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/requirement.svg" /> |
+| [Capability](/pages/modeling/objects/capability) | Represents a high-level system capability that can be connected to subjects and traced across the model. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/capability.svg" /> |
+| [Linkage](/pages/modeling/objects/linkages) | Represents a structural link or allocation relationship between objects. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/linkage.svg" /> |
+
+### Values
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Attribute](/pages/modeling/objects/attributes) | Represents characteristics of an object, including values which are equations with unit and kind. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/attribute.svg" /> |
+| [Constraint](/pages/modeling/objects/constraints) | Defines a condition or limitation on the system, expressed as a boolean expression with a mathematical relation. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/constraint.svg" /> |
+| [Resource](/pages/modeling/objects/resource) | Represents a quantity or consumable budget that is tracked and rolled up across the model. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/resource.svg" /> |
+| [Risk](/pages/modeling/objects/risk) | Represents a risk with likelihood and consequence used for risk assessment. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/risk.svg" /> |
+
+### Artifacts
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Document](/pages/modeling/objects/documents) | Represents a structured document artifact containing sections and tables in a pageful display. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/document.svg" /> |
+| [Table](/pages/modeling/objects/tables) | A structured artifact representation of data in rows and columns, used to organize object data. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/table.svg" /> |
+| [Matrix](/pages/modeling/objects/matrix) | An artifact that maps relationships between two sets of objects in a configurable allocation matrix. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/matrix.svg" /> |
+| [Slide](/pages/modeling/objects/slide) | A presentation artifact made of slides with editable text, media, and layout elements. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/slide.svg" /> |
+
+### Behavior
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Action](/pages/modeling/objects/actions) | Defines operations or behaviors that occur within the system, such as triggering events or changing states. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/action.svg" /> |
+| [State](/pages/modeling/objects/states) | Represents a state in a state machine, with entry, exit, and do behaviors and state-dependent values. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/state.svg" /> |
+| [Transition](/pages/modeling/objects/transitions) | Defines a transition between states with triggers and guard conditions. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/transition.svg" /> |
+| [Task](/pages/modeling/objects/task) | Represents a unit of work with scheduling, dependencies, and duration for project planning. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/task.svg" /> |
+
+### Interface
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Port](/pages/modeling/objects/ports) | Used to connect components or objects, typically representing an input or output point for data or signals. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/port.svg" /> |
+| [Interface](/pages/modeling/objects/interface) | Defines a set of connections or interactions between objects via ports. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/interface.svg" /> |
+| [Item](/pages/modeling/objects/item) | Represents an item that flows across a port or interface. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/item.svg" /> |
+
+### Analysis
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Code](/pages/modeling/objects/code) | Represents executable code snippets. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/code.svg" /> |
+| [Toolbox](/pages/modeling/objects/toolbox) | Defines a reusable set of tools and capabilities that can be exposed to the agent or as an MCP server. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/toolbox.svg" /> |
+
+{/* CAD is not fully released yet — hidden until launch.
+### CAD
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Geometry](/pages/modeling/objects/geometry) | Represents geometric CAD shape data for visualization. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/geometry.svg" /> |
+| [Assembly](/pages/modeling/objects/assembly) | Represents a CAD assembly composed of geometry and parts. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/assembly.svg" /> |
+*/}
+
+### Reference
+
+| Name | Description | Icon |
+| --- | --- | --- |
+| [Reference](/pages/modeling/objects/reference) | A provided data source object used to build the model from, such as a pdf, json, etc. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/reference.svg" /> |
 
 
 ## Base Fields
@@ -38,35 +90,38 @@ In addition to the base fields objects also have a `lock` status which will prev
 <Note>Locking (or unlocking) will automatically lock all of children elements and their descendents. This action can be undone by unlocking those child elements.</Note>
 
 
-## Reference Objects
+## Ways Objects Connect
 
-Reference Objects serve as a truth source or origin of data within the model. These Objects are uploaded as Files and used by Davinci to source data for the Model.
+Most Davinci objects can connect to other objects in several ways. These connections are what make the model useful as a structured engineering graph rather than a flat list of records.
 
-For non-reference objects, an additional field exists to link to a reference object:
+### Parent And Child Hierarchy
 
-| Property    | Description                                                                                     |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| `Reference` | Links to Reference Objects that inform or are the source of the value, structure, or property of the object. |
+Objects live in a tree. Each object has a parent and may own child objects. This hierarchy is visible in the model index and is used to organize systems, packages, requirements, behaviors, artifacts, and reference material.
 
-## Interface Objects
+Parent-child hierarchy is best for ownership and structure. For example, a system part may own subsystem parts, attributes, ports, and requirements.
 
-For interface objects, a field is added to indicate which objects are connected as part of the named interface:
+### References
 
-| Property    | Description                                                                                     |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| `Connects`  | Lists all the objects that are part of the named interface.                                     |
+Reference Objects serve as a truth source or origin of data within the model. These objects are uploaded as files and used by Davinci to source data for the model.
 
-## Attribute Objects
+For non-reference objects, references connect model content back to source material that informed the object, value, structure, or claim. References can point to documents, PDFs, source snippets, pages, anchors, or generated evidence depending on the workflow.
 
-For attribute objects, a field is added to show the value, equation, and unit associated with the attribute:
+Use references when you need traceability to source material or want the Davinci Agent to ground model changes in evidence.
 
-| Property    | Description                                                                                     |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| `Value`     | The value or equation of the attribute, including its unit and kind.                            |
+See [Files And References](/pages/editor/files-and-references) for the workflow overview and [Reference Objects](/pages/modeling/objects/reference) for field-level details.
 
-<Note>Artifacts, actions, and code objects all have unique view editors to define their specific parameters and are not discussed here.</Note>
+### Relationships
 
+Relationships connect objects across the model without changing the ownership hierarchy. They are used for traceability, allocation, dependencies, interfaces, validation, requirements subjects, mitigations, source links, and other engineering connections. Some relationships are implict given an object's type or purpose.
 
+Relationships can be incoming, outgoing, or bidirectional depending on the relationship type.
 
+See [Relationships](/pages/modeling/common/relationships) for the relationship type reference.
 
+### Tags
 
+Tags provide a flexible way to categorize objects across the project regardless of where they live in the hierarchy. Use tags for ownership, maturity, status, subsystem, priority, requirement compliance, or any other project-specific grouping.
+
+Tags can be applied from the Properties View and managed in project settings.
+
+See [Tags](/pages/editor/project-settings/tags) for tag creation, filtering, restrictions, and deletion behavior.

@@ -1,0 +1,66 @@
+---
+title: Key Concepts
+description: Learn the core concepts behind Davinci projects, models, objects, references, and agents
+---
+
+## Overview
+
+This page is a starting point for the major concepts you will see across Davinci. Each section links to the deeper docs for that topic.
+
+## Davinci Browser
+
+The [Davinci Browser](/pages/browser/overview) is the first place most users land in the Davinci app. It helps you find projects, open project pages, manage organizations and teams, update your account, respond to notifications, and review access or usage settings.
+
+Start with:
+
+- [Browser Overview](/pages/browser/overview)
+- [Browser Navigation](/pages/browser/navigation)
+- [Projects](/pages/browser/projects)
+
+## Davinci Editor
+
+The [Davinci Editor](/pages/editor/overview) opens from a project page and is where engineering work happens. It includes the model index, workspace tabs, project settings, files and references, collaboration tools, Agent workflows, reviews, integrations, and exports.
+
+Start with:
+
+- [Editor Overview](/pages/editor/overview)
+- [Model Area](/pages/editor/model-area)
+- [Modeling Basics](/pages/editor/modeling-basics)
+
+## Projects
+
+A [project](/pages/browser/projects) is the main workspace for an engineering effort. Projects contain a model, uploaded files, configuration, collaborators, snapshots, branches, and settings.
+
+Projects can be owned by a user or an organization. Ownership controls where project limits, storage, access, and administrative controls are managed. See [Roles And Permissions](/pages/browser/roles-permissions) for visibility and access behavior.
+
+## Models And Objects
+
+A model is made of [objects](/pages/modeling/objects/objects). Objects represent engineering information such as [parts](/pages/modeling/objects/parts), [requirements](/pages/modeling/objects/requirements), [actions](/pages/modeling/objects/actions), [attributes](/pages/modeling/objects/attributes), [constraints](/pages/modeling/objects/constraints), [documents](/pages/modeling/objects/documents), [tables](/pages/modeling/objects/tables), [references](/pages/modeling/objects/reference), and [risks](/pages/modeling/objects/risk).
+
+Objects can own child objects, link to each other with [relationships](/pages/modeling/common/relationships), and appear in multiple [views](/pages/user-guide/views/properties) depending on their type.
+
+## Files And References
+
+[Files and references](/pages/editor/files-and-references) bring source material into the model. They can represent PDFs, images, documents, spreadsheets, data files, and other uploaded material.
+
+Davinci uses references to keep generated content grounded in source material and to make traceability visible across the model.
+
+## Davinci Agent
+
+The [Davinci Agent](/pages/editor/right-panel/agent-chat) is the AI assistant inside the Editor. It can inspect project context, use model tools, update objects, work from reference files, and help review a project.
+
+The Agent is powerful, but model changes should still be reviewed by users. Use checkpoints, tool results, and [Model Review](/pages/editor/agent/model-review) workflows to inspect important changes.
+
+## Organizations And Teams
+
+[Organizations](/pages/browser/organizations) and [teams](/pages/browser/teams) help manage ownership, access, projects, members, usage, and administrative controls.
+
+Use organizations when project ownership should belong to a group instead of an individual user. Use teams when users, organizations, usage, and governance need to be managed centrally.
+
+## Integrations
+
+[Integrations](/pages/integrations/overview) connect Davinci to external tools and services.
+
+## Developer API
+
+The [Davinci API](/pages/api/introduction) and SDKs let scripts, CI jobs, reporting tools, and AI systems inspect Davinci project data.

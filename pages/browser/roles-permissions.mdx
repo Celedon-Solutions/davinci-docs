@@ -1,0 +1,99 @@
+---
+title: Roles And Permissions
+description: Understand project access, organization roles, visibility, and inherited permissions in Davinci
+---
+
+## Overview
+
+Davinci uses roles and permissions to decide what a user can see or change. Roles are user-facing labels such as Owner, Admin, Editor, Member, and Viewer. Permissions are the underlying capabilities checked by the app, API, Agent tools, and project services.
+
+Most users only need to understand roles, ownership, and visibility. Advanced permission names are implementation details, but they explain why different users see different actions in the Browser or Editor.
+
+## Ownership
+
+Projects can be owned by either:
+
+- A user account.
+- An organization.
+
+Ownership matters because owners have the broadest control over project settings, transfer, deletion, storage accounting, and access management.
+
+Organizations can also own projects. This keeps important projects tied to a team or company rather than a single user account.
+
+## Project Roles
+
+Project access is based on these common roles:
+
+| Role | Typical access |
+| --- | --- |
+| **Owner** | Full control over the project, including deletion, transfer, settings, members, content, exports, and collaboration. |
+| **Admin** | Manage project settings and members, edit model content, export, import, and collaborate. |
+| **Editor** | Edit project content and collaborate, but not manage members or high-risk project settings. |
+| **Viewer** | Read project content and participate in limited collaboration where allowed. |
+
+System administrators can bypass ordinary project permission checks for support or administration.
+
+## How Project Access Resolves
+
+When you open a project, Davinci resolves access in this order:
+
+1. Project owner.
+2. Direct project membership.
+3. Organization membership for organization-owned projects.
+4. Tenant/team-level administration for organization-owned projects.
+5. Public project visibility.
+6. No access.
+
+For organization-owned projects, direct project roles and organization-inherited roles are combined. A direct project role can add access, but it does not remove access inherited from the owning organization.
+
+## Project Visibility
+
+Projects can be:
+
+| Visibility | Meaning |
+| --- | --- |
+| **Private** | Only owners, project members, inherited organization members, and authorized admins can access the project. |
+| **Internal** | Only available for organization-owned projects. Organization members can access the project through organization membership. |
+| **Public** | User-owned public projects are visible to anyone. Organization-owned public projects are visible publicly only when the owning organization is also public. |
+
+Public visitors receive read-only access. They can inspect public model content, documents, CAD, code, comments, and git history, but they cannot write, connect to the live Design Engine, or start Agent sessions unless invited with a project role.
+
+<Warning>
+If a project contains sensitive source, code, history, reference files, or model details, keep it private.
+</Warning>
+
+## Organization Roles
+
+Organization roles control organization-level management and inherited access to organization-owned projects.
+
+| Role | Typical access |
+| --- | --- |
+| **Owner** | Full organization control. Can transfer ownership and manage high-risk organization settings. |
+| **Admin** | Manage organization settings, members, roles, project access, and administrative surfaces where permitted. |
+| **Member** | Participate in organization work and inherit member-level access to visible organization projects. |
+| **Viewer** | Read organization information and inherit viewer-style access where permitted. |
+
+Organization owners and admins inherit strong project administration permissions on organization-owned projects, including project lifecycle permissions where appropriate.
+
+## Organization Visibility
+
+Organizations can be:
+
+| Visibility | Meaning |
+| --- | --- |
+| **Private** | The organization is not publicly listed. Organization-owned projects do not become publicly accessible unless access is granted through membership or administrative permissions. |
+| **Public** | The organization can be publicly visible, and public organization-owned projects can be accessed publicly. |
+
+Organization visibility and project visibility work together. For an organization-owned project to be public to anonymous users, both the project and the owning organization must be public.
+
+## Teams And Tenant Administration
+
+Teams can provide higher-level administration across users, organizations, projects, usage, and audit visibility. Team or tenant administrators may inherit project administration access for organization-owned projects depending on their permissions.
+
+Team-level access does not replace organization and project roles. It adds an administrative layer above them.
+
+## API Keys And Agent Permissions
+
+API keys and Agent tools use scoped permissions behind the scenes. A personal access token identifies the user who created it and is limited by both token scopes and the user's effective access.
+
+The Davinci Agent also has its own tool permission checks. A user may be able to read or edit something directly while Agent tools are separately limited by project, organization, or deployment policy.

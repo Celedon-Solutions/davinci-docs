@@ -1,0 +1,47 @@
+---
+title: 'Version 4.4.0 - Skills, SysML Import & Richer Engineering Artifacts'
+description: 'June 9 2026'
+---
+
+## Version 4.4.0 - Skills, SysML Import & Richer Engineering Artifacts
+
+This release adds agent skills, SysML v2 import, richer documents and slides, improved relationship tooling, and many modeling workflow refinements.
+
+### [Agent Skills](/pages/editor/agent/skills)
+
+- Added skill injection so the agent can apply specialized instructions to the current task
+- Added skill-related tab icons and UI affordances
+- Improved plan and review saving
+- Improved context handling for agent workflows
+- Added support for newer Claude model options, including Opus 4.8 and Sonnet 4.6 defaults
+
+### SysML & Modeling Interoperability
+
+- Added [SysML v2](/pages/modeling/overview/sysml-export) import support and export tweaks
+- Improved project import behavior for [project workflows](/pages/browser/projects)
+- Improved [interface](/pages/modeling/objects/interface) tool safety
+- Improved [parts](/pages/modeling/objects/parts), [requirements](/pages/modeling/objects/requirements), [ports](/pages/modeling/objects/ports), [capabilities](/pages/modeling/objects/capability), [resources](/pages/modeling/objects/resource), and [tasks](/pages/modeling/objects/task) tooling
+- Added better short-name and hierarchy generation behavior
+
+### Relationships & Search
+
+- Reworked [relationship](/pages/modeling/common/relationships) updates so single-direction relationships are not deleted unexpectedly
+- Fixed relationship deduplication in block and thread views
+- Improved add-relationship UI readability
+- Updated [search](/pages/editor/right-panel/search-view) to include dot-notation matches and filter correctly when object types are disabled or hidden
+- Added tag exploration and general tag search improvements
+
+### Documents, Markdown & Slides
+
+- Added a markdown viewer and improved markdown editor focus and tabs for [documents](/pages/modeling/objects/documents)
+- Added math block support
+- Improved document tools with templates and block updates
+- Added audio and video elements to [slides](/pages/modeling/objects/slide) with media editing controls
+- Improved slide generation, undo behavior, table editing, and presentation backgrounds
+
+### Reliability & UI Polish
+
+- Improved conflict and diff rendering between history and chat
+- Fixed risk updates being overwritten on project load
+- Improved table, matrix, behavior simulation, and zoom controls
+- Enabled promo code support

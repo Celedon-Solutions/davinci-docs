@@ -12,12 +12,12 @@
     },
     "favicon": "/logo/fav_icon_dark.svg",
     "colors": {
-        "primary": "#000000",
-        "light": "#FFFFFF",
-        "dark": "#000000"
+        "primary": "#7e57c2",
+        "dark": "#9575cd",
+        "light": "#9575cd"
     },
     "banner": {
-        "content": "Davinci v4.2 is now available! [See what's new](/pages/release-notes/v4.2.0)",
+        "content": "Davinci v4.4.0 is now available.",
         "dismissible": true
     },
     "footer": {
@@ -112,185 +112,188 @@
         }
     },
     "navigation": {
-        "versions": [
+        "groups": [
             {
-                "version": "v4.2.0",
-                "groups": [
+                "group": "Getting Started",
+                "icon": "rocket",
+                "pages": [
+                    "pages/getting-started/introduction",
+                    "pages/getting-started/quickstart",
+                    "pages/getting-started/signup",
+                    "pages/getting-started/plans",
+                    "pages/getting-started/key-concepts",
+                    "pages/getting-started/faq"
+                ]
+            },
+            {
+                "group": "Davinci Browser",
+                "icon": "globe",
+                "pages": [
+                    "pages/browser/overview",
+                    "pages/browser/navigation",
+                    "pages/browser/projects",
+                    "pages/browser/organizations",
+                    "pages/browser/teams",
+                    "pages/browser/roles-permissions",
+                    "pages/browser/account",
+                    "pages/browser/notifications",
+                    {
+                        "group": "Usage, Plans, And Billing",
+                        "pages": [
+                            "pages/browser/usage-plans-billing/overview",
+                            "pages/browser/usage-plans-billing/change-individual-plan",
+                            "pages/browser/usage-plans-billing/add-organization",
+                            "pages/browser/usage-plans-billing/upgrade-to-team",
+                            "pages/browser/usage-plans-billing/cancel-or-unsubscribe"
+                        ]
+                    }
+                ]
+            },
+            {
+                "group": "Davinci Editor",
+                "icon": "pen-ruler",
+                "pages": [
+                    "pages/editor/overview",
+                    "pages/editor/interface",
+                    "pages/editor/model-area",
+                    "pages/editor/hotkeys",
+                    "pages/editor/modeling-basics",
+                    {
+                        "group": "Project Settings",
+                        "pages": [
+                            "pages/editor/project-settings/project",
+                            "pages/editor/project-settings/files",
+                            "pages/editor/project-settings/toolboxes",
+                            "pages/editor/project-settings/unit-settings",
+                            "pages/editor/project-settings/relationship-settings",
+                            "pages/editor/project-settings/secrets",
+                            "pages/editor/project-settings/dependencies",
+                            "pages/editor/project-settings/tags",
+                            "pages/editor/project-settings/risk",
+                            "pages/editor/project-settings/persona-settings",
+                            "pages/editor/project-settings/mcp"
+                        ]
+                    },
+                    {
+                        "group": "Collaboration In The Editor",
+                        "pages": [
+                            "pages/editor/collaboration/overview",
+                            "pages/editor/collaboration/real-time-editing",
+                            "pages/editor/collaboration/object-locking",
+                            "pages/editor/right-panel/comment-view",
+                            "pages/editor/right-panel/version-control"
+                        ]
+                    },
+                    "pages/editor/files-and-references",
+                    {
+                        "group": "AI Agent",
+                        "pages": [
+                            "pages/editor/right-panel/agent-chat",
+                            "pages/editor/agent/workspaces",
+                            "pages/editor/agent/agents",
+                            "pages/editor/agent/persona",
+                            "pages/editor/agent/skills",
+                            "pages/editor/agent/planning",
+                            "pages/editor/agent/agent-tools",
+                            "pages/editor/agent/model-review",
+                            "pages/editor/agent/tips"
+                        ]
+                    },
+                    "pages/editor/exports",
+                    {
+                        "group": "Right Panel Tools",
+                        "pages": [
+                            "pages/editor/right-panel/overview",
+                            "pages/editor/right-panel/search-view",
+                            "pages/editor/right-panel/validation-view"
+                        ]
+                    }
+                ]
+            },
+            {
+                "group": "Integrations",
+                "icon": "plug",
+                "pages": [
+                    "pages/integrations/overview",
+                    "pages/integrations/onshape"
+                ]
+            },
+            {
+                "group": "Modeling Guide",
+                "icon": "cube",
+                "pages": [
                     {
                         "group": "Overview",
-                        "icon": "book-open",
                         "pages": [
-                            {
-                                "group": "Get Started",
-                                "pages": [
-                                    "pages/overview/get-started/introduction",
-                                    "pages/overview/get-started/subscribing",
-                                    "pages/user-guide/common/quick-start",
-                                    "pages/faqs/common-faqs"
-                                ]
-                            },
-                            {
-                                "group": "Navigating Davinci",
-                                "pages": [
-                                    "pages/user-guide/navigating/ui"
-                                ]
-                            }
+                            "pages/modeling/overview/systemmodeling",
+                            "pages/modeling/overview/language",
+                            "pages/modeling/overview/mentions",
+                            "pages/modeling/overview/imports",
+                            "pages/modeling/overview/sysml-export"
                         ]
                     },
                     {
-                        "group": "Davinci Browser",
-                        "icon": "house",
+                        "group": "Common",
                         "pages": [
-                            {
-                                "group": "Davinci Browser",
-                                "pages": [
-                                    "pages/user-guide/navigating/home",
-                                    "pages/user-guide/navigating/notifications",
-                                    "pages/user-guide/navigating/profile",
-                                    "pages/user-guide/navigating/settings"
-                                ]
-                            },
-                            {
-                                "group": "Account & Billing",
-                                "pages": [
-                                    "pages/overview/get-started/account",
-                                    "pages/overview/get-started/change-tier",
-                                    "pages/overview/get-started/unsubscribing"
-                                ]
-                            },
-                            {
-                                "group": "Plans",
-                                "pages": [
-                                    "pages/overview/get-started/plans",
-                                    "pages/overview/get-started/teams"
-                                ]
-                            }
+                            "pages/modeling/common/equations",
+                            "pages/modeling/common/relationships",
+                            "pages/modeling/common/units"
                         ]
                     },
                     {
-                        "group": "Editor",
-                        "icon": "window",
+                        "group": "Object Views",
                         "pages": [
-                            {
-                                "group": "Getting Around",
-                                "pages": [
-                                    "pages/user-guide/navigating/editor",
-                                    "pages/user-guide/navigating/model",
-                                    "pages/user-guide/common/hotkeys"
-                                ]
-                            },
-                            {
-                                "group": "The Right Panel",
-                                "pages": [
-                                    "pages/user-guide/right-panel/right-panel-overview",
-                                    "pages/user-guide/right-panel/agent-chat",
-                                    "pages/user-guide/right-panel/version-control",
-                                    "pages/user-guide/right-panel/search-view",
-                                    "pages/user-guide/right-panel/comment-view",
-                                    "pages/user-guide/right-panel/validation-view"
-                                ]
-                            },
-                            {
-                                "group": "Project Settings",
-                                "pages": [
-                                    "pages/user-guide/project-settings/project",
-                                    "pages/user-guide/project-settings/files",
-                                    "pages/user-guide/project-settings/toolboxes",
-                                    "pages/user-guide/project-settings/collaboration",
-                                    "pages/user-guide/project-settings/unit-settings",
-                                    "pages/user-guide/project-settings/relationship-settings",
-                                    "pages/user-guide/project-settings/secrets",
-                                    "pages/user-guide/project-settings/dependencies",
-                                    "pages/user-guide/project-settings/tags",
-                                    "pages/user-guide/project-settings/risk",
-                                    "pages/user-guide/project-settings/persona-settings",
-                                    "pages/user-guide/project-settings/mcp"
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "group": "Digital Modeling",
-                        "icon": "code",
-                        "pages": [
-                            {
-                                "group": "Overview",
-                                "pages": [
-                                    "pages/modeling/overview/systemmodeling",
-                                    "pages/modeling/overview/language",
-                                    "pages/modeling/overview/mentions",
-                                    "pages/modeling/overview/imports",
-                                    "pages/modeling/overview/sysml-export"
-                                ]
-                            },
-                            {
-                                "group": "Common",
-                                "pages": [
-                                    "pages/modeling/common/equations",
-                                    "pages/modeling/common/relationships",
-                                    "pages/modeling/common/units"
-                                ]
-                            },
-                            {
-                                "group": "Scripts",
-                                "pages": [
-                                    "pages/modeling/python-database-api"
-                                ]
-                            },
-                            {
-                                "group": "Object Views",
-                                "pages": [
-                                    "pages/user-guide/views/activity",
-                                    "pages/user-guide/views/artifact",
-                                    "pages/user-guide/views/block",
-                                    "pages/user-guide/views/code",
-                                    "pages/user-guide/views/connectome",
-                                    "pages/user-guide/views/design-space-explorer",
-                                    "pages/user-guide/views/digital-thread",
-                                    "pages/user-guide/views/gantt",
-                                    "pages/user-guide/views/help",
-                                    "pages/user-guide/views/history",
-                                    "pages/user-guide/views/package",
-                                    "pages/user-guide/views/pie",
-                                    "pages/user-guide/views/plot",
-                                    "pages/user-guide/views/properties",
-                                    "pages/user-guide/views/reference",
-                                    "pages/user-guide/views/risk",
-                                    "pages/user-guide/views/rollup",
-                                    "pages/user-guide/views/sequence",
-                                    "pages/user-guide/views/slide",
-                                    "pages/user-guide/views/state",
-                                    "pages/user-guide/views/table",
-                                    "pages/user-guide/views/toolbox",
-                                    "pages/user-guide/views/tree"
-                                ]
-                            }
+                            "pages/user-guide/views/activity",
+                            "pages/user-guide/views/artifact",
+                            "pages/user-guide/views/block",
+                            "pages/user-guide/views/code",
+                            "pages/user-guide/views/connectome",
+                            "pages/user-guide/views/design-space-explorer",
+                            "pages/user-guide/views/digital-thread",
+                            "pages/user-guide/views/gantt",
+                            "pages/user-guide/views/geometric",
+                            "pages/user-guide/views/geometry",
+                            "pages/user-guide/views/help",
+                            "pages/user-guide/views/history",
+                            "pages/user-guide/views/package",
+                            "pages/user-guide/views/pie",
+                            "pages/user-guide/views/plot",
+                            "pages/user-guide/views/properties",
+                            "pages/user-guide/views/reference",
+                            "pages/user-guide/views/risk",
+                            "pages/user-guide/views/rollup",
+                            "pages/user-guide/views/sequence",
+                            "pages/user-guide/views/slide",
+                            "pages/user-guide/views/state",
+                            "pages/user-guide/views/table",
+                            "pages/user-guide/views/toolbox",
+                            "pages/user-guide/views/tree",
+                            "pages/user-guide/views/schematic",
+                            "pages/user-guide/views/simulation",
+                            "pages/user-guide/views/board"
                         ]
                     },
                     {
                         "group": "Object Types",
-                        "icon": "cube",
                         "pages": [
+                            "pages/modeling/objects/objects",
                             {
-                                "group": "Model-Based Systems Engineering",
+                                "group": "Structure",
                                 "pages": [
                                     "pages/modeling/objects/parts",
-                                    "pages/modeling/objects/attributes",
+                                    "pages/modeling/objects/packages",
+                                    "pages/modeling/objects/entities",
                                     "pages/modeling/objects/requirements",
                                     "pages/modeling/objects/capability",
-                                    "pages/modeling/objects/constraints",
-                                    "pages/modeling/objects/ports",
-                                    "pages/modeling/objects/interface",
-                                    "pages/modeling/objects/entities",
-                                    "pages/modeling/objects/packages",
                                     "pages/modeling/objects/linkages"
                                 ]
                             },
                             {
-                                "group": "Project Management",
+                                "group": "Values",
                                 "pages": [
+                                    "pages/modeling/objects/attributes",
+                                    "pages/modeling/objects/constraints",
                                     "pages/modeling/objects/resource",
-                                    "pages/modeling/objects/task",
                                     "pages/modeling/objects/risk"
                                 ]
                             },
@@ -298,110 +301,451 @@
                                 "group": "Artifacts",
                                 "pages": [
                                     "pages/modeling/objects/documents",
-                                    "pages/modeling/objects/dashboard",
                                     "pages/modeling/objects/tables",
-                                    "pages/modeling/objects/slide",
-                                    "pages/modeling/objects/matrix"
+                                    "pages/modeling/objects/matrix",
+                                    "pages/modeling/objects/slide"
                                 ]
                             },
                             {
-                                "group": "Simulation & Behavior",
+                                "group": "Behavior",
                                 "pages": [
-                                    "pages/modeling/objects/code",
                                     "pages/modeling/objects/actions",
                                     "pages/modeling/objects/states",
-                                    "pages/modeling/objects/transitions"
+                                    "pages/modeling/objects/transitions",
+                                    "pages/modeling/objects/task"
                                 ]
                             },
                             {
-                                "group": "Data & Tools",
+                                "group": "Interface",
                                 "pages": [
-                                    "pages/modeling/objects/reference",
+                                    "pages/modeling/objects/ports",
+                                    "pages/modeling/objects/interface",
+                                    "pages/modeling/objects/item"
+                                ]
+                            },
+                            {
+                                "group": "Analysis",
+                                "pages": [
+                                    "pages/modeling/objects/code",
                                     "pages/modeling/objects/toolbox"
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        "group": "Modeling Agent",
-                        "icon": "robot",
-                        "pages": [
-                            "pages/user-guide/design-agent/workspaces",
-                            "pages/user-guide/design-agent/agents",
-                            "pages/user-guide/design-agent/persona",
-                            "pages/user-guide/design-agent/agent-tools",
-                            "pages/user-guide/design-agent/tips"
-                        ]
-                    },
-                    {
-                        "group": "Collaboration",
-                        "icon": "users",
-                        "pages": [
-                            "pages/user-guide/collaboration/overview",
-                            "pages/user-guide/collaboration/real-time-editing",
-                            "pages/user-guide/collaboration/object-locking"
-                        ]
-                    },
-                    {
-                        "group": "Examples",
-                        "icon": "book-sparkles",
-                        "pages": [
-                            "examples/index",
-                            "examples/OV1_example",
-                            "examples/Technical_Decomposition_Example",
-                            "examples/Requirements_Management_Example",
-                            "examples/Document_Templates_Example",
-                            "examples/Organization_Process_Example"
-                        ]
-                    },
-                    {
-                        "group": "Developer API",
-                        "icon": "code",
-                        "pages": [
+                            },
                             {
-                                "group": "API Reference",
+                                "group": "CAD",
                                 "pages": [
-                                    "pages/api/introduction",
-                                    "pages/api/personal-access-tokens"
+                                    "pages/modeling/objects/geometry",
+                                    "pages/modeling/objects/assembly"
                                 ]
                             },
                             {
-                                "group": "General",
-                                "icon": "circle-info",
-                                "openapi": "openapi/davinci-public.v2.yaml",
+                                "group": "Reference",
                                 "pages": [
-                                    "GET /api/v2/programmatic",
-                                    "GET /api/v2/programmatic/health"
-                                ]
-                            },
-                            {
-                                "group": "Projects",
-                                "icon": "folder-tree",
-                                "openapi": "openapi/davinci-public.v2.yaml",
-                                "pages": [
-                                    "GET /api/v2/programmatic/projects",
-                                    "GET /api/v2/programmatic/projects/{projectId}",
-                                    "GET /api/v2/programmatic/projects/{projectId}/tree",
-                                    "GET /api/v2/programmatic/projects/{projectId}/objects/{objectId}",
-                                    "GET /api/v2/programmatic/projects/{projectId}/files",
-                                    "GET /api/v2/programmatic/projects/{projectId}/files/{fileId}"
+                                    "pages/modeling/objects/reference"
                                 ]
                             }
-                        ]
-                    },
-                    {
-                        "group": "Release Notes",
-                        "icon": "clock",
-                        "pages": [
-                            "pages/release-notes/v4.2.1",
-                            "pages/release-notes/v4.2.0",
-                            "pages/release-notes/v4.1.5",
-                            "pages/release-notes/v4.1.4",
-                            "pages/release-notes/archive"
                         ]
                     }
                 ]
+            },
+            {
+                "group": "Developer API",
+                "icon": "code",
+                "pages": [
+                    {
+                        "group": "API Reference",
+                        "pages": [
+                            "pages/api/introduction",
+                            "pages/api/personal-access-tokens"
+                        ]
+                    },
+                    {
+                        "group": "General",
+                        "icon": "circle-info",
+                        "openapi": "openapi/davinci-public.v2.yaml",
+                        "pages": [
+                            "GET /api/v2/programmatic",
+                            "GET /api/v2/programmatic/health"
+                        ]
+                    },
+                    {
+                        "group": "Projects",
+                        "icon": "folder-tree",
+                        "openapi": "openapi/davinci-public.v2.yaml",
+                        "pages": [
+                            "GET /api/v2/programmatic/projects",
+                            "GET /api/v2/programmatic/projects/{projectId}",
+                            "GET /api/v2/programmatic/projects/{projectId}/tree",
+                            "GET /api/v2/programmatic/projects/{projectId}/objects/{objectId}",
+                            "GET /api/v2/programmatic/projects/{projectId}/files",
+                            "GET /api/v2/programmatic/projects/{projectId}/files/{fileId}"
+                        ]
+                    }
+                ]
+            },
+            {
+                "group": "Examples",
+                "icon": "book-sparkles",
+                "pages": [
+                    "examples/index",
+                    "examples/OV1_example",
+                    "examples/Technical_Decomposition_Example",
+                    "examples/Requirements_Management_Example",
+                    "examples/Document_Templates_Example",
+                    "examples/Organization_Process_Example"
+                ]
+            },
+            {
+                "group": "Release Notes",
+                "icon": "clock",
+                "pages": [
+                    "pages/release-notes/v4.4.0",
+                    "pages/release-notes/v4.3.2",
+                    "pages/release-notes/v4.3.1",
+                    "pages/release-notes/v4.3.0",
+                    "pages/release-notes/v4.2.20",
+                    "pages/release-notes/v4.2.19",
+                    "pages/release-notes/archive"
+                ]
+            },
+            {
+                "group": "Release Notes Archive",
+                "icon": "box-archive",
+                "hidden": true,
+                "searchable": true,
+                "pages": [
+                    "pages/release-notes/v4.2.18",
+                    "pages/release-notes/v4.2.17",
+                    "pages/release-notes/v4.2.16",
+                    "pages/release-notes/v4.2.15",
+                    "pages/release-notes/v4.2.14",
+                    "pages/release-notes/v4.2.13",
+                    "pages/release-notes/v4.2.12",
+                    "pages/release-notes/v4.2.11",
+                    "pages/release-notes/v4.2.10",
+                    "pages/release-notes/v4.2.9",
+                    "pages/release-notes/v4.2.8",
+                    "pages/release-notes/v4.2.7",
+                    "pages/release-notes/v4.2.6",
+                    "pages/release-notes/v4.2.5",
+                    "pages/release-notes/v4.2.4",
+                    "pages/release-notes/v4.2.3",
+                    "pages/release-notes/v4.2.2",
+                    "pages/release-notes/v4.2.1",
+                    "pages/release-notes/v4.2.0",
+                    "pages/release-notes/v4.1.11",
+                    "pages/release-notes/v4.1.10",
+                    "pages/release-notes/v4.1.9",
+                    "pages/release-notes/v4.1.8",
+                    "pages/release-notes/v4.1.7",
+                    "pages/release-notes/v4.1.6",
+                    "pages/release-notes/v4.1.5",
+                    "pages/release-notes/v4.1.4",
+                    "pages/release-notes/v4.1.3",
+                    "pages/release-notes/v4.1.2",
+                    "pages/release-notes/v4.1.1",
+                    "pages/release-notes/v4.1.0",
+                    "pages/release-notes/v4.0.7",
+                    "pages/release-notes/v4.0.6",
+                    "pages/release-notes/v4.0.5",
+                    "pages/release-notes/v4.0.4",
+                    "pages/release-notes/v4.0.3",
+                    "pages/release-notes/v4.0.2",
+                    "pages/release-notes/v4.0.1",
+                    "pages/release-notes/v4.0.0",
+                    "pages/release-notes/v3.7.2",
+                    "pages/release-notes/v3.6.2",
+                    "pages/release-notes/v3.5.2",
+                    "pages/release-notes/v3.4.1",
+                    "pages/release-notes/v3.3.0",
+                    "pages/release-notes/v3.2.0",
+                    "pages/release-notes/v3.1.0",
+                    "pages/release-notes/v3.0.1",
+                    "pages/release-notes/v3.0.0",
+                    "pages/release-notes/v2.0.0"
+                ]
             }
         ]
-    }
+    },
+    "redirects": [
+        {
+            "source": "/pages/overview/about-davinci",
+            "destination": "/pages/getting-started/introduction"
+        },
+        {
+            "source": "/pages/overview/features",
+            "destination": "/pages/getting-started/introduction"
+        },
+        {
+            "source": "/pages/overview/get-started/introduction",
+            "destination": "/pages/getting-started/introduction"
+        },
+        {
+            "source": "/pages/overview/get-started/signup",
+            "destination": "/pages/getting-started/signup"
+        },
+        {
+            "source": "/pages/overview/get-started/subscribing",
+            "destination": "/pages/getting-started/signup"
+        },
+        {
+            "source": "/pages/overview/get-started/plans",
+            "destination": "/pages/getting-started/plans"
+        },
+        {
+            "source": "/pages/user-guide/common/quick-start",
+            "destination": "/pages/getting-started/quickstart"
+        },
+        {
+            "source": "/pages/overview/get-started/key-concepts",
+            "destination": "/pages/getting-started/key-concepts"
+        },
+        {
+            "source": "/pages/faqs/common-faqs",
+            "destination": "/pages/getting-started/faq"
+        },
+        {
+            "source": "/pages/user-guide/browser/overview",
+            "destination": "/pages/browser/overview"
+        },
+        {
+            "source": "/pages/user-guide/browser/projects",
+            "destination": "/pages/browser/projects"
+        },
+        {
+            "source": "/pages/user-guide/browser/organizations",
+            "destination": "/pages/browser/organizations"
+        },
+        {
+            "source": "/pages/user-guide/browser/teams",
+            "destination": "/pages/browser/teams"
+        },
+        {
+            "source": "/pages/user-guide/browser/roles-permissions",
+            "destination": "/pages/browser/roles-permissions"
+        },
+        {
+            "source": "/pages/user-guide/browser/user-account",
+            "destination": "/pages/browser/account"
+        },
+        {
+            "source": "/pages/user-guide/browser/usage-plans-billing",
+            "destination": "/pages/browser/usage-plans-billing/overview"
+        },
+        {
+            "source": "/pages/user-guide/navigating/home",
+            "destination": "/pages/browser/home"
+        },
+        {
+            "source": "/pages/user-guide/navigating/notifications",
+            "destination": "/pages/browser/notifications"
+        },
+        {
+            "source": "/pages/user-guide/navigating/profile",
+            "destination": "/pages/browser/profile"
+        },
+        {
+            "source": "/pages/user-guide/navigating/settings",
+            "destination": "/pages/browser/account"
+        },
+        {
+            "source": "/pages/overview/get-started/account",
+            "destination": "/pages/browser/account"
+        },
+        {
+            "source": "/pages/overview/get-started/change-tier",
+            "destination": "/pages/browser/usage-plans-billing/change-individual-plan"
+        },
+        {
+            "source": "/pages/overview/get-started/unsubscribing",
+            "destination": "/pages/browser/usage-plans-billing/cancel-or-unsubscribe"
+        },
+        {
+            "source": "/pages/overview/get-started/teams",
+            "destination": "/pages/browser/usage-plans-billing/upgrade-to-team"
+        },
+        {
+            "source": "/pages/user-guide/editor/overview",
+            "destination": "/pages/editor/overview"
+        },
+        {
+            "source": "/pages/user-guide/editor/modeling-basics",
+            "destination": "/pages/editor/modeling-basics"
+        },
+        {
+            "source": "/pages/user-guide/editor/files-and-references",
+            "destination": "/pages/editor/files-and-references"
+        },
+        {
+            "source": "/pages/user-guide/editor/exports",
+            "destination": "/pages/editor/exports"
+        },
+        {
+            "source": "/pages/user-guide/navigating/editor",
+            "destination": "/pages/editor/interface"
+        },
+        {
+            "source": "/pages/user-guide/navigating/model",
+            "destination": "/pages/editor/model-area"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/project",
+            "destination": "/pages/editor/project-settings/project"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/files",
+            "destination": "/pages/editor/project-settings/files"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/toolboxes",
+            "destination": "/pages/editor/project-settings/toolboxes"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/collaboration",
+            "destination": "/pages/editor/collaboration/overview"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/unit-settings",
+            "destination": "/pages/editor/project-settings/unit-settings"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/relationship-settings",
+            "destination": "/pages/editor/project-settings/relationship-settings"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/secrets",
+            "destination": "/pages/editor/project-settings/secrets"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/dependencies",
+            "destination": "/pages/editor/project-settings/dependencies"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/tags",
+            "destination": "/pages/editor/project-settings/tags"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/risk",
+            "destination": "/pages/editor/project-settings/risk"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/persona-settings",
+            "destination": "/pages/editor/project-settings/persona-settings"
+        },
+        {
+            "source": "/pages/user-guide/project-settings/mcp",
+            "destination": "/pages/editor/project-settings/mcp"
+        },
+        {
+            "source": "/pages/user-guide/collaboration/overview",
+            "destination": "/pages/editor/collaboration/overview"
+        },
+        {
+            "source": "/pages/user-guide/collaboration/real-time-editing",
+            "destination": "/pages/editor/collaboration/real-time-editing"
+        },
+        {
+            "source": "/pages/user-guide/collaboration/object-locking",
+            "destination": "/pages/editor/collaboration/object-locking"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/right-panel-overview",
+            "destination": "/pages/editor/right-panel/overview"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/agent-chat",
+            "destination": "/pages/editor/right-panel/agent-chat"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/version-control",
+            "destination": "/pages/editor/right-panel/version-control"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/search-view",
+            "destination": "/pages/editor/right-panel/search-view"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/comment-view",
+            "destination": "/pages/editor/right-panel/comment-view"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/validation-view",
+            "destination": "/pages/editor/right-panel/validation-view"
+        },
+        {
+            "source": "/pages/user-guide/design-agent/workspaces",
+            "destination": "/pages/editor/agent/workspaces"
+        },
+        {
+            "source": "/pages/user-guide/design-agent/agents",
+            "destination": "/pages/editor/agent/agents"
+        },
+        {
+            "source": "/pages/user-guide/design-agent/persona",
+            "destination": "/pages/editor/agent/persona"
+        },
+        {
+            "source": "/pages/user-guide/design-agent/agent-tools",
+            "destination": "/pages/editor/agent/agent-tools"
+        },
+        {
+            "source": "/pages/user-guide/design-agent/tips",
+            "destination": "/pages/editor/agent/tips"
+        },
+        {
+            "source": "/pages/user-guide/model-review/model-review",
+            "destination": "/pages/editor/agent/model-review"
+        },
+        {
+            "source": "/pages/editor/model-review",
+            "destination": "/pages/editor/agent/model-review"
+        },
+        {
+            "source": "/pages/integrations/onshape",
+            "destination": "/pages/integrations/onshape"
+        },
+        {
+            "source": "/pages/api/getting-started",
+            "destination": "/pages/api/introduction"
+        },
+        {
+            "source": "/pages/api/service-accounts",
+            "destination": "/pages/api/personal-access-tokens"
+        },
+        {
+            "source": "/pages/api/projects",
+            "destination": "/api-reference/projects/list-accessible-projects"
+        },
+        {
+            "source": "/pages/api/project-data",
+            "destination": "/api-reference/projects/get-project-tree"
+        },
+        {
+            "source": "/pages/api/files",
+            "destination": "/api-reference/projects/list-files-attached-to-a-project"
+        },
+        {
+            "source": "/pages/browser/plans",
+            "destination": "/pages/getting-started/plans"
+        },
+        {
+            "source": "/pages/user-guide/right-panel/error-view",
+            "destination": "/pages/editor/right-panel/validation-view"
+        },
+        {
+            "source": "/pages/editor/project-settings/collaboration",
+            "destination": "/pages/editor/collaboration/overview"
+        },
+        {
+            "source": "/pages/browser/navigation",
+            "destination": "/pages/browser/navigation"
+        },
+        {
+            "source": "/pages/user-guide/common/hotkeys",
+            "destination": "/pages/editor/hotkeys"
+        },
+        {
+            "source": "/pages/user-guide/navigating/ui",
+            "destination": "/pages/browser/navigation"
+        }
+    ]
 }
