@@ -1,5 +1,6 @@
 ---
 title: Tasks
+icon: /images/objecticons/task.svg
 ---
 
 <img height="20" noZoom src="/images/objecticons/task.svg" /> 
@@ -9,7 +10,7 @@ Task objects represent discrete units of work or activities that need to be perf
 
 Tasks support prerequisite relationships with other tasks, allowing you to define dependencies where one task must complete before another can begin. Prerequisites can include time offsets, enabling flexible scheduling such as "start 2 days after Task A completes." The duration field specifies how long a task takes to complete, with configurable units (Days, Hours, etc.). Tasks automatically calculate their start and end dates based on their duration, prerequisites, and the project timeline.
 
-The ordering of tasks is based on the ordering in the [index](/pages/user-guide/navigating/model#index). To change top to bottom ordering of tasks in the [Gantt view](/pages/user-guide/views/gantt) rearrange the tasks using the index.
+The ordering of tasks is based on the ordering in the [index](/pages/editor/model-area#index). To change top to bottom ordering of tasks in the [Gantt view](/pages/user-guide/views/gantt) rearrange the tasks using the index.
 
 <Note>If the task has owned sub tasks as children, then the parent task will inherit the start and end date of its children and is not editable.</Note>
 
@@ -21,7 +22,7 @@ The ordering of tasks is based on the ordering in the [index](/pages/user-guide/
 | :--- | :--- |
 | [Gantt](#gantt-chart) | Visualize tasks and dependencies on a timeline. |
 | [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
-| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
+| [Table](/pages/user-guide/views/table) | Display the object and its children in a tabular format. |
 | [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
 
 ## Properties Fields

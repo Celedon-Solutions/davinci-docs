@@ -1,0 +1,99 @@
+---
+title: Planning
+description: Use agent plans to break complex work into editable, trackable tasks
+tag: New
+---
+
+## Overview
+
+Agent planning helps Davinci handle complex work by turning a broad request into a structured set of tasks. Plans are useful for multi-step modeling, document extraction, requirements work, reviews, research, and any task where the agent should inspect context before making changes.
+
+For simple requests, the agent may act directly. For larger requests, it can create a plan, pause for approval, and then execute dependency-ready tasks.
+
+## When The Agent Creates A Plan
+
+The agent creates plans for work that is complex, uncertain, or likely to require multiple tools. Planning is especially useful when the task involves:
+
+- Several model areas or object types.
+- Source documents that need inspection before extraction.
+- Requirements, traceability, risk, or review workflows.
+- External research with Web Search.
+- A large generation step that should be reviewed before execution.
+
+Before planning, the agent should inspect relevant model context when practical. This helps the plan avoid duplicate work and reference the right objects.
+
+## What A Plan Contains
+
+An agent plan has a title, description, progress, and a graph of tasks. Tasks are flat items connected by dependencies rather than nested outlines.
+
+There are two task types:
+
+- **Task** — executable work the agent can perform, with a goal and method.
+- **Clarification** — a question for the user that must be answered before dependent work continues.
+
+Dependencies control execution order. The agent should only work on tasks whose prerequisites are complete. If multiple tasks are independent, the agent may treat them as parallel-ready.
+
+## Opening A Plan
+
+When a plan exists, it appears in the Agent chat summary panel above the object change tracker. Click the plan row or the open icon to open the plan as a workspace tab.
+
+In the plan tab, you can:
+
+- Edit the plan title and description.
+- Review task goals, methods, and clarification questions.
+- Change task status.
+- Add, remove, move, resize, and connect task cards.
+- Switch between left-to-right and top-to-bottom layouts.
+- Reset the graph layout.
+- Run the plan.
+
+Plan changes are saved back to the project so the agent uses the latest plan state.
+
+## Editing The Plan
+
+You can edit a plan before running it or while the agent is paused. Use this when the generated plan is mostly right but needs different scope, order, or decision points.
+
+Useful edits include:
+
+- Add a discovery task before generation.
+- Add a clarification task where user input changes downstream work.
+- Split a broad task into smaller reviewable tasks.
+- Connect tasks so review or validation happens before downstream creation.
+- Mark tasks complete if you already performed that work manually.
+
+<Note>
+The active plan is the source of truth for plan-guided execution. If you edit the plan, the agent should follow the updated graph rather than older task text in chat history.
+</Note>
+
+## Running A Plan
+
+Click **Run Plan** from the plan tab to ask the associated agent workspace to execute the plan. The agent works through dependency-ready tasks, updates task status as it proceeds, and revises the plan when discovery changes what should happen next.
+
+The agent may pause when it reaches a clarification task. Answer the question in chat, then the agent can continue with tasks that depend on that answer.
+
+## How Plans Change During Work
+
+Plans are working artifacts, not fixed contracts. The agent can update task status as it works and modify the plan when new information changes the right approach.
+
+Common reasons to revise a plan:
+
+- A source document has a different structure than expected.
+- The model already contains part of the requested content.
+- A task should be split into smaller, safer batches.
+- A dependency or review step is missing.
+- User feedback changes the desired outcome.
+
+## Planning With Skills And Web Search
+
+[Workflow skills](/pages/editor/agent/skills) can guide how plans are created and executed. For example, a workflow skill can require source inspection before extraction, require review tasks after generation, or define a standard review process.
+
+When Web Search is enabled, web skills can also influence planning. For tasks involving current external information, the agent may add early research tasks that search the web and read source pages before downstream modeling or generation.
+
+## Best Practices
+
+- Use planning for large or risky changes, not every small edit.
+- Review the plan before running it when the task affects important model structure.
+- Add clarification tasks only where the answer materially changes the plan.
+- Prefer bounded tasks for source-document extraction and large model generation.
+- Keep review and validation tasks dependent on the creation tasks they inspect.
+- Pause the agent and edit the plan if execution starts moving in the wrong direction.

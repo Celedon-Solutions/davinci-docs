@@ -1,0 +1,33 @@
+---
+title: Exports
+description: Export Davinci projects and model scopes for archive, interchange, and analysis
+---
+
+## Overview
+
+Davinci supports several export paths from the Editor. Use exports to archive project state, share project data, integrate with external tools, or publish model content for review.
+
+Exports are available from Project Settings and from supported object or project menus.
+
+## Export Formats
+
+| Format | Use for | Notes |
+| --- | --- | --- |
+| `.DAF` | Davinci archive and transfer | Preserves model objects and uploaded reference files. Best for round-tripping between Davinci environments. |
+| `JSON` | Raw project/model data | Exports model data without uploaded reference files. Useful for inspection and tooling. |
+| `SysML v2` | Systems engineering interchange | Exports a standards-oriented `.sysml` representation with export-only transformations. |
+| `SysML v2 JSON` | Structured SysML-oriented analysis | Exports structured JSON for workflows that need machine-readable SysML-style data. |
+| Document/table/presentation exports | Artifact sharing | Available from supported artifact views. |
+
+## SysML Exports
+
+SysML exports are not a raw dump of the Davinci model. Davinci applies export-only transformations to make the output more valid, readable, and useful in downstream tools.
+
+See [SysML v2 Export](/pages/modeling/overview/sysml-export) for detailed mapping behavior, supported object types, limitations, validation behavior, and JSON export details.
+
+## Choosing A Format
+
+- Use `.DAF` when you want to preserve a project for another Davinci environment.
+- Use JSON when you need model data for custom tooling.
+- Use SysML v2 when you need standards-oriented system-model interchange.
+- Use artifact exports when sharing human-readable documents, tables, or presentations.

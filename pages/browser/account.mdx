@@ -1,0 +1,125 @@
+---
+title: User Account
+description: Manage your Davinci account, profile, security, connections, storage, and personal settings
+---
+
+## Overview
+
+Every Davinci user has an account. Your account controls your identity in the Davinci app, your personal projects, your profile, your security settings, and your personal access tokens.
+
+Account management is separate from organization or team management. A user account can own projects directly, belong to organizations, and belong to teams.
+
+## How To Get There
+
+Open account settings from your avatar menu in the Davinci Browser or go to `/~/settings`.
+
+You can also click your avatar in the Davinci Editor and select **Settings**. This takes you back to account settings in the Browser.
+
+Settings are organized into five tabs: **General**, **Billing**, **Connections**, **Storage**, and **About**.
+
+## General
+
+The General tab covers your profile, security, and preferences.
+
+### Account
+
+- **Name** — your display name, shown across Davinci and on your public profile. Click the pencil icon to edit it.
+- **Avatar Color** — the background color of your avatar bubble. Click `Randomize` to pick a new color.
+- **Email** — the email address tied to your account. This is read-only and cannot be changed from this page.
+- **License Key** — a unique identifier for your account. It is hidden by default; click the eye icon to reveal it. Support may ask for this when helping with your account.
+- **Password** — click `Change Password` to update your password. This option is only shown if you signed up with email (not available for Google or SSO sign-in).
+- **Sign Out** — log out of Davinci on this browser.
+
+### Handle
+
+Your handle is your public identifier on the platform (e.g. `@yourname.celedon.io`). It appears in your profile URL and anywhere your username is shown.
+
+**Changing your handle:**
+1. Click the pencil icon next to your current handle.
+2. In the dialog, edit the username portion. Your handle will be `{username}.celedon.io`.
+3. Click `Save`.
+
+Handles must be unique across the platform.
+
+**Custom Domain Handle (paid plans only):**
+
+Paid users can verify a domain they own and use it as their handle instead of the default `.celedon.io` format. For example, you could use `@alice.example.com` instead of `@alice.celedon.io`.
+
+<Steps>
+    <Step title="Start verification">
+        Click `Use Custom Domain` in the Handle section. A verification dialog will open.
+    </Step>
+    <Step title="Enter your domain">
+        Type the domain you want to use (e.g. `example.com`) and click `Continue`.
+    </Step>
+    <Step title="Prove ownership">
+        Davinci will provide verification instructions. You can choose between two methods:
+
+        **DNS Record** — add a TXT record to your domain's DNS with the provided Name/Host and Value. Set the TTL to 3600.
+
+        **HTTPS File** — create a file at a specific URL on your domain with the exact content provided.
+
+        Copy the values using the copy buttons and add them through your domain registrar or hosting provider.
+    </Step>
+    <Step title="Verify">
+        Click `Verify`. Davinci will check for your DNS record or HTTPS file. Once found, your domain is verified and your handle is updated immediately.
+    </Step>
+</Steps>
+
+If you want to revert to the default `.celedon.io` handle after verifying a custom domain, click `Revert to Default` in the Handle section.
+
+### Notifications
+
+Control which emails you receive from Davinci:
+- **Email notifications** — toggle on or off to receive emails for invitations, alerts, and activity updates.
+- **Marketing emails** — toggle on or off to receive product updates and news from Celedon Solutions.
+
+### Security
+
+If your deployment has two-factor authentication (2FA) enabled, this section appears with options to:
+- **Enable 2FA** — choose between an **Authenticator App** (TOTP) or **Email Code** method. For authenticator apps, scan the QR code and enter the verification code to activate.
+- **Disable 2FA** — enter a verification code to turn off two-factor authentication.
+
+### Danger Zone
+
+- **Delete Account** — permanently delete your account and all associated data. You must type `DELETE` to confirm. This action cannot be undone.
+
+<Warning>Deleting your account removes all projects you own and revokes access to shared projects. Export any important data before proceeding.</Warning>
+
+## Billing
+
+The Billing tab shows subscription and usage information when self-service billing is available for your deployment. For detailed usage, plan, storage, organization, and team billing concepts, see [Usage, Plans, And Billing](/pages/browser/usage-plans-billing/overview).
+
+Key items on this tab:
+- **Subscription Tier** — your current plan
+- **Renewal Date** — when your subscription renews (or cancellation date)
+- **Upgrade / Change Plan** — link to the [Upgrade page](https://davinci-app.com/~/upgrade)
+- **Stripe Account** — click `Manage` to open the Stripe Customer Portal for invoices and payment methods
+- **Included Usage** — a gauge showing your remaining subscription credits for the current period
+- **On-Demand** — enable or disable on-demand credit usage and set a spending limit
+- **Trial Credits** — your remaining trial credit balance
+- **Team** — if you are on a team plan, links to the Team hub; otherwise, a link to upgrade to a Team plan
+
+## Connections
+
+The Connections tab is where you manage integrations and API access for your account.
+
+Personal access tokens identify your user account and inherit your project access. Store them securely and revoke exposed tokens.
+
+See [Personal Access Tokens](/pages/api/personal-access-tokens) for API token details.
+
+## Storage
+
+The Storage tab gives you an overview of how much storage you are using.
+
+- **Summary** — a line showing your total usage relative to your plan's storage limit.
+- **Project breakdown** — a sortable table listing each project's uploaded file size, project name, last accessed date, and project ID. Sort by any column to find your largest files.
+
+Storage limits depend on your plan, organization, team, and deployment. See [Usage, Plans, And Billing](/pages/browser/usage-plans-billing/overview) for storage and usage concepts.
+
+## About
+
+The About tab provides quick links and a way to send feedback.
+
+- **Send Feedback** — type a message and click `Send` to share feedback with the Davinci team.
+- **Links** — direct links to the Terms of Service, Privacy Policy, Celedon Solutions website, and Davinci documentation.

@@ -1,0 +1,75 @@
+---
+title: Projects
+description: Create, open, organize, and manage projects in the Davinci Browser
+---
+
+## Overview
+
+Projects are the primary workspace for engineering work in Davinci. A project contains a model, files, settings, collaborators, branches, history, and project-specific configuration.
+
+Projects can be owned by a user or by an organization. Ownership affects access, storage, limits, and who can administer the project.
+
+<Info>
+For a detailed explanation of project roles, inherited organization access, public access, and visibility rules, see [Roles And Permissions](/pages/browser/roles-permissions).
+</Info>
+
+## Project List
+
+The Home page shows the projects you can access. Use the project list to filter between:
+
+- **All** — every project visible to you.
+- **Owned** — projects you own directly.
+- **Shared** — projects owned by someone else or by an organization where you have access.
+
+Open a project page from the list, then click **Open Project** to enter the Davinci Editor.
+
+## Project Page
+
+A project page gives you Browser-level controls and context:
+
+- Project owner and name.
+- Branch selector.
+- README or project description, if configured.
+- Collaborators and access.
+- Branches and recent activity.
+- History and commit activity.
+- Project settings such as name, visibility, collaborators, and deletion.
+
+## Project Visibility
+
+Project visibility controls who can discover or read a project when they do not have a direct project role.
+
+| Visibility | Meaning |
+| --- | --- |
+| **Private** | Access is limited to the owner, project members, inherited organization members, and authorized administrators. |
+| **Internal** | Only available for organization-owned projects. Organization members can access the project through organization membership. |
+| **Public** | User-owned projects are visible to anyone. Organization-owned public projects are visible to everyone only when the owning organization is also public. |
+
+Public access is read-only. Public visitors cannot edit the model, connect to a live Editor session, or use the Davinci Agent unless they are explicitly invited with a project role.
+
+## Project Permissions
+
+Project permissions come from several possible sources:
+
+- The project owner has full control.
+- Direct project members receive permissions from their project role.
+- Organization members can inherit project permissions for organization-owned projects.
+- Team or tenant administrators may receive administrative access to organization-owned projects.
+- Public projects grant limited read-only access to non-members.
+
+Direct project roles and organization-inherited roles can combine. Assigning a narrower direct project role does not remove stronger access a user already inherits from the owning organization.
+
+## Creating And Importing Projects
+
+Use **New** to create a blank project. Use **Import** to import supported archive formats.
+
+Project exports and imports using `.DAF` retain uploaded reference files. JSON exports do not include uploaded reference files.
+
+## Browser Settings Vs. Editor Settings
+
+Project settings exist in two places:
+
+- **Browser project settings** manage project-level metadata and access, such as name, visibility, collaborators, and deletion.
+- **Editor project settings** manage model-level configuration, such as files, units, relationships, tags, secrets, toolboxes, exports, and model health.
+
+See [Editor project settings](/pages/editor/project-settings/project) for in-project configuration.

@@ -11,11 +11,11 @@ This release introduces the Davinci Browser — a completely redesigned experien
 
 The old in-app home screen has been replaced with a full web experience called the Davinci Browser.
 
-- New [Home](/pages/user-guide/navigating/home) page with a sidebar project list, resume cards, and an activity feed
+- New [Home](/pages/browser/home) page with a sidebar project list, resume cards, and an activity feed
 - Project Pages with an overview (README, collaborators, branches, recent activity), commit history with filtering and an activity graph, and a settings tab
-- Redesigned [Account Settings](/pages/user-guide/navigating/settings) with tabs for General, Billing, Connections, Storage, and About
-- [Notifications](/pages/user-guide/navigating/notifications) system with a top-bar dropdown and a full notifications page
-- [User Profiles](/pages/user-guide/navigating/profile) showing public projects and recent activity
+- Redesigned [Account Settings](/pages/browser/account) with tabs for General, Billing, Connections, Storage, and About
+- [Notifications](/pages/browser/notifications) system with a top-bar dropdown and a full notifications page
+- [User Profiles](/pages/browser/profile) showing public projects and recent activity
 - Customizable handles for profile URLs, including custom domain verification for paid users
 - Navigation menu drawer with links to Home, Projects, Team, Notifications, and Docs
 - Search from the top bar for finding projects
@@ -23,7 +23,7 @@ The old in-app home screen has been replaced with a full web experience called t
 
 ### Team Plans
 
-- Create a team with a name and billing frequency, then invite members by email
+- Create a [team](/pages/browser/teams) with a name and billing frequency, then invite members by email
 - Team Hub at `/team` with tabs for Overview, Members, Billing, and Settings
 - Role-based access with Owner, Admin, Billing, Support, and Member roles
 - Per-member on-demand spending limits
@@ -34,7 +34,7 @@ The old in-app home screen has been replaced with a full web experience called t
 ### Billing & Account
 
 - Redesigned billing with usage-based credit tracking, on-demand spending, and reconciliation
-- [Upgrade page](/pages/overview/get-started/change-tier) for switching between Free, Core, and Max without leaving Davinci
+- [Upgrade page](/pages/browser/change-plan) for switching between Free, Core, and Max without leaving Davinci
 - In-app password reset
 - Avatar color customization
 - Storage tracking based on billing database for more accurate reporting
@@ -49,10 +49,10 @@ The old in-app home screen has been replaced with a full web experience called t
 
 ### Collaboration & Projects
 
-- New projects can be set as Private or Public at creation time
-- Improved project import with better UUID, reference, and error handling
+- New [projects](/pages/browser/projects) can be set as Private or Public at creation time
+- Improved project import with better UUID, [reference](/pages/editor/files-and-references), and error handling
 - Import button disabled when project count exceeds plan limits
-- Better error feedback when inviting collaborators
+- Better error feedback when inviting [collaborators](/pages/editor/collaboration/overview)
 
 ### Table & Spreadsheet Improvements
 
@@ -76,10 +76,10 @@ The old in-app home screen has been replaced with a full web experience called t
 
 ### Behavior & State Machines
 
-- Action runtime management with duration tracking and retry signals
+- [Action](/pages/modeling/objects/actions) runtime management with duration tracking and retry signals
 - Async support in action sequences with awaitable expressions
 - Implicit conditional fallthrough handling
-- State machine smoke testing tool
+- [State machine](/pages/modeling/objects/states) smoke testing tool
 
 ### Database API & Code
 

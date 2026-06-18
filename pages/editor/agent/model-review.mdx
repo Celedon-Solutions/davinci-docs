@@ -1,0 +1,79 @@
+---
+title: Model Review
+description: Build, run, inspect, and save AI-assisted model reviews in Davinci
+tag: New
+---
+
+## Overview
+
+Model Review is a Davinci Agent workflow for structured engineering review. It helps evaluate a model against itself, against selected subsystems, or against reference source material such as PDFs, datasheets, specifications, and other uploaded documents.
+
+Use Model Review to find gaps, conflicts, weak traceability, missing structure, requirement drift, unsupported claims, and integration issues before a design review or handoff.
+
+## Review Types
+
+Davinci supports two review modes:
+
+- **Standard review** — critiques model architecture, interfaces, connectivity, traceability, requirements, risks, subsystem interactions, and implementation concerns across selected model axes.
+- **Reference review** — compares model objects against selected reference objects and source documents to identify missing coverage, partial coverage, value drift, overclaims, and retrieval-limited evidence.
+
+## Build Before Running
+
+A model review is built before it runs. The build step defines:
+
+- Review type.
+- Scope and goal.
+- Reviewer expertise.
+- Row and column object roots.
+- Descendant expansion depth.
+- Optional focus object types.
+- Optional references and retrieval settings.
+
+After a review is built, Davinci asks for approval before execution. This helps users inspect the review scope and avoid running an expensive or overly broad review accidentally.
+
+## Axes And Participants
+
+Model Review uses row and column axes to define what should be compared or critiqued.
+
+- Use the same roots on both axes for an internal self-review.
+- Use different roots to compare subsystems, interfaces, requirements, or design areas.
+- Use reference mode when the model should be checked against source documents.
+
+Choose owning model elements such as parts, entities, packages, requirements, interfaces, ports, linkages, risks, states, actions, or code objects. Avoid choosing leaf value objects directly when their parent object provides better context.
+
+## Depth And Focus Filters
+
+Depth controls how far Davinci expands from the selected roots. A shallow review is focused and cheaper. A deeper review covers more descendants but may take longer.
+
+Focus filters can limit participant expansion to specific object types. For example, a review can inspect a subsystem but focus the row axis on interfaces and ports.
+
+## Running A Review
+
+When a review runs, Davinci streams progress through the Agent chat and stores review state in the project. Depending on the review, the output may include:
+
+- Review progress.
+- Participant turns and transcript.
+- Issue drafts and findings.
+- Evidence links.
+- Coverage information.
+- Matrix or graph views.
+- A saved markdown report.
+
+## Findings And Evidence
+
+Review findings should be treated as engineering review input, not as automatic truth. Inspect the cited model objects, reference evidence, and transcript before accepting or dismissing a finding.
+
+Reference reviews may mark evidence as strong, contextual, rescued, or retrieval-limited depending on what source material was found.
+
+## Saved Reports
+
+Completed reviews can save a markdown report into the workspace. Use reports for design review preparation, issue triage, traceability cleanup, and review records.
+
+## Best Practices
+
+- Define a clear review goal.
+- Start with a focused scope and modest depth.
+- Add source references for document-grounded reviews.
+- Review the planned scope before approving execution.
+- Inspect findings and evidence before making design decisions.
+- Rerun reviews after major model or reference updates.

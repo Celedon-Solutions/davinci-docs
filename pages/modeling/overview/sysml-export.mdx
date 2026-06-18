@@ -12,7 +12,20 @@ This export is **deterministic**, but it is not a raw dump of the stored Davinci
 Treat SysML v2 export as a standards-oriented publication format, not as a guaranteed round-trip editor format. Davinci tries to preserve engineering meaning, but some constructs are normalized, relocated, simplified, or preserved as comments to satisfy SysML v2 scoping and syntax constraints.
 </Warning>
 
+<Info>
+For a shorter workflow-oriented overview of all export formats, see [Exports](/pages/editor/exports).
+</Info>
+
 ## Quick Summary
+
+### Available SysML Outputs
+
+Davinci supports two SysML-oriented export paths:
+
+- **SysML v2 text (`.sysml`)** — a standards-oriented textual export for downstream SysML v2 tools, reviews, and analysis.
+- **SysML v2 JSON** — a structured JSON export for workflows that need machine-readable SysML-style data, validation, or custom processing.
+
+Both paths use export-oriented normalization. They are intended for interchange and analysis, not as guaranteed round-trip editor formats.
 
 ### Exported Directly
 

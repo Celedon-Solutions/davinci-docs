@@ -1,0 +1,68 @@
+---
+title: Organizations
+description: Manage organization-owned projects, members, roles, storage, and administrative controls
+---
+
+## Overview
+
+Organizations let a group own and manage projects separately from an individual user account. Like users, organizations can own projects. Unlike individual users, organizations can have members, roles, storage controls, and administrative settings.
+
+Use organizations when project ownership should belong to a group, program, company, customer, or long-lived engineering effort rather than a single user.
+
+<Info>
+For a detailed explanation of organization roles, inherited project access, organization visibility, and how visibility combines with project visibility, see [Roles And Permissions](/pages/browser/roles-permissions).
+</Info>
+
+## What Organizations Manage
+
+Organizations can manage:
+
+- Organization-owned projects.
+- Members and access.
+- Project administration.
+- Storage usage and storage tiers.
+- Organization-level settings.
+- Admin surfaces for users with the required permissions.
+
+Service accounts and API-key governance for organizations are planned, but only shipped public API behavior is documented in the Developer API section.
+
+## Organization Projects
+
+Organization-owned projects are managed by the organization rather than a personal account. This helps teams keep important project ownership stable even when individual users change roles.
+
+Organization project admins can manage project metadata, collaborators, and access based on their permissions.
+
+Organization members can inherit access to organization-owned projects. Public and internal organization-owned projects are visible to organization members even when they are not direct project collaborators.
+
+## Members And Roles
+
+Organization roles control what members can see and manage. Higher-privilege members can administer organization settings, project membership, storage, or billing-related controls depending on deployment configuration.
+
+Exact available actions depend on your role and deployment.
+
+Common organization roles include Owner, Admin, Member, and Viewer. Owners and Admins inherit strong administrative access to organization-owned projects. Members and Viewers inherit more limited access based on the role and project visibility.
+
+## Organization Visibility
+
+Organization visibility controls whether the organization can be publicly visible and whether its public projects can be accessed by anonymous visitors.
+
+| Visibility | Meaning |
+| --- | --- |
+| **Private** | The organization is not publicly listed. Organization-owned public projects do not become anonymous-public unless access is granted another way. |
+| **Public** | The organization can be publicly visible. Organization-owned projects marked public can be accessed publicly. |
+
+For an organization-owned project to be public to anonymous users, both the organization and the project must be public.
+
+## Storage
+
+Organizations can have storage usage and storage limits separate from individual users. Organization storage controls may include usage summaries, storage tier changes, grace periods, and project-level storage visibility.
+
+## Billing Relationship
+
+Organization billing behavior depends on how the organization was created and whether it belongs to a team. Some organizations are paid directly; others are managed through team billing or enterprise deployment controls.
+
+## Admin Tab
+
+Users with sufficient permissions may see an organization Admin area. This area can expose project administration, storage information, and other organization management tools.
+
+Use the Admin tab for organization-wide management. Use the project page or Editor project settings for project-specific work.
