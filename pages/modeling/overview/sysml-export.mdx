@@ -72,6 +72,7 @@ Important nuance:
 Davinci may change the exported structure in order to keep the output legal and usable:
 
 - attributes may be hoisted upward so references stay valid
+- code-backed attribute equations may become generated calculation definitions when they can be represented cleanly
 - interfaces and some connections may move to a more appropriate common scope
 - requirements may gain export-only subject aliases or subject aggregate helpers
 - some relationships and connections are preserved as `doc` comments instead of native SysML syntax
@@ -253,6 +254,14 @@ Examples of export behaviors include:
 If an attribute has a unit, the unit is emitted using bracket notation such as `['kg']`.
 
 Davinci may use the resolved unit rather than the raw unit field when that produces a better export.
+
+#### Callable calculation export
+
+When an attribute value is backed by a callable Code object function, Davinci exports the calculation intent where possible by synthesizing a SysML calculation definition and using that definition from the derived attribute expression.
+
+If the callable reference cannot be exported cleanly, for example because the target code object or method cannot be resolved, Davinci preserves a preflight warning rather than emitting invalid SysML.
+
+For exported models, this means code-backed calculations may appear as generated calculation definitions instead of raw Davinci equation syntax.
 
 ### Ports
 
@@ -546,6 +555,7 @@ When reviewing a Davinci SysML v2 export, use this checklist:
 5. For requirements, inspect local aggregate or alias helpers before concluding the subject structure changed.
 6. For behavior, read both the action declarations and the generated sequence and control-flow region.
 7. For state machines, look for promoted `state def` declarations and comment-preserved cross-machine transitions.
+8. For code-backed attribute equations, inspect generated calculation definitions and any preflight warnings.
 
 ### How to export
 

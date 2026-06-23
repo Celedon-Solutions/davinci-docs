@@ -23,6 +23,12 @@ The Upload File button in the Files view supports uploading multiple files simul
 When uploading files to Davinci, they are created as both index objects in the model and uploaded to the project storage. Files that are removed from the model are retained in project storage to maintain Snapshot integrity.
 </Note>
 
+## Upload Limits
+
+Davinci supports large project files, with a 2 GB upload limit per file.
+
+Large files are stored in project storage and can be represented as Reference objects in the Library. For very large spreadsheets, Davinci may offer import options so you can choose between editable tables, CSV-backed references, or preserving the original file.
+
 ## Using Uploaded Files
 
 Uploaded files can be referenced directly in chat by referencing them using the "@" menu. Davinci will attempt to utilize information in the file when performing the task.

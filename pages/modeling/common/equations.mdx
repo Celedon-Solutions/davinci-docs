@@ -2,7 +2,7 @@
 title: Equations
 ---
 ## Descriptions
-Each attribute and constraint object has a defined value. For attributes, this includes the unit, the type of value, and any associated equations. For constraints, the value is simply a boolean statement. These values can either be simple values, like strings or numbers, or complex mathematical relations involving values from other objects.
+Each attribute and constraint object has a defined value. For attributes, this includes the unit, the type of value, and any associated equations. For constraints, the value is simply a boolean statement. These values can either be simple scalar values, supported arrays, or complex mathematical relations involving values from other objects.
 
 <Note>Special handling is applied when resolving values containing strings of `TBD` (To Be Determined). This can be useful during the early stages of model formation to not resolve errors when the value is still being defined.</Note>
 
@@ -94,14 +94,121 @@ Equations are powered by Math.js, providing a comprehensive set of mathematical 
 | Golden Ratio     | `phi`    | 1.61803... |
 
 ## Value Types
-Attributes can have the following kind assoicated to a value, which handles how it is displayed or computed:
+Attributes can have the following kind associated to a value, which handles how it is displayed or computed:
 
-| Type      | Description |
-| --------- | ----------- |
-| `Boolean` | Represents `true` or `false` values. Does not use a unit and clears any existing unit. |
-| `Date`    | Used for date values. Does not use a unit and clears any existing unit. |
-| `Number`  | Represents standard numeric values. Optionally includes a unit. |
-| `String`  | Represents string values. Does not use a unit and clears any existing unit. |
+{/* Prefer Markdown tables in docs. This table uses HTML so we can override Mintlify's default table cell sizing and alignment for this support matrix. */}
+
+<style>{`
+  .value-types-table th,
+  .value-types-table td {
+    min-width: unset !important;
+  }
+
+  .value-types-table th:first-child,
+  .value-types-table td:first-child {
+    white-space: nowrap;
+  }
+
+  .value-types-table th:nth-child(n+2):nth-child(-n+5),
+  .value-types-table td:nth-child(n+2):nth-child(-n+5) {
+    text-align: center;
+  }
+`}</style>
+
+<table className="value-types-table">
+  <thead>
+    <tr>
+      <th>Value Type</th>
+      <th style={{ textAlign: "center" }}>Scalar</th>
+      <th style={{ textAlign: "center" }}>1D array</th>
+      <th style={{ textAlign: "center" }}>2D array</th>
+      <th style={{ textAlign: "center" }}>3D array</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Boolean</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td>Represents <code>true</code> or <code>false</code> values. Does not use a unit and clears any existing unit.</td>
+    </tr>
+    <tr>
+      <td><code>Date</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td>Used for date values. Does not use a unit and clears any existing unit.</td>
+    </tr>
+    <tr>
+      <td><code>Number</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td>Represents standard numeric values. Optionally includes a unit.</td>
+    </tr>
+    <tr>
+      <td><code>String</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td>Represents string values. Does not use a unit and clears any existing unit.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Array Values
+
+Equations can produce scalar values or supported array values. Arrays use bracket syntax:
+
+```js
+[1, 2, 3]
+[[1, 2], [3, 4]]
+[[[1], [2]], [[3], [4]]]
+```
+
+Supported array shapes include:
+
+- 1D arrays, such as vectors.
+- 2D arrays, such as matrices.
+- 3D arrays, such as grouped matrices or tensor-like values.
+
+Array values are supported for numbers and booleans. Strings and dates are scalar-only, so arrays of strings and arrays of dates are not supported.
+
+Numeric arrays use one shared unit for the entire array value. Individual elements do not have separate units.
+
+## Callable Code Functions
+
+Attribute equations can call functions defined in [Code objects](/pages/modeling/objects/code). This lets an equation delegate calculation logic to Python or JavaScript while still using model attributes as inputs.
+
+Use the direct call syntax:
+
+```js
+[@CodeObject].functionName(@InputA, @InputB)
+```
+
+The function receives the resolved attribute values as positional arguments and returns one value. Return values can be:
+
+- Number
+- Boolean
+- String
+- Date
+- Numeric array
+- Boolean array
+
+For numeric results with units, return an object with `value` and `unit`:
+
+```python
+def calculate_mass(volume, density):
+    return { "value": volume * density, "unit": "kg" }
+```
+
+If a Code object used by an attribute equation changes, Davinci may mark dependent attribute values as stale until they are recomputed. The previous resolved value remains visible so downstream model content does not disappear unexpectedly.
 
 ## Unit Referencing
 Values can reference units inline, such as `10 kg`, where the number is associated with the unit.
