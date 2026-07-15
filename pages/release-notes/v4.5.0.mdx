@@ -1,0 +1,36 @@
+---
+title: 'Version 4.5.0 - Arrays, Callable Equations & Large File Workflows'
+description: 'June 22 2026'
+---
+
+## Version 4.5.0 - Arrays, Callable Equations & Large File Workflows
+
+This release expands attribute calculations with array values and callable code-backed equations, improves SysML v2 export coverage, and makes large file workflows more resilient.
+
+### Attribute Values & Equations
+
+- Added array-valued attributes for numeric and boolean data
+- Added support for 1D vectors, 2D matrices, and 3D arrays while keeping strings and dates scalar-only
+- Added callable attribute equations that can invoke code object functions using syntax like `[codeUuid].method(arg1, arg2)`
+- Added support for Python and JavaScript functions to receive resolved attribute values and return a calculated value
+- Expanded equation outputs to support numbers, dates, booleans, strings, and arrays of numbers or booleans
+- Added unitful return support with `{ value, unit }` results from code-backed calculations
+- Added stale-value warnings for attributes that depend on code-backed calculations
+
+### SysML & Modeling Interoperability
+
+- Improved [SysML v2](/pages/modeling/overview/sysml-export) export for callable code-backed calculations
+- Added preflight warnings so export issues can be reviewed before generating SysML output
+
+### Files, Imports & Code Execution
+
+- Added a large-workbook flow for Excel import
+- Increased the upload limit from 1 GB to 2 GB
+- Added configurable code file I/O limits with streaming support for larger code workflows
+
+### Editor & Agent Experience
+
+- Added a warning for non-Chromium browsers
+- Improved chat and thought streaming
+- Improved history and diff rendering
+- Improved large value and error display handling

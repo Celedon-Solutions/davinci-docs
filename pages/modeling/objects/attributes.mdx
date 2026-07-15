@@ -1,5 +1,6 @@
 ---
 title: Attributes
+icon: /images/objecticons/attribute.svg
 ---
 
 <img height="20" noZoom src="/images/objecticons/attribute.svg" /> 
@@ -7,9 +8,91 @@ title: Attributes
 ## Description
 Attributes define properties or characteristics of system elements, specifying quantitative or qualitative aspects such as dimensions, weight, material properties, performance metrics, or other parameters. In SysML v2, attributes are fundamental modeling elements that capture the values and properties that describe system components.
 
-Attributes can contain singular values (strings, numbers, or booleans), or they can reference other attributes in the model, creating calculated relationships between system properties. They support units of measurement and type specifications, enabling precise engineering analysis and ensuring consistency across the model. When attributes reference other values, they can perform unit conversions automatically, allowing engineers to view the same property in different unit systems.
+Attributes can contain scalar values, supported array values, or references to other attributes in the model, creating calculated relationships between system properties. They support units of measurement and type specifications, enabling precise engineering analysis and ensuring consistency across the model. When attributes reference other values, they can perform unit conversions automatically, allowing engineers to view the same property in different unit systems.
 
 <Note>The unit field is optional but recommended for engineering values. When specified, it enables automatic unit conversion and helps prevent errors in calculations. For attributes that reference other attributes, the unit can be changed and the evaluated value will be transformed automatically if the conversion is possible.</Note>
+
+## Value Kinds and Array Values
+
+Attributes support scalar values for all value kinds. Number and boolean attributes also support array values up to three dimensions.
+
+{/* Prefer Markdown tables in docs. This table uses HTML so we can override Mintlify's default table cell sizing and alignment for this support matrix. */}
+
+<style>{`
+  .attribute-value-types-table th,
+  .attribute-value-types-table td {
+    min-width: unset !important;
+  }
+
+  .attribute-value-types-table th:first-child,
+  .attribute-value-types-table td:first-child {
+    white-space: nowrap;
+  }
+
+  .attribute-value-types-table th:nth-child(n+2):nth-child(-n+5),
+  .attribute-value-types-table td:nth-child(n+2):nth-child(-n+5) {
+    text-align: center;
+  }
+`}</style>
+
+<table className="attribute-value-types-table">
+  <thead>
+    <tr>
+      <th>Kind</th>
+      <th style={{ textAlign: "center" }}>Scalar</th>
+      <th style={{ textAlign: "center" }}>1D array</th>
+      <th style={{ textAlign: "center" }}>2D array</th>
+      <th style={{ textAlign: "center" }}>3D array</th>
+      <th>Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Number</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td>Optional shared unit</td>
+    </tr>
+    <tr>
+      <td><code>Boolean</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td>No unit</td>
+    </tr>
+    <tr>
+      <td><code>String</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td>No unit</td>
+    </tr>
+    <tr>
+      <td><code>Date</code></td>
+      <td style={{ textAlign: "center" }}>✅</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td style={{ textAlign: "center" }}>❌</td>
+      <td>No unit</td>
+    </tr>
+  </tbody>
+</table>
+
+Numeric arrays use one shared unit for the full attribute value. Individual array elements do not have separate units. When an equation or callable code function returns a numeric array, Davinci preserves the array shape and applies the attribute unit to the returned values when possible.
+
+Examples of supported array values:
+
+```js
+[1, 2, 3]                // 1D numeric array
+[[1, 2], [3, 4]]         // 2D numeric array
+[[[true], [false]]]      // 3D boolean array
+```
+
+<Note>String and date attributes are scalar-only. Arrays of strings and arrays of dates are not supported.</Note>
 
 ## Unit Conversion and Validation
 
@@ -44,17 +127,17 @@ The system validates unit compatibility during equation evaluation to prevent ph
 
 The validation system ensures that your model maintains physical consistency and helps catch errors early in the design process.
 
-<Info>For custom unit definitions and unit system management, see [Unit Settings](/pages/user-guide/project-settings/unit-settings).</Info>
+<Info>For custom unit definitions and unit system management, see [Unit Settings](/pages/editor/project-settings/unit-settings).</Info>
 
 ## View Types
 
 | View | Description |
 | :--- | :--- |
 | [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
-| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
-| [Rollup](/pages/user-guide/views/renderviews#equation-rollup-view) | Visualize the calculation tree for equation attributes. |
+| [Table](/pages/user-guide/views/table) | Display the object and its children in a tabular format. |
+| [Rollup](/pages/user-guide/views/rollup) | Visualize the calculation tree for equation attributes. |
 | [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
-| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the object. |
+| [History](/pages/editor/model-area) | Track changes and revisions to the object. |
 
 ## Properties Fields
 
@@ -72,13 +155,13 @@ Short name of the object.
 </ParamField>
 
 <ParamField path="Value" type="string">
-  The value of the attribute which as the form of:
+  The value of the attribute, which has the form:
 
   `Equation or value` [`unit`] (`type`)
 
 
 
-  <Warning>If the units of the equation or reference either do not match or can not be convereted, an error will occur. Mouseover the error box to see the details of the error.</Warning>
+  <Warning>If the units of the equation or reference either do not match or can not be converted, an error will occur. Mouseover the error box to see the details of the error.</Warning>
 
   <Info>See the allowed [mathematical operations/syntax](/pages/modeling/common/equations) and [base units](/pages/modeling/common/units) for details on what is allowed.</Info>
 </ParamField>

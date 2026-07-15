@@ -1,0 +1,57 @@
+---
+title: Files And References
+description: Upload source material, use reference objects, and keep model content grounded in evidence
+---
+
+## Overview
+
+Files and references bring source material into a Davinci project. They help the model stay connected to technical documents, specifications, diagrams, spreadsheets, CAD exports, reports, and other source data.
+
+Use files when you need to store source material in a project. Use reference objects when you need that material to be visible, searchable, cited, and usable by the Davinci Agent.
+
+## Uploading Files
+
+You can add files by:
+
+- Dragging files into the Editor.
+- Using the upload button in the Library.
+- Uploading files from Project Settings > Files.
+- Pasting supported files into Agent chat.
+
+Uploaded files are stored with the project and can be represented as reference objects in the Library.
+
+Davinci supports large uploaded files, including large spreadsheets and source datasets. Some file types can be converted into model objects, while others are stored as Reference objects for browsing, citation, and Agent context.
+
+For file limits and storage management, see [Project Settings > Files](/pages/editor/project-settings/files). For Excel import behavior, see [Tables](/pages/modeling/objects/tables).
+
+## Reference Objects
+
+Reference objects are model objects that point to source material. They can represent PDFs, images, raw files, converted documents, spreadsheets, or other uploaded data.
+
+Use reference objects to:
+
+- Browse source material in the Editor.
+- Give the Davinci Agent source context.
+- Ground generated model content in evidence.
+- Track where a requirement, attribute, or object came from.
+- Maintain citation metadata for documents and reports.
+
+See [Reference object](/pages/modeling/objects/reference) for field-level details.
+
+## Source Grounding
+
+When the Agent uses a reference to create or update model objects, Davinci can create reference relationships back to the source object. These relationships help users understand why a model element exists and where its supporting evidence came from.
+
+For PDFs and long documents, reference handling can include source-page or source-window context so reviews and generated content can point back to relevant evidence.
+
+## Using `@` References
+
+Use `@` to mention model objects in chat, documents, tables, code, equations, and other supported editors. This helps connect text, calculations, and Agent prompts to concrete model objects.
+
+See [The @ System](/pages/modeling/overview/mentions) for syntax and examples.
+
+## Managing Files
+
+Use [Project Settings > Files](/pages/editor/project-settings/files) to inspect uploaded files, active/inactive status, storage usage, and cleanup options.
+
+Use the Library in the Index to organize active reference objects alongside the model.

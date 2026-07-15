@@ -1,5 +1,6 @@
 ---
 title: Tables
+icon: /images/objecticons/table.svg
 ---
 
 <img height="20" noZoom src="/images/objecticons/table.svg" /> 
@@ -171,6 +172,16 @@ To import an Excel file:
 1. Drag and drop the Excel file into your workspace, or use the file import dialog
 2. Each worksheet in the Excel file becomes a separate table object
 3. Cell data, formulas, and formatting are automatically converted
+
+### Large Excel Imports
+
+When importing a large workbook, Davinci may ask how you want to handle the file:
+
+- Import as editable Davinci tables when you want spreadsheet cells, formulas, and formatting converted into model objects.
+- Import as a CSV-backed reference when the workbook is mainly source data and does not need full spreadsheet editing.
+- Upload the raw XLSX file when you want to preserve the original workbook as source material.
+
+This helps keep very large workbooks usable without forcing every cell into the model.
 
 ### What Gets Converted
 - **Cell values**: Text, numbers, and dates are preserved

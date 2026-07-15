@@ -1,0 +1,71 @@
+---
+title: Editor
+---
+The Editor is Davinci's full-featured design workspace. It loads when you click `Open Project` from a Project Page on the Davinci Browser, and runs at `/app/{owner}/{project}/{branch}`.
+
+## Navigation Bar
+
+The Navigation Bar appears on the far left edge of the Editor. It contains:
+
+1. **Home** — returns you to the Davinci Browser. This is a full page navigation, not an in-app switch.
+2. **Model** — the primary workspace for browsing and editing your model.
+3. **Project** — in-project settings and configuration.
+
+<Note>Model and Project are only active once a project is loaded. If you navigate to the Editor without a project URL, you will be prompted to open one.</Note>
+
+## Header Bar
+
+The Header Bar runs across the top of the Editor and provides several tools:
+
+<Frame>
+    <img height="400" noZoom src="/images/header-bar.png" /> 
+</Frame>
+
+### Navigation Buttons
+The back and forward arrows near the search bar work like browser navigation buttons, letting you move through the views you have visited within the Editor. You can also use your browser's built-in back/forward buttons or mouse buttons.
+
+### Connection Indicator
+The cloud icon shows your connection status to the Davinci servers:
+- A gray cloud means you are connected.
+- A red cloud with a slash means you are disconnected.
+
+### Search Bar
+Click the search box to open a search menu. Type to search your model for objects by Name or Short Name. Click a result to open it in the workspace. For more advanced queries, use the [Search View](/pages/editor/right-panel/search-view).
+
+<Note>The Search Bar is only enabled when a project is loaded.</Note>
+
+### Account Menu
+Click your avatar in the top right to open a dropdown menu:
+- **Profile** — view your public profile on the Davinci Browser
+- **Settings** — navigate to Account Settings on the Davinci Browser (`/~/settings`)
+- **Log out** — sign out of Davinci
+
+## Model Area
+
+The Model Area is the primary workspace and is covered in detail on its own page.
+
+<Card title="Model Area" horizontal icon="link" href="/pages/editor/model-area">
+  Read more about the Model Area
+</Card>
+
+Key sections of the Model Area:
+- **Index** — the tree of all objects in the project, split into Library and Model sections
+- **Workspace** — tabbed view where you open, view, and edit objects
+- **Right Panel** — the design agent chat, version control, search, comments, and validation
+
+## Project Settings
+
+The Project Settings area in the Editor provides access to in-project configuration that is specific to the model. This is different from the project-level settings on the Davinci Browser (rename, visibility, collaborators, delete).
+
+Editor Project Settings includes:
+- [Summary](/pages/editor/project-settings/project) — model statistics, health indicators, and export
+- [Files](/pages/editor/project-settings/files) — manage uploaded files and storage
+- [Toolboxes](/pages/editor/project-settings/toolboxes) — configure available toolboxes
+- [Unit Settings](/pages/editor/project-settings/unit-settings) — custom unit definitions
+- [Relationship Settings](/pages/editor/project-settings/relationship-settings) — relationship type configuration
+- [Secrets](/pages/editor/project-settings/secrets) — project secrets for scripts and integrations
+- [Dependencies](/pages/editor/project-settings/dependencies) — package dependencies
+- [Tags](/pages/editor/project-settings/tags) — tag management
+- [Risk](/pages/editor/project-settings/risk) — risk category configuration
+- [Persona Settings](/pages/editor/project-settings/persona-settings) — agent persona configuration
+- [MCP](/pages/editor/project-settings/mcp) — Model Context Protocol settings

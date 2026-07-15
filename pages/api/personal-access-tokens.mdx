@@ -1,0 +1,75 @@
+---
+title: Personal Access Tokens
+description: Create a personal access token for SDK and API usage
+---
+
+## Overview
+
+Programmatic API access uses user-owned personal access tokens. A token identifies the user who created it, and API requests made with that token inherit that user's project access and permissions.
+
+Use personal access tokens for user-owned scripts, local tools, CI jobs, and SDK usage. Tokens can be scoped, rate-limited, given an expiration date, and revoked at any time.
+
+<Warning>
+Treat personal access tokens like passwords. Store them in environment variables or a secret manager, never commit them to source control, and revoke any token that may have been exposed.
+</Warning>
+
+## Create A Token In The UI
+
+1. Sign in to Davinci.
+2. Click your account icon in the top-right corner.
+3. Open **Settings**.
+4. Select **Connections**.
+5. In **Personal Access Tokens**, click **New Token**.
+6. Fill out the token options and click **Create Token**.
+7. Copy the token immediately. It is shown only once.
+
+## Token Options
+
+| Option | Description | Limit |
+| --- | --- | --- |
+| Name | Human-readable label for the token, such as `staging-sdk-tests` or `ci-indexer`. | 1-100 characters. Letters, numbers, spaces, periods, underscores, and hyphens. |
+| Expiration | Date when the token stops working. | Required. Must be within 90 days. |
+| Rate limit | Maximum requests per minute for the token. | 1-10,000 requests per minute. Default is 60. |
+| Scopes | Permissions granted to the token. | Use `projects:read` for the current SDK/API. |
+
+## Token Format And Length
+
+Tokens use this format:
+
+```text
+dav_ak_live_<secret>
+dav_ak_test_<secret>
+```
+
+Production tokens start with `dav_ak_live_`; non-production tokens start with `dav_ak_test_`.
+
+The full token is 110 characters long:
+
+- `dav_ak_live_` or `dav_ak_test_` prefix
+- 12-character key id segment
+- 86-character secret segment
+
+Only the key id is stored/displayed later. The full token cannot be recovered after the creation dialog closes.
+
+## Use The Token
+
+Use the token as a bearer token:
+
+```bash
+curl "https://davinci-app.com/api/v2/programmatic/projects" \
+  -H "Authorization: Bearer dav_ak_live_your_token"
+```
+
+For SDK usage, pass the token as `apiKey`:
+
+<CodeGroup>
+
+```typescript TypeScript
+const client = new DavinciClient({ apiKey: process.env.DAVINCI_API_KEY! });
+```
+
+```python Python
+client = DavinciClient(api_key=os.environ["DAVINCI_API_KEY"])
+```
+
+</CodeGroup>

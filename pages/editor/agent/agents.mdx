@@ -1,0 +1,137 @@
+---
+title: Agent Guide
+---
+
+## Overview
+
+Davinci uses AI agents to automate complex engineering tasks within your system models. Agents can generate requirements, design system architectures, create documentation, perform analyses, and more—all through natural language instructions.
+
+Each agent operates within its own workspace, maintaining separate chat histories and contexts. This allows you to work on multiple aspects of your model simultaneously with different agents, each focused on specific tasks or areas.
+
+<Frame>
+    <img noZoom src="/images/chat_input.png" />
+</Frame>
+
+## Working with Agents
+
+For detailed information about the agent chat interface and input options, see the [Agent Chat documentation](/pages/editor/right-panel/agent-chat).
+
+### Starting and Stopping Agents
+
+<img width="50" noZoom src="/images/agent-start-stop.png" /> 
+
+- **Play button**: Starts the agent or resumes execution
+- **Stop button**: Pauses agent execution
+
+Stop an agent to add more context, provide clarifications, or redirect if it has gone off track. The agent will resume from where it stopped when you press play again.
+
+### Providing Context
+
+The more specific you are with your instructions, the better results you'll get. Provide enough details so the agent has all the context needed to perform its actions effectively.
+
+**Ways to provide context:**
+- **Text instructions**: Describe what you want in detail
+- **Images**: Paste images directly into chat (png/jpg/webp formats) for visual reference
+- **Model objects**: Reference specific objects using `@` followed by the object name
+- **Reference files**: The agent can access uploaded reference documents and data
+
+### Web Search
+
+<img width="50" noZoom src="/images/agent-web-search.png" /> 
+
+
+Click the **globe icon** to enable web search for the agent. When enabled (colored blue), the agent can:
+- Search the internet for information
+- Import data, images, PDFs, and documents
+- Add imported content as Reference objects in the Library
+
+This is useful for pulling in specifications, standards, research papers, or other public information directly into your model.
+
+### Upload Reference Files
+
+<img width="50" noZoom src="/images/upload-icon.png" /> 
+
+The Agent can interact with Reference Objects to get more information about your Model. Click the `Upload a File` button to add new Reference Objects.
+
+[Read more about uploading files to Davinci](/pages/editor/project-settings/files#uploading-files)
+
+
+### Agent Personas
+
+<img width="200" noZoom src="/images/agent-persona-picker.png" /> 
+
+
+Agents can be assigned personas—predefined instruction sets that modify how the agent works. The currently selected persona is displayed in the dropdown menu.
+
+Personas provide consistent instructions to the agent with each message, allowing you to customize agent behavior for specific workflows without repeating instructions. For example, you might have personas for:
+- Detailed technical design work
+- High-level architecture planning
+- Documentation generation
+- Requirements analysis
+
+Personas can be created and managed in [Project Settings](/pages/editor/project-settings/persona-settings).
+
+### Skills
+
+[Skills](/pages/editor/agent/skills) are reusable project guidance for specific kinds of agent work. Use them to define research methods, workflow rules, generation patterns, naming conventions, or review checklists that should apply across repeated tasks.
+
+### Planning
+
+For complex work, the agent can create an editable [plan](/pages/editor/agent/planning) with tasks, dependencies, and clarification points. Review the plan before running it when the task affects important model structure or requires several steps.
+
+## Managing Agent Actions
+
+### Undoing Individual Actions
+
+Each action performed by the agent can be undone independently. Click the **Undo** button next to any tool call in the chat history to revert only the changes made by that specific action.
+
+<Frame>
+    <img noZoom src="/images/agent-undo-action.png" />
+</Frame>
+
+This allows you to selectively keep the changes you want while reverting specific mistakes without losing all progress.
+
+### Restoring Checkpoints
+
+Davinci automatically creates a checkpoint every time you send a message to the agent. This allows you to easily roll back to any previous state.
+
+To restore a checkpoint:
+1. Scroll to the message where you want to restore
+2. Click the **Restore Checkpoint** button
+3. All agent changes made after that message will be undone
+4. Your message and any pasted images will be restored to the chat input for easy resubmission
+
+<Frame>
+    <img noZoom src="/images/restore_checkpoint.png" />
+</Frame>
+
+
+### Clearing Chat History
+
+<img width="50" noZoom src="/images/agent-clear-chat.png" /> 
+
+
+Click the **trash can icon** to clear the agent's entire chat history. This starts the agent fresh with no prior context, which can be useful if:
+- The agent seems stuck or incorrectly focused
+- You want to start a completely new task
+- The chat history has become too long
+
+<Warning>Clearing chat history cannot be undone. The agent will lose all context from previous conversations in that workspace.</Warning>
+
+## Best Practices
+
+### Be Specific
+Provide clear, detailed instructions rather than vague requests. Instead of "design a power system," try "design a power system for a 3U CubeSat with solar panels generating 12W and a battery capacity of 40Wh."
+
+### Use Model References
+Reference existing objects with `@` to help the agent understand context and maintain consistency with your existing model.
+
+### Provide Examples
+Paste images of diagrams, sketches, or reference materials to give the agent visual context for what you're trying to achieve.
+
+### Iterate Incrementally
+Break complex tasks into smaller steps. Review each step before proceeding to the next, using [Planning](/pages/editor/agent/planning), checkpoints, and [Version Control](/pages/editor/right-panel/version-control) to save progress along the way.
+
+### Review Agent Work
+Always review what the agent creates. Use the Properties view, Tree view, and other visualizations to verify that the agent's output matches your intent.
+

@@ -1,11 +1,17 @@
 ---
 title: Geometry
+icon: /images/objecticons/geometry.svg
+hidden: true
 ---
 
 <img height="20" noZoom src="/images/objecticons/geometry.svg" /> 
 
 ## Description
 Geometry objects define 3D geometric shapes using CadQuery code.
+
+<Info>
+For the full workflow around importing, configuring, synchronizing, and analyzing Onshape-linked geometry, see [Onshape Integration](/pages/integrations/onshape).
+</Info>
 
 ## View Types
 
@@ -31,11 +37,24 @@ Short name of the object.
 </ParamField>
 
 <ParamField path="Kind" type="string">
-  The kind of geometry definition (code or file).
+  The kind of geometry definition: `code` (CadQuery), `step` (imported STEP file), or `onshape` (live link to an Onshape part studio or assembly).
 </ParamField>
 
 <ParamField path="Data" type="string">
   The CadQuery code that defines the geometry.
+
+  For `kind: "onshape"` geometries, this field holds a JSON-serialized link
+  payload (`documentId`, `elementId`, `workspaceId`, `onshapeUrl`, etc.) — not
+  CadQuery — and the geometric view shows a Source Details panel with an
+  "Open in Onshape" link plus a two-way-bound configuration editor for any
+  Onshape configuration parameters bound to this geometry.
+</ParamField>
+
+<ParamField path="Resolved Values" type="object">
+  Mass, volume, surface area, centroid, inertia tensor, bounding box, and
+  principal axes resolved from the geometry. For `kind: "onshape"` geometries,
+  these are pulled from Onshape's `/massproperties` and `/boundingboxes` APIs
+  on import and on every sync; mass is stored in grams and lengths in metres.
 </ParamField>
 
 <ParamField path="Relationships" type="connection">
@@ -44,3 +63,30 @@ Short name of the object.
 
   [Read more about Relationships](/pages/modeling/common/relationships)
 </ParamField>
+
+## Onshape-Linked Geometry
+
+When a geometry has `kind: "onshape"`, Davinci treats it as a live link
+to an Onshape part studio or assembly:
+
+- The full document subtree lives inside a tidy container under the
+  Library: `Onshape Document → { Part Studios, Assemblies, Drawings,
+  References }`. Configuration `attribute` children sit under their
+  owning part studio / assembly.
+- A status indicator (`metadata.onshape.syncState`) on each geometry/
+  assembly tracks the sync lifecycle (`idle → starting → preview →
+  final`, with `failed` for errors). The "Updating…" pill in the
+  geometric view derives from this field, so it survives view close/open
+  and reconnect.
+- Mass properties refresh automatically on import, on configuration
+  change, and on every Onshape webhook event (`onshape.model.lifecycle.changed`).
+  Cached by `(elementId, microversion, configurationEncoded)` to stay
+  inside Onshape's API rate-limit budget.
+- Edits made in Davinci to any Onshape-linked configuration attribute
+  push back to Onshape via `OnshapeConfigSync`, which encodes the new
+  configuration, waits for the workspace microversion to advance past
+  the pre-change baseline, then re-tessellates and re-pulls mass
+  properties at the new configuration.
+- The right-click menu on Onshape-linked objects exposes "Open in
+  Onshape", and the Source Details properties section shows the
+  document/element/workspace IDs plus the last-sync timestamp.

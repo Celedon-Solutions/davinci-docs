@@ -1,5 +1,6 @@
 ---
 title: Transition
+icon: /images/objecticons/transition.svg
 ---
 
 <img height="20" noZoom src="/images/objecticons/transition.svg" /> 
@@ -37,9 +38,9 @@ Failure transitions represent error handling and fault recovery paths. They are 
 | View | Description |
 | :--- | :--- |
 | [Properties](/pages/user-guide/views/properties) | Edit the object's properties, attributes, and metadata. |
-| [Table](/pages/user-guide/views/renderviews#table-view) | Display the object and its children in a tabular format. |
-| [Block](/pages/user-guide/views/renderviews#block-view) | Visual block diagram showing transition connections. |
-| [History](/pages/user-guide/navigating/model) | Track changes to attributes of the object. |
+| [Table](/pages/user-guide/views/table) | Display the object and its children in a tabular format. |
+| [Block](/pages/user-guide/views/block) | Visual block diagram showing transition connections. |
+| [History](/pages/editor/model-area) | Track changes to attributes of the object. |
 
 ## Properties Fields
 
@@ -87,7 +88,7 @@ Short name of the object.
 
   This is the source state that the system must be in for this transition to be considered.
 
-  [Read more about States](/pages/modeling/objects/state)
+  [Read more about States](/pages/modeling/objects/states)
 </ParamField>
 
 <ParamField path="To States" type="array">
@@ -97,7 +98,7 @@ Short name of the object.
 
   **Multiple Targets**: When multiple target states are specified, the transition will trigger all of them at once.
 
-  [Read more about States](/pages/modeling/objects/state)
+  [Read more about States](/pages/modeling/objects/states)
 </ParamField>
 
 <ParamField path="Probability" type="number">

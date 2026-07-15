@@ -1,0 +1,115 @@
+---
+title: Skills
+description: Guide how the Davinci Agent researches, plans, and generates project content
+tag: New
+---
+
+## Overview
+
+Skills are project-specific instructions that guide how the Davinci Agent works. Use them when you want the agent to consistently follow a method, naming convention, review checklist, research process, or generation pattern without repeating that guidance in every prompt.
+
+Skills are different from [Personas](/pages/editor/agent/persona). A persona changes the agent's general role and communication style for a workspace. A skill is narrower: it applies to a category of work such as web research, workflow planning, or generation of specific model objects and artifacts.
+
+## How Skills Affect The Agent
+
+When a skill is active, Davinci can select it as relevant context for the current task. Selected skills are treated as authoritative guidance for that task, especially when they define constraints, accepted object types, naming rules, relationship endpoints, document structure, or engineering methods.
+
+Skills can influence the agent in several ways:
+
+- **Toolbox work** — when the agent uses toolboxes, skills can guide how tools are selected and how tool parameters are formed.
+- **Generation** — generation skills can shape object trees, properties, documentation, tags, code, documents, slides, CAD, and other artifacts.
+- **Planning** — workflow skills can guide how the agent decomposes work, adds review steps, asks clarifying questions, and updates active plans.
+- **Web research** — web skills can guide search strategy, source selection, extraction, and how external evidence should be used.
+
+<Note>
+Skills do not add new tools by themselves. To change which custom tools the agent can call, configure [Toolboxes](/pages/editor/project-settings/toolboxes). To guide how the agent uses available tools, create or edit a skill.
+</Note>
+
+## Skill Categories
+
+Each skill has a category that controls where it is most likely to apply.
+
+### Web
+
+Use a web skill for research, navigation, source selection, or extraction from web resources. Web skills are most useful when Web Search is enabled in the Agent panel.
+
+Examples:
+
+- Prefer official standards, datasheets, or vendor documentation before blogs.
+- Extract requirement-like statements with source citations.
+- Compare current product options using published specifications.
+
+### Workflow
+
+Use a workflow skill for planning, decomposition, review process, and task execution guidance. Workflow skills help shape [agent plans](/pages/editor/agent/planning), model review approaches, and multi-step engineering processes.
+
+Examples:
+
+- Always inspect existing model structure before creating new requirements.
+- Add a review task after each source-document extraction batch.
+- Use a specific systems engineering process for risk analysis or trade studies.
+
+### Generation
+
+Use a generation skill for creating or editing specific outputs such as model objects, code, documents, CAD, tables, slides, or diagrams. Generation skills can be targeted with subjects and, for code-related skills, extensions.
+
+Examples:
+
+- Apply a requirement naming convention.
+- Use a standard subsystem decomposition pattern.
+- Follow a code style for Python analysis scripts.
+- Structure generated documents around an organization template.
+
+## Creating And Editing Skills
+
+Open the **Skills & Rules** panel from the left widget rail in the Editor. From there you can:
+
+- Add a new skill.
+- Organize skills into folders.
+- Rename skills and folders inline.
+- Open a skill in the workspace for detailed editing.
+- Toggle a skill active or inactive.
+
+Each skill includes:
+
+- **Name** — the label shown in the Skills list and workspace tab.
+- **Description** — a short summary of when the skill should be selected.
+- **Active** — whether the skill can be applied by the agent.
+- **Category** — Web, Workflow, or Generation.
+- **Subjects** — generation-only object types the skill applies to. Leaving this empty makes the skill broader.
+- **Extensions** — generation-only file types or languages for code-related skills.
+- **Instructions** — the full Markdown guidance the agent should follow.
+
+You can reference project assets in instructions with `[<uuid>]` syntax. This is useful when a skill should follow a source object, template document, standard, or example already stored in the project.
+
+## Writing Effective Skills
+
+Keep skills focused and concrete. A good skill describes one reusable behavior that the agent should apply when the task matches.
+
+Strong skills usually:
+
+- State when the skill applies.
+- Define constraints the agent should follow.
+- Include positive examples of the desired output.
+- Name object types, relationship types, or artifact formats when relevant.
+- Avoid combining unrelated domains into one broad rule.
+
+Avoid skills that are so broad they compete with normal user intent. For example, a project-wide risk skill should not also define requirements, CAD, and document-writing behavior unless those workflows are intentionally coupled.
+
+## Skills, Personas, And Toolboxes
+
+Use these features together:
+
+- Use **Personas** for the agent's role, tone, and general working style.
+- Use **Skills** for reusable task-specific methods and constraints.
+- Use **Toolboxes** for the actual custom tools the agent can call.
+
+For example, a "Requirements Analyst" persona might make the agent more verification-focused, while a generation skill defines the project's exact requirement wording and traceability pattern. A requirements toolbox, if active, provides the tools the agent uses to create or update the objects.
+
+## Best Practices
+
+- Disable a skill instead of deleting it if you may need it later.
+- Prefer several focused skills over one large instruction document.
+- Use subjects on generation skills so they load only for relevant object types.
+- Keep workflow skills separate from generation skills unless the same rule truly governs both.
+- Review skills after major process changes so the agent does not follow outdated guidance.
