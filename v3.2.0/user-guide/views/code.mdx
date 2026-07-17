@@ -129,10 +129,12 @@ When using files paths any named paths are defined starting from the code object
 
 <Note>You can use named paths to traverse package objects to find files in the database. You can NOT use `../` to traverse upwards.</Note>
 
-You can load refernece files from the model by calling the `davinci_open_file()` function.
+You can load refernece files from the model by calling `file.open()`.
 
 ```python load_file.py
-    content = davinci_open_file("<uuid_string>", "r")
+    from davinci import file
+
+    content = file.open("<uuid_string>", "r")
 ```
 This example opens the file `File.txt` which is under the object at the start of the path from the project database. 
 

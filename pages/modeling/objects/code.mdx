@@ -269,7 +269,7 @@ The following custom functions are available in all Python code objects:
 | Function | Description | Signature |
 |----------|-------------|-----------|
 | `davinci_save_file()` | Save file to model | `davinci_save_file(file, name, id=None)` |
-| `davinci_open_file()` | Load file from model | `davinci_open_file(path, mode='rb', encoding='utf-8')` |
+| `file.open()` | Load file from model | `file.open(path, mode='rb', encoding='utf-8')` |
 
 ### Monitoring Functions
 
@@ -335,23 +335,25 @@ The function creates a Reference object in your model with the saved content.
 
 ### Loading Files
 
-Load reference files using `davinci_open_file()`:
+Load reference files using `file.open()`:
 
 ```python
+from davinci import file
+
 # Load text file
-content = davinci_open_file("@ParentObject/config.txt", mode='r')
+content = file.open("@ParentObject/config.txt", mode='r')
 print(content)
 
 # Load binary file
-binary_data = davinci_open_file("@ParentObject/image.png", mode='rb')
+binary_data = file.open("@ParentObject/image.png", mode='rb')
 
 # Specify encoding for text files
-text = davinci_open_file("@ParentObject/data.csv", mode='r', encoding='utf-8')
+text = file.open("@ParentObject/data.csv", mode='r', encoding='utf-8')
 ```
 
 **Function signature:**
 ```python
-davinci_open_file(path, mode='rb', encoding='utf-8')
+file.open(path, mode='rb', encoding='utf-8')
 ```
 
 **Parameters:**
