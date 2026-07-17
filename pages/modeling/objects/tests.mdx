@@ -1,0 +1,143 @@
+---
+title: Tests
+---
+
+<img height="20" noZoom src="/images/objecticons/test.svg" />
+
+## Description
+
+Tests capture verification and validation activities that provide evidence a system meets its requirements. A Test can represent a physical or software test, analysis, inspection, demonstration, or milestone review, based on its project-defined category.
+
+Tests complement [Requirements](/pages/modeling/objects/requirements): requirements describe what the system must satisfy, while tests define the activity and evidence used to verify it. Link a Test to the requirement it verifies using a `verify` relationship.
+
+## Test Hierarchy
+
+Tests can contain child Tests. A leaf Test records its own result and verdict. A parent Test rolls up the verdicts of its children according to the category's configured rollup mode.
+
+| Test type | Behavior |
+| :--- | :--- |
+| Leaf Test | Defines an observed result, evaluation criteria, procedure, results, and verdict. |
+| Parent Test | Summarizes its child Tests. An empty/TBD result or evaluation error leaves the parent verdict incomplete; a non-scoring result is excluded from the numeric rollup. |
+
+Parent rollups use the numeric scores assigned to each category verdict. The selected category determines how those child scores become the parent's verdict.
+
+## Evaluation
+
+A leaf Test evaluates one observed result against its evaluation criteria:
+
+1. Define the expected observation type in **Results Value**: number, text, or boolean.
+2. Provide the observed value directly or calculate it with an equation or reference.
+3. Map result ranges or values to named verdicts in **Evaluation Criteria**.
+4. The Test resolves to the matching category verdict.
+
+<Info>
+**Results Value** is the observed measurement or assessment. **Resolved Value** is the normalized score for the selected verdict, such as `1` for Pass or `0` for Fail. They are not the same value.
+</Info>
+
+When criteria overlap, cannot be resolved, use an incompatible result type, or refer to an unavailable category verdict, the Test displays a configuration error rather than a valid verdict.
+
+### Evaluation State
+
+| State | Description |
+| :--- | :--- |
+| `pending` | The Test has not been evaluated. |
+| `live` | The verdict was calculated from the current result or equation but has not been formally run. |
+| `stale` | The result or criteria changed after the last formal run. Re-run the Test before relying on its verdict. |
+| `done` | A formal Test run committed the current verdict. |
+
+Running a Test executes its configured procedure when applicable, records the resulting evidence, and updates its evaluation state. Equation-based results can also update a verdict live as referenced model values change.
+
+## Categories and Verdicts
+
+Each Test uses a category configured in the project's **Test Categories** settings. A category defines the available verdict names, colors, normalized scores, and parent rollup mode.
+
+New projects include categories for Test, Analysis, Inspection, Demonstration, and Milestone Review. The first four typically use Pass and Fail verdicts; Milestone Review includes readiness verdicts such as Go, Conditional Go, and No-Go. Projects can customize these categories and verdicts to match their verification process.
+
+### Rollup Modes
+
+| Mode | Parent verdict behavior | Best for |
+| :--- | :--- | :--- |
+| **All** | Preserves the shared child score only when every child has the same score; otherwise uses the lowest child score. With a Pass/Fail category, every child must pass for the parent to pass. | A set of checks that must agree before the parent can advance. |
+| **Minimum** | Uses the lowest child verdict score. | Stage gates and weakest-link decisions where the least favorable outcome controls the parent. |
+| **Weighted** | Uses the weighted average of child verdict scores. Each child Test's **Weight** controls its contribution. If no usable weights are available, the parent uses an equal average. | Verification activities where some child Tests should contribute more than others. |
+
+New projects use **Weighted** for Test, Analysis, Inspection, and Demonstration categories. **Milestone Review** uses **Minimum** so the least-ready review area controls the overall outcome.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| [Properties](/pages/user-guide/views/properties) | Configure the Test, its procedure, results, criteria, and verdict. |
+| [Table](/pages/user-guide/views/renderviews#table-view) | Display Tests and their fields in a tabular format. |
+| [Tree](/pages/user-guide/views/renderviews#tree-view) | View a Test hierarchy and parent-child rollups. |
+| [Relationships](/pages/modeling/common/relationships) | Trace verification relationships to requirements and other model objects. |
+| [Dependency Graph](/pages/user-guide/views/dependency-graph) | Explore prerequisites and downstream dependencies. |
+| [Thread](/pages/user-guide/views/renderviews#digital-thread-view) | Visualize traceability and connection density in 3D. |
+| [History](/pages/user-guide/navigating/model) | Track changes and revisions to the Test. |
+
+## Properties Fields
+
+<ParamField path="Name" type="string">
+Name of the object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name of the object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+  Description of the object.
+</ParamField>
+
+<ParamField path="Category" type="string">
+The project-defined verification method used by this Test. The selected category determines the available verdicts and rollup behavior.
+</ParamField>
+
+<ParamField path="Status" type="string">
+Tracks the activity lifecycle: `pending`, `started`, `done`, `cancelled`, or `waived`.
+</ParamField>
+
+<ParamField path="Weight" type="number">
+The Test's relative contribution to a parent verdict when the category uses **Weighted** rollup. It does not affect **All** or **Minimum** rollups.
+</ParamField>
+
+<ParamField path="Procedure" type="object">
+Describes how to perform the Test and can reference documents, code, actions, or other model objects that contain the procedure.
+</ParamField>
+
+<ParamField path="Results Value" type="object">
+Defines the observed number, text, or boolean result. It may be entered directly or calculated from equations and model references.
+</ParamField>
+
+<ParamField path="Evaluation Criteria" type="object">
+Maps possible observed results to category verdicts. For numeric results, criteria can include target expressions and display units.
+</ParamField>
+
+<ParamField path="Results" type="object">
+Describes the completed evidence and can reference result artifacts, documents, code, or other model objects.
+</ParamField>
+
+<ParamField path="Verdict" type="string">
+The resolved category verdict for a leaf Test, or the rolled-up verdict for a parent Test.
+</ParamField>
+
+<ParamField path="Tests" type="object">
+
+<a href="/pages/modeling/objects/tests" style={{ borderBottom: 'none' }}> <img height="20" noZoom src="/images/objecticons/test.svg" /> </a>
+
+  A list of all child Test objects owned by this Test.
+
+  Child Tests can be viewed and deleted, and their verdicts roll up into this Test.
+
+  [Read more about Tests](/pages/modeling/objects/tests)
+</ParamField>
+
+<ParamField path="Prerequisites" type="connection">
+Tests that must be completed before this leaf Test can proceed.
+</ParamField>
+
+<ParamField path="Relationships" type="connection">
+Connects the Test to requirements it verifies and to other model objects.
+
+[Read more about Relationships](/pages/modeling/common/relationships)
+</ParamField>

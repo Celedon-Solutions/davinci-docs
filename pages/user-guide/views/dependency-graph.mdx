@@ -1,0 +1,49 @@
+---
+title: Dependency Graph View
+---
+
+## Description
+
+The Dependency Graph View visualizes the prerequisite structure of a [Task](/pages/modeling/objects/task) or [Test](/pages/modeling/objects/tests) hierarchy as a layered diagram. It lays out the nested hierarchy in a single pass and routes dependency links between the objects that carry them, making the order of work or verification immediately visible.
+
+Parent Tasks and Tests are rendered as group boxes that contain their children. Leaf objects are rendered as cards, and prerequisite links are drawn as routed edges between the leaf cards they connect. When viewing a Test hierarchy, each Test card also displays its category verdict badge, so you can review verification sequencing and outcomes at the same time.
+
+## View Controls
+
+### Refresh
+
+Recomputes the layout and regenerates the graph. Use this after changing children, prerequisites, or other fields that affect the structure.
+
+### Center
+
+Re-fits the graph to the visible area and returns it to a centered position.
+
+### Layout Direction
+
+Toggle between **Horizontal** and **Vertical** layout. Horizontal arranges prerequisites left-to-right; vertical arranges them top-to-bottom.
+
+### Zoom and Pan
+
+Use the mouse wheel or pinch gestures to zoom, and click and drag to pan around large graphs.
+
+## Graph Elements
+
+**Group boxes**: Parent Tasks or Tests that contain child objects. The box encloses the entire subtree beneath the parent.
+
+**Leaf cards**: Individual Tasks or Tests that have no children. Prerequisite edges attach to these cards.
+
+**Dependency edges**: Routed lines connecting leaf cards, representing prerequisite relationships between leaves. Only leaves carry prerequisite chains; parent prerequisites are relocated onto their entry leaves.
+
+**Verdict badges**: On a Test hierarchy, each Test card shows its resolved category verdict.
+
+## Interaction
+
+Click a card to open that Task or Test object.
+
+## Use Cases
+
+**Sequencing**: Trace prerequisite chains to understand the order in which work or verification must occur.
+
+**Bottleneck analysis**: Identify entry points and objects that many downstream items depend on.
+
+**Verification review**: For Test hierarchies, review dependency order and verdicts together to assess verification progress.

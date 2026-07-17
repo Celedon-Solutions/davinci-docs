@@ -197,6 +197,62 @@
                     },
                     "pages/editor/exports",
                     {
+                        "dropdown": "Digital Modeling",
+                        "icon": "code",
+                        "groups": [
+                            {
+                                "group": "Overview",
+                                "pages": [
+                                    "pages/modeling/overview/systemmodeling",
+                                    "pages/modeling/overview/language",
+                                    "pages/modeling/overview/mentions",
+                                    "pages/modeling/overview/imports",
+                                    "pages/modeling/overview/sysml-export"
+                                ]
+                            },
+                            {
+                                "group": "Common",
+                                "pages": [
+                                    "pages/modeling/common/equations",
+                                    "pages/modeling/common/relationships",
+                                    "pages/modeling/common/units"
+                                ]
+                            },
+                            {
+                                "group": "Scripts",
+                                "pages": [
+                                    "pages/modeling/python-database-api"
+                                ]
+                            },
+                            {
+                                "group": "Object Views",
+                                "pages": [
+                                    "pages/user-guide/views/activity",
+                                    "pages/user-guide/views/artifact",
+                                    "pages/user-guide/views/block",
+                                    "pages/user-guide/views/code",
+                                    "pages/user-guide/views/connectome",
+                                    "pages/user-guide/views/dependency-graph",
+                                    "pages/user-guide/views/design-space-explorer",
+                                    "pages/user-guide/views/digital-thread",
+                                    "pages/user-guide/views/gantt",
+                                    "pages/user-guide/views/help",
+                                    "pages/user-guide/views/history",
+                                    "pages/user-guide/views/package",
+                                    "pages/user-guide/views/pie",
+                                    "pages/user-guide/views/plot",
+                                    "pages/user-guide/views/properties",
+                                    "pages/user-guide/views/reference",
+                                    "pages/user-guide/views/risk",
+                                    "pages/user-guide/views/rollup",
+                                    "pages/user-guide/views/sequence",
+                                    "pages/user-guide/views/slide",
+                                    "pages/user-guide/views/state",
+                                    "pages/user-guide/views/table",
+                                    "pages/user-guide/views/toolbox",
+                                    "pages/user-guide/views/tree"
+                                ]
+                            }
                         "group": "Right Panel Tools",
                         "pages": [
                             "pages/editor/right-panel/overview",
@@ -280,6 +336,7 @@
                                     "pages/modeling/objects/packages",
                                     "pages/modeling/objects/entities",
                                     "pages/modeling/objects/requirements",
+                                    "pages/modeling/objects/tests",
                                     "pages/modeling/objects/capability",
                                     "pages/modeling/objects/linkages"
                                 ]
