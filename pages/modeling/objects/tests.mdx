@@ -60,16 +60,19 @@ In this partition, `-20` and `60` match Pass; only values below `-20` or above `
 
 Every clause must remain non-overlapping with the target of every other verdict. For example, `Pass: -20 to 60` and `Fail: < -20 or > 50` is invalid because the second Fail clause overlaps Pass. Each clause must be complete: `< -20 or`, `or > 60`, and `< -20or > 60` are malformed. OR unions are supported only for numeric targets; String targets are exact text and Boolean targets are `true` or `false`.
 
-### Evaluation State
+### Status
 
-| State | Description |
+Status tracks the Test activity lifecycle. Leaf Tests set status directly; parent Tests roll up status from their children.
+
+| Status | Description |
 | :--- | :--- |
-| `pending` | The Test has not been evaluated. |
-| `live` | The verdict was calculated from the current result or equation but has not been formally run. |
-| `stale` | The result or criteria changed after the last formal run. Re-run the Test before relying on its verdict. |
-| `done` | A formal Test run committed the current verdict. |
+| `pending` | The Test has not been started. New Tests default to this status. |
+| `started` | Work on the Test is in progress. |
+| `done` | The Test activity is complete and has supporting evidence (a resolved result, linked results artifacts, or a successful run). |
+| `cancelled` | The Test was cancelled and will not be run. |
+| `waived` | The Test is waived and is not required. |
 
-Running a Test executes its configured procedure when applicable, records the resulting evidence, and updates its evaluation state. Equation-based results can also update a verdict live as referenced model values change.
+Running a Test executes its configured procedure when applicable, records the resulting evidence, and can advance status (for example from `pending` to `started` or `done`). Cancelled and waived Tests are blocked from running. Equation-based results can also update a verdict as referenced model values change.
 
 ## Categories and Verdicts
 
