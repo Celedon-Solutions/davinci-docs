@@ -12,6 +12,10 @@ A state defines what the system does while in that particular mode, including ac
 
 States can be hierarchical, containing nested sub-states to represent refinements of behavior at different levels of abstraction. This enables modular design of complex state-based systems where high-level states can be decomposed into detailed state machines.
 
+Attributes owned by the containing system or component can define state-specific values for both top-level States and their nested substates. A nested State remains in the containing host's state scope as long as its ancestor chain contains only States or Actions. Crossing into a nested Part begins a separate state scope.
+
+State hierarchy supplies inheritance: when an Attribute has no explicit value for a nested State, Davinci walks up to the nearest ancestor State value and then falls back to the Attribute default. Hierarchy does not by itself roll child values into a parent; max rollup follows explicit trigger transitions.
+
 <Note>The interval property defines how frequently the do action executes while the system remains in this state. This is particularly useful for periodic monitoring, control loops, or continuous operations.</Note>
 
 ## View Types

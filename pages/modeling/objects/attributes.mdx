@@ -94,6 +94,16 @@ Examples of supported array values:
 
 <Note>String and date attributes are scalar-only. Arrays of strings and arrays of dates are not supported.</Note>
 
+## Reading a Named State Value
+
+In any equation, `[attribute-uuid].state([state-uuid])` reads that Attribute's effective value for the named State. Davinci resolves state equations first, rolls up triggered states, inherits from parent states, and falls back to the Attribute's default value when no override applies.
+
+An Attribute can define explicit values for every State or Action in the state branches owned by its host, including nested substates. For example, an Attribute under a Part may define values for both `TPO` and `TPO > Idle`. State branches owned by nested Parts are separate and are not valid for the outer Part's Attribute.
+
+The accessor always selects its explicit state rather than an ambient state used to evaluate the surrounding equation. The receiver must be an Attribute and the argument must be a State. For array values, use a 1-based index such as `[attribute].state([state])[1]` or reduce the result with `min()`, `max()`, or `mean()` when a scalar is required.
+
+This syntax does not execute code. Only `[code-uuid].method(args)` with a Code receiver is callable.
+
 ## Unit Conversion and Validation
 
 ### Automatic Unit Conversion

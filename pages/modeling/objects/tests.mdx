@@ -37,6 +37,29 @@ A leaf Test evaluates one observed result against its evaluation criteria:
 
 When criteria overlap, cannot be resolved, use an incompatible result type, or refer to an unavailable category verdict, the Test displays a configuration error rather than a valid verdict.
 
+### State-specific Results and Thresholds
+
+Use `[attribute-uuid].state([state-uuid])` in Results Value or a numeric criterion when the Test must use an Attribute's effective value for one named State. State equations resolve first, followed by trigger-path rollup, parent-state inheritance, and default-value fallback. This explicit state is independent of any ambient state in which another equation is evaluated.
+
+The receiver must be an Attribute and the argument must be a State. This is a value accessor, not an executable method; only `[code-uuid].method(args)` with a Code receiver executes code. If a state value is an array, select a 1-based index or use `min()`, `max()`, or `mean()` to produce the single scalar required by evaluation criteria.
+
+### Evaluation Criteria Target Syntax
+
+Numeric targets use an optional comparator (`>=`, `<=`, `>`, `<`, `=`, or `!=`) followed by a number or resolvable numeric expression. A bare number is an exact match. Use `to` for one continuous range:
+
+- `-20 to 60` includes both boundaries.
+- `> -20 to < 60` excludes both boundaries.
+- `< [minimum-uuid] or > [maximum-uuid]` uses referenced numeric bounds.
+
+Use whitespace-delimited `or` to join numeric clauses when a verdict accepts disjoint regions. A value matches if it matches any clause:
+
+- `Pass: -20 to 60`
+- `Fail: < -20 or > 60`
+
+In this partition, `-20` and `60` match Pass; only values below `-20` or above `60` match Fail. `to` is not interchangeable with `or`: `to` defines one interval while `or` joins separate clauses.
+
+Every clause must remain non-overlapping with the target of every other verdict. For example, `Pass: -20 to 60` and `Fail: < -20 or > 50` is invalid because the second Fail clause overlaps Pass. Each clause must be complete: `< -20 or`, `or > 60`, and `< -20or > 60` are malformed. OR unions are supported only for numeric targets; String targets are exact text and Boolean targets are `true` or `false`.
+
 ### Evaluation State
 
 | State | Description |

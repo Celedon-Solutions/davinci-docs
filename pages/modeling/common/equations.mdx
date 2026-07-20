@@ -6,6 +6,22 @@ Each attribute and constraint object has a defined value. For attributes, this i
 
 <Note>Special handling is applied when resolving values containing strings of `TBD` (To Be Determined). This can be useful during the early stages of model formation to not resolve errors when the value is still being defined.</Note>
 
+## Named State Values
+
+Use `[attribute-uuid].state([state-uuid])` to read an attribute's effective value for one explicit state:
+
+```text
+[temperature-attribute].state([hot-state])
+max([temperature-attribute].state([hot-state]), 0)
+[profile-attribute].state([hot-state])[1]
+```
+
+The receiver must be an Attribute and the argument must be a State. State equations are resolved before lookup. Davinci then applies the normal effective-state behavior: triggered states roll up, parent-state values are inherited, and the attribute's default value is used when no state override applies. An errored state dependency produces an equation error instead of a partial value.
+
+Valid named States include direct and recursively nested State/Action branches owned by the Attribute's host. Traversal remains inside those branches, so it does not include States owned by nested Parts or unrelated model objects.
+
+This accessor selects the named state even when the surrounding equation is being evaluated in a different ambient state. It is value access, not code execution. `[attribute].state(...)` reads state data; `[code].method(...)` executes a Code object. Arrays remain arrays, so select a 1-based index or use a reduction such as `min()`, `max()`, or `mean()` when a scalar is required.
+
 ## Math Syntax
 Equations are powered by Math.js, providing a comprehensive set of mathematical operations and functions. The syntax follows standard mathematical conventions:
 
@@ -84,6 +100,10 @@ Equations are powered by Math.js, providing a comprehensive set of mathematical 
 | OR               | `or(a, b)`          | Logical OR |
 | NOT              | `not(x)`            | Logical NOT |
 | XOR              | `xor(a, b)`         | Logical XOR |
+
+<Note>
+`or(a, b)` above is a Math.js logical function used inside an equation. It is different from the whitespace-delimited `clause or clause` syntax used only by numeric Test evaluation-criteria targets. For example, a Test target of `< -20 or > 60` matches either numeric region; it is not a Math.js expression or a general equation operator.
+</Note>
 
 ### Constants
 

@@ -22,6 +22,8 @@ A Value Resolution Error is an error that occurs when Davinci attempts to resolv
 
 Each of these will result in an error in the resolution field.
 
+Tests can also report evaluation-criteria configuration errors here. Numeric criteria that contain an incomplete OR union (for example, `< -20 or`), an invalid clause, or any overlap between a union clause and another verdict target cannot determine a verdict. Complete the malformed clause or adjust the boundaries so each verdict owns a distinct region.
+
 <Frame>
     <img noZoom src="/images/attribute_error.png" />
 </Frame>
