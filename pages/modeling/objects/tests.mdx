@@ -58,7 +58,7 @@ Use whitespace-delimited `or` to join numeric clauses when a verdict accepts dis
 
 In this partition, `-20` and `60` match Pass; only values below `-20` or above `60` match Fail. `to` is not interchangeable with `or`: `to` defines one interval while `or` joins separate clauses.
 
-Every clause must remain non-overlapping with the target of every other verdict. For example, `Pass: -20 to 60` and `Fail: < -20 or > 50` is invalid because the second Fail clause overlaps Pass. Each clause must be complete: `< -20 or`, `or > 60`, and `< -20or > 60` are malformed. OR unions are supported only for numeric targets; String targets are exact text and Boolean targets are `true` or `false`.
+Every clause must remain non-overlapping with the target of every other verdict. For example, `Pass: -20 to 60` and `Fail: < -20 or > 50` is invalid because the second Fail clause overlaps Pass. Each clause must be complete: `< -20 or`, `or > 60`, and `< -20 or > 60` are malformed. OR unions are supported only for numeric targets; String targets are exact text and Boolean targets are `true` or `false`.
 
 ### Status
 
