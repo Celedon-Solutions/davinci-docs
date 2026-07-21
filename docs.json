@@ -450,6 +450,7 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
+                    "pages/release-notes/v4.6.0",
                     "pages/release-notes/v4.5.0",
                     "pages/release-notes/v4.4.0",
                     "pages/release-notes/v4.3.2",
