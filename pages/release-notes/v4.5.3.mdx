@@ -1,0 +1,33 @@
+---
+title: 'Version 4.5.3 - Directory Sign-In & Account Linking'
+description: 'July 8 2026'
+---
+
+## Version 4.5.3 - Directory Sign-In & Account Linking
+
+This release adds directory-based sign-in for supported self-hosted deployments, with account linking and broader authentication and export security improvements.
+
+### Directory Sign-In
+
+- Added directory (LDAP) as a sign-in option alongside password, OAuth, and SSO
+- Added an email-first sign-in flow that directs users to the appropriate method for their account and configured email domain
+- Added a dedicated directory sign-in form that accepts a username or email address
+- Added support for eligible new directory users to create a Davinci account on their first successful sign-in
+- Added directory sign-in support for deployments that otherwise require SSO
+
+### Account Settings
+
+- Added a **Sign-in** settings section showing the methods connected to an account
+- Added self-service directory account linking for signed-in users
+- Added current-password confirmation before linking when the account has a Davinci password
+- Added clear linked and not-linked status indicators
+- Improved guidance explaining how directory linking changes future sign-in behavior
+
+### Security & Reliability
+
+- Strengthened authentication token validation and account-linking safeguards
+- Prevented existing accounts from being linked automatically during sign-in
+- Added additional protections for directory credentials, search filters, secure connections, and group access
+- Removed saved project secrets from exported project downloads
+- Fixed unitful equation references so exponent operations apply to the complete quantity
+- Improved directory sign-in reliability
