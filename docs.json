@@ -355,6 +355,7 @@
                                     "pages/modeling/objects/documents",
                                     "pages/modeling/objects/tables",
                                     "pages/modeling/objects/matrix",
+                                    "pages/modeling/objects/figure",
                                     "pages/modeling/objects/slide"
                                 ]
                             },

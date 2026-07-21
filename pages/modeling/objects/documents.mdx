@@ -43,7 +43,7 @@ Document tables support two cell types:
 <Note>Document tables are designed for data display, not calculation. For spreadsheet functionality with formulas and equations, use standalone [Table objects](/pages/modeling/objects/tables).</Note>
 
 ### Figure Blocks
-Figure blocks contain images with optional captions. Figures are automatically numbered (Figure 1, Figure 2, etc.) and can be cross-referenced from text. When a figure with caption splits across pages, the system intelligently keeps the caption with the image.
+Figure blocks render live model diagrams. A block can reference a reusable [Figure object](/pages/modeling/objects/figure), which owns its roots, render mode, layout, and styling, or directly reference another model object for a simple local visualization. Figure captions are separate caption blocks and can provide automatic numbering and cross-references.
 
 ### Image Blocks
 Image blocks display images without the automatic numbering and caption functionality of figures. They're useful for decorative images, logos, or illustrations that don't need formal referencing.
@@ -274,7 +274,7 @@ The Insert menu provides access to all insertable block types:
 - **Table**: Insert a new embedded spreadsheet table
 - **Table Caption**: Add or update a table's caption  
 - **Image**: Insert an image file
-- **Figure**: Insert an image as a numbered figure
+- **Figure**: Insert a reusable Figure object or a direct visualization of another model object
 - **Figure Caption**: Add or update a figure's caption
 
 ### Structural Blocks  

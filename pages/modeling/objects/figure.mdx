@@ -1,0 +1,197 @@
+---
+title: Figures
+icon: /images/objecticons/figure.svg
+---
+
+<img height="20" noZoom src="/images/objecticons/figure.svg" />
+
+## Description
+
+Figure objects are reusable diagram artifacts that turn live model data into a visual view. A figure stores its root objects, render mode, layout choices, styling, and manual overrides while continuing to read names, relationships, values, and hierarchy from the underlying model.
+
+Figures are useful when a diagram needs to be edited once and reused in multiple documents or presentations. Because a figure references model objects rather than copying them, changes to the model are reflected the next time the figure renders or refreshes.
+
+<Info>
+Figure objects store presentation choices, not a duplicate of the model. Editing a node's position or appearance changes the figure; editing the represented object's name or properties changes the model object itself.
+</Info>
+
+## Creating a Figure
+
+1. Create a **Figure** object from the model index, normally inside a package.
+2. Open the new figure in its Figure view.
+3. Add one or more root objects from the **Roots** menu, or drag model objects from the index onto the figure canvas.
+4. Select a **Render Mode** appropriate for the objects you added.
+5. Use **Settings** to configure layout, labels, relationships, theme, styling, and the legend.
+
+A new figure starts in Tree mode. It remains empty until at least one root object is added.
+
+### Root Objects
+
+Roots are the starting points used to generate the diagram. A figure can have multiple roots, allowing related areas of the model to appear in one artifact.
+
+Roots can be managed in two ways:
+
+- Open **Roots** and use **Add Root** to search for model objects.
+- Drag objects from the model index directly onto the figure canvas.
+
+The selected render mode determines how each root is interpreted. For example, Gantt mode looks for scheduled tasks, while Risk Matrix mode looks for risks. If a root has no applicable content, the Roots control displays a warning badge and explains why the root was not shown.
+
+<Note>
+Adding a root does not move, copy, or re-parent that object. It only adds the object's ID to the figure's scope.
+</Note>
+
+## Render Modes
+
+The same roots can be displayed in different ways by changing **Render Mode**.
+
+| Mode | Use |
+| :--- | :--- |
+| **Tree** | Show parent-child hierarchy from the selected roots. Configure depth, orientation, and per-node expansion. |
+| **Interface** | Show interfaces, ports, and connections associated with structural objects. |
+| **Block** | Show structural objects and their connections in a block-style diagram. |
+| **Traceability** | Show selected relationship types as a traceability graph. |
+| **Activity** | Show actions and flows as an activity diagram. Optional content includes items and performers. |
+| **State** | Show states and transitions, including entry, do, and exit behavior. |
+| **Gantt** | Show tasks and dependencies across a configurable time scale. |
+| **Risk Matrix** | Show risks by likelihood and consequence, with optional criticality filtering. |
+
+Changing modes preserves the figure's roots and reusable styling. Mode-specific layout settings change to match the selected visualization.
+
+## Configuring the Figure
+
+### Layout
+
+Layout settings vary by render mode and can include:
+
+- Horizontal or vertical orientation
+- Traversal depth
+- Relationship types
+- Activity endpoint and layout style
+- State transition visibility
+- Gantt scale and date range
+- Risk criticality thresholds
+
+### Labels and Connections
+
+Figures can display full names, short names, or both. Connection labels can be shown or hidden, and connection routing can use direct, orthogonal, or spline lines.
+
+### Themes and Styles
+
+Use a built-in theme for a consistent appearance, or switch to custom styling. Custom settings include the figure canvas, default node and edge colors, line weight, label color, font size, node width, padding, and corner radius.
+
+### Style Rules
+
+Style rules apply reusable formatting to matching content. Rules can target object types, selected nodes, connection types, a tree subtree, or a state scene. They continue to apply as matching objects are added to the model.
+
+Property-based color rules can visualize supported live values such as risk measures, requirement satisfaction, and task status.
+
+### Legend
+
+Enable the legend when colors or line styles carry meaning. A legend can:
+
+- List custom entries with node or edge swatches
+- Show relationship categories derived from the rendered diagram
+- Be moved, resized, and styled like other figure content
+
+## Editing the Canvas
+
+Select nodes or connections to edit their figure-specific presentation. Depending on the render mode, you can:
+
+- Drag one or more nodes to create manual positions
+- Resize nodes
+- Adjust connection routing and label placement
+- Show documentation, type, or selected attributes inside a node
+- Expand tree children or relationship groups
+- Hide an object from this figure
+- Restore previously removed objects from **Settings**
+
+Manual edits are stored as overrides on the Figure object. They do not alter the represented model objects.
+
+<Note>
+The automatic layout remains responsible for content without manual overrides. Use manual positions and sizes only where the automatic result needs adjustment.
+</Note>
+
+## Reusing Figures
+
+Figure objects can be embedded in Documents and Slides.
+
+### Documents
+
+1. Place the caret at the desired insertion point.
+2. Open **Insert** and choose **Figure**.
+3. Search for and select the Figure object.
+4. Select **Insert**.
+
+The document creates a figure block that references the Figure object. Select the block to resize, align, refresh, change its focus object, or open the source Figure.
+
+### Slides
+
+1. Open the slide where the figure should appear.
+2. Open **Insert** and choose **Figure**.
+3. Search for and select the Figure object.
+4. Select **Insert**, then position and resize the new element.
+
+The slide element references the same Figure object, so its render mode and figure-level settings remain centralized.
+
+### Figure Objects Versus Direct Object Figures
+
+The Figure insertion wizard also accepts ordinary model objects:
+
+- Selecting a **Figure object** embeds the reusable figure. Its roots, render mode, layout, and styles belong to that Figure object.
+- Selecting another **model object** creates a direct figure reference. The host Document or Slide stores a local display mode such as Block, Tree, Gantt, or Risk Matrix.
+
+Use a Figure object when a diagram needs custom styling, manual layout, multiple roots, or reuse. Use a direct object reference for a simple one-off visualization.
+
+## Refreshing Embedded Figures
+
+Rendered figures are cached for performance. If an embedded figure does not yet show a recent model or styling change, select it and choose **Refresh**. Refreshing clears the cached render and rebuilds the diagram from current model data.
+
+## View Types
+
+| View | Description |
+| :--- | :--- |
+| **Figure** | Build and style the reusable diagram. |
+| [Properties](/pages/user-guide/views/properties) | Edit the figure's name, short name, documentation, and metadata. |
+| **Help** | View in-app guidance for Figure objects. |
+
+## Properties Fields
+
+<ParamField path="Name" type="string">
+Name of the Figure object.
+</ParamField>
+
+<ParamField path="Short Name" type="string">
+Short name used to identify the Figure object.
+</ParamField>
+
+<ParamField path="Documentation" type="string">
+Description of the figure's purpose or intended audience.
+</ParamField>
+
+<ParamField path="Root Objects" type="array">
+Model object IDs used as the starting scope for diagram generation.
+</ParamField>
+
+<ParamField path="Layout" type="object">
+The selected render mode and its mode-specific layout options.
+</ParamField>
+
+<ParamField path="Styles" type="object">
+Theme, labels, connection routing, canvas style, and default node and edge styles.
+</ParamField>
+
+<ParamField path="Style Rules" type="array">
+Reusable rules that style matching nodes or connections.
+</ParamField>
+
+<ParamField path="Overrides" type="object">
+Manual node positions, sizes, content choices, styles, and connection routing.
+</ParamField>
+
+<ParamField path="Removed Objects" type="array">
+Objects intentionally excluded from this figure. Removed objects can be restored from Figure settings.
+</ParamField>
+
+<ParamField path="Legend" type="object">
+Legend visibility, relationship categories, and custom legend entries.
+</ParamField>
