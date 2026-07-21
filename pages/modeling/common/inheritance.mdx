@@ -16,16 +16,20 @@ Inheritance is useful for product variants, reusable system patterns, specialize
 
 Object inheritance is different from state-value inheritance, risk rollups, and task scheduling rollups. This page describes inheritance created with **Extend Object** and **New Object from Extension**.
 
-## How Inheritance Works
+## How to Use Inheritance
 
-Davinci stores a specialization as a sparse object. Instead of copying every value from the base, it stores:
+Start with a base object that contains the information shared by every variant. Create a specialization from that base, then edit only the details that should be different.
 
-- Its own identity and location in the model
-- A link to the base object it extends
-- Fields that have been overridden locally
-- Objects, tags, references, relationships, and other entries added locally
+For example, a base Part might define the ports, attributes, and requirements common to a product family. Each product variant can extend that Part and override its own dimensions, performance values, or documentation.
 
-When Davinci displays or evaluates the specialization, it combines the base with those local changes.
+As you work:
+
+- Make shared changes on the base so every specialization receives them.
+- Make variant-specific changes on the specialization.
+- Add content to a specialization only when it does not belong on every variant.
+- Resync an override when the specialization should follow the base again.
+
+Davinci keeps everything that has not been changed locally synchronized with the base.
 
 ### Inherited Fields
 
