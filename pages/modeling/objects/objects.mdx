@@ -102,6 +102,14 @@ Objects live in a tree. Each object has a parent and may own child objects. This
 
 Parent-child hierarchy is best for ownership and structure. For example, a system part may own subsystem parts, attributes, ports, and requirements.
 
+### Object Inheritance
+
+Object inheritance creates a specialized version of a supported model object. The specialization inherits fields and model structure from a base while keeping intentional local overrides and additions.
+
+Use inheritance for variants and reusable patterns where one object is a specialized form of another. Use relationships instead when objects are connected but neither is a specialization of the other.
+
+See [Object Inheritance](/pages/modeling/common/inheritance) for supported object types and the Extend, Resync, and Revert workflows.
+
 ### References
 
 Reference Objects serve as a truth source or origin of data within the model. These objects are uploaded as files and used by Davinci to source data for the model.

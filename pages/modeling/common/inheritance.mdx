@@ -1,0 +1,217 @@
+---
+title: Object Inheritance
+description: Create specialized model objects that stay synchronized with a reusable base
+icon: code-branch
+---
+
+## Overview
+
+Object inheritance lets one model object specialize another object of the same type. The original object is the **base**, and the object that extends it is the **specialization**.
+
+A specialization begins by inheriting the base's fields and supported model structure. Changes to the base continue to flow into the specialization unless a value has been overridden locally.
+
+<Info>
+Inheritance is useful for product variants, reusable system patterns, specialized requirements, regional configurations, and other cases where models share a common definition but need controlled differences.
+</Info>
+
+Object inheritance is different from state-value inheritance, risk rollups, and task scheduling rollups. This page describes inheritance created with **Extend Object** and **New Object from Extension**.
+
+## How Inheritance Works
+
+Davinci stores a specialization as a sparse object. Instead of copying every value from the base, it stores:
+
+- Its own identity and location in the model
+- A link to the base object it extends
+- Fields that have been overridden locally
+- Objects, tags, references, relationships, and other entries added locally
+
+When Davinci displays or evaluates the specialization, it combines the base with those local changes.
+
+### Inherited Fields
+
+An inherited field stays synchronized with the base. If the base's name, documentation, value, scheduling, or other supported field changes, the specialization receives the new value automatically.
+
+### Overridden Fields
+
+Editing an inherited field creates a local override. The specialization keeps that value when the corresponding base field changes.
+
+In the Properties view:
+
+- **Inherited** means the value currently comes from the base.
+- **Overridden** means the specialization owns a local value.
+- **Extended** means a collection contains the inherited entries plus locally added entries.
+
+Hover over these indicators to see their source and current state.
+
+### Additive Collections
+
+Collections are extended rather than replaced. A specialization keeps the base entries and may add its own:
+
+- Child objects
+- Tags
+- References
+- Relationships
+- Task prerequisites
+
+Inherited entries cannot be removed from the specialization. Change or remove them on the base, then allow the change to flow down.
+
+## Creating a Specialization
+
+There are two creation workflows in the model Index.
+
+### Extend Object
+
+Use **Extend Object** when the specialization should be created beside the base.
+
+1. Right-click the object that will be the base.
+2. Select **Extend Object**.
+3. Davinci creates a specialization under the same parent and opens it.
+4. Rename the specialization and edit only the fields that should differ.
+
+The new object inherits the base and mirrors its inheritable child structure.
+
+### New Object from Extension
+
+Use **New Object from Extension** when the specialization should be created under a different parent.
+
+1. Right-click the intended parent in the Index.
+2. Open **Add Object**.
+3. Select **New Object from Extension**.
+4. Search for the object to use as the base.
+5. Select the base to create and open the specialization.
+
+The picker only allows inheritable object types that are valid children of the selected parent. Objects that would create an inheritance or containment cycle are unavailable.
+
+<Note>
+A base and its specialization must have the same object type. For example, a Part can extend another Part, but it cannot extend a Requirement.
+</Note>
+
+## Inherited Structure
+
+When an inheritable object contains inheritable children, Davinci creates corresponding specialized children. These are **structural counterparts**: they mirror the base hierarchy while allowing local field overrides.
+
+For example, extending a Part that owns Ports and Attributes creates a specialized Part with corresponding specialized Ports and Attributes.
+
+### Base Structure Changes
+
+Structure remains synchronized:
+
+- Adding an inheritable child to the base adds a counterpart to existing specializations.
+- Removing a child from the base removes its inherited counterparts.
+- Internal relationships and supported object references resolve to counterparts within the same specialization when available.
+
+Object types that do not support inheritance are not mirrored into a specialization.
+
+### Moving and Deleting Inherited Objects
+
+Inherited structural counterparts cannot be moved to a different parent or deleted independently. Their placement is defined by the base structure.
+
+To change inherited structure:
+
+1. Make the structural change on the base object.
+2. Allow Davinci to propagate it to the specializations.
+
+The specialization root can still be moved as a complete reusable group. Local objects added to a specialization can generally be moved or removed normally.
+
+<Warning>
+Deleting a base object also removes the specialization trees that depend on it. Review its extensions before deleting a base.
+</Warning>
+
+## Resynchronizing with the Base
+
+### Resync a Field
+
+Use field-level resync when only one override should be discarded:
+
+1. Open the specialization's Properties view.
+2. Find a field marked **Overridden**.
+3. Select the indicator.
+4. Review the inherited value and confirm **Resync**.
+
+Davinci removes the local override. The field immediately inherits from the base again.
+
+Some related values, such as task scheduling fields, are shown as one override group and resync together.
+
+### Revert the Whole Specialization
+
+Use **Revert to Base** to discard changes throughout an extension:
+
+1. Right-click the specialization root in the Index.
+2. Select **Revert to Base**.
+3. Review the confirmation carefully.
+4. Confirm **Revert**.
+
+Reverting removes local field overrides from the specialization and its inherited children. It also removes extra inheritable objects added inside the extension when they have no counterpart in the base.
+
+<Warning>
+Revert to Base affects the complete specialization subtree. Use field-level Resync when only one value should return to the base.
+</Warning>
+
+## Indicators in the Interface
+
+Davinci displays inheritance status in the Index, object anchors, and Properties view:
+
+- A **link icon** identifies an object that extends a base.
+- A **branch icon** identifies a base that is extended by one or more specializations.
+- **Inherited**, **Overridden**, and **Extended** indicators describe individual fields and collections.
+- Disabled removal controls identify inherited entries that must be changed on the base.
+
+The inheritance link in Properties opens the base object.
+
+## Supported Object Types
+
+Inheritance is available for model object types whose content can be specialized safely.
+
+### Structure
+
+- [Parts](/pages/modeling/objects/parts)
+- [Packages](/pages/modeling/objects/packages)
+- [Entities](/pages/modeling/objects/entities)
+- [Requirements](/pages/modeling/objects/requirements)
+- [Tests](/pages/modeling/objects/tests)
+- [Capabilities](/pages/modeling/objects/capability)
+- [Linkages](/pages/modeling/objects/linkages)
+
+### Values
+
+- [Attributes](/pages/modeling/objects/attributes)
+- [Constraints](/pages/modeling/objects/constraints)
+- [Resources](/pages/modeling/objects/resource)
+- [Risks](/pages/modeling/objects/risk)
+
+### Behavior
+
+- [Actions](/pages/modeling/objects/actions)
+- [States](/pages/modeling/objects/states)
+- [Transitions](/pages/modeling/objects/transitions)
+- [Tasks](/pages/modeling/objects/task)
+
+### Interface
+
+- [Ports](/pages/modeling/objects/ports)
+- [Interfaces](/pages/modeling/objects/interface)
+- [Items](/pages/modeling/objects/item)
+
+Artifacts, References, Code, Toolboxes, and CAD objects do not currently support object inheritance. Each object-type page lists its inheritance support in **Properties Fields**.
+
+## Multi-Level Inheritance
+
+A specialization can itself be used as a base, creating multiple levels of specialization. Values resolve through the chain, with the nearest local override taking precedence.
+
+Keep inheritance chains focused and easy to understand. When variants no longer share a stable definition, separate objects and explicit relationships may be clearer than adding more inheritance levels.
+
+## Best Practices
+
+- Put stable, shared definitions on the base.
+- Override only fields that intentionally differ.
+- Add shared children and relationships to the base, not separately to every specialization.
+- Use the Properties indicators to distinguish inherited and local content.
+- Prefer field-level Resync over Revert to Base for small corrections.
+- Review specializations before restructuring or deleting a base.
+- Use [Relationships](/pages/modeling/common/relationships) when objects are connected but one is not a specialized form of the other.
+
+## Search, Agent, and Export Behavior
+
+Inherited values are resolved throughout Davinci, including search and supported Agent workflows. Internal model references are mapped to the corresponding objects inside a specialization when counterparts exist.
+
+SysML v2 import and export preserve supported inheritance and redefinition structures. Locally overridden content exports as specialization-specific redefinitions where applicable.

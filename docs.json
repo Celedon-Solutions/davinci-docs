@@ -214,6 +214,7 @@
                                 "pages": [
                                     "pages/modeling/common/equations",
                                     "pages/modeling/common/relationships",
+                                    "pages/modeling/common/inheritance",
                                     "pages/modeling/common/units"
                                 ]
                             },
@@ -291,6 +292,7 @@
                         "pages": [
                             "pages/modeling/common/equations",
                             "pages/modeling/common/relationships",
+                            "pages/modeling/common/inheritance",
                             "pages/modeling/common/units"
                         ]
                     },
