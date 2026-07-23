@@ -1,0 +1,99 @@
+---
+title: 'Version 4.6.0 - Figures, Inheritance & Test Modeling'
+description: 'July 21 2026'
+---
+
+## Version 4.6.0 - Figures, Inheritance & Test Modeling
+
+This release introduces reusable Figure and Test objects, object inheritance for building specialized model structures, graphically editable Gantt schedules, and broader improvements to documents, slides, the agent, exports, and everyday modeling workflows.
+
+### New Object Types
+
+- Added **Figure** objects for creating reusable diagrams that stay connected to live model data
+- Added **Test** objects for planning, performing, and documenting verification and validation activities
+
+### Figures
+
+- Added a dedicated Figure editor for building and refining diagrams independently of documents and slides
+- Added Tree, Interface, Block, Traceability, Activity, State, Gantt, and Risk Matrix figure modes
+- Added interactive editing for moving and resizing nodes, selecting multiple items, adjusting connections and labels, and placing ports
+- Added themes, custom colors, node and connection styling, and reusable style rules
+- Added rule-based coloring for values such as risk level, requirement satisfaction, and task status
+- Added configurable legends with custom entries and automatically generated entries based on figure styling
+- Added controls for changing a figure's scope, hiding or restoring objects, and switching connection routing styles
+- Added a figure picker for embedding existing Figure objects in documents and slides
+- Improved figure rendering and export fidelity across PDF, Word, PowerPoint, PNG, and SVG output
+- Added agent support for creating, styling, updating, and embedding Figures
+
+### Object Inheritance
+
+- Added object inheritance so a specialized object can extend an existing base object instead of duplicating it
+- Added **Extend Object** and **New Object from Extension** actions for creating specializations from the project index
+- Specialized objects inherit fields, children, relationships, references, tags, and other model structure from their base
+- Changes to a base flow to specializations while preserving values that have been overridden locally
+- Added clear inherited and overridden indicators in the Index and Properties view
+- Added one-click resync for individual overrides and **Revert to Base** for resetting a specialization
+- Added safeguards that keep inherited structures aligned and prevent accidental moves or removals that would break the base relationship
+- Added inheritance-aware search, agent workflows, and SysML v2 import and export
+
+### [Test Objects](/pages/modeling/objects/tests)
+
+- Added nested Test hierarchies for organizing verification plans and rolling results up from individual activities
+- Added project-level Test Categories for Test, Analysis, Inspection, Demonstration, Milestone Review, and custom verification methods
+- Added configurable verdict names, colors, scores, and All, Minimum, or Weighted rollup behavior
+- Added fields for procedures, observed results, evaluation criteria, supporting evidence, status, weight, and prerequisites
+- Added criteria for evaluating numeric ranges, text, booleans, model references, and state-specific values
+- Added **Run Test** for executing code-backed results across a test hierarchy, tracking progress, deriving verdicts, and saving result evidence
+- Added stale-result indicators when referenced model values or evaluation criteria change
+- Added verify and validate relationships for connecting Tests to Requirements
+- Added a dedicated Test Table, dependency visualization, observed-value history, change comparisons, and in-app Help
+- Added agent support for building, updating, running, and sequencing Tests and for configuring Test Categories
+- Added SysML v2 text and JSON export for Test objects
+
+### [Tasks & Scheduling](/pages/modeling/objects/task)
+
+- Added direct Gantt editing so tasks can be moved and resized on the timeline
+- Added right-click creation of tasks from the Gantt view
+- Improved automatic schedule consistency when task dates and dependencies change
+
+### [Documents](/pages/modeling/objects/documents), [Slides](/pages/modeling/objects/slide) & Agent
+
+- Added agent tools for generating research posters and quad-chart slide layouts
+- Improved agent-generated slide layouts, text fitting, gap detection, and follow-up edits
+- Improved document text editing, formatting controls, and reference handling
+- Improved slide preview updates, zoomed-slide scrolling, and resize behavior
+- Improved table presentation in documents and slides
+- Improved table border fidelity in Word and PDF exports, including headers and footers
+- Added the ability to remove dependencies directly from the agent Plan view
+- Improved planning, continued conversations, streamed markdown, and agent change summaries
+
+### Modeling, Views & Navigation
+
+- Added support for equations that use state-specific Attribute values
+- Added support for project files and nested file data in Attribute calculations
+- Improved replacement of referenced files so existing references update without creating duplicate objects
+- Improved Allocation Matrix labels, object names, settings, and large-view safeguards
+- Improved table layouts and relationship controls across Requirements, Resources, Risks, Tasks, and roll-up views
+- Added stale satisfaction warnings for Requirements in the Issues view
+- Added richer object tooltips and paths throughout the workspace, Index, and Search
+- Added a relative timeline to object History and improved change descriptions
+- Improved search performance and keyboard navigation
+- Redesigned Include Package as a searchable project, branch, and package explorer
+- Improved sequence, messaging, state tree, fault tree, and Connectome views
+
+### Export & Interoperability
+
+- Expanded SysML v2 export coverage for expressions, interfaces, connections, Tests, and inherited model structures
+- Improved DMO round-trip fidelity for referenced block data
+- Improved document, slide, table, and Figure export consistency
+
+### Administration
+
+- Improved LDAP and SSO settings for configuring multiple group mappings
+
+### Reliability & Performance
+
+- Improved responsiveness when rendering large or complex views
+- Improved agent session recovery, planning reliability, and file handling
+- Added safeguards and clearer warnings for views that would render unusually large amounts of model data
+- Added general stability, interaction, and display improvements throughout the editor

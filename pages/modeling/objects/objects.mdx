@@ -34,6 +34,7 @@ Model Object Types in Davinci are organized into the following visual categories
 | [Document](/pages/modeling/objects/documents) | Represents a structured document artifact containing sections and tables in a pageful display. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/document.svg" /> |
 | [Table](/pages/modeling/objects/tables) | A structured artifact representation of data in rows and columns, used to organize object data. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/table.svg" /> |
 | [Matrix](/pages/modeling/objects/matrix) | An artifact that maps relationships between two sets of objects in a configurable allocation matrix. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/matrix.svg" /> |
+| [Figure](/pages/modeling/objects/figure) | A reusable diagram artifact that renders live model objects using configurable layouts, styling, and manual overrides. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/figure.svg" /> |
 | [Slide](/pages/modeling/objects/slide) | A presentation artifact made of slides with editable text, media, and layout elements. | <img width="15" noZoom style={{ margin: 0, display: "inline-block", verticalAlign: "middle" }} src="/images/objecticons/slide.svg" /> |
 
 ### Behavior
@@ -100,6 +101,14 @@ Most Davinci objects can connect to other objects in several ways. These connect
 Objects live in a tree. Each object has a parent and may own child objects. This hierarchy is visible in the model index and is used to organize systems, packages, requirements, behaviors, artifacts, and reference material.
 
 Parent-child hierarchy is best for ownership and structure. For example, a system part may own subsystem parts, attributes, ports, and requirements.
+
+### Object Inheritance
+
+Object inheritance creates a specialized version of a supported model object. The specialization inherits fields and model structure from a base while keeping intentional local overrides and additions.
+
+Use inheritance for variants and reusable patterns where one object is a specialized form of another. Use relationships instead when objects are connected but neither is a specialization of the other.
+
+See [Object Inheritance](/pages/modeling/common/inheritance) for supported object types and the Extend, Resync, and Revert workflows.
 
 ### References
 

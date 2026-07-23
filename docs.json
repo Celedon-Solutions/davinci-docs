@@ -214,6 +214,7 @@
                                 "pages": [
                                     "pages/modeling/common/equations",
                                     "pages/modeling/common/relationships",
+                                    "pages/modeling/common/inheritance",
                                     "pages/modeling/common/units"
                                 ]
                             },
@@ -291,6 +292,7 @@
                         "pages": [
                             "pages/modeling/common/equations",
                             "pages/modeling/common/relationships",
+                            "pages/modeling/common/inheritance",
                             "pages/modeling/common/units"
                         ]
                     },
@@ -355,6 +357,7 @@
                                     "pages/modeling/objects/documents",
                                     "pages/modeling/objects/tables",
                                     "pages/modeling/objects/matrix",
+                                    "pages/modeling/objects/figure",
                                     "pages/modeling/objects/slide"
                                 ]
                             },
@@ -450,6 +453,10 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
+                    "pages/release-notes/v4.6.0",
+                    "pages/release-notes/v4.5.3",
+                    "pages/release-notes/v4.5.2",
+                    "pages/release-notes/v4.5.1",
                     "pages/release-notes/v4.5.0",
                     "pages/release-notes/v4.4.0",
                     "pages/release-notes/v4.3.2",

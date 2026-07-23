@@ -39,9 +39,9 @@ Image elements display images from Reference objects in your model. You can inse
 When you drag an image from the index onto a slide, it automatically uploads the image and adds it to the slide. Dragging multiple images is supported.
 
 ### Figure Elements
-Figure elements are images with associated captions and automatic numbering. They work similarly to figures in documents, maintaining sequential numbering (Figure 1, Figure 2, etc.) across all slides in the presentation.
+Figure elements render live model diagrams. An element can reference a reusable [Figure object](/pages/modeling/objects/figure), which owns its roots, render mode, layout, and styling, or directly reference another model object for a simple visualization stored on that slide.
 
-Figures are useful when you need to formally reference images in presentation notes or documentation.
+Reusable Figure objects are useful when the same diagram appears in multiple slides or documents, or when it needs custom styling, multiple roots, and manual layout overrides.
 
 ### Table Elements
 Table elements embed data tables within slides. These tables support basic data display with text and reference cells, making them ideal for showing specifications, comparisons, or traceability information.
@@ -270,7 +270,7 @@ The Insert menu provides access to all element types you can add to slides:
 ### Elements
 - **Text Box**: Add a formatted text container
 - **Image**: Insert an image from a model Reference object
-- **Figure**: Insert a numbered figure with caption
+- **Figure**: Insert a reusable Figure object or a direct visualization of another model object
 - **Table**: Embed a data table
 - **Circle**: Add a circular/elliptical shape
 - **Line**: Draw a connecting line
@@ -363,6 +363,10 @@ PPTX export converts slides to PowerPoint format, preserving:
 | [Relationships](/pages/modeling/common/relationships) | Explore the network of connections to other objects. |
 
 ## Properties Fields
+
+<ParamField path="Inheritable" type="boolean">
+**No.** Slides do not currently support [object inheritance](/pages/modeling/common/inheritance).
+</ParamField>
 
 <ParamField path="Name" type="string">
 Name of the object.
