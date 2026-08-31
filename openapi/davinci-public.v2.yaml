@@ -2,103 +2,185 @@ openapi: 3.1.0
 info:
   title: Davinci Public API
   version: 2.0.0
-  description: Public Routing Server API contract for Davinci integrations and official SDKs.
+  description: |
+    Public Routing Server API contract for Davinci integrations and official SDKs.
+
+    Most operations live on the canonical `/api/v2/projects` mount and accept a
+    personal access token (`dav_ak_live_…` / `dav_ak_test_…`) or browser access
+    token. Evaluation-run creation is the deliberate exception: it accepts only a
+    `purpose=automation` grant issued to a running Code execution.
+    Project membership and role are checked on every user call, and an API key is
+    additionally bounded by the permission ceiling derived from its scopes — a key
+    can never exceed what its owner can do, and usually does less.
+
+    Collaboration operations (invitations, membership changes, ownership transfer)
+    are deliberately absent: they require a browser session and are not part of the
+    programmatic surface.
+
+    ## Two planes
+
+    Most operations are **control plane**: they run on the Routing Server, take
+    small requests, and answer quickly. A few are **data plane**, marked
+    `x-plane: data`, and go straight to the machine holding your project — the only
+    practical way to move multi-gigabyte files or hold a connection open for half
+    an hour.
+
+    Data-plane operations use a different host and a different credential. Create a
+    session on a project and it returns both: a `dataPlane.url` to send to and a
+    short-lived `dataPlane.token` (`dav_gr_…`, a *grant*) to send with. A grant
+    reaches exactly one project, carries no more permission than the key that
+    minted it, expires in minutes, and dies when its session closes. It is not
+    interchangeable with an API key in either direction.
+
+    The data-plane host never names a specific machine, so a project that moves
+    between machines mid-session stays reachable at the same URL.
 servers:
   - url: https://davinci-app.com
-    description: Production
+    description: Production (control plane)
+  - url: https://davinci-app.com/data
+    description: >-
+      Production (data plane). Serves the operations marked `x-plane: data`, using a
+      session's grant rather than an API key.
 tags:
-  - name: Meta
-    description: API metadata and health checks.
   - name: Projects
-    description: Read project metadata, trees, objects, and attached files.
+    description: Create, inspect, open, close, and delete projects, and manage their attached files.
+  - name: Content
+    description: |
+      Read and write the objects a project is made of. These reach the running
+      project rather than storage, so they see uncommitted work — and so they open
+      the project if it is not already open.
+  - name: Branches
+    description: |
+      Branches, commits, and the history of a single object. A commit captures the
+      running project's state, so these operations need the branch loaded, which they
+      arrange for the caller.
+  - name: Sessions
+    description: |
+      A session opens a project, holds it open, and issues the grant that reaches the
+      data plane. It is the programmatic equivalent of having a project open in a
+      browser tab: while it lives, the project stays loaded.
+
+      It is also where the agent lives. Send it a prompt, read its status from the
+      session, read the transcript back, and stop a run that is going the wrong way.
+  - name: AgentModels
+    description: |
+      Chat models available to your account. The returned keys are the values accepted
+      by the session message API; availability follows your subscription, tenant, and
+      any profile assigned to your account.
+  - name: Tools
+    description: |
+      Invoke one of the agent's tools yourself, without the agent. Useful when you
+      already know the operation you want and do not need a model to choose it — and
+      when you want a deterministic result rather than an interpreted one.
+
+      A tool is still held to the permissions of the credential invoking it, so a
+      key cannot reach through a tool to something its scopes exclude.
+  - name: Files
+    description: |
+      Data-plane file transfer. These reach your project's machine directly using a
+      session's grant, which is what allows request bodies far larger than the
+      control plane accepts.
+  - name: Usage
+    description: |
+      What your models cost, broken down by model, project, session, or day. These
+      read the usage ledger, which records one event per completed provider call —
+      not your credit balance, which is `/api/v2/billing`.
+
+      Usage is reported on an interval rather than per call, so a run that is still
+      going may not be fully counted yet. Every response carries `asOf`, the moment
+      the newest counted event was recorded, so you can see how current a total is
+      instead of guessing.
+
+      This is separate from `projects:read` on purpose: a key that reads your
+      project data is not thereby allowed to see what you spend.
+  - name: Evaluations
+    description: |
+      Lifecycle for the ephemeral target sandbox an evaluation runs against.
+      Creation is available only to a `purpose=automation` grant issued to a
+      running Code execution, so a sandbox always belongs to code rather than to
+      a person's key. It returns a second, `purpose=evaluation` grant bound to
+      the new sandbox; it never upgrades or replaces the source credential.
+  - name: Tests
+    description: |
+      Asynchronously run an authored Test. The Test executes its linked Code
+      object and applies its native evaluation criteria to derive the verdict.
+      This is one way to start Code, not a prerequisite for anything the Code can
+      do: the same function called directly holds the same authority.
 security:
   - ApiKeyBearer: []
 paths:
-  /api/v2/programmatic:
+  /api/v2/agent/models:
     get:
-      operationId: getApiInfo
-      tags: [Meta]
-      summary: Get programmatic API metadata
-      description: Returns the current public programmatic API name, version, endpoint map, and authentication hint.
-      x-routing-server-source: RoutingServer/api/v2/programmatic/index.js
+      operationId: listAgentModels
+      tags: [AgentModels]
+      summary: List available agent models
+      description: |
+        Returns the chat models available through the calling account's effective LLM
+        profile. Pass a model's `key` as `model` when sending an agent message, and
+        use its `options` definitions to build `modelOptions`.
+
+        The list can differ between accounts because subscription tier, tenant policy,
+        and an account-specific profile can all affect it. Omitting `model` from a
+        message uses `defaultModel`.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agent/agent.routes.js
+      x-required-scopes: [agent:message]
       x-sdk-methods:
-        typescript: client.getInfo
-        python: client.get_info
+        typescript: client.agentModels.list
+        python: client.agent_models.list
       x-codeSamples:
         - lang: typescript
           label: TypeScript SDK
           source: |
-            import { DavinciClient } from '@celedon/davinci-sdk';
-
-            const client = new DavinciClient({
-              apiKey: process.env.DAVINCI_API_KEY!,
-            });
-
-            const info = await client.getInfo();
-            console.log(info.version);
+            const available = await client.agentModels.list();
+            console.log('Default:', available.defaultModel);
+            for (const model of available.models) {
+              console.log(model.key, model.name);
+              console.log(model.options);
+            }
         - lang: python
           label: Python SDK
           source: |
-            import os
-            from davinci_sdk import DavinciClient
-
-            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                info = client.get_info()
-                print(info.version)
+            available = client.agent_models.list()
+            print("Default:", available.default_model)
+            for model in available.models:
+                print(model.key, model.name)
+                print(model.options)
       responses:
         '200':
-          description: Programmatic API metadata.
+          description: Models available to the calling account.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgrammaticApiInfoEnvelope'
-  /api/v2/programmatic/health:
-    get:
-      operationId: getHealth
-      tags: [Meta]
-      summary: Check programmatic API health
-      description: Returns a lightweight health payload for the public programmatic API.
-      x-routing-server-source: RoutingServer/api/v2/programmatic/index.js
-      x-sdk-methods:
-        typescript: client.getHealth
-        python: client.get_health
-      x-codeSamples:
-        - lang: typescript
-          label: TypeScript SDK
-          source: |
-            import { DavinciClient } from '@celedon/davinci-sdk';
-
-            const client = new DavinciClient({
-              apiKey: process.env.DAVINCI_API_KEY!,
-            });
-
-            const health = await client.getHealth();
-            console.log(health.status);
-        - lang: python
-          label: Python SDK
-          source: |
-            import os
-            from davinci_sdk import DavinciClient
-
-            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                health = client.get_health()
-                print(health.status)
-      responses:
-        '200':
-          description: Programmatic API health status.
+                $ref: '#/components/schemas/ListAgentModelsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '409':
+          description: The account has no usable published LLM profile.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgrammaticHealthEnvelope'
-  /api/v2/programmatic/projects:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects:
     get:
       operationId: listProjects
       tags: [Projects]
       summary: List accessible projects
-      description: Returns a flat paginated list of projects visible to the authenticated API-key actor.
+      description: |
+        Returns the caller's projects split into `owned` and `shared`. Each entry
+        carries git branch state and an `inUse` flag indicating whether the project
+        currently has a running Design Engine instance.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/Projects.routes.js
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
         typescript: client.projects.list
@@ -113,9 +195,9 @@ paths:
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const { projects } = await client.projects.list({ limit: 10 });
-            for (const project of projects) {
-              console.log(project.id, project.name);
+            const { owned, shared } = await client.projects.list();
+            for (const project of [...owned, ...shared]) {
+              console.log(project.id, project.name, project.inUse);
             }
         - lang: python
           label: Python SDK
@@ -124,44 +206,124 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                result = client.projects.list(limit=10)
-                for project in result.projects:
-                    print(project.id, project.name)
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+                result = client.projects.list()
+                for project in [*result.owned, *result.shared]:
+                    print(project.id, project.name, project.in_use)
       responses:
         '200':
-          description: Project page.
+          description: The caller's owned and shared projects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListProjectsEnvelope'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/ListProjectsResponse'
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/InsufficientScopes'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-        '503':
-          description: Service or project acquisition unavailable. Common error codes include `SERVICE_UNAVAILABLE`, `PROJECT_NOT_READY`, and `SERVER_NOT_AVAILABLE`.
+    post:
+      operationId: createProject
+      tags: [Projects]
+      summary: Create a project
+      description: |
+        Creates a project owned by the caller, or by `orgId` when supplied. Either
+        `name` or `initialPrompt` is required. When `autoName` is set with an
+        `initialPrompt`, the name is derived from the prompt.
+
+        Send an `Idempotency-Key` header to make a retry safe. Creating a project
+        writes a repository and an initial commit, and a duplicate is not reclaimed,
+        so a request that times out after the server completed it would otherwise
+        leave you choosing between a leaked project and a lost one. A repeat of the
+        same key returns the project the first call created, with the same `201`.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:manage]
+      x-sdk-methods:
+        typescript: client.projects.create
+        python: client.projects.create
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const project = await client.projects.create({ name: 'Spacecraft' });
+            console.log(project.id);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                project = client.projects.create(name="Spacecraft")
+                print(project.id)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
+      responses:
+        '201':
+          description: Project created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            Scope missing, project limit reached (`PROJECT_LIMIT_REACHED`), or no
+            permission to create in the requested organization.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
-  /api/v2/programmatic/projects/{projectId}:
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            The Idempotency-Key is currently initializing a project, was reused
+            with different create settings, or points to a result that is no
+            longer available. Error code is `PROJECT_CREATE_IN_PROGRESS`,
+            `IDEMPOTENCY_KEY_REUSED`, or `IDEMPOTENCY_RESULT_UNAVAILABLE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
     get:
       operationId: getProject
       tags: [Projects]
-      summary: Get project metadata and permissions
-      description: Returns 404 when the project does not exist or is hidden from the caller.
-      security:
-        - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/Projects.routes.js
+      summary: Get project metadata
+      description: |
+        Returns the project's stored metadata, including its owner, visibility,
+        version, storage footprint, and effective collaborators.
+
+        Use the permissions endpoint when you need to know what this credential may
+        do with the project; those are reported separately because they are derived
+        per credential rather than stored on the project.
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
         typescript: client.projects.get
@@ -176,8 +338,8 @@ paths:
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const project = await client.projects.get('project-id');
-            console.log(project.name, project.permissions);
+            const { metadata } = await client.projects.get(projectId);
+            console.log(metadata.name, metadata.visibility);
         - lang: python
           label: Python SDK
           source: |
@@ -185,46 +347,703 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                project = client.projects.get("project-id")
-                print(project.name, project.permissions)
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
+                result = client.projects.get(project_id)
+                print(result.metadata.name, result.metadata.visibility)
       responses:
         '200':
           description: Project metadata.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectMetadataEnvelope'
+                $ref: '#/components/schemas/GetProjectResponse'
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      operationId: updateProject
+      tags: [Projects]
+      summary: Update project metadata
+      description: Updates any subset of name, description, visibility, readme, tags, or units.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:manage]
+      x-sdk-methods:
+        typescript: client.projects.update
+        python: client.projects.update
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { metadata } = await client.projects.update(projectId, {
+              description: 'Launch vehicle upper stage',
+            });
+            console.log(metadata.description);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.projects.update(
+                    project_id, description="Launch vehicle upper stage"
+                )
+                print(result.metadata.description)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectRequest'
+      responses:
+        '200':
+          description: Updated project metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          $ref: '#/components/responses/ProjectNotFound'
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteProject
+      tags: [Projects]
+      summary: Delete a project
+      description: |
+        Soft-deletes the project. Storage is released from the owner's balance and
+        the project becomes invisible to normal reads; a system administrator can
+        restore it for a retention window.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:manage]
+      x-sdk-methods:
+        typescript: client.projects.delete
+        python: client.projects.delete
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.projects.delete(projectId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.projects.delete(project_id)
+      responses:
+        '204':
+          description: Project deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/open:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      operationId: openProject
+      tags: [Projects]
+      summary: Open a project
+      description: |
+        Loads the project onto a Design Engine replica, or returns the already-running
+        instance. `alreadyLoaded` distinguishes the two.
+
+        API-key callers receive lifecycle confirmation only. The `url` and
+        `serverToken` fields that a browser receives are omitted, because
+        `serverToken` is minted per project rather than per user and would let its
+        holder act as any collaborator. Programmatic access to live project data will
+        use short-lived project-scoped grants instead.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.projects.open
+        python: client.projects.open
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const opened = await client.projects.open(projectId, { branch: 'main' });
+            console.log(opened.branchName, opened.alreadyLoaded);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                opened = client.projects.open(project_id, branch="main")
+                print(opened.branch_name, opened.already_loaded)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpenProjectRequest'
+      responses:
+        '200':
+          description: Project is loaded and ready.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
-          description: Service unavailable. Common error codes include `SERVICE_UNAVAILABLE` and `SERVER_NOT_AVAILABLE`.
+          description: |
+            No Design Engine replica could take the project. Common codes are
+            `PROJECT_SERVER_UNAVAILABLE` and `SERVICE_UNAVAILABLE`. Safe to retry.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
-  /api/v2/programmatic/projects/{projectId}/tree:
+  /api/v2/projects/{projectId}/close:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      operationId: closeProject
+      tags: [Projects]
+      summary: Close a project
+      description: |
+        Saves and unloads the running Design Engine instance. Closing a project that
+        is not running succeeds without effect, so this is safe to call
+        unconditionally in cleanup paths.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.projects.close
+        python: client.projects.close
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.projects.close(projectId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.projects.close(project_id)
+      responses:
+        '200':
+          description: Project closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/branches:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listProjectBranches
+      tags: [Projects]
+      summary: List project branches
+      description: Returns the authoritative git branches for the project from storage.
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.listBranches
+        python: client.projects.list_branches
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { branches } = await client.projects.listBranches(projectId);
+            console.log(branches.map((branch) => branch.name));
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.projects.list_branches(project_id)
+                print([branch.name for branch in result.branches])
+      responses:
+        '200':
+          description: Project branches.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBranchesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createBranch
+      tags: [Branches]
+      summary: Create a branch
+      description: |
+        Branches from another branch at its latest commit, copying its committed
+        content. Uncommitted work on the source is not carried over.
+
+        Branch names are sanitized, so the created name is not always the requested
+        one. `branch.name` is what was created and `sanitized` says whether it
+        differs.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/projectGit.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.branches.create
+        python: client.branches.create
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { branch } = await client.branches.create(projectId, { name: 'thermal-study' });
+            console.log(branch.name);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.branches.create(project_id, name="thermal-study")
+                print(result.branch.name)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBranchRequest'
+      responses:
+        '201':
+          description: Branch created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBranchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            Project not found, or the source branch does not exist. Error code is
+            `SOURCE_BRANCH_NOT_FOUND` for the latter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            A branch of that name already exists (`BRANCH_ALREADY_EXISTS`), or the
+            project is no longer running (`PROJECT_NOT_RUNNING`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/GitFailed'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/branches/{branch}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BranchPath'
+    delete:
+      operationId: deleteBranch
+      tags: [Branches]
+      summary: Delete a branch
+      description: |
+        Deletes a branch and the commits only it holds. There is no undo, which is
+        why this asks for `projects:manage` where creating a branch asks for
+        `projects:write`.
+
+        Refused with `BRANCH_IN_USE` while anyone is connected to the branch. Pass
+        `force=true` to disconnect them instead; their in-memory work is saved to the
+        branch first, and then goes with it.
+
+        `main` cannot be deleted.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/projectGit.routes.js
+      x-required-scopes: [projects:manage]
+      x-sdk-methods:
+        typescript: client.branches.delete
+        python: client.branches.delete
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.branches.delete(projectId, 'thermal-study');
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.branches.delete(project_id, "thermal-study")
+      parameters:
+        - name: force
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Disconnect anyone using the branch instead of refusing.
+      responses:
+        '200':
+          description: Branch deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteBranchResponse'
+        '400':
+          description: |
+            The branch cannot be deleted as asked. Error code is `CANNOT_DELETE_MAIN`,
+            `BRANCH_IN_USE`, `BRANCH_NOT_FOUND`, or `UNMERGED_COMMITS`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/GitFailed'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/branches/{branch}/commits:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BranchPath'
+    post:
+      operationId: createCommit
+      tags: [Branches]
+      summary: Commit a branch
+      description: |
+        Commits everything uncommitted on the branch. There is nothing to stage — the
+        working state is the live project, not a checkout, so a commit is all of it or
+        nothing.
+
+        Committing requires the branch to be loaded, which this does on the caller's
+        behalf. A commit of an untouched branch still produces a revision.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/projectGit.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.branches.commit
+        python: client.branches.commit
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { commit } = await client.branches.commit(projectId, 'main', {
+              message: 'Seed requirements',
+            });
+            console.log(commit.hash);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.branches.commit(project_id, "main", message="Seed requirements")
+                print(result.commit.hash)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitRequest'
+      responses:
+        '201':
+          description: Commit created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/GitFailed'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/branches/{branch}/changes:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BranchPath'
+    get:
+      operationId: getBranchChanges
+      tags: [Branches]
+      summary: Read uncommitted changes
+      description: |
+        Returns which objects on the branch differ from its last commit, as three
+        lists of ids plus enough metadata to name the deleted ones.
+
+        Deleted objects come with their name and type because they can no longer be
+        read from the project.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/projectGit.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.branches.getChanges
+        python: client.branches.get_changes
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const changes = await client.branches.getChanges(projectId, 'main');
+            console.log(changes.hasChanges, changes.added.length);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                changes = client.branches.get_changes(project_id, "main")
+                print(changes.has_changes, len(changes.added))
+      responses:
+        '200':
+          description: Uncommitted changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/GitFailed'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/packages:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listProjectPackages
+      tags: [Projects]
+      summary: List public packages
+      description: |
+        Returns the project's public packages, which are the units another project can
+        include by reference.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.listPackages
+        python: client.projects.list_packages
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { packages } = await client.projects.listPackages(projectId, { branch: 'main' });
+            console.log(packages.length);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.projects.list_packages(project_id, branch="main")
+                print(len(result.packages))
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: Public packages.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPackagesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/tree:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
     get:
       operationId: getProjectTree
-      tags: [Projects]
-      summary: Get project tree
-      description: Auto-acquires a Design Engine instance, then returns a flat tree of project objects.
+      tags: [Content]
+      summary: Read the object tree
+      description: |
+        Returns every object in the project as a flat list, with parentage expressed
+        by `parent` and `childrenCount`.
+
+        This reads the running project, so it opens it if it is not already open, and
+        it shows uncommitted state — which is the state a caller that just wrote
+        something is asking about. The storage-backed reads are cheaper but only show
+        the last save.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
-        typescript: client.projects.getTree
-        python: client.projects.get_tree
+        typescript: client.content.getTree
+        python: client.content.get_tree
       x-codeSamples:
         - lang: typescript
           label: TypeScript SDK
@@ -235,8 +1054,10 @@ paths:
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const tree = await client.projects.getTree('project-id', { branch: 'main' });
-            console.log(tree.tree.length);
+            const { tree } = await client.content.getTree(projectId);
+            for (const node of tree) {
+              console.log(node.type, node.name);
+            }
         - lang: python
           label: Python SDK
           source: |
@@ -244,52 +1065,154 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                tree = client.projects.get_tree("project-id", branch="main")
-                print(len(tree.tree))
+                result = client.content.get_tree(project_id)
+                for node in result.tree:
+                    print(node.type, node.name)
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Branch'
       responses:
         '200':
-          description: Project tree.
+          description: The project's objects.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectTreeEnvelope'
+                $ref: '#/components/schemas/ProjectTree'
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          $ref: '#/components/responses/ProjectNotFound'
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
-          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
-          headers:
-            Retry-After:
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/objects:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      operationId: addProjectObjects
+      tags: [Content]
+      summary: Add objects
+      description: |
+        Adds objects to the running project, opening it if needed. The write goes
+        through the same path an interactive client uses, so parentage, layout, and
+        the broadcast to anyone else in the project all happen as normal.
+
+        The objects are in memory once this returns; they are in git only after a
+        commit. A response reporting fewer objects than were sent does not happen —
+        the request either applies in full or fails.
+
+        Every object is checked against the schema for its `type` before anything
+        is written, so one bad object fails the whole request and the project is
+        left untouched. Any type the model defines can be written here; the 400
+        names what was wrong with each object it refused.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.content.addObjects
+        python: client.content.add_objects
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { addedCount } = await client.content.addObjects(projectId, {
+              objects: {
+                [crypto.randomUUID()]: { type: 'requirement', name: 'Dry mass under 500 kg' },
+              },
+            });
+            console.log(addedCount);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            import uuid
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.content.add_objects(
+                    project_id,
+                    objects={str(uuid.uuid4()): {"type": "requirement", "name": "Dry mass under 500 kg"}},
+                )
+                print(result.added_count)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddObjectsRequest'
+      responses:
+        '201':
+          description: Objects added.
+          content:
+            application/json:
               schema:
-                type: integer
-                minimum: 1
+                $ref: '#/components/schemas/AddObjectsResponse'
+        '400':
+          description: |
+            Nothing was written. `INVALID_OBJECTS` means the `objects` map itself was
+            missing, empty, or not a map. `INVALID_OBJECT` means at least one object
+            failed its schema: `details.objects` maps each refused id to what is
+            wrong with it, and `details.validTypes` lists every writable type when a
+            `type` was the problem.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
-  /api/v2/programmatic/projects/{projectId}/objects/{objectId}:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          description: |
+            The project accepted the request but applied none of it. Error code is
+            `OBJECTS_NOT_APPLIED`. Nothing was written; the request can be retried.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/objects/{objectId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ObjectId'
     get:
       operationId: getProjectObject
-      tags: [Projects]
-      summary: Get a project object
-      description: Returns a full object payload. Object shape is type-specific; common fields are documented and extra fields are allowed.
+      tags: [Content]
+      summary: Read an object
+      description: |
+        Returns one object with its computed values resolved, from the running
+        project. Fields vary by object type.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
-        typescript: client.projects.getObject
-        python: client.projects.get_object
+        typescript: client.content.getObject
+        python: client.content.get_object
       x-codeSamples:
         - lang: typescript
           label: TypeScript SDK
@@ -300,10 +1223,8 @@ paths:
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const object = await client.projects.getObject('project-id', 'object-id', {
-              branch: 'main',
-            });
-            console.log(object.name, object.type);
+            const { object } = await client.content.getObject(projectId, objectId);
+            console.log(object.name);
         - lang: python
           label: Python SDK
           source: |
@@ -311,49 +1232,213 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                obj = client.projects.get_object("project-id", "object-id", branch="main")
-                print(obj.name, obj.type)
+                result = client.content.get_object(project_id, object_id)
+                print(result.object)
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/ObjectId'
         - $ref: '#/components/parameters/Branch'
       responses:
         '200':
-          description: Project object.
+          description: The object.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectObjectEnvelope'
+                $ref: '#/components/schemas/GetObjectResponse'
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          $ref: '#/components/responses/ObjectNotFound'
+          description: |
+            Project or object not found. Error code is `OBJECT_NOT_FOUND` when the
+            project was readable but the object was not in it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
-          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
-          headers:
-            Retry-After:
+          $ref: '#/components/responses/ProjectNotReady'
+    delete:
+      operationId: deleteProjectObject
+      tags: [Content]
+      summary: Delete an object
+      description: |
+        Deletes an object from the running project, together with its descendants.
+        Parent links, relationships, indexes, and other model references are cleaned
+        through the same update path used by the editor.
+
+        The change is uncommitted when this returns. Call `createCommit` to save it
+        in git. Deleting a reference object does not delete its stored file bytes,
+        because file storage is shared across branches.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.content.deleteObject
+        python: client.content.delete_object
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const result = await client.content.deleteObject(projectId, objectId);
+            console.log(result.deletedObjectIds);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.content.delete_object(project_id, object_id)
+                print(result.deleted_object_ids)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: The object and its descendants were deleted.
+          content:
+            application/json:
               schema:
-                type: integer
-                minimum: 1
+                $ref: '#/components/schemas/DeleteObjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Project or object not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
-  /api/v2/programmatic/projects/{projectId}/files:
+        '409':
+          description: The object is protected, locked, or cannot be deleted independently.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/objects/{objectId}/history:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ObjectId'
+    get:
+      operationId: getObjectHistory
+      tags: [Branches]
+      summary: Read an object's commit history
+      description: |
+        Returns the commits on a branch that changed one object, newest first, each
+        with the object's state at that commit and the fields that changed.
+
+        Commits that did not touch the object are omitted, so this is not a slice of
+        the project history — it is the object's own.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/projectGit.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.branches.getObjectHistory
+        python: client.branches.get_object_history
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { history } = await client.branches.getObjectHistory(projectId, objectId);
+            for (const entry of history) {
+              console.log(entry.commit.shortHash, entry.changeType);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.branches.get_object_history(project_id, object_id)
+                for entry in result.history:
+                    print(entry.commit.short_hash, entry.change_type)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        '200':
+          description: The object's history on this branch.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectHistoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/GitFailed'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/files:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
     get:
       operationId: listProjectFiles
       tags: [Projects]
-      summary: List files attached to a project
-      description: Files are derived from project reference objects.
+      summary: List attached files
+      description: |
+        Returns the files attached to a branch from committed branch HEAD. Each
+        reference is joined to its `assets.primary` descriptor when present, so the
+        listed filename and size describe the immutable SHA-addressed blob. Older
+        snapshots without asset metadata retain the legacy files-prefix lookup.
+
+        Read from the branch's saved snapshot rather than from the running project,
+        so it works whether or not the project is open — and so a file attached
+        since the last save is not listed yet.
+
+        A reference whose bytes are missing from storage is listed with a null
+        `size`, because the object exists and omitting it would hide a half-finished
+        upload. The reverse does not hold: stored bytes with no reference on this
+        branch are not listed, since storage is shared across branches and one
+        branch cannot tell an orphan from another branch's file.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
         typescript: client.projects.listFiles
@@ -368,9 +1453,9 @@ paths:
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const files = await client.projects.listFiles('project-id', { branch: 'main' });
+            const { files } = await client.projects.listFiles(projectId);
             for (const file of files) {
-              console.log(file.id, file.name);
+              console.log(file.filename, file.size ?? 'missing');
             }
         - lang: python
           label: Python SDK
@@ -379,49 +1464,100 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                files = client.projects.list_files("project-id", branch="main")
-                for file in files:
-                    print(file.id, file.name)
+                result = client.projects.list_files(project_id)
+                for file in result.files:
+                    print(file.filename, file.size)
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Branch'
       responses:
         '200':
-          description: Project files.
+          description: Files attached to the branch.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListFilesEnvelope'
+                $ref: '#/components/schemas/ListFilesResponse'
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          $ref: '#/components/responses/ProjectNotFound'
+          $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-        '503':
-          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-                minimum: 1
+  /api/v2/projects/{projectId}/files/{fileId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/FileId'
+    delete:
+      operationId: deleteProjectFile
+      tags: [Projects]
+      summary: Delete an attached file
+      description: Removes a file and all of its stored variants from the project.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.projects.deleteFile
+        python: client.projects.delete_file
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.projects.deleteFile(projectId, fileId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.projects.delete_file(project_id, file_id)
+      responses:
+        '204':
+          description: File deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Project or file not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
-  /api/v2/programmatic/projects/{projectId}/files/{fileId}:
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/files/{fileId}/content:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/FileId'
     get:
       operationId: downloadProjectFile
       tags: [Projects]
-      summary: Download a project file
-      description: Returns raw file bytes with content headers forwarded from Design Engine. Successful download responses are not wrapped in the JSON success envelope used by other project read endpoints.
-      security:
-        - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/api/v2/programmatic/ProgrammaticRead.routes.js
+      summary: Download an attached file
+      description: |
+        Streams the bytes of a referenced file. `fileId` may be a reference object id
+        or a stored filename.
+
+        An authenticated caller receives current working bytes when this exact branch
+        is already active on a Design Engine. This request never starts a project; if
+        no live instance is available it falls back to committed branch HEAD.
+        Anonymous access to a public project always reads committed branch HEAD and
+        never observes working state. Committed snapshots use the immutable
+        `assets.primary.sha256` blob, with a legacy files-prefix fallback for older
+        snapshots.
+      x-routing-server-source: RoutingServer/project/project.routes.js
       x-required-scopes: [projects:read]
       x-sdk-methods:
         typescript: client.projects.downloadFile
@@ -430,18 +1566,14 @@ paths:
         - lang: typescript
           label: TypeScript SDK
           source: |
-            import { writeFile } from 'node:fs/promises';
             import { DavinciClient } from '@celedon/davinci-sdk';
 
             const client = new DavinciClient({
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
-            const download = await client.projects.downloadFile('project-id', 'file-id', {
-              branch: 'main',
-            });
-            await writeFile('downloaded-file', download.buffer);
-            console.log(download.contentType, download.contentLength);
+            const bytes = await client.projects.downloadFile(projectId, fileId);
+            console.log(bytes.byteLength);
         - lang: python
           label: Python SDK
           source: |
@@ -449,17 +1581,13 @@ paths:
             from davinci_sdk import DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
-                download = client.projects.download_file("project-id", "file-id", branch="main")
-                with open("downloaded-file", "wb") as file:
-                    file.write(download.content)
-                print(download.content_type, download.content_length)
+                data = client.projects.download_file(project_id, file_id)
+                print(len(data))
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/FileId'
         - $ref: '#/components/parameters/Branch'
       responses:
         '200':
-          description: Raw file bytes. This response is not a JSON envelope.
+          description: File bytes.
           headers:
             Content-Type:
               schema:
@@ -467,35 +1595,1334 @@ paths:
             Content-Disposition:
               schema:
                 type: string
-            Content-Length:
-              schema:
-                type: integer
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: binary
         '401':
-          $ref: '#/components/responses/InvalidApiKey'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
-          $ref: '#/components/responses/FileNotFound'
+          description: File not found. Error code is `REFERENCED_FILE_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      operationId: createSession
+      tags: [Sessions]
+      summary: Open a session and mint a data-plane grant
+      description: |
+        Loads the project, holds it open, and returns the credential for reaching it
+        directly.
+
+        A project unloads shortly after nothing is connected to it, so a session is
+        what keeps it resident between your requests. Poll the session (`getSession`)
+        to both refresh the grant and signal that you are still working.
+
+        The grant can never exceed the key that minted it. Omit `scopes` to inherit
+        the key's own scopes; supply them to narrow the grant further, which is worth
+        doing when one job needs less than the key can do.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: client.sessions.create
+        python: client.sessions.create
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const session = await client.sessions.create(projectId);
+            console.log(session.sessionId, session.dataPlane.url);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                session = client.sessions.create(project_id)
+                print(session.session_id, session.data_plane.url)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: The session, with the grant needed to reach the data plane.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: |
+            Invalid request. Error code is `INVALID_SCOPES` for an unknown scope name
+            or `INVALID_TTL` for a non-positive `ttlSeconds`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            The caller lacks `project:connect` on this project, or asked for scopes
+            the key does not hold (`INSUFFICIENT_SCOPES`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          description: |
+            The project could not be opened or its machine is unavailable. Error code
+            is `PROJECT_NOT_READY`, `SERVER_NOT_AVAILABLE`, or `GRANT_PUSH_FAILED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    get:
+      operationId: getSession
+      tags: [Sessions]
+      summary: Read a session, refresh its grant, and check the agent
+      description: |
+        Returns the session with a **new** grant and revokes the previous one, so a
+        leaked grant stops working at the next poll rather than at its expiry.
+
+        This is also the keepalive, for both clocks that matter: the grant's expiry
+        and the machine's idle timer. Call it well before `dataPlane.expiresAt` — the
+        SDKs do this for you.
+
+        `agent.status` is how you follow a run started with `sendAgentMessage`. It is
+        reported here rather than on a route of its own precisely so that one poll
+        keeps the session alive and tells you where the run is. `completed`, `failed`,
+        and `paused` are terminal; `paused` is what a `stopAgent` produces. `unknown`
+        means the machine could not be reached for this field alone — the grant in the
+        same response is still good, so retry rather than recreating the session.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.sessions.get
+        python: client.sessions.get
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const refreshed = await client.sessions.get(projectId, sessionId);
+            console.log(refreshed.dataPlane.expiresAt, refreshed.agent?.status);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                refreshed = client.sessions.get(project_id, session_id)
+                print(refreshed.data_plane.expires_at, refreshed.agent.status)
+      responses:
+        '200':
+          description: The session, with a freshly minted grant.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, or it belongs to another user. Error code is
+            `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            The project this session opened is no longer running. Error code is
+            `PROJECT_NOT_RUNNING`; create a new session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteSession
+      tags: [Sessions]
+      summary: Close a session
+      description: |
+        Releases the project and revokes every grant the session issued. Grants stop
+        working immediately rather than at expiry, which is the point of closing a
+        session rather than letting it lapse.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: client.sessions.delete
+        python: client.sessions.delete
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.sessions.delete(projectId, sessionId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.sessions.delete(project_id, session_id)
+      responses:
+        '200':
+          description: The session was closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteSessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, or it belongs to another user. Error code is
+            `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}/messages:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      operationId: sendAgentMessage
+      tags: [Sessions]
+      summary: Send a prompt to the session's agent
+      description: |
+        Gives the agent something to do. Starts a run if none is going, and adds a turn
+        to the conversation if one is.
+
+        This returns as soon as the agent has accepted the prompt, not when it has
+        finished — a run takes as long as the work takes. Follow it with `getSession`
+        and read `agent.status`, or let the SDK's `waitUntilDone` do that for you.
+
+        Acceptance is not the same as success. A `202` means the agent took the prompt;
+        a `409` means it refused, which happens when the run it belonged to has ended.
+        Recreate the session in that case rather than retrying the message.
+
+        The agent can change anything in the project and spends credits doing it, which
+        is why this needs the `agent:message` scope rather than a project write.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agent/agent.routes.js
+      x-required-scopes: [agent:message]
+      x-sdk-methods:
+        typescript: session.sendMessage
+        python: session.send_message
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.sessions.with(projectId, async (session) => {
+              await session.sendMessage('Add a 10mm M3 standoff under each corner of the base plate');
+
+              const final = await session.waitUntilDone();
+              console.log(final.status);
+            });
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                with client.sessions.create(project_id) as session:
+                    session.send_message(
+                        "Add a 10mm M3 standoff under each corner of the base plate"
+                    )
+
+                    final = session.wait_until_done()
+                    print(final.status)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendAgentMessageRequest'
+      responses:
+        '202':
+          description: The agent accepted the prompt. The run is now in progress.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendAgentMessageResponse'
+        '400':
+          description: |
+            Invalid request. Error code is `MISSING_MESSAGE`, `MESSAGE_TOO_LARGE`,
+            `INVALID_MESSAGE_ID`, `INVALID_CONTEXT`, `INVALID_PERSONA`,
+            `UNKNOWN_PERSONA`, `INVALID_MODEL`, `UNKNOWN_MODEL`,
+            `INVALID_MODEL_OPTIONS`, `INVALID_WEB_SEARCH`, `LLM_OPTION_UNKNOWN`,
+            or `LLM_OPTION_VALUE_UNAVAILABLE`.
+
+            `UNKNOWN_PERSONA` names a persona the project does not define, and
+            carries `details.definedPersonas` — the ids that would have worked. The
+            message is refused rather than run under a default persona you did not
+            ask for.
+
+            `UNKNOWN_MODEL` names a well-formed model key outside the calling
+            account's effective profile and carries `details.availableModels`.
+
+            An invalid model option identifies its model and option key in
+            `details.model` and `details.option`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, it belongs to another user, or it belongs to a different
+            project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            The agent refused the message (`MESSAGE_REFUSED`), or the project the
+            session opened is no longer running (`PROJECT_NOT_RUNNING`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      operationId: listAgentMessages
+      tags: [Sessions]
+      summary: Read the session's conversation
+      description: |
+        The transcript: your prompts, the agent's replies and reasoning, and every tool
+        it used with the result.
+
+        `source` tells you where the answer came from. `live` is the running agent's own
+        copy and is current. `persisted` is the saved copy, which is written when a run
+        ends — so it is complete for a finished run but behind for a running one. `none`
+        means there is no conversation yet.
+
+        Entries are ordered oldest to newest and `limit` takes the most recent, which is
+        usually what you want after a run.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agent/agent.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: session.messages
+        python: session.messages
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const session = await client.sessions.get(projectId, sessionId);
+            const transcript = await session.messages({ limit: 20 });
+            for (const entry of transcript.messages) {
+              console.log(entry.role, entry.kind, entry.text);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                session = client.sessions.resume(project_id, session_id)
+                transcript = session.messages(limit=20)
+                for entry in transcript.messages:
+                    print(entry.role, entry.kind, entry.text)
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+          description: Most recent entries to return.
+      responses:
+        '200':
+          description: The conversation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentTranscript'
+        '400':
+          description: '`limit` is out of range. Error code is `INVALID_LIMIT`.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, it belongs to another user, or it belongs to a different
+            project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}/stop:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      operationId: stopAgent
+      tags: [Sessions]
+      summary: Stop the agent without closing the session
+      description: |
+        Halts the current run. The session survives, the project stays open, and the
+        conversation so far is kept — so you can send a new prompt afterwards without
+        starting over. Use `deleteSession` when you actually want to finish.
+
+        Stopping when nothing is running is not an error; `stopped` is `false` and the
+        status is whatever it already was. That makes this safe to call defensively,
+        for instance when abandoning a run you may or may not have started.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agent/agent.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: session.stop
+        python: session.stop
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const session = await client.sessions.get(projectId, sessionId);
+            const result = await session.stop();
+            console.log(result.stopped, result.status);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                session = client.sessions.resume(project_id, session_id)
+                result = session.stop()
+                print(result.stopped, result.status)
+      responses:
+        '200':
+          description: The run was halted, or there was none to halt.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopAgentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, it belongs to another user, or it belongs to a different
+            project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            The project this session opened is no longer running. Error code is
+            `PROJECT_NOT_RUNNING`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}/tools/invoke:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      operationId: invokeTool
+      tags: [Tools]
+      summary: Invoke one of the agent's tools directly
+      description: |
+        Runs a single tool and returns its result, with no model in the loop. Faster and
+        deterministic where the agent is neither, and it spends no LLM credits.
+
+        This needs a session because a tool belongs to one: the tools available are the
+        ones the session's project has open, and the tool acts on that project's live
+        state.
+
+        A tool that refuses answers `422` with the tool's own message. Permission
+        refusals are deliberately indistinguishable from "no such tool" — a key cannot
+        use the error to discover what it is not allowed to do.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agent/agent.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: session.invokeTool
+        python: session.invoke_tool
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.sessions.with(projectId, async (session) => {
+              const result = await session.invokeTool({
+                toolbox: 'Core',
+                tool: 'ReadObject',
+                params: { objectId },
+              });
+              console.log(result.content.text);
+            });
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                with client.sessions.create(project_id) as session:
+                    result = session.invoke_tool(
+                        toolbox="Core",
+                        tool="ReadObject",
+                        params={"objectId": object_id},
+                    )
+                    print(result.content.text)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeToolRequest'
+      responses:
+        '200':
+          description: The tool ran and returned a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeToolResponse'
+        '400':
+          description: |
+            Invalid request. Error code is `MISSING_TOOL_TARGET`, `INVALID_TOOL_TARGET`,
+            or `INVALID_PARAMS`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, it belongs to another user, it belongs to a different
+            project than the one in the path (`SESSION_NOT_FOUND`), or no such toolbox
+            for this session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            The project this session opened is no longer running. Error code is
+            `PROJECT_NOT_RUNNING`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: |
+            The tool ran and refused: bad arguments, a precondition it needs, or a
+            permission your credential does not hold. Error code is `TOOL_ERROR` and the
+            message is the tool's own.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/usage:
+    get:
+      operationId: getUsage
+      tags: [Usage]
+      summary: What you spent
+      description: |
+        Credits and tokens charged to your account, optionally narrowed by project,
+        session, or time, and optionally broken down by model, project, session, or
+        day.
+
+        This reports your own usage. A project you share with collaborators returns
+        what *you* spent on it, not the project's total — what someone else spends is
+        their financial data, not the project's.
+
+        Reads are eventually consistent with a live run: the engine reports usage on
+        an interval, so check `asOf` before treating a total as final.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-required-scopes: [usage:read]
+      x-sdk-methods:
+        typescript: client.usage.get
+        python: client.usage.get
+      parameters:
+        - name: projectId
+          in: query
+          required: false
+          description: Narrow to one project. Accepts the bare id or `{projectId}--{branch}`.
+          schema:
+            type: string
+        - name: sessionId
+          in: query
+          required: false
+          description: Narrow to one session.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/UsageFrom'
+        - $ref: '#/components/parameters/UsageTo'
+        - $ref: '#/components/parameters/UsageGroupBy'
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const usage = await client.usage.get({ groupBy: 'model' });
+            for (const row of usage.groups ?? []) {
+              console.log(row.model, row.credits);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                usage = client.usage.get(group_by="model")
+                for row in usage.groups or []:
+                    print(row.model, row.credits)
+      responses:
+        '200':
+          description: Usage totals for the scope, and the breakdown if one was asked for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        '400':
+          description: |
+            Invalid request. Error code is `INVALID_GROUP_BY` or `INVALID_RANGE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/usage:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: getProjectUsage
+      tags: [Usage]
+      summary: What you spent on one project
+      description: |
+        The same reading as `getUsage`, scoped to one project and authorized against
+        it — you must be able to read the project as well as hold `usage:read`.
+
+        Usage is recorded against the bare project id, so this covers every branch of
+        the project rather than only the one you name.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-required-scopes: [usage:read, projects:read]
+      x-sdk-methods:
+        typescript: client.usage.forProject
+        python: client.usage.for_project
+      parameters:
+        - $ref: '#/components/parameters/UsageFrom'
+        - $ref: '#/components/parameters/UsageTo'
+        - $ref: '#/components/parameters/UsageGroupBy'
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const usage = await client.usage.forProject(projectId, { groupBy: 'day' });
+            console.log(usage.totals.credits, usage.asOf);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                usage = client.usage.for_project(project_id, group_by="day")
+                print(usage.totals.credits, usage.as_of)
+      responses:
+        '200':
+          description: Usage totals for the project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        '400':
+          description: |
+            Invalid request. Error code is `INVALID_GROUP_BY` or `INVALID_RANGE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}/usage:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    get:
+      operationId: getSessionUsage
+      tags: [Usage]
+      summary: What one session spent
+      description: |
+        What a single session's agent run cost. This is the granularity to use when
+        you want to know the price of a specific piece of work rather than a month of
+        it.
+
+        A run still in progress will under-report until its last interval is flushed,
+        so read `asOf` — or read this after `waitUntilDone` returns.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-required-scopes: [usage:read, projects:read]
+      x-sdk-methods:
+        typescript: session.usage
+        python: session.usage
+      parameters:
+        - $ref: '#/components/parameters/UsageFrom'
+        - $ref: '#/components/parameters/UsageTo'
+        - $ref: '#/components/parameters/UsageGroupBy'
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.sessions.with(projectId, async (session) => {
+              await session.sendMessage('Add a mounting bracket');
+              await session.waitUntilDone();
+
+              const usage = await session.usage();
+              console.log(`That run cost ${usage.totals.credits} credits`);
+            });
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                with client.sessions.create(project_id) as session:
+                    session.send_message("Add a mounting bracket")
+                    session.wait_until_done()
+
+                    usage = session.usage()
+                    print(f"That run cost {usage.totals.credits} credits")
+      responses:
+        '200':
+          description: Usage totals for the session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        '400':
+          description: |
+            Invalid request. Error code is `INVALID_GROUP_BY` or `INVALID_RANGE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session, it belongs to another user, or it belongs to a different
+            project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/file/upload/{ownerId}/{userId}/{projectId}/{connectionId}/{parentId}:
+    parameters:
+      - $ref: '#/components/parameters/DataPlaneOwnerId'
+      - $ref: '#/components/parameters/DataPlaneUserId'
+      - $ref: '#/components/parameters/DataPlaneProjectId'
+      - $ref: '#/components/parameters/ConnectionId'
+      - $ref: '#/components/parameters/ParentId'
+    post:
+      operationId: uploadFile
+      tags: [Files]
+      summary: Upload a file to a project
+      x-plane: data
+      description: |
+        Sends a file to the machine holding your project and attaches it under
+        `parentId` in the parts tree.
+
+        Send this to `dataPlane.url`, not to the control-plane host, with
+        `Authorization: Bearer {dataPlane.token}`. Supply the session's own
+        `dataPlane.connectionId` as `connectionId`; the upload is applied through the
+        session's live connection, so any other value is rejected.
+
+        Bodies up to 2 GB are accepted and streamed rather than buffered.
+      security:
+        - GrantBearer: []
+      x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: session.upload
+        python: session.upload
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { readFile } from 'node:fs/promises';
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const session = await client.sessions.create(projectId);
+            const result = await session.upload({
+              file: await readFile('housing.step'),
+              filename: 'housing.step',
+              parentId: rootId,
+            });
+            console.log(result.fileId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                session = client.sessions.create(project_id)
+                with open("housing.step", "rb") as handle:
+                    result = session.upload(handle, filename="housing.step", parent_id=root_id)
+                print(result.file_id)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadFileRequest'
+      responses:
+        '200':
+          description: The file was stored and attached.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadFileResponse'
+        '401':
+          $ref: '#/components/responses/GrantRejected'
+        '403':
+          description: The grant does not carry `documents:write` on this project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ProjectMoved'
+        '413':
+          description: The file exceeds the maximum upload size.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/file/download/{ownerId}/{projectId}/{fileName}:
+    parameters:
+      - $ref: '#/components/parameters/DataPlaneOwnerId'
+      - $ref: '#/components/parameters/DataPlaneProjectId'
+      - $ref: '#/components/parameters/FileName'
+    get:
+      operationId: downloadFileDirect
+      tags: [Files]
+      summary: Download a file from a project
+      x-plane: data
+      description: |
+        Streams a file from the machine holding your project.
+
+        Send this to `dataPlane.url` with `Authorization: Bearer {dataPlane.token}`.
+        Prefer this over the control-plane `downloadProjectFile` for large files: the
+        bytes travel directly rather than through the API server, with a 30-minute
+        window rather than 15.
+
+        A file belonging to a different project is served only when your project has
+        an active include referencing it — the same rule the editor follows.
+      security:
+        - GrantBearer: []
+      x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: session.download
+        python: session.download
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const session = await client.sessions.create(projectId);
+            const bytes = await session.download('housing.step');
+            console.log(bytes.byteLength);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                session = client.sessions.create(project_id)
+                data = session.download("housing.step")
+                print(len(data))
+      responses:
+        '200':
+          description: File bytes.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            Content-Disposition:
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/GrantRejected'
+        '403':
+          description: |
+            The grant does not carry `documents:read`, or the file belongs to another
+            project with no active include referencing it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: No such file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ProjectMoved'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/evaluation-runs:
+    post:
+      operationId: createEvaluationRun
+      tags: [Evaluations]
+      summary: Create an ephemeral evaluation sandbox
+      description: |
+        Creates a separate ephemeral project to evaluate against. The caller must
+        hold the `purpose=automation` grant issued to a running Code execution,
+        which is what binds the sandbox to code rather than to a person's key.
+        The source project and execution are taken from the grant rather than
+        accepted from the body.
+
+        The response contains sandbox metadata and a second,
+        `purpose=evaluation` grant/data-plane block bound to that sandbox. This
+        target grant can seed and inspect the sandbox and drive its agent, but
+        cannot access another project, account resources, or git routes.
+      security:
+        - ExecutionGrantBearer: []
+      x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.evaluations.create
+        python: client.evaluations.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEvaluationRunRequest'
+      responses:
+        '201':
+          description: The target sandbox is ready and its grant has been attached.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRun'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/InfrastructureFailure'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
-          description: Project acquisition unavailable. Common error codes include `PROJECT_NOT_READY`, `SERVICE_UNAVAILABLE`, and `SERVER_NOT_AVAILABLE`.
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-                minimum: 1
+          $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/evaluation-runs/{runId}:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      operationId: getEvaluationRun
+      tags: [Evaluations]
+      summary: Get an evaluation sandbox run
+      description: |
+        Reads lifecycle, quality, evidence, and cleanup state. The Code
+        execution's own grant or the user credential behind it may read the run.
+        Tokens are returned only to the execution grant while the sandbox is
+        live.
+      security:
+        - ExecutionGrantBearer: []
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.evaluations.status
+        python: client.evaluations.status
+      responses:
+        '200':
+          description: Current evaluation-run state.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorEnvelope'
+                $ref: '#/components/schemas/EvaluationRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteEvaluationRun
+      tags: [Evaluations]
+      summary: Clean up an evaluation sandbox
+      description: |
+        Idempotently stops target work, revokes target grants, releases the
+        sandbox pin, and deletes the ephemeral project. Cleanup state is retained
+        as evidence; a cleanup error never hides the run's primary failure.
+      security:
+        - ExecutionGrantBearer: []
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.evaluations.cancel
+        python: client.evaluations.cancel
+      responses:
+        '200':
+          description: Cleanup completed or had already completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRun'
+        '202':
+          description: Cleanup has been requested and is still running.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/tests/{testId}/runs:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TestId'
+    post:
+      operationId: createTestRun
+      tags: [Tests]
+      summary: Start an authored Test asynchronously
+      description: |
+        Validates a runnable leaf Test and starts its Results Value expression.
+        When that expression calls a Code object, the Code runs with the ordinary
+        `purpose=automation` execution grant it would have received from any
+        other caller. The route returns after scheduling; poll the run resource
+        for evidence, observation, native verdict, or infrastructure failure.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/testRun/testRun.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.tests.run
+        python: client.tests.run
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTestRunRequest'
+      responses:
+        '202':
+          description: Test run accepted.
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL of the new Test-run resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRun'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/InfrastructureFailure'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/tests/{testId}/runs/{runId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TestId'
+      - $ref: '#/components/parameters/RunId'
+    get:
+      operationId: getTestRun
+      tags: [Tests]
+      summary: Get Test-run status and evidence
+      description: |
+        Returns async lifecycle, structured evidence, numeric observation, native
+        Test verdict, or an infrastructure failure for one authored Test run.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/testRun/testRun.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.tests.status
+        python: client.tests.status
+      responses:
+        '200':
+          description: Current or terminal Test-run state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteTestRun
+      tags: [Tests]
+      summary: Cancel a Test run
+      description: |
+        Requests cancellation and evaluation-sandbox cleanup. The operation is
+        idempotent. A run already completed remains completed; a run that can be
+        interrupted moves through `cancelling` to `cancelled`.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/testRun/testRun.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.tests.cancel
+        python: client.tests.cancel
+      responses:
+        '200':
+          description: Terminal state after cancellation or an already-terminal run.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRun'
+        '202':
+          description: Cancellation has been accepted and is in progress.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/InsufficientScopes'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     ApiKeyBearer:
@@ -503,25 +2930,53 @@ components:
       scheme: bearer
       bearerFormat: dav_ak_live_... or dav_ak_test_...
       x-default: dav_ak_live_your_token
-      description: Personal access token. Programmatic reads require the projects:read scope.
+      description: |
+        Personal access token. The scopes granted at issuance determine both which
+        operations the key may call and the ceiling on the project permissions it can
+        exercise. `projects:manage` implies `projects:write`, which implies
+        `projects:read`.
+    GrantBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: dav_gr_...
+      x-default: dav_gr_your_grant
+      description: |
+        A session's data-plane grant, from `dataPlane.token`. Valid only on the
+        data-plane host, only for the one project its session opened, and only for
+        minutes.
+
+        A grant is not an API key and the two are not interchangeable: presenting a
+        grant to a control-plane operation is rejected, and an API key is not accepted
+        on the data plane. The separation is deliberate — a grant is meant to be
+        cheap to lose, so it reaches one project, does no more than the key that
+        minted it, and is revoked when its session closes.
+    ExecutionGrantBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: dav_gr_... (purpose=automation)
+      x-default: dav_gr_execution_grant
+      description: |
+        The grant injected into a running Code object's container. It delegates
+        the reach of whoever started the execution over the one project the Code
+        object lives in, and it expires with the container.
+
+        On this mount it can create, inspect, and clean up the evaluation
+        sandboxes that execution owns. It cannot select an existing project as a
+        target, and a sandbox-bound `purpose=evaluation` grant is refused here so
+        an evaluation cannot start another one.
   parameters:
-    Page:
-      name: page
-      in: query
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
       required: false
       schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 50
+        type: string
+        maxLength: 255
+      description: |
+        A value you choose to identify this request, so that retrying it does not
+        repeat its effect. Reuse the same key when retrying and the original result
+        is returned; use a fresh key when you mean to create something new. Keys are
+        scoped to the account that sent them.
     ProjectId:
       name: projectId
       in: path
@@ -530,13 +2985,6 @@ components:
         type: string
         minLength: 1
       description: Project id. May be compound in the form `{projectId}--{branchName}`.
-    ObjectId:
-      name: objectId
-      in: path
-      required: true
-      schema:
-        type: string
-        minLength: 1
     FileId:
       name: fileId
       in: path
@@ -552,51 +3000,229 @@ components:
       schema:
         type: string
         default: main
+    BranchPath:
+      name: branch
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Branch name.
+    ObjectId:
+      name: objectId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Id of an object in the project.
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Session id from `createSession`.
+    TestId:
+      name: testId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Id of the authored Test object in the source project.
+    RunId:
+      name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Evaluation-run or Test-run id returned by its create operation.
+    DataPlaneOwnerId:
+      name: ownerId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: |
+        Id of the account or organization that owns the project, from the project's
+        `ownerId`.
+    DataPlaneUserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: |
+        Acting user id. Ignored for authorization — the acting identity comes from the
+        grant, so this cannot be used to act as someone else.
+    DataPlaneProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: |
+        Project id, compound as `{projectId}--{branchName}`. Must be the project the
+        session opened.
+    ConnectionId:
+      name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^headless-'
+      description: |
+        The session's `dataPlane.connectionId`, which is `headless-{sessionId}`. Send
+        what the session gave you and this is the only value you will ever need.
+
+        What the server actually requires is the `headless-` prefix, and the
+        difference matters in one place: a Code object addresses the data plane with
+        `headless-exec-{executionId}`, because an execution holds a grant rather than
+        a session. The prefix is what makes the upload be applied through a client, so
+        the reference joins the parts tree instead of the bytes landing in storage
+        with nothing pointing at them. An id naming no live connection is served by an
+        ephemeral one.
+    ParentId:
+      name: parentId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Id of the parts-tree object the file is attached under.
+    FileName:
+      name: fileName
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+      description: Stored filename, in the form `{fileId}.{extension}`.
+    UsageFrom:
+      name: from
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date-time
+      description: |
+        Only count events at or after this time. Omit for all of recorded history.
+    UsageTo:
+      name: to
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date-time
+      description: Only count events at or before this time.
+    UsageGroupBy:
+      name: groupBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [model, project, session, day]
+      description: |
+        Break the totals down. Omit to receive totals only — `totals` is always
+        present and always covers the whole scope, whether or not you group.
   responses:
     BadRequest:
-      description: Malformed request parameters.
+      description: Malformed request parameters or body.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
-    InvalidApiKey:
-      description: Missing, invalid, expired, or inactive API key.
+    Unauthorized:
+      description: |
+        No credential was supplied, or the supplied credential is malformed, expired,
+        or revoked. A credential that is present but unusable is never downgraded to
+        an anonymous request.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
     InsufficientScopes:
-      description: API key lacks a required scope.
+      description: API key lacks a required scope. Error code is `INSUFFICIENT_SCOPES`.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
     Forbidden:
-      description: Caller is authenticated but not authorized.
+      description: |
+        Authenticated but not authorized. Either the acting user lacks the project
+        permission, or the key's scope ceiling excludes it, or the endpoint rejects
+        this credential type (`CREDENTIAL_NOT_PERMITTED`).
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
-    ProjectNotFound:
-      description: Project does not exist or is hidden from the caller.
+    NotFound:
+      description: |
+        Project does not exist, or is hidden from the caller. Absence and denial are
+        deliberately indistinguishable so that project existence cannot be probed.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
-    ObjectNotFound:
-      description: Object does not exist in the project.
+    GrantRejected:
+      description: |
+        The grant is missing, unknown, expired, or revoked. These are one response so a
+        rejected request cannot be used to learn which grants exist. Refresh the
+        session to get a new grant, or create a new session if that also fails.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
-    FileNotFound:
-      description: File does not exist in the project.
+    ProjectMoved:
+      description: |
+        The project moved to another machine. Error code is `PROJECT_MOVED`. Retry the
+        request: the next one resolves to the machine holding it now, at the same URL.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ProjectNotRunning:
+      description: |
+        The project stopped running between being opened for this request and the
+        request reaching it. Error code is `PROJECT_NOT_RUNNING`. Retry: the next call
+        opens it again.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    ProjectNotReady:
+      description: |
+        The project could not be opened in time, or no machine is currently available
+        to run it. Error codes are `PROJECT_NOT_READY`, `SERVER_NOT_AVAILABLE`, and
+        `SERVICE_UNAVAILABLE`. Retry after the interval in `Retry-After`.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    GitFailed:
+      description: |
+        The git operation failed inside the engine rather than being refused. Error
+        code is `GIT_OPERATION_FAILED`, or `CHANGES_UNAVAILABLE` and
+        `COMMIT_NOT_RECORDED` for the two cases where a specific step is known to have
+        produced nothing.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
     RateLimited:
-      description: API key request rate exceeded.
+      description: Request rate exceeded, either globally or for this key.
       headers:
         Retry-After:
           schema:
@@ -613,16 +3239,37 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: |
+        The resource is already running or its state no longer permits this
+        operation. Error codes include `TEST_ALREADY_RUNNING`,
+        `TEST_NOT_RUNNABLE`, and `EVALUATION_RUN_NOT_ACTIVE`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InfrastructureFailure:
+      description: |
+        The request was understood, but required evaluation infrastructure or
+        evidence was unavailable. Error codes include `EVALUATION_SCOPE_MISSING`,
+        `EVALUATION_AGENT_FAILED`, `EVALUATION_TIMEOUT`,
+        `EVALUATION_EVIDENCE_MISSING`, `EVALUATION_OBSERVATION_INVALID`, and
+        `EVALUATION_CLEANUP_FAILED`. These conditions are never converted to a
+        successful quality observation or a skipped Test.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
   schemas:
-    SuccessEnvelope:
-      type: object
-      required: [success, data]
-      properties:
-        success:
-          type: boolean
-        data: {}
-      additionalProperties: true
     ErrorEnvelope:
+      description: |
+        The error shape for every failure on this API, whether it was refused by the
+        credential layer before reaching a domain or by the domain itself.
+
+        Branch on `code`, which is stable. `message` is for a person reading a log or
+        a dialog and may be reworded. `details` carries fields specific to one
+        failure — a project-limit refusal reports its numbers there — and is absent
+        when there are none.
       type: object
       required: [success, error]
       properties:
@@ -641,203 +3288,522 @@ components:
               additionalProperties: true
           additionalProperties: true
       additionalProperties: true
-    ProgrammaticApiInfoEnvelope:
-      allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/ProgrammaticApiInfo'
-    ProgrammaticApiInfo:
+    SuccessResponse:
       type: object
-      required: [name, version, description, documentation, endpoints, authentication]
+      required: [success]
+      properties:
+        success:
+          type: boolean
+      additionalProperties: true
+    CreateEvaluationRunRequest:
+      type: object
       properties:
         name:
           type: string
-        version:
-          type: string
-        description:
-          type: string
-        documentation:
-          type: string
-        endpoints:
-          type: object
-          additionalProperties:
-            type: string
-        authentication:
-          type: string
-      additionalProperties: true
-    ProgrammaticHealthEnvelope:
-      allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/ProgrammaticHealth'
-    ProgrammaticHealth:
+          maxLength: 120
+          description: Human-readable sandbox name used in logs.
+        ttlSeconds:
+          type: integer
+          minimum: 60
+          maximum: 3600
+          default: 900
+          description: Hard cleanup deadline, independent of Code execution timeout.
+      additionalProperties: false
+    EvaluationRun:
       type: object
-      required: [status, version, timestamp]
+      required:
+        - runId
+        - sourceProjectId
+        - status
+        - sandbox
+        - createdAt
+        - expiresAt
+        - cleanup
       properties:
+        runId:
+          type: string
+          format: uuid
+        sourceProjectId:
+          type: string
+        testId:
+          type: [string, 'null']
+          description: |
+            The Test whose Results Value started the Code, when a Test did.
+            Absent for a Code object run directly.
+        testRunId:
+          type: [string, 'null']
+          format: uuid
+          description: The Test run that started the Code, when one did.
+        codeExecutionId:
+          type: string
+        sessionId:
+          type: string
+          format: uuid
+          description: Headless target session attached to the evaluation data-plane grant.
         status:
+          $ref: '#/components/schemas/EvaluationRunStatus'
+        sandbox:
+          $ref: '#/components/schemas/EvaluationSandbox'
+        dataPlane:
+          $ref: '#/components/schemas/EvaluationDataPlaneAccess'
+        evidence:
+          $ref: '#/components/schemas/EvaluationEvidence'
+        quality:
+          $ref: '#/components/schemas/QualityObservation'
+        failure:
+          $ref: '#/components/schemas/RunFailure'
+        cleanup:
+          $ref: '#/components/schemas/EvaluationCleanup'
+        createdAt:
           type: string
-        version:
+          format: date-time
+        expiresAt:
           type: string
-        timestamp:
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
       additionalProperties: true
-    ListProjectsEnvelope:
+    EvaluationRunStatus:
+      type: string
+      enum: [provisioning, ready, running, cleaning, cleaned, failed, expired]
+      description: |
+        `ready` means the target is pinned and its grant can be used. `failed`
+        is an infrastructure failure, not a low quality score. `cleaned` and
+        `expired` are terminal and carry no usable grant.
+    EvaluationSandbox:
+      type: object
+      required: [projectId, branchName, ephemeral]
+      properties:
+        projectId:
+          type: string
+          description: Server-chosen target project. It is never accepted from the create body.
+        branchName:
+          type: string
+        name:
+          type: string
+        ephemeral:
+          type: boolean
+          description: Always true for an evaluation-created target.
+        deleteAfter:
+          type: string
+          format: date-time
+      additionalProperties: true
+    EvaluationDataPlaneAccess:
       allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
+        - $ref: '#/components/schemas/DataPlaneAccess'
         - type: object
+          required: [purpose]
           properties:
-            data:
-              $ref: '#/components/schemas/ListProjectsResponse'
+            purpose:
+              type: string
+              const: evaluation
+              description: |
+                Target-bound evaluation authority. Ordinary data-plane/execution
+                grants remain denied from agent and git routes; this purpose
+                admits only the target agent, and still denies git.
+          additionalProperties: true
+    EvaluationEvidence:
+      type: object
+      required: [capturedAt, transcript, tree, usage]
+      properties:
+        capturedAt:
+          type: string
+          format: date-time
+        transcript:
+          $ref: '#/components/schemas/AgentTranscript'
+        tree:
+          $ref: '#/components/schemas/ProjectTree'
+        usage:
+          $ref: '#/components/schemas/UsageResponse'
+        seededObjectIds:
+          type: array
+          items:
+            type: string
+        artifacts:
+          type: array
+          items:
+            type: object
+            required: [name]
+            properties:
+              name:
+                type: string
+              mediaType:
+                type: string
+              fileId:
+                type: string
+              sha256:
+                type: string
+                pattern: '^[0-9a-f]{64}$'
+            additionalProperties: true
+        summary:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    QualityObservation:
+      type: object
+      required: [value]
+      properties:
+        value:
+          type: number
+          description: Finite numeric observation returned to native Test evaluation criteria.
+        unit:
+          type: string
+        rubric:
+          type: string
+        metrics:
+          type: object
+          additionalProperties:
+            type: number
+      additionalProperties: false
+    EvaluationCleanup:
+      type: object
+      required: [status, requested]
+      properties:
+        status:
+          type: string
+          enum: [not_started, pending, completed, failed]
+        requested:
+          type: boolean
+        requestedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        grantsRevoked:
+          type: integer
+          minimum: 0
+        projectDeleted:
+          type: boolean
+        failure:
+          $ref: '#/components/schemas/RunFailure'
+      additionalProperties: true
+    CreateTestRunRequest:
+      type: object
+      properties:
+        branch:
+          type: string
+          maxLength: 255
+          description: Branch containing the authored Test. Defaults to `main`.
+      additionalProperties: false
+    TestRun:
+      type: object
+      required: [runId, projectId, branchName, testId, status, createdAt]
+      properties:
+        runId:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+        branchName:
+          type: string
+        testId:
+          type: string
+        codeObjectId:
+          type: string
+        evaluationRunId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/TestRunStatus'
+        observation:
+          type: number
+          description: Finite numeric observation committed to the Test's Results Value.
+        unit:
+          type: string
+        verdict:
+          $ref: '#/components/schemas/TestRunVerdict'
+        evidence:
+          type: object
+          additionalProperties: true
+          description: |
+            Fixture-defined structured evidence. SYSTEM quality fixtures include
+            transcript, final-tree, usage, and rubric summaries; callers must
+            tolerate additional fixture-specific fields.
+        failure:
+          $ref: '#/components/schemas/RunFailure'
+        createdAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      additionalProperties: true
+    TestRunStatus:
+      type: string
+      enum: [queued, starting, running, evaluating, cancelling, completed, failed, cancelled, timed_out]
+      description: |
+        `completed`, `failed`, `cancelled`, and `timed_out` are terminal.
+        `failed` means the Code execution or evaluation infrastructure failed;
+        a valid low observation still completes and may resolve to a failing
+        Test verdict.
+    TestRunVerdict:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        score:
+          type: [number, 'null']
+        criteriaTarget:
+          type: string
+      additionalProperties: true
+    RunFailure:
+      type: object
+      required: [code, message, infrastructure]
+      properties:
+        code:
+          type: string
+          enum:
+            - EVALUATION_SCOPE_MISSING
+            - EVALUATION_AGENT_FAILED
+            - EVALUATION_TIMEOUT
+            - EVALUATION_EVIDENCE_MISSING
+            - EVALUATION_OBSERVATION_INVALID
+            - EVALUATION_CLEANUP_FAILED
+            - CODE_EXECUTION_FAILED
+            - TEST_CANCELLED
+            - TEST_RUN_FAILED
+            - TEST_RUN_TIMED_OUT
+        message:
+          type: string
+        infrastructure:
+          type: boolean
+          description: True when no quality verdict may be inferred from this failure.
+        details:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
     ListProjectsResponse:
       type: object
-      required: [projects, count, page, limit, totalPages]
+      required: [owned, shared]
       properties:
-        projects:
+        owned:
           type: array
           items:
             $ref: '#/components/schemas/ProjectSummary'
-        count:
-          type: integer
-          minimum: 0
-        page:
-          type: integer
-          minimum: 1
-        limit:
-          type: integer
-          minimum: 1
-        totalPages:
-          type: integer
-          minimum: 0
+        shared:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSummary'
       additionalProperties: true
     ProjectSummary:
-      type: object
-      properties:
-        id:
-          type: string
-        projectId:
-          type: string
-        name:
-          type: string
-        ownerLicenseKey:
-          type: string
-        ownerUserId:
-          type: string
-        ownerOrgId:
-          type: [string, 'null']
-        visibility:
-          type: [string, 'null']
-        createdAt:
-          type: string
-        modifiedAt:
-          type: string
-      additionalProperties: true
-    ProjectMetadataEnvelope:
       allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
+        - $ref: '#/components/schemas/ProjectMetadata'
         - type: object
           properties:
-            data:
-              $ref: '#/components/schemas/ProjectMetadata'
-    ProjectMetadata:
+            inUse:
+              type: boolean
+              description: True when a Design Engine instance is currently running for this project.
+            git:
+              $ref: '#/components/schemas/GitState'
+          additionalProperties: true
+    GitState:
       type: object
-      required: [id, name, accessReason, permissions]
+      required: [initialized, branches]
+      properties:
+        initialized:
+          type: boolean
+        branches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Branch'
+      additionalProperties: true
+    Branch:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        inUse:
+          type: boolean
+      additionalProperties: true
+    GetProjectResponse:
+      type: object
+      required: [metadata]
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ProjectMetadata'
+      additionalProperties: true
+    ProjectMetadata:
+      description: |
+        Stored project metadata. `ProjectSummary` is this plus the live `inUse` and
+        `git` fields that only the list endpoint computes.
+      type: object
+      required: [id, name]
       properties:
         id:
           type: string
         name:
           type: string
-        ownerUserId:
-          type: [string, 'null']
-        ownerOrgId:
-          type: [string, 'null']
         slug:
           type: [string, 'null']
-        visibility:
+        description:
           type: [string, 'null']
-        createdAt:
+        owner:
           type: string
-        updatedAt:
+          description: User id or organization id that owns the project.
+        createdBy:
+          type: [string, 'null']
+        visibility:
           type: string
-        accessReason:
+        version:
           type: string
+        created:
+          type: [string, 'null']
+          format: date-time
+        lastModified:
+          type: [string, 'null']
+          format: date-time
+        storageUsedBytes:
+          type: integer
+          minimum: 0
+        transferState:
+          type: [string, 'null']
+        collaborators:
+          type: array
+          items:
+            type: string
+          description: User ids with effective access, including access inherited from an organization.
+        pendingCollaborators:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    CreateProjectRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Required unless initialPrompt is supplied.
+        initialPrompt:
+          type: string
+          maxLength: 4000
+          description: Staged as the creator's first agent message when a client connects.
+        description:
+          type: string
+        orgId:
+          type: [string, 'null']
+          description: Create the project under an organization instead of the calling user.
+        visibility:
+          type: string
+          enum: [private, internal, public]
+          default: private
+        autoName:
+          type: boolean
+          default: false
+          description: Derive the project name from initialPrompt.
+        skipInitialCommit:
+          type: boolean
+          default: false
+      additionalProperties: false
+    CreateProjectResponse:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        projectSlug:
+          type: [string, 'null']
+        ownerSlug:
+          type: [string, 'null']
+        projectList:
+          $ref: '#/components/schemas/ListProjectsResponse'
+      additionalProperties: true
+    UpdateProjectRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        visibility:
+          type: string
+          enum: [private, internal, public]
+        readme:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        units:
+          type: string
+      additionalProperties: true
+    UpdateProjectResponse:
+      type: object
+      required: [metadata]
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ProjectMetadata'
+      additionalProperties: true
+    OpenProjectRequest:
+      type: object
+      properties:
+        branch:
+          type: string
+          default: main
+        oldProjectId:
+          type: string
+          description: Previously open project to close as part of switching.
+        initialPrompt:
+          type: string
+          maxLength: 4000
+      additionalProperties: false
+    OpenProjectResponse:
+      type: object
+      required: [projectId, branchName, alreadyLoaded, permissions]
+      properties:
+        projectId:
+          type: string
+        branchName:
+          type: string
+        alreadyLoaded:
+          type: boolean
+          description: True when the project was already running and this call reused the instance.
+        metadata:
+          $ref: '#/components/schemas/ProjectMetadata'
         permissions:
           type: array
           items:
             type: string
+        url:
+          type: string
+          description: |
+            Design Engine replica URL. Present only for browser access-token callers;
+            omitted for API keys.
+        serverToken:
+          type: string
+          description: |
+            Project instance credential. Present only for browser access-token
+            callers; omitted for API keys.
       additionalProperties: true
-    ProjectTreeEnvelope:
-      allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/ProjectTree'
-    ProjectTree:
+    ListBranchesResponse:
       type: object
-      required: [tree]
+      required: [branches]
       properties:
-        objectCount:
-          type: integer
-          minimum: 0
-        tree:
+        branches:
           type: array
           items:
-            $ref: '#/components/schemas/TreeNode'
+            $ref: '#/components/schemas/Branch'
       additionalProperties: true
-    TreeNode:
+    ListPackagesResponse:
       type: object
-      required: [id, name, type, parent]
+      required: [packages]
       properties:
-        id:
-          type: string
-        name:
-          type: string
-        type:
-          type: string
-        parent:
-          type: string
-        childrenCount:
-          type: integer
-          minimum: 0
-      additionalProperties: true
-    ProjectObjectEnvelope:
-      allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/ProjectObject'
-    ProjectObject:
-      type: object
-      required: [id, type]
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-        name:
-          type: string
-        parent:
-          type: string
-        children:
+        packages:
           type: array
           items:
-            type: string
-        documentation:
-          type: string
+            type: object
+            additionalProperties: true
       additionalProperties: true
-    ListFilesEnvelope:
-      allOf:
-        - $ref: '#/components/schemas/SuccessEnvelope'
-        - type: object
-          properties:
-            data:
-              $ref: '#/components/schemas/ListFilesResponse'
     ListFilesResponse:
       type: object
       required: [files, count]
@@ -845,23 +3811,966 @@ components:
         files:
           type: array
           items:
-            $ref: '#/components/schemas/FileInfo'
+            $ref: '#/components/schemas/ProjectFile'
         count:
           type: integer
           minimum: 0
       additionalProperties: true
-    FileInfo:
+    ProjectFile:
       type: object
-      required: [id, name, parent]
+      description: |
+        A file attached to the project, described by the reference object that owns
+        it. Included references and Onshape-linked references are not files in this
+        sense and are not listed.
+      required: [objectId, name, filename, fileType, size]
+      properties:
+        objectId:
+          type: string
+          description: Id of the reference object. Pass as `fileId` to download or delete.
+        name:
+          type: string
+          description: Display name of the object.
+        filename:
+          type: string
+          description: |
+            Stored name from `assets.primary.fileName`, or `{objectId}{fileType}` for
+            a legacy snapshot. This is the `fileName` the data-plane download takes.
+        fileType:
+          type: string
+          description: Extension including the leading dot.
+        parentId:
+          type: [string, 'null']
+          description: Object the reference is attached under.
+        size:
+          type: [integer, 'null']
+          minimum: 0
+          description: |
+            Byte size from `assets.primary.byteSize`, or the legacy stored-file size.
+            Null when the reference exists but no size metadata or legacy blob exists.
+      additionalProperties: true
+    ProjectTree:
+      type: object
+      description: |
+        Flat list of project objects excluding the project object itself. New
+        projects contain reserved `Model` and `Library` packages whose `parent`
+        is the project id; callers must not assume a parentless node exists.
+      required: [objectCount, tree]
+      properties:
+        objectCount:
+          type: integer
+          minimum: 0
+          description: Total objects in the project, including the project object itself.
+        tree:
+          type: array
+          items:
+            $ref: '#/components/schemas/TreeNode'
+      additionalProperties: true
+    TreeNode:
+      type: object
+      description: |
+        One object, as a node. Parentage is expressed by `parent` and `childrenCount`
+        rather than by nesting, so the array is flat and a node can be read without
+        walking to it.
+      required: [id, name, type]
       properties:
         id:
           type: string
         name:
           type: string
+        type:
+          type: string
+        parent:
+          type: [string, 'null']
+        childrenCount:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    GetObjectResponse:
+      type: object
+      required: [object]
+      properties:
+        object:
+          type: object
+          description: |
+            The full object, with computed values resolved. Fields vary by `type`, so
+            only `id`, `name`, and `type` are guaranteed.
+          required: [id, name, type]
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+          additionalProperties: true
+      additionalProperties: true
+    AddObjectsRequest:
+      type: object
+      required: [objects]
+      properties:
+        objects:
+          type: object
+          minProperties: 1
+          description: |
+            Objects to add, keyed by the id each should take. A key is an id, so it
+            must be a UUID — mint one per object. Ids must be unique within the
+            project; reusing one overwrites, which is why guessable keys are not
+            accepted.
+
+            Each body is validated against the schema for its `type`. Fields
+            differ by type, anything the type does not define is refused rather
+            than dropped, and every field is optional except `type` — the model
+            supplies the rest.
+
+            `tags` is refused here rather than accepted and discarded: creation
+            does not carry them. Assign them once the object exists.
+          additionalProperties:
+            type: object
+            required: [type]
+            properties:
+              type:
+                type: string
+                description: |
+                  Any object type the model defines: `task`, `requirement`, `part`,
+                  `attribute`, `risk`, `test`, `package`, and the rest. A 400 for an
+                  unrecognised type lists them all in `details.validTypes`.
+              name:
+                type: string
+              parent:
+                type: string
+                format: uuid
+                description: Overrides `parentId` for this object.
+            additionalProperties: true
+        parentId:
+          type: [string, 'null']
+          format: uuid
+          description: |
+            Parent for objects that do not name one themselves. An id, so a UUID.
+      additionalProperties: false
+    AddObjectsResponse:
+      type: object
+      required: [addedCount, objectIds]
+      properties:
+        addedCount:
+          type: integer
+          minimum: 1
+        objectIds:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    DeleteObjectResponse:
+      type: object
+      required: [deletedCount, deletedObjectIds]
+      properties:
+        deletedCount:
+          type: integer
+          minimum: 1
+        deletedObjectIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+      additionalProperties: true
+    CreateBranchRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        sourceBranch:
+          type: string
+          description: Branch to copy from. Defaults to the `branch` query parameter, or `main`.
+      additionalProperties: false
+    CreateBranchResponse:
+      type: object
+      required: [branch, sanitized]
+      properties:
+        branch:
+          type: object
+          required: [name, sourceBranch]
+          properties:
+            name:
+              type: string
+              description: The name actually created, which is the requested one unless it was sanitized.
+            sourceBranch:
+              type: string
+            commit:
+              type: [string, 'null']
+              description: Commit the new branch starts from.
+          additionalProperties: true
+        sanitized:
+          type: boolean
+          description: True when the created name differs from the requested one.
+      additionalProperties: true
+    DeleteBranchResponse:
+      type: object
+      required: [deleted]
+      properties:
+        deleted:
+          type: string
+        disconnectedUsers:
+          type: integer
+          minimum: 0
+          description: Clients disconnected by a forced delete.
+      additionalProperties: true
+    CommitRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+        author:
+          type: object
+          required: [name]
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+          description: Defaults to the acting user.
+          additionalProperties: false
+      additionalProperties: false
+    CommitResponse:
+      type: object
+      required: [commit]
+      properties:
+        commit:
+          type: object
+          required: [hash]
+          properties:
+            hash:
+              type: string
+            message:
+              type: string
+            author:
+              type: [string, 'null']
+            timestamp:
+              type: [string, 'null']
+              format: date-time
+            branch:
+              type: string
+            stats:
+              type: [object, 'null']
+              properties:
+                additions:
+                  type: integer
+                modifications:
+                  type: integer
+                deletions:
+                  type: integer
+              additionalProperties: true
+          additionalProperties: true
+      additionalProperties: true
+    ChangesResponse:
+      type: object
+      description: |
+        Uncommitted changes on a branch, as object ids. One shape regardless of
+        whether the branch is loaded — the answer comes from memory when it is and
+        from a git diff when it is not, and the difference is not published.
+      required: [hasChanges, totalObjectChanges, added, modified, deleted, deletedObjects]
+      properties:
+        hasChanges:
+          type: boolean
+        committedHash:
+          type: [string, 'null']
+          description: Commit the changes are measured against.
+        totalObjectChanges:
+          type: integer
+          minimum: 0
+        added:
+          type: array
+          items:
+            type: string
+        modified:
+          type: array
+          items:
+            type: string
+        deleted:
+          type: array
+          items:
+            type: string
+        deletedObjects:
+          type: array
+          description: |
+            Enough of each deleted object to name it, since it can no longer be read
+            from the project.
+          items:
+            type: object
+            required: [objectId]
+            properties:
+              objectId:
+                type: string
+              name:
+                type: [string, 'null']
+              type:
+                type: [string, 'null']
+              parentId:
+                type: [string, 'null']
+            additionalProperties: true
+      additionalProperties: true
+    ObjectHistoryResponse:
+      type: object
+      required: [objectId, found, totalChanges, history]
+      properties:
+        objectId:
+          type: string
+        found:
+          type: boolean
+          description: False when no commit on this branch ever touched the object.
+        totalChanges:
+          type: integer
+          minimum: 0
+        history:
+          type: array
+          description: Newest first. Commits that did not change the object are omitted.
+          items:
+            $ref: '#/components/schemas/ObjectHistoryEntry'
+      additionalProperties: true
+    ObjectHistoryEntry:
+      type: object
+      required: [commit, changeType]
+      properties:
+        commit:
+          type: object
+          required: [hash]
+          properties:
+            hash:
+              type: string
+            shortHash:
+              type: string
+            message:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+            author:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+              additionalProperties: true
+          additionalProperties: true
+        changeType:
+          type: string
+          enum: [created, modified, deleted]
+        state:
+          type: [object, 'null']
+          description: The object as of this commit. Null when the commit deleted it.
+          additionalProperties: true
+        changes:
+          type: object
+          description: Field-level difference from the previous commit.
+          additionalProperties: true
+      additionalProperties: true
+    CreateSessionRequest:
+      type: object
+      properties:
+        branch:
+          type: [string, 'null']
+          description: Branch to open. Defaults to the branch in a compound project id, or `main`.
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - projects:read
+              - projects:write
+              - projects:manage
+              - sessions:manage
+              - agent:message
+              - webhooks:receive
+              - usage:read
+          description: |
+            Narrow the grant below the key's own scopes. Omit to inherit them. Asking
+            for a scope the key does not hold is refused rather than silently reduced.
+        ttlSeconds:
+          type: integer
+          minimum: 1
+          maximum: 3600
+          default: 900
+          description: Grant lifetime. Capped at one hour regardless of what is requested.
+      additionalProperties: false
+    Session:
+      type: object
+      required: [sessionId, projectId, branchName, ownerId, dataPlane]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          description: Bare project id, without the branch suffix.
+        branchName:
+          type: string
+        ownerId:
+          type: string
+          description: |
+            Account or organization that owns the project. Files live under the owner's
+            storage namespace, not the caller's, which is why a shared or org-owned
+            project needs this rather than your own user id.
+        dataPlane:
+          $ref: '#/components/schemas/DataPlaneAccess'
+        agent:
+          $ref: '#/components/schemas/AgentState'
+      additionalProperties: true
+    AgentState:
+      type: object
+      description: |
+        What the session's agent is doing. Present on a session read, absent on create
+        because nothing has been asked of the agent yet.
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        taskId:
+          type: [string, 'null']
+          description: Identifies the run. Also names the stored conversation.
+        lastMessageId:
+          type: [string, 'null']
+          description: The `messageId` of the most recent prompt the agent took.
+      additionalProperties: true
+    AgentStatus:
+      type: string
+      description: |
+        - `no_session` — the machine has no record of this session; it lapsed or the
+          project restarted. Create a new one.
+        - `project_not_running` — the session is known but its project has unloaded.
+        - `idle` — the session is live and no run has been started.
+        - `starting` — a run is being set up.
+        - `running` — a run is in progress.
+        - `paused` — a run was stopped and can be continued with a new prompt.
+        - `completed` — the run finished.
+        - `failed` — the run ended in an error. The transcript says why.
+        - `unknown` — the machine could not be reached for this field. Retry; anything
+          else in the same response is still valid.
+
+        `paused`, `completed`, and `failed` are terminal for a run.
+      enum:
+        - no_session
+        - project_not_running
+        - idle
+        - starting
+        - running
+        - paused
+        - completed
+        - failed
+        - unknown
+    SendAgentMessageRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 100000
+          description: What you want the agent to do.
+        messageId:
+          type: string
+          description: |
+            Your own id for this prompt, echoed back and recorded in the transcript.
+            Generated for you if omitted.
+        context:
+          type: object
+          description: |
+            Opaque data kept with the session and returned to your webhook alongside the
+            agent's replies. Davinci does not interpret it.
+          additionalProperties: true
+        model:
+          type: string
+          minLength: 1
+          maxLength: 200
+          pattern: '^[a-z0-9][a-z0-9._:-]*$'
+          description: |
+            A model key returned by `listAgentModels`. Omit it to use the calling
+            account's default model. The choice applies to this prompt; every prompt
+            that omits it uses the account default.
+        modelOptions:
+          type: object
+          maxProperties: 32
+          description: |
+            Model configuration keyed by the option keys returned for the selected
+            model by `listAgentModels`. Values may be strings, numbers, or booleans.
+            Omitted options use that model's effective account defaults.
+          additionalProperties:
+            $ref: '#/components/schemas/AgentModelOptionValue'
+        webSearch:
+          type: boolean
+          default: false
+          description: Whether the agent may use web search for this prompt.
+        persona:
+          type: string
+          maxLength: 200
+          description: |
+            The id of a persona the project defines, which sets who the agent is for
+            this prompt and every one after it in the session. Omit to keep whichever
+            persona the session is already running under; omitting it on the first
+            prompt uses the project's default.
+
+            This is an id, not a persona. An object is refused with `INVALID_PERSONA`,
+            because a persona's name, purpose and approach are written into the system
+            prompt — accepting one here would let a caller rewrite the instructions
+            that decide what the agent will refuse to do. Define personas in the
+            project, then name one.
+
+            An id the project does not define is refused with `UNKNOWN_PERSONA` rather
+            than quietly falling back to a default.
+      additionalProperties: false
+    AgentModelOptionValue:
+      description: A typed model option value.
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+    AgentModelOptionChoice:
+      type: object
+      required: [value, label, description]
+      properties:
+        value:
+          $ref: '#/components/schemas/AgentModelOptionValue'
+        label:
+          type: string
+        description:
+          type: [string, 'null']
+      additionalProperties: false
+    AgentModelOption:
+      type: object
+      required: [key, label, description, type, defaultValue]
+      properties:
+        key:
+          type: string
+          description: Key to use in `SendAgentMessageRequest.modelOptions`.
+        label:
+          type: string
+        description:
+          type: [string, 'null']
+        type:
+          type: string
+          enum: [enum, boolean]
+        defaultValue:
+          $ref: '#/components/schemas/AgentModelOptionValue'
+        choices:
+          type: array
+          description: Allowed values for an `enum` option.
+          items:
+            $ref: '#/components/schemas/AgentModelOptionChoice'
+        trueLabel:
+          type: string
+          description: Display label for `true` on a boolean option.
+        falseLabel:
+          type: string
+          description: Display label for `false` on a boolean option.
+      additionalProperties: false
+    AgentModel:
+      type: object
+      required: [key, name, isDefault, options]
+      properties:
+        key:
+          type: string
+          description: Stable selector key accepted by `SendAgentMessageRequest.model`.
+        name:
+          type: string
+          description: Human-readable model name.
+        isDefault:
+          type: boolean
+          description: Whether this is the account profile's default chat model.
+        options:
+          type: array
+          description: Effective model controls and defaults available to this account.
+          items:
+            $ref: '#/components/schemas/AgentModelOption'
+      additionalProperties: false
+    ListAgentModelsResponse:
+      type: object
+      required: [defaultModel, models]
+      properties:
+        defaultModel:
+          type: string
+          description: Key used when an agent message omits `model`.
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentModel'
+      additionalProperties: false
+    SendAgentMessageResponse:
+      type: object
+      required: [sessionId, taskId, messageId, status]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+          description: The run the prompt joined.
+        messageId:
+          type: string
+        status:
+          type: string
+          description: Always `message_delivered` — a refusal is a `409`, not a status here.
+      additionalProperties: true
+    AgentTranscript:
+      type: object
+      required: [sessionId, taskId, source, status, entryCount, messages]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+        source:
+          type: string
+          enum: [live, persisted, none]
+          description: |
+            Where the answer came from. `live` is current; `persisted` is the copy saved
+            when a run ended, and so lags a run in progress.
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        entryCount:
+          type: integer
+          minimum: 0
+          description: Entries in the whole conversation, not just the returned window.
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentMessage'
+          description: Oldest first. Bounded by `limit`, taken from the end.
+      additionalProperties: true
+    AgentMessage:
+      type: object
+      required: [index, role, kind]
+      properties:
+        index:
+          type: integer
+          minimum: 0
+          description: Position in the whole conversation, so a window can be placed.
+        role:
+          type: string
+          enum: [user, agent]
+        kind:
+          type: string
+          description: |
+            `text` for what was said, `thought` for the agent's reasoning, `tool` for a
+            tool it used, `error` for a failure it hit. Treat an unrecognized value as
+            informational rather than as a problem — new kinds can appear.
+        text:
+          type: string
+          description: The content. For a `tool` entry, the tool's name.
+        timestamp:
+          type: [integer, 'null']
+          description: Milliseconds since the epoch.
+        messageId:
+          type: string
+          description: Present on your own prompts, matching what you sent.
+        tool:
+          $ref: '#/components/schemas/AgentToolUse'
+      additionalProperties: true
+    AgentToolUse:
+      type: object
+      description: Present only on entries whose `kind` is `tool`.
+      properties:
+        name:
+          type: [string, 'null']
+        status:
+          type: [string, 'null']
+          description: |
+            `working` while it runs, `complete` when it succeeded, otherwise the severity
+            of what went wrong.
+        params:
+          description: The arguments the agent chose. Null when the tool takes none.
+        result:
+          description: What the tool returned. Shape is the tool's own.
+        error:
+          type: string
+          description: Present when the tool failed.
+      additionalProperties: true
+    StopAgentResponse:
+      type: object
+      required: [sessionId, taskId, stopped, status]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+        stopped:
+          type: boolean
+          description: |
+            False when there was no run to stop, which is not a failure — you asked for
+            a state you already had.
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+      additionalProperties: true
+    InvokeToolRequest:
+      type: object
+      required: [toolbox, tool]
+      properties:
+        toolbox:
+          type: string
+          maxLength: 200
+          description: Toolbox holding the tool, for example `Core`.
+        tool:
+          type: string
+          maxLength: 200
+        params:
+          type: object
+          description: Arguments for the tool. Validated by the tool, not here.
+          additionalProperties: true
+      additionalProperties: false
+    InvokeToolResponse:
+      type: object
+      required: [sessionId, toolbox, tool, isError, content]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        toolbox:
+          type: string
+        tool:
+          type: string
+        isError:
+          type: boolean
+          description: |
+            Always false here — a tool that reported an error is answered as `422`, so a
+            `200` means the tool succeeded.
+        content:
+          $ref: '#/components/schemas/ToolResultContent'
+        structuredContent:
+          type: object
+          description: Present when the tool returns structured output as well as text.
+          additionalProperties: true
+      additionalProperties: true
+    ToolResultContent:
+      type: object
+      required: [text, parts]
+      properties:
+        text:
+          type: string
+          description: Every text part the tool returned, joined by newlines.
+        parts:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: |
+            Non-text parts, such as images, passed through with their `type` intact.
+      additionalProperties: true
+    UsageResponse:
+      type: object
+      required: [scope, asOf, totals]
+      properties:
+        scope:
+          type: string
+          enum: [account, project, session]
+          description: What the numbers cover, determined by the path you called.
+        projectId:
+          type: string
+          description: Present on the project and session reads. Always the bare id.
+        sessionId:
+          type: string
+          format: uuid
+          description: Present on the session read.
+        asOf:
+          type: [string, 'null']
+          format: date-time
+          description: |
+            When the newest counted event was recorded, or null when the scope holds
+            none. This is the honest bound on freshness: the engine reports usage on an
+            interval, so a run's last few seconds may not be included. Null means
+            "nothing here", not "nothing yet" — a scope with no usage looks the same
+            either way, and inventing a timestamp would hide that.
+        totals:
+          $ref: '#/components/schemas/UsageTotals'
+        groupBy:
+          type: string
+          enum: [model, project, session, day]
+          description: Echoed back when you asked for a breakdown.
+        groups:
+          type: array
+          description: |
+            One entry per group, largest spend first — except `day`, which is
+            chronological. Absent unless you passed `groupBy`.
+          items:
+            $ref: '#/components/schemas/UsageGroup'
+      additionalProperties: true
+    UsageTotals:
+      type: object
+      required: [credits, promptTokens, completionTokens, reasoningTokens, cacheWriteTokens, cacheReadTokens, eventCount]
+      properties:
+        credits:
+          type: number
+          description: Credits charged, to six decimal places.
+        promptTokens:
+          type: integer
+        completionTokens:
+          type: integer
+        reasoningTokens:
+          type: integer
+          description: Thinking tokens, charged at the completion rate.
+        cacheWriteTokens:
+          type: integer
+        cacheReadTokens:
+          type: integer
+        eventCount:
+          type: integer
+          description: |
+            Charged calls counted. Not all of them are token-priced — image generation
+            and web search are charged per call, so a non-zero `credits` with zero
+            tokens is normal rather than a gap.
+      additionalProperties: true
+    UsageGroup:
+      allOf:
+        - $ref: '#/components/schemas/UsageTotals'
+        - type: object
+          description: |
+            Totals for one group. Which identifying field is present depends on
+            `groupBy`, and any of them may be null — usage with no project, for example
+            naming a new project, is real usage that belongs to no project.
+          properties:
+            provider:
+              type: [string, 'null']
+              description: Present when grouping by model.
+            model:
+              type: [string, 'null']
+              description: Present when grouping by model.
+            projectId:
+              type: [string, 'null']
+              description: Present when grouping by project.
+            sessionId:
+              type: [string, 'null']
+              description: Present when grouping by session.
+            day:
+              type: [string, 'null']
+              format: date-time
+              description: Midnight UTC of the day. Present when grouping by day.
+          additionalProperties: true
+    DataPlaneAccess:
+      type: object
+      description: |
+        Everything needed to address the data plane: where to send, what to send with,
+        and the path parameters that are not obvious from the project id alone.
+      required: [url, token, expiresAt, connectionId, ownerId, userId, projectKey, operations]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: |
+            Base URL for data-plane operations. Names no specific machine, so it stays
+            valid if the project moves.
+        token:
+          type: string
+          description: |
+            The grant, `dav_gr_…`. Returned only here and only once — it is not stored
+            in recoverable form, so a lost grant is replaced by refreshing the session
+            rather than looked up.
+        expiresAt:
+          type: string
+          format: date-time
+        connectionId:
+          type: string
+          description: Pass as the `connectionId` path parameter on upload.
+        ownerId:
+          type: string
+          description: Pass as the `ownerId` path parameter.
+        userId:
+          type: string
+          description: Pass as the `userId` path parameter on upload.
+        projectKey:
+          type: string
+          description: |
+            Pass as the `projectId` path parameter. Compound form
+            `{projectId}--{branchName}`, since the data plane addresses a branch.
+        operations:
+          type: array
+          items:
+            type: string
+          description: Data-plane operations this grant authorizes.
+      additionalProperties: true
+    DeleteSessionResponse:
+      type: object
+      required: [success, sessionId]
+      properties:
+        success:
+          type: boolean
+        sessionId:
+          type: string
+          format: uuid
+        revokedGrants:
+          type: integer
+          minimum: 0
+          description: How many live grants the close revoked.
+      additionalProperties: true
+    UploadFileRequest:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+        objectName:
+          type: string
+          description: Display name for the created object. Defaults to the filename.
+        keepAsArchive:
+          type: boolean
+          default: false
+          description: |
+            Preserve a ZIP or 7z upload as one archive reference instead of
+            extracting it immediately. Set this when the archive will be passed
+            to `session.extract_archive()` later.
+      # Closed deliberately. Other engine form fields used for progress tracking
+      # and import options remain outside the published contract.
+      additionalProperties: false
+    UploadFileResponse:
+      type: object
+      description: |
+        The objects the upload created, keyed by id.
+
+        One file does not always mean one object. A STEP assembly becomes a tree,
+        a PDF becomes a document plus a page image per page, and a source file
+        becomes a code object — so the answer is a map rather than a single
+        record. A plain file that needs no conversion yields exactly one entry.
+      required: [object]
+      properties:
+        object:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/UploadedObject'
+      additionalProperties: true
+    UploadedObject:
+      type: object
+      description: |
+        One object in the parts tree. Fields beyond these vary by `type`, so treat
+        this as the shape you can rely on rather than the whole record.
+      required: [id, name, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          description: |
+            What the file became: `reference` for a stored file, `geometry` or
+            `assembly` for imported CAD, `code` for an imported source file.
         parent:
           type: string
+          description: Id of the object this was attached under.
+        children:
+          type: array
+          items:
+            type: string
         fileType:
-          type: [string, 'null']
-        filename:
-          type: [string, 'null']
+          type: string
+          description: |
+            Extension of the stored blob, including the leading dot. Present on
+            objects that own a file. Concatenated with `id` this gives the
+            `fileName` that downloads it.
+        fileSize:
+          type: integer
+          minimum: 0
       additionalProperties: true
