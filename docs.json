@@ -462,6 +462,8 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
+                    "pages/release-notes/v5.1.0",
+                    "pages/release-notes/v5.0.0",
                     "pages/release-notes/v4.6.0",
                     "pages/release-notes/v4.5.3",
                     "pages/release-notes/v4.5.2",
