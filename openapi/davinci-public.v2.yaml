@@ -106,6 +106,19 @@ tags:
       object and applies its native evaluation criteria to derive the verdict.
       This is one way to start Code, not a prerequisite for anything the Code can
       do: the same function called directly holds the same authority.
+  - name: Organizations
+    description: Discover organizations available as containers for team planning.
+  - name: Cards
+    description: |
+      Project-scoped agile cards, their index hierarchy, comments, tags, assignees,
+      card dependencies, and design-object references. Project access is checked
+      on every call; an inaccessible project is reported as not found.
+  - name: Teams
+    description: |
+      Organization-scoped team boards, linked projects, workflow columns, sprints,
+      analytics, and card placements. Team visibility is privacy preserving:
+      inaccessible organizations, private teams, and cross-organization ids are
+      reported as not found rather than revealing that they exist.
 security:
   - ApiKeyBearer: []
 paths:
@@ -2923,6 +2936,2489 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v2/orgs:
+    get:
+      operationId: listOrganizations
+      tags: [Organizations]
+      summary: List accessible organizations
+      description: |
+        Returns organizations the caller belongs to, plus tenant organizations
+        visible through an assigned tenant role. This read-only discovery route
+        supplies the `orgId` required by team operations; organization membership
+        and administration remain browser-only.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/organization/organization.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.organizations.list
+        python: client.organizations.list
+      responses:
+        '200':
+          description: Organizations available to the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: searchCards
+      tags: [Cards]
+      summary: Search project cards
+      description: |
+        Returns a bounded flat card page plus tag, assignee, linked-team,
+        workflow-status, and accessible active/planned sprint filter options.
+        Cards default to open only. Values within
+        one repeated/comma-separated filter are ORed; distinct filter dimensions
+        are ANDed. `includeNoTeam` extends the team facet with cards having no
+        placement, and `includeUnassigned` extends the assignee facet with cards
+        having no user links. Results use an explicit stable sort and opaque cursor.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/CardQuery'
+        - $ref: '#/components/parameters/CardState'
+        - $ref: '#/components/parameters/CardTagIds'
+        - $ref: '#/components/parameters/CardAssigneeIds'
+        - $ref: '#/components/parameters/CardIncludeUnassigned'
+        - $ref: '#/components/parameters/CardTeamIds'
+        - $ref: '#/components/parameters/CardIncludeNoTeam'
+        - $ref: '#/components/parameters/CardStatusIds'
+        - $ref: '#/components/parameters/CardSprintIds'
+        - $ref: '#/components/parameters/CardSort'
+        - $ref: '#/components/parameters/CardPageLimit'
+        - $ref: '#/components/parameters/CardCursor'
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.search
+        python: client.cards.search
+      responses:
+        '200':
+          description: Flat project-card search page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createCard
+      tags: [Cards]
+      summary: Create a card
+      description: Creates a project card and records the creation in card history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.create
+        python: client.cards.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardRequest'
+      responses:
+        '201':
+          description: Card created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/projects/{projectId}/cards/filter-options:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: getCardFilterOptions
+      tags: [Cards]
+      summary: Get project card filter options
+      description: Returns project tag, assignee, linked-team, workflow-status, and accessible active/planned sprint filter catalogs.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.getFilterOptions
+        python: client.cards.get_filter_options
+      responses:
+        '200':
+          description: Project card tag, assignee, linked-team, status, and sprint options.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFilterOptionsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/related:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listRelatedCards
+      tags: [Cards]
+      summary: List cards related to seed cards
+      description: |
+        Returns direct `relates_to` neighbors and the full connected dependency
+        component for one or more seed cards. Seed cards and cards already on
+        `excludeTeamId` are omitted from the result. At most 50 seeds and 500
+        related cards are returned; `meta.truncated` reports a larger component.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: seedCardIds
+          in: query
+          required: false
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 50
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+          description: Seed card ids, supplied repeatedly or as one comma-separated value.
+        - name: excludeTeamId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Omit related cards already placed on this team board.
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.listRelated
+        python: client.cards.list_related
+      responses:
+        '200':
+          description: Related cards and exclusion counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatedCardsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/assignable-members:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listAssignableCardMembers
+      tags: [Cards]
+      summary: List users assignable to project cards
+      description: |
+        Returns only the id and display name of effective project members. This is
+        a read-only assignment catalog; project membership management is not part
+        of this surface. The API key needs `cards:read`, and the acting user must
+        have both card-read and project-member-read permission on the project.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.listAssignableMembers
+        python: client.cards.list_assignable_members
+      responses:
+        '200':
+          description: Users eligible for card assignment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignableCardMembersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    get:
+      operationId: getCard
+      tags: [Cards]
+      summary: Get a card
+      description: Returns one card owned by the route project.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.get
+        python: client.cards.get
+      responses:
+        '200':
+          description: Card record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      operationId: updateCard
+      tags: [Cards]
+      summary: Update a card
+      description: |
+        Updates project-global card fields and appends field-history events.
+        Changing `isOpen` never changes any team workflow placement.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.update
+        python: client.cards.update
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardRequest'
+      responses:
+        '200':
+          description: Updated card.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteCard
+      tags: [Cards]
+      summary: Delete a card
+      description: |
+        Permanently deletes the card. Comments and all card, tag, user, object,
+        and team-board links cascade away; removal and deletion history is recorded.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:manage]
+      x-sdk-methods:
+        typescript: client.cards.delete
+        python: client.cards.delete
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Card deleted.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/details:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    get:
+      operationId: getCardDetails
+      tags: [Cards]
+      summary: Get card details
+      description: |
+        Returns the card with tags, users, linked cards, design-object references,
+        team placements, the newest 50 comments, and up to 50 newest history events.
+        Use the paginated comment/history routes to continue older timelines.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.getDetails
+        python: client.cards.get_details
+      responses:
+        '200':
+          description: Composite card details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/history:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    get:
+      operationId: listCardHistory
+      tags: [Cards]
+      summary: List card history
+      description: Returns card history events newest-first with offset pagination.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/CardDetailLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.history.list
+        python: client.cards.history.list
+      responses:
+        '200':
+          description: One page of card history events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardHistoryPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/comments:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    get:
+      operationId: listCardComments
+      tags: [Cards]
+      summary: List card comments
+      description: Returns card comments newest-first with offset pagination.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/CardDetailLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.comments.list
+        python: client.cards.comments.list
+      responses:
+        '200':
+          description: One page of card comments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardCommentsPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createCardComment
+      tags: [Cards]
+      summary: Add a card comment
+      description: Adds a comment and records it in card history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.comments.create
+        python: client.cards.comments.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCommentRequest'
+      responses:
+        '201':
+          description: Comment created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardCommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/projects/{projectId}/cards/{cardId}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/CommentId'
+    patch:
+      operationId: updateCardComment
+      tags: [Cards]
+      summary: Edit a card comment
+      description: |
+        Only the comment author may edit its text. API keys require `cards:write`;
+        browser JWT authors may edit their own comment with card-read access.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.comments.update
+        python: client.cards.comments.update
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCommentRequest'
+      responses:
+        '200':
+          description: Updated comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardCommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteCardComment
+      tags: [Cards]
+      summary: Delete a card comment
+      description: |
+        The author or a caller with project card-write permission may delete a
+        comment. API keys require `cards:write`; browser JWT authors retain
+        self-service deletion with card-read access.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.comments.delete
+        python: client.cards.comments.delete
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Comment deleted.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/tags:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    post:
+      operationId: addCardTag
+      tags: [Cards]
+      summary: Add a tag to a card
+      description: |
+        Adds an existing project tag and records the change in card history.
+        Re-adding the same tag is accepted and may return an empty JSON object.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.tags.add
+        python: client.cards.tags.add
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardTagRequest'
+      responses:
+        '201':
+          description: Tag attached, or already attached.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTagLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      operationId: replaceCardTags
+      tags: [Cards]
+      summary: Replace all tags on a card
+      description: Atomically replaces the full tag set and records the add/remove diff in history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.tags.set
+        python: client.cards.tags.set
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceCardTagsRequest'
+      responses:
+        '200':
+          description: Current full tag set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTagsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/tags/{tagId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/TagId'
+    delete:
+      operationId: removeCardTag
+      tags: [Cards]
+      summary: Remove a tag from a card
+      description: Removes the tag link and records the change in card history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.tags.remove
+        python: client.cards.tags.remove
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Tag detached.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/user-links:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    post:
+      operationId: addCardUserLink
+      tags: [Cards]
+      summary: Link a user to a card
+      description: |
+        Links a user in a named relation, defaulting to `participant`, and records
+        the change in history. Re-adding the same relation is accepted and may
+        return an empty JSON object.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.userLinks.add
+        python: client.cards.user_links.add
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardUserLinkRequest'
+      responses:
+        '201':
+          description: User relation attached, or already attached.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardUserLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/user-links/{linkId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/LinkId'
+    delete:
+      operationId: removeCardUserLink
+      tags: [Cards]
+      summary: Remove a user link from a card
+      description: Removes the identified assignee or participant relation from the card.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.userLinks.remove
+        python: client.cards.user_links.remove
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: User relation removed.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/card-links:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    post:
+      operationId: addCardLink
+      tags: [Cards]
+      summary: Link two cards
+      description: |
+        Links two cards in the same project. `dependency_of` reverses the stored
+        direction and is returned from the opposite card's perspective. Dependency
+        cycles are rejected. Re-adding an identical link is accepted and may return
+        an empty JSON object.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.cardLinks.add
+        python: client.cards.card_links.add
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardLinkRequest'
+      responses:
+        '201':
+          description: Card link created, or already present.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/card-links/{linkId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/LinkId'
+    delete:
+      operationId: removeCardLink
+      tags: [Cards]
+      summary: Remove a card-to-card link
+      description: Removes the single stored link and records history on both cards.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.cardLinks.remove
+        python: client.cards.card_links.remove
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Card link removed.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/object-links:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+    post:
+      operationId: addCardObjectLink
+      tags: [Cards]
+      summary: Link a design object to a card
+      description: |
+        Creates or updates a branch-scoped design-object reference and records it
+        in card history. `branch` overrides a branch embedded in the project id;
+        otherwise the branch defaults to `main`.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: branch
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Branch containing the referenced object.
+        - $ref: '#/components/parameters/IfMatch'
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.objectLinks.add
+        python: client.cards.object_links.add
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCardObjectLinkRequest'
+      responses:
+        '201':
+          description: Current object-link record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardObjectLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/cards/{cardId}/object-links/{linkId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/CardId'
+      - $ref: '#/components/parameters/LinkId'
+    delete:
+      operationId: removeCardObjectLink
+      tags: [Cards]
+      summary: Remove a design-object link
+      description: Removes the reference and records it in card history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cards.objectLinks.remove
+        python: client.cards.object_links.remove
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Object link removed.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/card-tags:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listCardTags
+      tags: [Cards]
+      summary: List the project's card-tag catalog
+      description: Returns every project card tag with its current card usage count.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cardTags.list
+        python: client.card_tags.list
+      responses:
+        '200':
+          description: Project tags with card usage counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTagCatalogResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createCardTag
+      tags: [Cards]
+      summary: Create a card tag
+      description: Creates a uniquely named tag in the project card catalog.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cardTags.create
+        python: client.card_tags.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardTagRequest'
+      responses:
+        '201':
+          description: Card tag created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/projects/{projectId}/card-tags/{tagId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TagId'
+    patch:
+      operationId: updateCardTag
+      tags: [Cards]
+      summary: Update a card tag
+      description: Updates the name, description, color, or lifecycle status of a card tag.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:write]
+      x-sdk-methods:
+        typescript: client.cardTags.update
+        python: client.card_tags.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardTagRequest'
+      responses:
+        '200':
+          description: Updated card tag.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTagResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteCardTag
+      tags: [Cards]
+      summary: Delete a card tag
+      description: Permanently deletes the catalog tag and cascades all card-tag links.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/card/card.routes.js
+      x-required-scopes: [cards:manage]
+      x-sdk-methods:
+        typescript: client.cardTags.delete
+        python: client.card_tags.delete
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedHistoryHeadsRequest'
+      responses:
+        '204':
+          description: Card tag deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+    get:
+      operationId: listTeams
+      tags: [Teams]
+      summary: List visible teams
+      description: |
+        Returns only teams visible to the caller: explicit memberships, internal
+        teams for organization members, and all teams for the organization owner.
+        The list never reveals inaccessible private teams.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Exact team lifecycle status to include.
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.list
+        python: client.teams.list
+      responses:
+        '200':
+          description: Teams visible in the organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createTeam
+      tags: [Teams]
+      summary: Create a team
+      description: |
+        Creates a team, makes the caller its owner, and seeds `Not started`,
+        `In progress`, and `Done` workflow statuses.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage]
+      x-sdk-methods:
+        typescript: client.teams.create
+        python: client.teams.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '201':
+          description: Team created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/orgs/{orgId}/teams/{teamId}:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: getTeam
+      tags: [Teams]
+      summary: Get a team
+      description: |
+        Returns team metadata and the caller's effective team permissions.
+        A private or cross-organization team the caller cannot access is reported
+        as not found.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.get
+        python: client.teams.get
+      responses:
+        '200':
+          description: Team and viewer permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      operationId: updateTeam
+      tags: [Teams]
+      summary: Update a team
+      description: Updates operational team metadata when the caller may manage the team.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.update
+        python: client.teams.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRequest'
+      responses:
+        '200':
+          description: Updated team.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteTeam
+      tags: [Teams]
+      summary: Delete a team
+      description: |
+        Permanently deletes the team. Its statuses, sprints, memberships, linked
+        projects, and board placements cascade away; project cards remain. Because
+        placements are removed, the caller must be able to write every affected
+        project card.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.delete
+        python: client.teams.delete
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedHistoryHeadsRequest'
+      responses:
+        '204':
+          description: Team deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/index:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: getTeamIndex
+      tags: [Teams]
+      summary: Get the team board index
+      description: |
+        Returns team metadata, workflow statuses, sprints, board cards, and viewer
+        permissions. API-key requests default to 100 cards and may request up to
+        500; browser requests remain unbounded when pagination is omitted.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/CardPageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.getIndex
+        python: client.teams.get_index
+      responses:
+        '200':
+          description: Composite team board index.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamIndex'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/overview:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: getTeamOverview
+      tags: [Teams]
+      summary: Get active team planning work
+      description: |
+        Returns team metadata, workflow statuses, active and planned sprints,
+        placed cards outside completed sprints, the completed-sprint count, and
+        viewer permissions. The card page is always bounded and defaults to 500.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 500
+          description: Maximum active-work cards returned.
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/CardSort'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.getOverview
+        python: client.teams.get_overview
+      responses:
+        '200':
+          description: Bounded active team planning work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOverview'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/reports:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: getTeamReports
+      tags: [Teams]
+      summary: Get the team reports summary
+      description: |
+        Returns a board index plus the number of distinct cards completed in the
+        last seven days. API-key requests default to 100 cards and may request up
+        to 500; browser requests remain unbounded when pagination is omitted.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/CardPageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.getReports
+        python: client.teams.get_reports
+      responses:
+        '200':
+          description: Board index and report statistics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamReports'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/charts:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: getTeamChart
+      tags: [Teams]
+      summary: Get team analytics
+      description: |
+        Returns sprint velocity by default or a daily cumulative-flow series.
+        Explicit cumulative-flow ranges are capped to 90 days; an omitted range
+        covers the team's full history.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [velocity, cumulative-flow]
+            default: velocity
+        - name: from
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/SprintDateInput'
+        - name: to
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/SprintDateInput'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.getChart
+        python: client.teams.get_chart
+      responses:
+        '200':
+          description: Requested team chart.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TeamVelocityChart'
+                  - $ref: '#/components/schemas/TeamCumulativeFlowChart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/projects:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: listTeamProjects
+      tags: [Teams]
+      summary: List projects linked to a team
+      description: Returns the projects whose cards may be placed on this team board.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.projects.list
+        python: client.teams.projects.list
+      responses:
+        '200':
+          description: Linked project database records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamProjectsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: addTeamProject
+      tags: [Teams]
+      summary: Link a project to a team
+      description: |
+        Links an existing project owned by the route's organization. Re-linking
+        an existing project is accepted and may return an empty JSON object.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage]
+      x-sdk-methods:
+        typescript: client.teams.projects.add
+        python: client.teams.projects.add
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeamProjectRequest'
+      responses:
+        '201':
+          description: Project link created, or already present.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamProjectLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/projects/{projectId}:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/TeamProjectId'
+    delete:
+      operationId: removeTeamProject
+      tags: [Teams]
+      summary: Unlink a project from a team
+      description: |
+        Removes the project link. Existing board placements for cards from that
+        project are not removed by this operation.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage]
+      x-sdk-methods:
+        typescript: client.teams.projects.remove
+        python: client.teams.projects.remove
+      responses:
+        '204':
+          description: Project unlinked.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/statuses:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: listTeamStatuses
+      tags: [Teams]
+      summary: List team workflow statuses
+      description: Returns the ordered status columns configured for the team board.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.statuses.list
+        python: client.teams.statuses.list
+      responses:
+        '200':
+          description: Ordered workflow statuses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStatusesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: createTeamStatus
+      tags: [Teams]
+      summary: Create a workflow status
+      description: Creates a new ordered status column for the team board.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.statuses.create
+        python: client.teams.statuses.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamStatusRequest'
+      responses:
+        '201':
+          description: Workflow status created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/orgs/{orgId}/teams/{teamId}/statuses/{statusId}:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/StatusId'
+    patch:
+      operationId: updateTeamStatus
+      tags: [Teams]
+      summary: Update a workflow status
+      description: Updates a team status name, order, analytics state, or close mode.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.statuses.update
+        python: client.teams.statuses.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamStatusRequest'
+      responses:
+        '200':
+          description: Updated workflow status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteTeamStatus
+      tags: [Teams]
+      summary: Delete a workflow status
+      description: |
+        Moves every card in this column to `moveToStatusId` before deleting it.
+        Moving into an `automatic` destination closes open project cards. No move
+        reopens a card or changes another team's placement. The destination must
+        belong to the same team.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.statuses.delete
+        python: client.teams.statuses.delete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteTeamStatusRequest'
+      responses:
+        '204':
+          description: Workflow status deleted and cards reassigned.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/statuses/{statusId}/closures:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/StatusId'
+    post:
+      operationId: closeTeamStatusCards
+      tags: [Teams]
+      summary: Close every open card in a workflow status
+      description: |
+        Atomically closes every still-open project card currently placed in this
+        team status. The status must use `manual` or `automatic` close mode. The
+        caller must be able to write every affected project; any denial or stale
+        history head rolls back the complete operation.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.statuses.closeAll
+        python: client.teams.statuses.close_all
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpectedHistoryHeadsRequest'
+      responses:
+        '200':
+          description: Bounded summary of cards closed by the transaction.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseTeamStatusCardsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    post:
+      operationId: createTeamSprint
+      tags: [Teams]
+      summary: Create a planned sprint
+      description: New sprints are always created in the `planned` lifecycle state.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.sprints.create
+        python: client.teams.sprints.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamSprintRequest'
+      responses:
+        '201':
+          description: Planned sprint created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/IdempotencyUnavailable'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/completed:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: listCompletedTeamSprints
+      tags: [Teams]
+      summary: List completed team sprints
+      description: |
+        Returns completed sprints in stable newest-ended order with each
+        sprint's current placed-card count. Search is case-insensitive across
+        sprint name and description. Date bounds apply to sprint end dates.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Case-insensitive sprint name or description search.
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Include sprints ending on or after this UTC date.
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Include sprints ending on or before this UTC date.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 25
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.sprints.listCompleted
+        python: client.teams.sprints.list_completed
+      responses:
+        '200':
+          description: Completed sprint page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompletedTeamSprintsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/{sprintId}:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/SprintId'
+    get:
+      operationId: getTeamSprint
+      tags: [Teams]
+      summary: Get a sprint
+      description: Returns one sprint after confirming it belongs to the route team.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.sprints.get
+        python: client.teams.sprints.get
+      responses:
+        '200':
+          description: Sprint record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      operationId: updateTeamSprint
+      tags: [Teams]
+      summary: Update sprint details
+      description: Sprint lifecycle state cannot be changed here; use the start and complete actions.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.sprints.update
+        python: client.teams.sprints.update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamSprintRequest'
+      responses:
+        '200':
+          description: Updated sprint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteTeamSprint
+      tags: [Teams]
+      summary: Delete a sprint
+      description: Active sprints must be completed before they can be deleted.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:manage]
+      x-sdk-methods:
+        typescript: client.teams.sprints.delete
+        python: client.teams.sprints.delete
+      responses:
+        '204':
+          description: Sprint deleted; card placements remain on the board with no sprint.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/{sprintId}/start:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/SprintId'
+    post:
+      operationId: startTeamSprint
+      tags: [Teams]
+      summary: Start a planned sprint
+      description: |
+        Starts a planned sprint that contains at least one card. Another active
+        sprint causes a conflict unless `allowConcurrent` is explicitly true.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write]
+      x-sdk-methods:
+        typescript: client.teams.sprints.start
+        python: client.teams.sprints.start
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartTeamSprintRequest'
+      responses:
+        '200':
+          description: Active sprint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/{sprintId}/complete:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/SprintId'
+    post:
+      operationId: completeTeamSprint
+      tags: [Teams]
+      summary: Complete an active sprint
+      description: |
+        Marks an active sprint completed. Finished cards stay attached for
+        reporting; unfinished cards move to the backlog or to the specified
+        planned sprint. Each movement is recorded in card and sprint history.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.sprints.complete
+        python: client.teams.sprints.complete
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteTeamSprintRequest'
+      responses:
+        '200':
+          description: Completed sprint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/{sprintId}/details:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/SprintId'
+    get:
+      operationId: getTeamSprintDetails
+      tags: [Teams]
+      summary: Get sprint details
+      description: Returns the sprint, its current cards, and the team's workflow statuses.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.sprints.getDetails
+        python: client.teams.sprints.get_details
+      responses:
+        '200':
+          description: Composite sprint details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/sprints/{sprintId}/charts:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/SprintId'
+    get:
+      operationId: getTeamSprintChart
+      tags: [Teams]
+      summary: Get sprint burndown or burnup
+      description: |
+        Replays card scope, effort edits, and status changes into UTC daily
+        buckets. Future sprint days have null actual values.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [burndown, burnup]
+            default: burndown
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.sprints.getChart
+        python: client.teams.sprints.get_chart
+      responses:
+        '200':
+          description: Requested sprint chart.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamSprintChart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/cards:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    get:
+      operationId: listTeamCards
+      tags: [Teams]
+      summary: List cards on a team board
+      description: |
+        Returns raw board card rows. Use `sprintId=null` to select the backlog.
+        API-key requests default to 100 cards and may request up to 500.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - name: sprintId
+          in: query
+          required: false
+          schema:
+            oneOf:
+              - type: string
+                format: uuid
+              - type: string
+                const: 'null'
+          description: Sprint id, or the literal `null` for cards not in a sprint.
+        - name: statusId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: isOpen
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/CardPageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:read]
+      x-sdk-methods:
+        typescript: client.teams.cards.list
+        python: client.teams.cards.list
+      responses:
+        '200':
+          description: Filtered board cards.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamCardsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: addTeamCard
+      tags: [Teams]
+      summary: Add a card to a team board
+      description: |
+        Places a card on the board and records linked history. An omitted status
+        selects the first not-started column. If the card's project is not linked,
+        it is linked automatically only when the caller may add team projects.
+        Adding an existing card updates its sprint and status placement. Entering
+        an `automatic` status closes an open card; no status ever reopens a card.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.cards.add
+        python: client.teams.cards.add
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeamCardRequest'
+      responses:
+        '201':
+          description: Current board placement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamCardLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/cards/{cardId}/sprint-link:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/CardId'
+    patch:
+      operationId: updateTeamCardSprint
+      tags: [Teams]
+      summary: Move a board card between sprints
+      description: |
+        Moves the card to a sprint on this team, or to the backlog when
+        `sprintId` is null, and records both sides of the membership change.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.cards.updateSprint
+        python: client.teams.cards.update_sprint
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamCardSprintRequest'
+      responses:
+        '200':
+          description: Updated board placement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamCardLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/cards/{cardId}/status:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/CardId'
+    patch:
+      operationId: updateTeamCardStatus
+      tags: [Teams]
+      summary: Change a board card's workflow status
+      description: |
+        Moves the card on this team only and records the change. Entering an
+        `automatic` status closes an open project card. `off` and `manual` do not
+        change project lifecycle, and no status transition reopens a card.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.cards.updateStatus
+        python: client.teams.cards.update_status
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamCardStatusRequest'
+      responses:
+        '200':
+          description: Updated board placement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamCardLinkResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+      - $ref: '#/components/parameters/CardId'
+    delete:
+      operationId: removeTeamCard
+      tags: [Teams]
+      summary: Remove a card from a team board
+      description: Removes only the board placement and records linked history; the project card remains.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.cards.remove
+        python: client.teams.cards.remove
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Card removed from this team board.
+          headers:
+            ETag:
+              $ref: '#/components/headers/CardHistoryETag'
+            X-Card-History-Head-Id:
+              $ref: '#/components/headers/CardHistoryHeadId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CardHistoryConflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     ApiKeyBearer:
@@ -2932,9 +5428,10 @@ components:
       x-default: dav_ak_live_your_token
       description: |
         Personal access token. The scopes granted at issuance determine both which
-        operations the key may call and the ceiling on the project permissions it can
-        exercise. `projects:manage` implies `projects:write`, which implies
-        `projects:read`.
+        operations the key may call and the ceiling on the resource permissions it
+        can exercise. Each scope family is a ladder: `projects:manage` implies
+        `projects:write` and `projects:read`; `cards:manage` implies `cards:write`
+        and `cards:read`; and `teams:manage` implies `teams:write` and `teams:read`.
     GrantBearer:
       type: http
       scheme: bearer
@@ -2976,7 +5473,8 @@ components:
         A value you choose to identify this request, so that retrying it does not
         repeat its effect. Reuse the same key when retrying and the original result
         is returned; use a fresh key when you mean to create something new. Keys are
-        scoped to the account that sent them.
+        scoped to the API key that sent them (or to the user for browser sessions).
+        Replayed responses include `Idempotency-Replayed: true`.
     ProjectId:
       name: projectId
       in: path
@@ -2985,6 +5483,239 @@ components:
         type: string
         minLength: 1
       description: Project id. May be compound in the form `{projectId}--{branchName}`.
+    TeamProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Bare id of a project linked to a team.
+    OrgId:
+      name: orgId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Organization id.
+    TeamId:
+      name: teamId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Agile team id.
+    CardId:
+      name: cardId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Agile card id.
+    TagId:
+      name: tagId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Card-tag id.
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Card-comment id.
+    LinkId:
+      name: linkId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Card relation junction-row id.
+    SprintId:
+      name: sprintId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Team sprint id.
+    StatusId:
+      name: statusId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Team workflow-status id.
+    CardQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 200
+      description: Case-insensitive substring search across card name, description, and resolution.
+    CardState:
+      name: state
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [open, closed, all]
+        default: open
+      description: Project-global card lifecycle state.
+    CardTagIds:
+      name: tagIds
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 50
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards carrying any selected project tag.
+    CardAssigneeIds:
+      name: assigneeIds
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 50
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards assigned to any selected project member.
+    CardIncludeUnassigned:
+      name: includeUnassigned
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: OR cards with no user links into the assignee facet. This is not a sentinel assignee ID.
+    CardTeamIds:
+      name: teamIds
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 50
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards placed on any selected linked team.
+    CardIncludeNoTeam:
+      name: includeNoTeam
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: OR cards with no team placement into the team facet. This is not a sentinel team ID.
+    CardStatusIds:
+      name: statusIds
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 50
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards whose selected-team placement uses any selected status.
+    CardSprintIds:
+      name: sprintIds
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 50
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards whose team placement uses any selected sprint.
+    CardSort:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - created_asc
+          - created_desc
+          - updated_asc
+          - updated_desc
+          - deadline_asc
+          - deadline_desc
+          - name_asc
+          - name_desc
+        default: created_desc
+      description: Stable card sort; card ID is the deterministic tie-breaker.
+    CardPageLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 500
+        default: 100
+      description: Maximum cards returned.
+    CardCursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 2048
+      description: Opaque cursor returned as `meta.nextCursor` or `meta.previousCursor`.
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 132
+      description: |
+        Quoted or unquoted latest card `historyHeadId`. When the request body also
+        contains `expectedHistoryHeadId`, both values must match. A stale head
+        returns `409 CARD_HISTORY_CONFLICT` without applying the mutation.
+    CardDetailLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    PageOffset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
     FileId:
       name: fileId
       in: path
@@ -3131,9 +5862,21 @@ components:
       description: |
         Break the totals down. Omit to receive totals only — `totals` is always
         present and always covers the whole scope, whether or not you group.
+  headers:
+    CardHistoryETag:
+      description: Quoted latest card history head after the committed mutation.
+      schema:
+        type: string
+    CardHistoryHeadId:
+      description: Latest card history head after the committed mutation.
+      schema:
+        type: string
+        format: uuid
   responses:
     BadRequest:
-      description: Malformed request parameters or body.
+      description: |
+        Malformed request parameters or body. Agile requests may return
+        `INVALID_PAGINATION` or `INVALID_IDEMPOTENCY_KEY`.
       content:
         application/json:
           schema:
@@ -3155,17 +5898,19 @@ components:
             $ref: '#/components/schemas/ErrorEnvelope'
     Forbidden:
       description: |
-        Authenticated but not authorized. Either the acting user lacks the project
-        permission, or the key's scope ceiling excludes it, or the endpoint rejects
-        this credential type (`CREDENTIAL_NOT_PERMITTED`).
+        Authenticated but not authorized. Either the acting user lacks the required
+        resource permission, the key's scope ceiling excludes it, or the endpoint
+        rejects this credential type (`CREDENTIAL_NOT_PERMITTED`).
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
     NotFound:
       description: |
-        Project does not exist, or is hidden from the caller. Absence and denial are
-        deliberately indistinguishable so that project existence cannot be probed.
+        The resource does not exist in the parent named by the path, or is hidden
+        from the caller. Absence and privacy denial are deliberately
+        indistinguishable so project, organization, and private-team existence
+        cannot be probed.
       content:
         application/json:
           schema:
@@ -3241,9 +5986,37 @@ components:
             $ref: '#/components/schemas/ErrorEnvelope'
     Conflict:
       description: |
-        The resource is already running or its state no longer permits this
-        operation. Error codes include `TEST_ALREADY_RUNNING`,
-        `TEST_NOT_RUNNABLE`, and `EVALUATION_RUN_NOT_ACTIVE`.
+        The resource's current state no longer permits this operation, or a unique
+        name, hierarchy, dependency, or lifecycle invariant would be violated.
+        Examples include an active sprint that must be completed first, a duplicate
+        card-tag name, or a dependency cycle. Idempotent creates may return
+        `IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENCY_REQUEST_IN_PROGRESS`; the latter
+        includes `Retry-After`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    CardHistoryConflict:
+      description: |
+        The supplied `If-Match`, `expectedHistoryHeadId`, or
+        `expectedHistoryHeadIds` no longer matches committed card history. Error
+        code is `CARD_HISTORY_CONFLICT`; `error.details` includes the expected
+        head, current head and sequence, plus recent card activity. No part of
+        the requested card mutation is applied.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    IdempotencyUnavailable:
+      description: |
+        Idempotency protection is temporarily unavailable. Error code is
+        `IDEMPOTENCY_UNAVAILABLE`; the response includes `Retry-After`.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+          description: Seconds to wait before retrying.
       content:
         application/json:
           schema:
@@ -3261,6 +6034,2175 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
   schemas:
+    NullableHistoryHeadId:
+      type: [string, 'null']
+      format: uuid
+      description: Latest committed card-history row ID; null only before a card has history.
+    HistoryHeadSequence:
+      type: string
+      pattern: '^\d+$'
+      description: Globally monotonic card-history sequence.
+    NullableHistoryHeadSequence:
+      type: [string, 'null']
+      pattern: '^\d+$'
+      description: Globally monotonic card-history sequence.
+    ExpectedHistoryHeadsRequest:
+      type: object
+      properties:
+        expectedHistoryHeadIds:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NullableHistoryHeadId'
+          description: Latest known history head keyed by every card the bulk write may affect.
+      additionalProperties: false
+    OrganizationSummary:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - handle
+        - handleType
+        - description
+        - tier
+        - visibility
+        - createdAt
+        - updatedAt
+        - isFrozen
+        - isTeamOwned
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        handle:
+          type: string
+        handleType:
+          type: string
+        handleVerifiedAt:
+          type: [string, 'null']
+          format: date-time
+        description:
+          type: string
+        tier:
+          type: string
+        visibility:
+          type: string
+        createdAt:
+          type: [string, 'null']
+          format: date-time
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+        isFrozen:
+          type: boolean
+        isTeamOwned:
+          type: boolean
+        memberCount:
+          type: integer
+          minimum: 0
+        joinedAt:
+          type: [string, 'null']
+          format: date-time
+        role:
+          type: string
+        roleName:
+          type: string
+        ownedProjectCount:
+          type: integer
+          minimum: 0
+        maxOwnedProjects:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    OrganizationsResponse:
+      type: object
+      required: [orgs]
+      properties:
+        orgs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationSummary'
+      additionalProperties: false
+    AgileCard:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - resolution
+        - created_by_user
+        - created_at
+        - updated_at
+        - deadline
+        - is_open
+        - project_id
+        - effort
+      properties: &AgileCardProperties
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        resolution:
+          type: [string, 'null']
+          maxLength: 10000
+          description: Optional Markdown resolution; closing or reopening the card does not clear it.
+        created_by_user:
+          type: [string, 'null']
+          format: uuid
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+        deadline:
+          type: [string, 'null']
+          format: date-time
+        is_open:
+          type: boolean
+        project_id:
+          type: string
+          format: uuid
+        effort:
+          type: [integer, 'null']
+          minimum: 0
+          description: Unit-agnostic estimate, commonly interpreted as story points or hours.
+      additionalProperties: true
+    CardResponse:
+      type: object
+      required: [card, historyHeadId, historyHeadSequence]
+      properties:
+        card:
+          $ref: '#/components/schemas/AgileCard'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        indexCard:
+          oneOf:
+            - $ref: '#/components/schemas/CardIndexRow'
+            - type: 'null'
+      additionalProperties: false
+    CreateCardRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        resolution:
+          type: [string, 'null']
+          maxLength: 10000
+        isOpen:
+          type: boolean
+          default: true
+        deadline:
+          type: [string, 'null']
+          format: date-time
+        effort:
+          type: [integer, 'null']
+          minimum: 0
+      additionalProperties: false
+    UpdateCardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        resolution:
+          type: [string, 'null']
+          maxLength: 10000
+        isOpen:
+          type: boolean
+        deadline:
+          type: [string, 'null']
+          format: date-time
+        effort:
+          type: [integer, 'null']
+          minimum: 0
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardTag:
+      type: object
+      required: [id, name, description, color, status, project_id]
+      properties: &AgileCardTagProperties
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        color:
+          type: string
+        status:
+          type: string
+        project_id:
+          type: string
+          format: uuid
+      additionalProperties: true
+    AgileCardTagWithCount:
+      type: object
+      required: [id, name, description, color, status, project_id, card_count]
+      properties:
+        <<: *AgileCardTagProperties
+        card_count:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    CardTagResponse:
+      type: object
+      required: [tag]
+      properties:
+        tag:
+          $ref: '#/components/schemas/AgileCardTag'
+      additionalProperties: false
+    CardTagsResponse:
+      type: object
+      required: [tags, historyHeadId, historyHeadSequence]
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileCardTag'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        indexCard:
+          oneOf:
+            - $ref: '#/components/schemas/CardIndexRow'
+            - type: 'null'
+      additionalProperties: false
+    CardTagCatalogResponse:
+      type: object
+      required: [tags]
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileCardTagWithCount'
+      additionalProperties: false
+    CreateCardTagRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        color:
+          type: string
+          default: '#FF9900'
+          description: Defaults to the Task Card tag color `#FF9900` when omitted.
+        description:
+          type: [string, 'null']
+      additionalProperties: false
+    UpdateCardTagRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        color:
+          type: string
+        description:
+          type: [string, 'null']
+        status:
+          type: string
+      additionalProperties: false
+    OffsetPageMeta:
+      type: object
+      required: [limit, offset, hasMore]
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        hasMore:
+          type: boolean
+        total:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    CardSearchPageMeta:
+      type: object
+      required:
+        - limit
+        - hasMore
+        - state
+        - sort
+        - previousCursor
+        - nextCursor
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+        hasMore:
+          type: boolean
+        total:
+          type: integer
+          minimum: 0
+        state:
+          type: string
+          enum: [open, closed, all]
+        sort:
+          type: string
+        projection:
+          type: string
+          enum: [full, index, mention]
+        hydrateOpen:
+          type: boolean
+        pageStart:
+          type: integer
+          minimum: 0
+        pageEnd:
+          type: integer
+          minimum: 0
+        previousCursor:
+          type: [string, 'null']
+        nextCursor:
+          type: [string, 'null']
+      additionalProperties: false
+    CardSearchResponse:
+      type: object
+      required: [cards, meta]
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardSearchCard'
+        filterOptions:
+          $ref: '#/components/schemas/CardFilterOptions'
+        meta:
+          $ref: '#/components/schemas/CardSearchPageMeta'
+      additionalProperties: false
+    CardIndexRow:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+        - resolution
+        - is_open
+        - deadline
+        - effort
+        - created_at
+        - updated_at
+        - tag_ids
+        - user_ids
+        - team_ids
+        - team_status_ids
+        - sprint_ids
+        - team_statuses
+        - team_placements
+        - history_head_id
+        - history_head_sequence
+        - search_text
+      properties:
+        id: { type: string, format: uuid }
+        project_id: { type: string, format: uuid }
+        name: { type: string }
+        resolution: { type: [string, 'null'], maxLength: 10000 }
+        is_open: { type: boolean }
+        deadline: { type: [string, 'null'], format: date-time }
+        effort: { type: [integer, 'null'], minimum: 0 }
+        created_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: [string, 'null'], format: date-time }
+        tag_ids:
+          type: array
+          items: { type: string, format: uuid }
+        user_ids:
+          type: array
+          items: { type: string, format: uuid }
+        team_ids:
+          type: array
+          items: { type: string, format: uuid }
+        team_status_ids:
+          type: array
+          items: { type: string, format: uuid }
+        sprint_ids:
+          type: array
+          items: { type: string, format: uuid }
+        team_statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardPlacementStatus'
+        team_placements:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardPlacement'
+        history_head_id:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        history_head_sequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        search_text:
+          type: string
+          maxLength: 8192
+      additionalProperties: false
+    CardSearchCard:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - resolution
+        - created_by_user
+        - created_at
+        - updated_at
+        - deadline
+        - is_open
+        - project_id
+        - effort
+        - tag_ids
+        - user_ids
+        - team_ids
+        - team_status_ids
+        - sprint_ids
+        - team_statuses
+        - team_placements
+        - history_head_id
+        - history_head_sequence
+      properties:
+        <<: *AgileCardProperties
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        team_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        team_status_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        sprint_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        team_statuses:
+          type: array
+          description: Deterministically ordered placed-team status metadata.
+          items:
+            $ref: '#/components/schemas/CardPlacementStatus'
+        team_placements:
+          type: array
+          description: Deterministically ordered team placement filter metadata.
+          items:
+            $ref: '#/components/schemas/CardPlacement'
+        history_head_id:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        history_head_sequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: true
+    CardPlacementStatus:
+      type: object
+      required: [team_id, status_id, status_name, status_color, sprint_id]
+      properties:
+        team_id:
+          type: string
+          format: uuid
+        status_id:
+          type: string
+          format: uuid
+        status_name:
+          type: [string, 'null']
+        status_color:
+          type: [string, 'null']
+        sprint_id:
+          type: [string, 'null']
+          format: uuid
+      additionalProperties: false
+    CardPlacement:
+      type: object
+      required: [team_id, status_id, sprint_id]
+      properties:
+        team_id:
+          type: string
+          format: uuid
+        status_id:
+          type: [string, 'null']
+          format: uuid
+        sprint_id:
+          type: [string, 'null']
+          format: uuid
+      additionalProperties: false
+    CardFilterOptions:
+      type: object
+      required: [tags, teams, assignees, statuses, sprints]
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTagFilterOption'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTeamFilterOption'
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardAssignee'
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardStatusFilterOption'
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardSprintFilterOption'
+      additionalProperties: false
+    CardFilterOptionsResponse:
+      type: object
+      required: [filterOptions]
+      properties:
+        filterOptions:
+          $ref: '#/components/schemas/CardFilterOptions'
+      additionalProperties: false
+    CardTagFilterOption:
+      type: object
+      required: [id, name, color]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+      additionalProperties: false
+    CardTeamFilterOption:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      additionalProperties: false
+    CardAssignee:
+      type: object
+      required: [id, display_name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: [string, 'null']
+      additionalProperties: false
+    CardStatusFilterOption:
+      type: object
+      required: [id, name, color, teamId, teamName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+        teamId:
+          type: string
+          format: uuid
+        teamName:
+          type: string
+      additionalProperties: false
+    CardSprintFilterOption:
+      type: object
+      required: [id, name, status, teamId, teamName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, planned]
+        teamId:
+          type: string
+          format: uuid
+        teamName:
+          type: string
+      additionalProperties: false
+    RelatedCardsResponse:
+      type: object
+      required: [cards, meta]
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedCard'
+        meta:
+          $ref: '#/components/schemas/RelatedCardsMeta'
+      additionalProperties: false
+    RelatedCard:
+      type: object
+      required: [id, name, project_id, is_open, assignees]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        project_id:
+          type: string
+          format: uuid
+        is_open:
+          type: boolean
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardAssignee'
+      additionalProperties: false
+    RelatedCardsMeta:
+      type: object
+      required: [seedCardIds, totalRelated, excludedOnTeam, truncated]
+      properties:
+        seedCardIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        totalRelated:
+          type: integer
+          minimum: 0
+        excludedOnTeam:
+          type: integer
+          minimum: 0
+        truncated:
+          type: boolean
+          description: True when the related component exceeds the 500-card response cap.
+      additionalProperties: false
+    AssignableCardMembersResponse:
+      type: object
+      required: [members]
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssignableCardMember'
+      additionalProperties: false
+    AssignableCardMember:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      additionalProperties: false
+    CardCommentRequest:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          minLength: 1
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardComment:
+      type: object
+      required: [id, card_id, user_id, body, created_at, updated_at]
+      properties: &AgileCardCommentProperties
+        id:
+          type: string
+          format: uuid
+        card_id:
+          type: string
+          format: uuid
+        user_id:
+          type: [string, 'null']
+          format: uuid
+        body:
+          type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: true
+    CardCommentResponse:
+      type: object
+      required: [comment, historyHeadId, historyHeadSequence]
+      properties:
+        comment:
+          $ref: '#/components/schemas/AgileCardComment'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+    CardCommentDetails:
+      type: object
+      required: [id, card_id, user_id, body, created_at, updated_at, author_display_name]
+      properties:
+        <<: *AgileCardCommentProperties
+        author_display_name:
+          type: [string, 'null']
+      additionalProperties: true
+    CardCommentsPage:
+      type: object
+      required: [comments, meta]
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardCommentDetails'
+        meta:
+          $ref: '#/components/schemas/OffsetPageMeta'
+      additionalProperties: false
+    AddCardTagRequest:
+      type: object
+      required: [tagId]
+      properties:
+        tagId:
+          type: string
+          format: uuid
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    ReplaceCardTagsRequest:
+      type: object
+      required: [tagIds]
+      properties:
+        tagIds:
+          type: array
+          maxItems: 50
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardTagLink:
+      type: object
+      required: [id, card_id, tag_id, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        card_id:
+          type: string
+          format: uuid
+        tag_id:
+          type: string
+          format: uuid
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    CardTagLinkResponse:
+      type: object
+      required: [historyHeadId, historyHeadSequence]
+      properties:
+        link:
+          $ref: '#/components/schemas/AgileCardTagLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        indexCard:
+          oneOf:
+            - $ref: '#/components/schemas/CardIndexRow'
+            - type: 'null'
+      additionalProperties: false
+      description: The `link` field is omitted when the identical link already existed.
+    AddCardUserLinkRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        relationType:
+          type: string
+          enum: [participant]
+          default: participant
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardUserLink:
+      type: object
+      required: [id, card_id, user_id, relation_type, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        card_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        relation_type:
+          type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    CardUserLinkResponse:
+      type: object
+      required: [historyHeadId, historyHeadSequence]
+      properties:
+        link:
+          $ref: '#/components/schemas/AgileCardUserLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        indexCard:
+          oneOf:
+            - $ref: '#/components/schemas/CardIndexRow'
+            - type: 'null'
+      additionalProperties: false
+      description: The `link` field is omitted when the identical user relation already existed.
+    CardUserDetailsLink:
+      type: object
+      required: [link_id, id, display_name, relation_type, created_at]
+      properties:
+        link_id:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: [string, 'null']
+        relation_type:
+          type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    CardLinkType:
+      type: string
+      enum: [relates_to, depends_on, dependency_of]
+    AddCardLinkRequest:
+      type: object
+      required: [cardId]
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        linkType:
+          allOf:
+            - $ref: '#/components/schemas/CardLinkType'
+          default: relates_to
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardLink:
+      type: object
+      required: [id, card_one_id, card_two_id, link_type, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        card_one_id:
+          type: string
+          format: uuid
+        card_two_id:
+          type: string
+          format: uuid
+        link_type:
+          type: string
+          enum: [relates_to, depends_on]
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    CardLinkResponse:
+      type: object
+      required: [historyHeadId, historyHeadSequence]
+      properties:
+        link:
+          $ref: '#/components/schemas/AgileCardLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+      description: The `link` field is omitted when the identical card link already existed.
+    CardLinkedCard:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - resolution
+        - created_by_user
+        - created_at
+        - updated_at
+        - deadline
+        - is_open
+        - project_id
+        - effort
+        - link_id
+        - link_type
+        - direction
+      properties:
+        <<: *AgileCardProperties
+        link_id:
+          type: string
+          format: uuid
+        link_type:
+          type: string
+          enum: [relates_to, depends_on]
+        direction:
+          type: string
+          enum: [outgoing, incoming]
+      additionalProperties: true
+    AddCardObjectLinkRequest:
+      type: object
+      required: [objectId, objectName, objectType]
+      properties:
+        objectId:
+          type: string
+          format: uuid
+        objectName:
+          type: string
+        objectType:
+          type: string
+        linkType:
+          type: string
+          enum: [related]
+          default: related
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    AgileCardObjectLink:
+      type: object
+      required:
+        - id
+        - card_id
+        - object_id
+        - object_name
+        - object_type
+        - link_type
+        - project_id
+        - branch_name
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        card_id:
+          type: string
+          format: uuid
+        object_id:
+          type: string
+          format: uuid
+        object_name:
+          type: string
+        object_type:
+          type: string
+        link_type:
+          type: string
+        project_id:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    CardObjectLinkResponse:
+      type: object
+      required: [link, historyHeadId, historyHeadSequence]
+      properties:
+        link:
+          $ref: '#/components/schemas/AgileCardObjectLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+    AgileHistoryEvent:
+      type: object
+      required:
+        - id
+        - project_id
+        - org_id
+        - team_id
+        - timestamp
+        - sequence
+        - entity_id
+        - entity_type
+        - user_id
+        - event_type
+        - event_data
+        - author_display_name
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: [string, 'null']
+          format: uuid
+        org_id:
+          type: [string, 'null']
+          format: uuid
+        team_id:
+          type: [string, 'null']
+          format: uuid
+        timestamp:
+          type: [string, 'null']
+          format: date-time
+        sequence:
+          $ref: '#/components/schemas/HistoryHeadSequence'
+        entity_id:
+          type: string
+          format: uuid
+        entity_type:
+          type: string
+          enum: [card, sprint, team, status]
+        user_id:
+          type: [string, 'null']
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - created
+            - deleted
+            - opened
+            - closed
+            - field_updated
+            - status_changed
+            - sprint_added
+            - sprint_removed
+            - team_added
+            - team_removed
+            - card_added
+            - card_removed
+            - tag_added
+            - tag_removed
+            - user_link_added
+            - user_link_removed
+            - reference_added
+            - reference_removed
+            - card_link_added
+            - card_link_removed
+            - card_mentioned
+            - comment_added
+            - comment_updated
+            - comment_deleted
+        event_data:
+          type: object
+          description: For `field_updated`, `field` may be `resolution` and `old`/`new` carry the Markdown values.
+          additionalProperties: true
+        author_display_name:
+          type: [string, 'null']
+      additionalProperties: false
+    CardHistoryPage:
+      type: object
+      required: [history, meta]
+      properties:
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileHistoryEvent'
+        meta:
+          $ref: '#/components/schemas/CardHistoryPageMeta'
+      additionalProperties: false
+    CardHistoryPageMeta:
+      type: object
+      required:
+        - limit
+        - offset
+        - hasMore
+        - historyHeadId
+        - historyHeadSequence
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+        hasMore:
+          type: boolean
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+    CardHistoryContext:
+      type: object
+      required: [users, tags, cards, references]
+      properties:
+        users:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CardHistoryUser'
+        tags:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AgileCardTag'
+        cards:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AgileCard'
+        references:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AgileCardObjectLink'
+      additionalProperties: false
+    CardHistoryUser:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      additionalProperties: false
+    CardDetails:
+      type: object
+      required:
+        - card
+        - tags
+        - userLinks
+        - linkedCards
+        - objectLinks
+        - teams
+        - teamPlacementCount
+        - comments
+        - history
+        - historyHeadId
+        - historyHeadSequence
+        - historyContext
+        - teamOptions
+      properties:
+        card:
+          $ref: '#/components/schemas/AgileCard'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileCardTag'
+        userLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardUserDetailsLink'
+        linkedCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardLinkedCard'
+        objectLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileCardObjectLink'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTeamPlacement'
+        teamPlacementCount:
+          type: integer
+          minimum: 0
+          description: Number of team placements; closing State remains global and does not move any placement.
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardCommentDetails'
+        history:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/AgileHistoryEvent'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+        historyContext:
+          $ref: '#/components/schemas/CardHistoryContext'
+        teamOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTeamOption'
+      additionalProperties: false
+    CardTeamOption:
+      type: object
+      required: [id, name, organizationId, organizationName, statuses, sprints, isPlaced]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        organizationId:
+          type: string
+          format: uuid
+        organizationName:
+          type: [string, 'null']
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTeamOptionStatus'
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTeamOptionSprint'
+        isPlaced:
+          type: boolean
+      additionalProperties: false
+    CardTeamOptionStatus:
+      type: object
+      required: [id, name, color, transitionState, closeMode]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+        transitionState:
+          $ref: '#/components/schemas/TeamTransitionState'
+        closeMode:
+          $ref: '#/components/schemas/TeamStatusCloseMode'
+      additionalProperties: false
+    CardTeamOptionSprint:
+      type: object
+      required: [id, name, status, startDate, endDate]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/TeamSprintStatus'
+        startDate:
+          type: [string, 'null']
+          format: date-time
+        endDate:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    TeamVisibility:
+      type: string
+      enum: [private, internal]
+    AgileTeam:
+      type: object
+      required: [id, name, description, status, created_at, updated_at, organization_id, visibility]
+      properties: &AgileTeamProperties
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        status:
+          type: string
+          description: Team lifecycle status; `active` is the database default.
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+        organization_id:
+          type: string
+          format: uuid
+        visibility:
+          $ref: '#/components/schemas/TeamVisibility'
+      additionalProperties: true
+    TeamsResponse:
+      type: object
+      required: [teams]
+      properties:
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileTeam'
+      additionalProperties: false
+    TeamResponse:
+      type: object
+      required: [team]
+      properties:
+        team:
+          $ref: '#/components/schemas/AgileTeam'
+      additionalProperties: false
+    GetTeamResponse:
+      type: object
+      required: [team, viewerPermissions]
+      properties:
+        team:
+          $ref: '#/components/schemas/AgileTeam'
+        viewerPermissions:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
+    CreateTeamRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        visibility:
+          allOf:
+            - $ref: '#/components/schemas/TeamVisibility'
+          default: private
+      additionalProperties: false
+    UpdateTeamRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        status:
+          type: string
+        visibility:
+          $ref: '#/components/schemas/TeamVisibility'
+      additionalProperties: false
+    CardTeamPlacement:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - status
+        - created_at
+        - updated_at
+        - organization_id
+        - visibility
+        - sprint_id
+        - status_id
+        - sprint_name
+        - status_name
+        - status_color
+        - status_close_mode
+        - org_handle
+        - org_slug
+      properties:
+        <<: *AgileTeamProperties
+        sprint_id:
+          type: [string, 'null']
+          format: uuid
+        status_id:
+          type: [string, 'null']
+          format: uuid
+        sprint_name:
+          type: [string, 'null']
+        status_name:
+          type: [string, 'null']
+        status_color:
+          type: [string, 'null']
+        status_close_mode:
+          oneOf:
+            - $ref: '#/components/schemas/TeamStatusCloseMode'
+            - type: 'null'
+        org_handle:
+          type: [string, 'null']
+        org_slug:
+          type: [string, 'null']
+      additionalProperties: true
+    TeamTransitionState:
+      type: string
+      enum: [not_started, started, closed]
+    TeamStatusCloseMode:
+      type: string
+      enum: ['off', manual, automatic]
+    TeamWorkflowStatus:
+      type: object
+      required: [id, name, description, position, color, status, transition_state, closeMode, team_id]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        position:
+          type: string
+        color:
+          type: string
+        status:
+          type: string
+          description: Workflow-status lifecycle flag; `active` is the database default.
+        transition_state:
+          $ref: '#/components/schemas/TeamTransitionState'
+        closeMode:
+          $ref: '#/components/schemas/TeamStatusCloseMode'
+        team_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    TeamStatusesResponse:
+      type: object
+      required: [statuses]
+      properties:
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamWorkflowStatus'
+      additionalProperties: false
+    TeamStatusResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/TeamWorkflowStatus'
+      additionalProperties: false
+    CreateTeamStatusRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        color:
+          type: string
+          default: '#000000'
+        position:
+          type: string
+        transitionState:
+          allOf:
+            - $ref: '#/components/schemas/TeamTransitionState'
+          default: not_started
+        closeMode:
+          allOf:
+            - $ref: '#/components/schemas/TeamStatusCloseMode'
+          default: off
+      additionalProperties: false
+    UpdateTeamStatusRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        color:
+          type: string
+        position:
+          type: string
+        transitionState:
+          $ref: '#/components/schemas/TeamTransitionState'
+        closeMode:
+          $ref: '#/components/schemas/TeamStatusCloseMode'
+        status:
+          type: string
+      additionalProperties: false
+    DeleteTeamStatusRequest:
+      type: object
+      required: [moveToStatusId]
+      properties:
+        moveToStatusId:
+          type: string
+          format: uuid
+          description: Different status on the same team that receives existing cards.
+        expectedHistoryHeadIds:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    TeamSprintStatus:
+      type: string
+      enum: [planned, active, completed]
+    SprintDateInput:
+      type: string
+      pattern: '^\d{4}-\d{2}-\d{2}(?:T.*)?$'
+      description: ISO 8601 calendar date or date-time accepted for a sprint boundary.
+      examples:
+        - '2026-08-27'
+        - '2026-08-27T09:00:00Z'
+    NullableSprintDateInput:
+      oneOf:
+        - $ref: '#/components/schemas/SprintDateInput'
+        - type: 'null'
+    AgileTeamSprint:
+      type: object
+      required: [id, name, description, status, created_at, start_date, end_date, team_id]
+      properties: &AgileTeamSprintProperties
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: [string, 'null']
+        status:
+          $ref: '#/components/schemas/TeamSprintStatus'
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        start_date:
+          type: [string, 'null']
+          format: date-time
+        end_date:
+          type: [string, 'null']
+          format: date-time
+        team_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    CompletedTeamSprint:
+      type: object
+      required: [id, name, description, status, created_at, start_date, end_date, team_id, card_count]
+      properties:
+        <<: *AgileTeamSprintProperties
+        card_count:
+          type: integer
+          minimum: 0
+          description: Current number of card placements retained in this completed sprint.
+      additionalProperties: false
+    CompletedTeamSprintsResponse:
+      type: object
+      required: [sprints, meta]
+      properties:
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompletedTeamSprint'
+        meta:
+          $ref: '#/components/schemas/OffsetPageMeta'
+      additionalProperties: false
+    TeamSprintResponse:
+      type: object
+      required: [sprint]
+      properties:
+        sprint:
+          $ref: '#/components/schemas/AgileTeamSprint'
+      additionalProperties: false
+    CreateTeamSprintRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        status:
+          type: string
+          const: planned
+        startDate:
+          $ref: '#/components/schemas/NullableSprintDateInput'
+        endDate:
+          $ref: '#/components/schemas/NullableSprintDateInput'
+      additionalProperties: false
+    UpdateTeamSprintRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        startDate:
+          $ref: '#/components/schemas/NullableSprintDateInput'
+        endDate:
+          $ref: '#/components/schemas/NullableSprintDateInput'
+      additionalProperties: false
+    StartTeamSprintRequest:
+      type: object
+      required: [startDate, endDate]
+      properties:
+        startDate:
+          $ref: '#/components/schemas/SprintDateInput'
+        endDate:
+          $ref: '#/components/schemas/SprintDateInput'
+        allowConcurrent:
+          type: boolean
+          default: false
+      additionalProperties: false
+    CompleteTeamSprintRequest:
+      type: object
+      properties:
+        moveToSprintId:
+          type: [string, 'null']
+          format: uuid
+          default: null
+          description: Planned sprint on the same team, or null to move unfinished cards to backlog.
+        expectedHistoryHeadIds:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    TeamCardLink:
+      type: object
+      required: [id, card_id, team_id, sprint_id, status_id, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        card_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        sprint_id:
+          type: [string, 'null']
+          format: uuid
+        status_id:
+          type: [string, 'null']
+          format: uuid
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    TeamCardLinkResponse:
+      type: object
+      required: [link, historyHeadId, historyHeadSequence]
+      properties:
+        link:
+          $ref: '#/components/schemas/TeamCardLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+    TeamBoardCard:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - resolution
+        - created_by_user
+        - created_at
+        - updated_at
+        - deadline
+        - is_open
+        - project_id
+        - effort
+        - link_id
+        - sprint_id
+        - status_id
+        - project_name
+      properties: &TeamBoardCardProperties
+        <<: *AgileCardProperties
+        link_id:
+          type: string
+          format: uuid
+        sprint_id:
+          type: [string, 'null']
+          format: uuid
+        status_id:
+          type: [string, 'null']
+          format: uuid
+        project_name:
+          type: [string, 'null']
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardAssignee'
+      additionalProperties: true
+    TeamBoardCardWithAssignees:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - resolution
+        - created_by_user
+        - created_at
+        - updated_at
+        - deadline
+        - is_open
+        - project_id
+        - effort
+        - link_id
+        - sprint_id
+        - status_id
+        - project_name
+        - assignees
+      properties:
+        <<: *TeamBoardCardProperties
+      additionalProperties: true
+    TeamCardsResponse:
+      type: object
+      required: [cards]
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamBoardCard'
+        meta:
+          $ref: '#/components/schemas/OffsetPageMeta'
+          description: Present on API-key or explicitly paginated requests.
+      additionalProperties: false
+    AddTeamCardRequest:
+      type: object
+      required: [cardId]
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        sprintId:
+          type: [string, 'null']
+          format: uuid
+          default: null
+        statusId:
+          type: [string, 'null']
+          format: uuid
+          default: null
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    UpdateTeamCardSprintRequest:
+      type: object
+      properties:
+        sprintId:
+          type: [string, 'null']
+          format: uuid
+          default: null
+          description: Null moves the card to the backlog.
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    UpdateTeamCardStatusRequest:
+      type: object
+      required: [statusId]
+      properties:
+        statusId:
+          type: string
+          format: uuid
+        expectedHistoryHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+      additionalProperties: false
+    CloseTeamStatusCardsResponse:
+      type: object
+      required:
+        - teamId
+        - statusId
+        - closeMode
+        - closedCount
+        - cardIds
+        - historyHeads
+        - truncated
+      properties:
+        teamId:
+          type: string
+          format: uuid
+        statusId:
+          type: string
+          format: uuid
+        closeMode:
+          $ref: '#/components/schemas/TeamStatusCloseMode'
+        closedCount:
+          type: integer
+          minimum: 0
+        cardIds:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        historyHeads:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/CardHistoryHead'
+        truncated:
+          type: boolean
+      additionalProperties: false
+    CardHistoryHead:
+      type: object
+      required: [cardId, historyHeadId, historyHeadSequence]
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
+    TeamIndex:
+      type: object
+      required: [team, workflowStatuses, sprints, cards, viewerPermissions]
+      properties: &TeamIndexProperties
+        team:
+          $ref: '#/components/schemas/AgileTeam'
+        workflowStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamWorkflowStatus'
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgileTeamSprint'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamBoardCardWithAssignees'
+        meta:
+          $ref: '#/components/schemas/OffsetPageMeta'
+          description: Present on API-key or explicitly paginated requests.
+        viewerPermissions:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    TeamOverview:
+      type: object
+      required:
+        - team
+        - workflowStatuses
+        - sprints
+        - cards
+        - completedSprintTotal
+        - meta
+        - viewerPermissions
+      properties:
+        <<: *TeamIndexProperties
+        completedSprintTotal:
+          type: integer
+          minimum: 0
+      additionalProperties: true
+    TeamReports:
+      type: object
+      required: [team, workflowStatuses, sprints, cards, viewerPermissions, stats]
+      properties:
+        <<: *TeamIndexProperties
+        stats:
+          type: object
+          required: [completed7d]
+          properties:
+            completed7d:
+              type: integer
+              minimum: 0
+          additionalProperties: false
+      additionalProperties: true
+    TeamSprintDetails:
+      type: object
+      required: [sprint, cards, workflowStatuses]
+      properties:
+        sprint:
+          $ref: '#/components/schemas/AgileTeamSprint'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamBoardCard'
+        workflowStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamWorkflowStatus'
+      additionalProperties: false
+    LinkedTeamProject:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - owner_org_id
+        - archived
+        - visibility
+        - version
+        - created_at
+        - updated_at
+        - linked_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: [string, 'null']
+        owner_org_id:
+          type: [string, 'null']
+          format: uuid
+        archived:
+          type: [boolean, 'null']
+        visibility:
+          type: string
+          enum: [private, internal, public]
+        version:
+          type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+        linked_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    TeamProjectsResponse:
+      type: object
+      required: [projects]
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedTeamProject'
+      additionalProperties: false
+    AddTeamProjectRequest:
+      type: object
+      required: [projectId]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+      additionalProperties: false
+    TeamProjectLink:
+      type: object
+      required: [id, team_id, project_id, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        created_at:
+          type: [string, 'null']
+          format: date-time
+      additionalProperties: false
+    TeamProjectLinkResponse:
+      type: object
+      properties:
+        link:
+          $ref: '#/components/schemas/TeamProjectLink'
+      additionalProperties: false
+      description: The `link` field is omitted when the project was already linked.
+    TeamSprintChart:
+      type: object
+      required: [chartType, sprint, unit, days, series, meta]
+      properties:
+        chartType:
+          type: string
+          enum: [burndown, burnup]
+        sprint:
+          type: object
+          required: [id, name, status, startDate, endDate]
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            status:
+              $ref: '#/components/schemas/TeamSprintStatus'
+            startDate:
+              type: [string, 'null']
+              format: date-time
+            endDate:
+              type: [string, 'null']
+              format: date-time
+          additionalProperties: false
+        unit:
+          type: string
+          const: effort
+        days:
+          type: array
+          items:
+            type: string
+            format: date
+        series:
+          type: object
+          required: [actual, scope]
+          properties:
+            actual:
+              type: array
+              items:
+                type: [number, 'null']
+            scope:
+              type: array
+              items:
+                type: number
+            ideal:
+              type: array
+              items:
+                type: number
+              description: Present for burndown charts only.
+          additionalProperties: false
+        meta:
+          type: object
+          required: [totalScope, completedScope, remainingScope, asOf, truncated]
+          properties:
+            totalScope:
+              type: number
+            completedScope:
+              type: number
+            remainingScope:
+              type: number
+            asOf:
+              type: string
+              format: date-time
+            truncated:
+              type: boolean
+              description: True when the replay reached its 100,000-event safety bound.
+          additionalProperties: false
+      additionalProperties: false
+    TeamVelocityChart:
+      type: object
+      required: [chartType, unit, sprints, meta]
+      properties:
+        chartType:
+          type: string
+          const: velocity
+        unit:
+          type: string
+          const: effort
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamVelocitySprint'
+        meta:
+          type: object
+          required: [from, to, sprintCount, truncated]
+          properties:
+            from:
+              type: [string, 'null']
+              format: date-time
+            to:
+              type: [string, 'null']
+              format: date-time
+            sprintCount:
+              type: integer
+              minimum: 0
+            truncated:
+              type: boolean
+              description: True when at least one replay query reached its event safety bound.
+          additionalProperties: false
+      additionalProperties: false
+    TeamVelocitySprint:
+      type: object
+      required: [id, name, status, startDate, endDate, committed, completed, partial]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, completed]
+        startDate:
+          type: [string, 'null']
+          format: date-time
+        endDate:
+          type: [string, 'null']
+          format: date-time
+        committed:
+          type: number
+        completed:
+          type: number
+        partial:
+          type: boolean
+      additionalProperties: false
+    TeamCumulativeFlowChart:
+      type: object
+      required: [chartType, days, categories, series, meta]
+      properties:
+        chartType:
+          type: string
+          const: cumulative-flow
+        days:
+          type: array
+          items:
+            type: string
+            format: date
+        categories:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/TeamCumulativeFlowCategory'
+        series:
+          type: object
+          required: [not_started, started, closed]
+          properties:
+            not_started:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+            started:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+            closed:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+          additionalProperties: false
+        meta:
+          type: object
+          required: [from, to, dayCount, totalCardsOnTeam, truncated]
+          properties:
+            from:
+              type: string
+              format: date
+            to:
+              type: string
+              format: date
+            dayCount:
+              type: integer
+              minimum: 0
+            totalCardsOnTeam:
+              type: integer
+              minimum: 0
+            truncated:
+              type: boolean
+              description: True when the replay reached its 100,000-event safety bound.
+          additionalProperties: false
+      additionalProperties: false
+    TeamCumulativeFlowCategory:
+      type: object
+      required: [key, label, color]
+      properties:
+        key:
+          $ref: '#/components/schemas/TeamTransitionState'
+        label:
+          type: string
+        color:
+          type: string
+      additionalProperties: false
     ErrorEnvelope:
       description: |
         The error shape for every failure on this API, whether it was refused by the
@@ -3275,6 +8217,7 @@ components:
       properties:
         success:
           type: boolean
+          const: false
         error:
           type: object
           required: [code, message]
