@@ -80,6 +80,17 @@ The **Field** dropdown determines what data the column displays. Available field
 
 <Warning>Field type selection determines which additional configuration options appear. Choose the right field type before configuring display and filter options.</Warning>
 
+### Value Background Styling
+
+Selected columns can apply a background color when their resolved cell value matches a rule. Add rules from **Styling** in the column settings, then choose:
+
+- A text or number comparison value
+- An operator: equals, not equals, contains, or a numeric comparison
+- A background color
+- Whether the color applies to the matching **cell** or the entire rendered **row**
+
+Rules run in order; the first matching rule in a column wins. When more than one column has a row rule that matches, the leftmost matching column wins. Only non-empty strings and finite numeric values are styled. Empty cells, booleans, arrays, objects, and composite displays such as name-and-value do not apply a rule.
+
 ## Field-Specific Configuration
 
 Different field types have different configuration options:
@@ -291,6 +302,12 @@ Short name of the object.
 
 <ParamField path="Documentation" type="string">
   Description of the object.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+  Attributes owned by the matrix for query parameters, metadata, and equations associated with the artifact.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
 </ParamField>
 
 <ParamField path="Relationships" type="connection">
