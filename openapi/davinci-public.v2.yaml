@@ -189,8 +189,9 @@ paths:
       summary: List accessible projects
       description: |
         Returns the caller's projects split into `owned` and `shared`. Each entry
-        carries git branch state and an `inUse` flag indicating whether the project
-        currently has a running Design Engine instance.
+        carries an `inUse` flag and the most recently active running branch
+        associated with the caller. Clients should use `main` when `activeBranch`
+        is null.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
@@ -8639,19 +8640,9 @@ components:
             inUse:
               type: boolean
               description: True when a Design Engine instance is currently running for this project.
-            git:
-              $ref: '#/components/schemas/GitState'
-          additionalProperties: true
-    GitState:
-      type: object
-      required: [initialized, branches]
-      properties:
-        initialized:
-          type: boolean
-        branches:
-          type: array
-          items:
-            $ref: '#/components/schemas/Branch'
+            activeBranch:
+              type: [string, 'null']
+              description: Most recently active running branch associated with the caller, or null.
       additionalProperties: true
     Branch:
       type: object
@@ -8671,8 +8662,8 @@ components:
       additionalProperties: true
     ProjectMetadata:
       description: |
-        Stored project metadata. `ProjectSummary` is this plus the live `inUse` and
-        `git` fields that only the list endpoint computes.
+        Stored project metadata. `ProjectSummary` is this plus the live `inUse`
+        and `activeBranch` fields that only the list endpoint computes.
       type: object
       required: [id, name]
       properties:
@@ -8751,8 +8742,6 @@ components:
           type: [string, 'null']
         ownerSlug:
           type: [string, 'null']
-        projectList:
-          $ref: '#/components/schemas/ListProjectsResponse'
       additionalProperties: true
     UpdateProjectRequest:
       type: object
