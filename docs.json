@@ -152,6 +152,27 @@
                     "pages/editor/overview",
                     "pages/editor/interface",
                     "pages/editor/model-area",
+                    {
+                        "group": "Panels",
+                        "pages": [
+                            "pages/editor/panels/left-panel",
+                            "pages/editor/panels/right-panel"
+                        ]
+                    },
+                    {
+                        "group": "Widgets",
+                        "pages": [
+                            "pages/editor/widgets/overview",
+                            "pages/editor/widgets/model",
+                            "pages/editor/widgets/skills-rules",
+                            "pages/editor/widgets/agent-chat",
+                            "pages/editor/widgets/source-control",
+                            "pages/editor/widgets/search",
+                            "pages/editor/widgets/comments",
+                            "pages/editor/widgets/validation",
+                            "pages/editor/widgets/terminal"
+                        ]
+                    },
                     "pages/editor/hotkeys",
                     "pages/editor/modeling-basics",
                     {
@@ -175,20 +196,16 @@
                         "pages": [
                             "pages/editor/collaboration/overview",
                             "pages/editor/collaboration/real-time-editing",
-                            "pages/editor/collaboration/object-locking",
-                            "pages/editor/right-panel/comment-view",
-                            "pages/editor/right-panel/version-control"
+                            "pages/editor/collaboration/object-locking"
                         ]
                     },
                     "pages/editor/files-and-references",
                     {
                         "group": "AI Agent",
                         "pages": [
-                            "pages/editor/right-panel/agent-chat",
                             "pages/editor/agent/workspaces",
                             "pages/editor/agent/agents",
                             "pages/editor/agent/persona",
-                            "pages/editor/agent/skills",
                             "pages/editor/agent/planning",
                             "pages/editor/agent/agent-tools",
                             "pages/editor/agent/model-review",
@@ -253,14 +270,6 @@
                                     "pages/user-guide/views/tree"
                                 ]
                             }
-                        ]
-                    },
-                    {
-                        "group": "Right Panel Tools",
-                        "pages": [
-                            "pages/editor/right-panel/overview",
-                            "pages/editor/right-panel/search-view",
-                            "pages/editor/right-panel/validation-view"
                         ]
                     }
                 ]
@@ -453,6 +462,8 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
+                    "pages/release-notes/v5.1.0",
+                    "pages/release-notes/v5.0.0",
                     "pages/release-notes/v4.6.0",
                     "pages/release-notes/v4.5.3",
                     "pages/release-notes/v4.5.2",
@@ -645,7 +656,7 @@
         },
         {
             "source": "/pages/user-guide/navigating/model",
-            "destination": "/pages/editor/model-area"
+            "destination": "/pages/editor/widgets/model"
         },
         {
             "source": "/pages/user-guide/project-settings/project",
@@ -709,27 +720,55 @@
         },
         {
             "source": "/pages/user-guide/right-panel/right-panel-overview",
-            "destination": "/pages/editor/right-panel/overview"
+            "destination": "/pages/editor/panels/right-panel"
+        },
+        {
+            "source": "/pages/editor/right-panel/overview",
+            "destination": "/pages/editor/panels/right-panel"
+        },
+        {
+            "source": "/pages/editor/right-panel/agent-chat",
+            "destination": "/pages/editor/widgets/agent-chat"
+        },
+        {
+            "source": "/pages/editor/right-panel/version-control",
+            "destination": "/pages/editor/widgets/source-control"
+        },
+        {
+            "source": "/pages/editor/right-panel/search-view",
+            "destination": "/pages/editor/widgets/search"
+        },
+        {
+            "source": "/pages/editor/right-panel/comment-view",
+            "destination": "/pages/editor/widgets/comments"
+        },
+        {
+            "source": "/pages/editor/right-panel/validation-view",
+            "destination": "/pages/editor/widgets/validation"
+        },
+        {
+            "source": "/pages/editor/agent/skills",
+            "destination": "/pages/editor/widgets/skills-rules"
         },
         {
             "source": "/pages/user-guide/right-panel/agent-chat",
-            "destination": "/pages/editor/right-panel/agent-chat"
+            "destination": "/pages/editor/widgets/agent-chat"
         },
         {
             "source": "/pages/user-guide/right-panel/version-control",
-            "destination": "/pages/editor/right-panel/version-control"
+            "destination": "/pages/editor/widgets/source-control"
         },
         {
             "source": "/pages/user-guide/right-panel/search-view",
-            "destination": "/pages/editor/right-panel/search-view"
+            "destination": "/pages/editor/widgets/search"
         },
         {
             "source": "/pages/user-guide/right-panel/comment-view",
-            "destination": "/pages/editor/right-panel/comment-view"
+            "destination": "/pages/editor/widgets/comments"
         },
         {
             "source": "/pages/user-guide/right-panel/validation-view",
-            "destination": "/pages/editor/right-panel/validation-view"
+            "destination": "/pages/editor/widgets/validation"
         },
         {
             "source": "/pages/user-guide/design-agent/workspaces",
@@ -789,7 +828,7 @@
         },
         {
             "source": "/pages/user-guide/right-panel/error-view",
-            "destination": "/pages/editor/right-panel/validation-view"
+            "destination": "/pages/editor/widgets/validation"
         },
         {
             "source": "/pages/editor/project-settings/collaboration",
