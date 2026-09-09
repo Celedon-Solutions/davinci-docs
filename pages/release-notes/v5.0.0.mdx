@@ -1,0 +1,167 @@
+---
+title: 'Version 5.0.0 - CAD, Circuits & Simulation'
+description: 'August 27 2026'
+---
+
+## Version 5.0.0 - CAD, Circuits & Simulation
+
+Version 5.0 brings mechanical CAD, electronics design, and physics simulation into Davinci as first-class engineering workflows. Alongside them, this release delivers a rebuilt agent chat experience, a redesigned include system for sharing packages across projects, a new wiring view, refreshed workspace navigation, and a broad set of platform improvements.
+
+### CAD Modeling
+
+Davinci now includes a full parametric CAD environment for authoring real geometry directly inside your model.
+
+- Added an object-oriented CAD language with sketches, extrudes, revolves, holes, fillets, and chamfers
+- Added a rebuilt sketch system with spline editing, mirroring, constraint handling, and selection from the feature tree
+- Added model parameters with unit-aware inputs and sliders for driving dimensions interactively
+- Added Material objects with a dedicated materials editor, PBR properties, and nested material libraries
+- Added SVG import for sketch profiles, including self-intersection resolution and fill contour classification
+- Added STEP export with proper unit conversion, plus GIF and WebM export for turntables and motion
+- Added drawing options with dimension mode support
+- Added section views, face and edge selection improvements, soft shadows, and transparent material rendering
+- Added multiple viewport navigation schemes — Davinci Native (default), Onshape, SolidWorks, and Inventor — with right-click access to viewport settings
+- Improved [Onshape](/pages/integrations/onshape)-linked geometry handling to preserve source geometry and mass properties
+- Improved compile performance with speculative compilation, background compilation, caching, and parallel child loading
+
+### Assemblies & Motion
+
+- Added assembly modeling with mates, including mate flipping, visibility toggles, and highlighted mate references
+- Added a place command for freely posing components within an assembly
+- Added the ability to import other model objects into assemblies, including circuits and mixed assemblies
+- Added joint dragging with enforced joint limits and smooth slider control
+- Added motion studies with capture, playback, and export to GIF and WebM
+- Added exploded views with adjustable offsets, idle spin, and rotation during explode
+- Added assembly instructions generated from the fully solved assembly
+- Added collision and interference detection with verification checks for clearance, distance, bounding box size, and component count
+- Added toggleable reference visibility with bulk controls
+
+### Circuits & PCB Design
+
+Version 5.0 introduces electronics design, taking Circuit objects from schematic capture through board layout and out to 3D.
+
+- Added schematic authoring in a three-pane view with code editor, schematic canvas, and output terminal
+- Added component libraries loaded directly from KiCAD symbols and footprints, with clear feedback on missing symbols
+- Added automatic schematic layout with improved line segments and multi-sheet handling
+- Added PCB board layout with component placement, automatic routing, and fully custom manual routing
+- Added multi-layer board support, BGA handling, via placement rules, and silkscreen reference editing
+- Added support for complex board outline shapes
+- Added design rule checks, including clearance verification
+- Added SPICE simulation support for circuits
+- Added board-to-3D conversion so circuits can be rendered as 3D geometry and placed in assemblies
+- Added agent workflows for circuit generation, layout, and routing
+
+### Simulation, Compiled
+
+Version 5.0 rebuilds simulation around a fundamentally new paradigm: a simulation is no longer a single solve. Set up a study once — mesh plus parametric boundary conditions — compile it in minutes, and the entire solution space becomes a live result that answers in about a tenth of a millisecond per solve. Every answer is a true physics solution carrying a provable accuracy guarantee, turning what used to be an overnight batch process into an interactive design instrument.
+
+- Added compiled solution spaces: declare parameters across loads, materials, and boundary conditions, compile once, then explore every combination of values instantly
+- Added live 3D field exploration with a slider on every declared parameter — displacement, stress, and temperature fields update in real time, sweeping thousands of design points per second
+- Added certified results: every solve carries a rigorous mathematical error bound, not a statistical confidence score or an AI approximation
+- Added full-order verification solves that can be run at any point in the solution space to confirm the certified answer
+- Added eight analysis types: static structural, steady thermal, coupled thermo-elastic, modal, harmonic, random vibration, shock response, and transient
+- Added certified geometry families so dimensional CAD variations can be explored with the same instant response
+- Solution spaces run identically in the browser and on the server, so exploration is immediate with no round trips to a solver
+- Added quantities of interest for tracking derived engineering values live across the space
+- Added a rebuilt simulation setup view integrated with the CAD environment, with parametric boundary condition authoring including a new bearing type
+- Added agent support for setting up, compiling, querying, and verifying simulations
+- Added clearer progress reporting and administrator controls for enabling simulation authoring
+
+### Agent & Chat
+
+- Rebuilt the [chat](/pages/editor/widgets/agent-chat) experience so switching between conversation tabs is instant
+- Added conversation renaming, with new conversations named from the request that opened them
+- Added a context window panel for inspecting exactly what the agent currently sees
+- Added automatic context management for long conversations that trims older content while preserving recent turns
+- Added dynamic model configuration options for conversations
+- Improved plan rendering with collapsed plan updates and better feedback when a plan change fails
+- Improved image handling, including sending images at proper fidelity and clamping oversized captures
+- Cancelled queued messages are now restored to the composer instead of being lost
+- Added progress reporting when importing legacy chat history
+
+### Includes & Linked Projects
+
+- Rebuilt the include system with fully resolved pointers and automatic migration of legacy projects
+- Added linked projects with chained includes so shared packages resolve across a chain of projects
+- All base packages are now treated as public for inclusion
+- Added dynamic includes for public objects outside the source package
+- Include updates and removals now apply together as a single synchronized action
+- Improved the include package explorer popup, including waiting on in-flight operations
+- Prevented merge conflicts and accidental parenting of new objects into included content
+
+### [Figures](/pages/modeling/objects/figure)
+
+- Added swimlane support with lane dragging and chaining via any relationship
+- Added an equation mode for figures
+- Added a linkage mode for rendering cabling
+- Added customization options for interface mode figures
+- Added more toggles for Gantt figures and fixed rendering errors
+- Improved activity mode rendering with manually positioned edge points
+- Improved consistency of generated figure scopes and interconnect linkages
+
+### Wiring & Harness Design
+
+- Added a new wiring view for designing cable harnesses
+- Added multi-cable splitting with build instructions for harness assembly
+- Improved wire routing, overlap handling, and edge processing
+- Added compact, multi-column layouts for large harnesses
+
+### Workspace & Navigation
+
+- Added a workspace bottom bar with source control status, stale value indicators, and quick widgets
+- Added unified breadcrumbs with drag-and-drop support
+- The sidebar is now always visible, with menu actions consolidated into the user menu
+- Added workspace pinning and a full-width workspace switcher
+- Workspace sheets are now retained and lazy-loaded for faster tab switching
+- Replaced browser-native dropdowns with consistent custom menus throughout the application
+- Added inline renaming when creating objects from the index, plus improved index scrolling and multi-select
+- Added folders for organizing projects, and Enter now opens the selected project
+- Refreshed the application color system
+- Added [project settings](/pages/editor/project-settings/project) import and export, including importing settings from an existing project at creation
+- Added one-time file share links
+
+### Documents & Editing
+
+- Improved text highlighting quality and highlight colors in documents
+- Improved caret placement, blank-line selection feedback, and typing responsiveness
+- Pasted text now strips external styling for cleaner documents
+- Improved matrix cell rendering and fixed row description wrapping
+
+### Version Control
+
+- [Source control](/pages/editor/widgets/source-control) now stores merge history and renders a proper commit graph
+- Rollbacks now record authorship and compute faster with client-side processing
+- Stale untracked generated files are cleaned up on branch change
+- Fixed git stability during storage transitions
+
+### Export & Interoperability
+
+- Improved SysML v2 export with proper unit handling, resolved references in action conditionals, and corrected test case exports
+- Model object exports now bundle referenced assets so imports restore references correctly
+- Improved DOCX, image, and figure export fidelity
+
+### [Public API](/pages/api/introduction) & SDKs
+
+- API sessions are now confined to their own conversation, with agent events relayed to the caller's live clients
+- Added validation for objects written through the public API
+- Added canonical error responses and robust handling of compound project IDs
+- Programmatic callers can now name the persona and see delivery failures explicitly
+- MCP servers are now told which conversation is calling them
+- Added configurable agent models through the public API
+- Added a usage ledger and support for Code objects acting as SDK clients
+- Improved Python and TypeScript SDK reliability
+
+### Administration & Deployment
+
+- Added support for custom SSL certificates
+- Added draft saving for LDAP configurations
+- Added a v2 health check endpoint and a liveness probe behind the browser's connection indicator
+- Added metering attribution to LLM usage reporting and Amazon Titan embedding support on Bedrock
+- Improved the platform logging pipeline
+
+### Reliability & Performance
+
+- Bulk model verification now runs in parallel
+- Every collaborator now gets a distinct color in the authorship wheel
+- Fixed race conditions in storage switching and kept session clones in sync across clients
+- Fixed organization page errors, sidebar closing issues, overlapping windows, and various rendering glitches
+- Added general stability, interaction, and display improvements throughout the editor

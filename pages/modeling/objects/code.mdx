@@ -10,6 +10,8 @@ Code objects contain executable code that integrates directly with your model. T
 
 Code objects are ideal for parametric studies, design optimization, analysis automation, and model-driven calculations that need to access and manipulate model data programmatically.
 
+Code can be organized beneath packages or owned directly by parts, entities, actions, states, transitions, tasks, requirements, capabilities, and tests. A code object can own Attributes for module-local parameters and calculated values.
+
 ## Language Support
 
 ### Browser-Executable
@@ -895,6 +897,12 @@ Short name of the object.
 
 <ParamField path="Code" type="string">
   The code content.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+  Module-local parameters and calculated values owned by this Code object.
+
+  [Read more about Attributes](/pages/modeling/objects/attributes)
 </ParamField>
 
 <ParamField path="Relationships" type="connection">

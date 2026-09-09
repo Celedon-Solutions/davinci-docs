@@ -1,0 +1,55 @@
+---
+title: 'Version 5.1.0 - Task Cards, Teams & Sprints'
+description: 'September 1 2026'
+---
+
+## Version 5.1.0 - Task Cards, Teams & Sprints
+
+Version 5.1 introduces Task Cards — a built-in project management layer for tracking day-to-day work — along with organization team boards, sprints, and reporting. Cards are available in projects, on team kanban boards, from the user dashboard, through the agent, and via the public API and SDKs.
+
+### Task Cards
+
+- Added Task Cards for tracking operational work within a project, separate from model [Task](/pages/modeling/objects/task) objects used for WBS and timeline modeling
+- Cards support descriptions, resolutions, deadlines, effort, assignees, tags, comments, and links to model objects and other cards
+- Added a project-global Open/Closed state that is preserved independently of any team board status
+- Added `@` mentions and `#` card references in the card editor
+- Card tags are managed as part of project settings
+- Added real-time edit synchronization so multiple people can work on cards together
+- Added card filtering and fast search backed by an in-memory index
+- Added bulk card creation and improved project linking
+- Added a card history timeline, with an "External" badge on updates made through the API
+
+### Team Boards & Sprints
+
+- Added Teams to [organizations](/pages/browser/organizations) with a kanban board for managing cards across projects
+- Added configurable workflow statuses with per-status close behavior — statuses can leave cards untouched, offer a manual close action, or close cards automatically
+- Added sprints with creation, start, and completion flows, plus support for viewing past sprints
+- Two sprints can now be active at once, with a warning to keep teams intentional about it
+- Added a reports tab with burnup and burndown charts and recent activity
+- Added overview, members, settings, and table tabs for each team, with team sprints consolidated into the overview
+- Added permissions for cards and teams, and team membership is validated against organization members
+
+### Dashboard & Widgets
+
+- Improved the user dashboard with a to-do list of your open cards
+- Cards on the dashboard now jump directly to their project
+- Added a Project Management widget in the editor with a card index and open-card count bubbles
+- Redesigned the card modal on the project site for easier editing
+- Refreshed and consolidated visual styling across card surfaces
+
+### Agent & SDK Access
+
+- Added a Cards toolbox so the agent can create, update, and manage cards
+- Renamed the Task toolbox to Schedule to clearly separate model task planning from cards
+- Added card endpoints to the [public API](/pages/api/introduction) with idempotent card creation
+- Added Python SDK support for working with cards
+- RunScript now resolves inherited objects
+
+### Other Improvements
+
+- Team billing is now labeled "Groups" to avoid confusion with organization Teams
+- Hardened card and dropdown rendering for large teams and sprints
+- Fixed member display errors on the organization page
+- Fixed branch lineage reconstruction in the source control graph
+- Fixed timer leaks and a left pane highlight issue
+- Removed legacy web app login code and fixed HTTP-only configuration for web routes

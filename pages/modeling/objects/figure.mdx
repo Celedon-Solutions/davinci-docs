@@ -15,6 +15,8 @@ Figures are useful when a diagram needs to be edited once and reused in multiple
 Figure objects store presentation choices, not a duplicate of the model. Editing a node's position or appearance changes the figure; editing the represented object's name or properties changes the model object itself.
 </Info>
 
+Figures are visual leaf artifacts: they reference model roots instead of containing those objects or other deliverables. They may own Attributes for figure-specific parameters and metadata.
+
 ## Creating a Figure
 
 1. Create a **Figure** object from the model index, normally inside a package.
@@ -50,8 +52,9 @@ The same roots can be displayed in different ways by changing **Render Mode**.
 | **Interface** | Show interfaces, ports, and connections associated with structural objects. |
 | **Block** | Show structural objects and their connections in a block-style diagram. |
 | **Traceability** | Show selected relationship types as a traceability graph. |
-| **Activity** | Show actions and flows as an activity diagram. Optional content includes items and performers. |
+| **Activity** | Show actions and flows as an activity diagram. Optional content includes items, performers, and relationship-derived swimlanes. |
 | **State** | Show states and transitions, including entry, do, and exit behavior. |
+| **Equation** | Show one or more equation-bearing objects as a dependency tree of themed rollup nodes. Each node can include its parent, resolved value, and equation. Equations use LaTeX formatting when supported and retain linked object anchors as a fallback. |
 | **Gantt** | Show tasks and dependencies across a configurable time scale. |
 | **Risk Matrix** | Show risks by likelihood and consequence, with optional criticality filtering. |
 
@@ -66,10 +69,13 @@ Layout settings vary by render mode and can include:
 - Horizontal or vertical orientation
 - Traversal depth
 - Relationship types
-- Activity endpoint and layout style
+- Activity endpoint, layout style, and swimlane grouping
 - State transition visibility
+- Equation, parent, and resolved-value visibility
 - Gantt scale and date range
 - Risk criticality thresholds
+
+Activity swimlanes group actions by the objects reached through configurable relationship paths. The default path follows incoming `performs` relationships. A path can contain multiple ordered steps, choose incoming, outgoing, or either direction at each step, and optionally filter endpoint object types. Multiple paths are additive: all matched terminal objects are combined into the lane assignment. Actions with no matching endpoint appear in **Unassigned**.
 
 ### Labels and Connections
 
@@ -170,6 +176,12 @@ Short name used to identify the Figure object.
 
 <ParamField path="Documentation" type="string">
 Description of the figure's purpose or intended audience.
+</ParamField>
+
+<ParamField path="Attributes" type="object">
+Figure-specific parameters, metadata, and equations owned by this visual artifact.
+
+[Read more about Attributes](/pages/modeling/objects/attributes)
 </ParamField>
 
 <ParamField path="Root Objects" type="array">

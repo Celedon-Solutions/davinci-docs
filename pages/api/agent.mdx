@@ -1,8 +1,65 @@
 ---
 title: Agent
-description: This API surface is not currently published in v2
+description: Select an available model and send work to a session's agent
 ---
 
-This page previously described an experimental `/api/v1/programmatic` surface. The public SDK release currently supports the documented `/api/v2/programmatic` API only.
+An agent runs inside a project session. Create a session, send it a prompt, and
+poll the session until the agent reaches a terminal state.
 
-Use the Projects, Project Data, Files, API Keys, Errors, and Rate Limits pages for the supported v2 API.
+## Available models
+
+Model availability follows the calling account's subscription tier, tenant
+policy, and account-specific LLM profile. Read the current choices before
+selecting one:
+
+```typescript
+const available = await client.agentModels.list();
+console.log(available.defaultModel);
+```
+
+```python
+available = client.agent_models.list()
+print(available.default_model)
+```
+
+Each entry's `key` is accepted by the message API. Omitting `model` uses
+`defaultModel`. Its `options` list is the effective configuration available to
+your account. Each option includes its type, allowed choices, and default value;
+option values can be strings, numbers, or booleans.
+
+## Select a model
+
+```typescript
+await client.sessions.with(projectId, async (session) => {
+  await session.sendMessage({
+    message: 'Add a mounting bracket',
+    model: 'anthropic:claude-opus-5',
+    modelOptions: {
+      effort: 'high',
+      speed: 'fast',
+    },
+    webSearch: true,
+  });
+  await session.waitUntilDone();
+});
+```
+
+```python
+with client.sessions.create(project_id) as session:
+    session.send_message(
+        "Add a mounting bracket",
+        model="anthropic:claude-opus-5",
+        model_options={
+            "effort": "high",
+            "speed": "fast",
+        },
+        web_search=True,
+    )
+    session.wait_until_done()
+```
+
+The model key is checked against the account's current choices. An unavailable
+key is rejected with `UNKNOWN_MODEL` and the valid keys in
+`error.details.availableModels`. Model options are checked against the selected
+model's effective definitions before the run starts; omitted options use their
+published defaults.

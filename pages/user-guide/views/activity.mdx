@@ -60,6 +60,12 @@ Control visibility of flow lines between actions.
 
 Toggle display of performers (actors or systems) responsible for executing actions.
 
+### Swimlanes
+
+Enable swimlanes to group actions by related model objects. By default, the view follows incoming `performs` relationships so each performer becomes a lane.
+
+Use **Configure lanes** to define one or more relationship paths. Steps within a path are ordered and can follow `in`, `out`, or `both` directions. Paths themselves are additive, so terminal objects from every matching path are combined into the lane assignment. Actions without a match appear in **Unassigned**.
+
 ### Refresh
 
 Regenerates the activity diagram from the current code definition.
