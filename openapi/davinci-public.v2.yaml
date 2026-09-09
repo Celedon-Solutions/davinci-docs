@@ -6055,7 +6055,7 @@ components:
         The resource's current state no longer permits this operation, or a unique
         name, hierarchy, dependency, or lifecycle invariant would be violated.
         Examples include an active sprint that must be completed first, a duplicate
-        card-tag name, or a dependency cycle. Idempotent creates may return
+        card-tag name (`TAG_NAME_CONFLICT`), or a dependency cycle. Idempotent creates may return
         `IDEMPOTENCY_KEY_REUSED` or `IDEMPOTENCY_REQUEST_IN_PROGRESS`; the latter
         includes `Retry-After`.
       content:
