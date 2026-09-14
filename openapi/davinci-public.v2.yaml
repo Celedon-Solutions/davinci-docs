@@ -3529,9 +3529,11 @@ paths:
       tags: [Cards]
       summary: Delete a card comment
       description: |
-        The author or a caller with project card-write permission may delete a
-        comment. API keys require `cards:write`; browser JWT authors retain
-        self-service deletion with card-read access.
+        The comment author or a caller with project `cards:delete` permission
+        may delete it. API keys require `cards:write`; moderation therefore
+        requires a `cards:manage` key so `cards:delete` survives its permission
+        ceiling. Browser JWT authors retain self-service deletion with card-read
+        access.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
@@ -3874,9 +3876,10 @@ paths:
       tags: [Cards]
       summary: Link a design object to a card
       description: |
-        Creates or updates a branch-scoped design-object reference and records it
-        in card history. `branch` overrides a branch embedded in the project id;
-        otherwise the branch defaults to `main`.
+        Verifies an object in the current project branch, resolves its canonical
+        name and type server-side, and records the branch-scoped reference in card
+        history. `branch` overrides a branch embedded in the project id; otherwise
+        the branch defaults to `main`.
       security:
         - ApiKeyBearer: []
       parameters:
@@ -3888,7 +3891,7 @@ paths:
           description: Branch containing the referenced object.
         - $ref: '#/components/parameters/IfMatch'
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: [cards:write, projects:read]
       x-sdk-methods:
         typescript: client.cards.objectLinks.add
         python: client.cards.object_links.add
@@ -4129,6 +4132,15 @@ paths:
           schema:
             type: string
           description: Exact team lifecycle status to include.
+        - name: include
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [work-summary]
+          description: |
+            Include open-card counts and planning sprint summaries. This expansion
+            additionally requires effective `teams:sprints:read` permission.
       x-routing-server-source: RoutingServer/team/team.routes.js
       x-required-scopes: [teams:read]
       x-sdk-methods:
@@ -4217,7 +4229,7 @@ paths:
         python: client.teams.get
       responses:
         '200':
-          description: Team and viewer permissions.
+          description: Team and effective viewer capabilities.
           content:
             application/json:
               schema:
@@ -4316,7 +4328,7 @@ paths:
       summary: Get the team board index
       description: |
         Returns team metadata, workflow statuses, sprints, board cards, and viewer
-        permissions. API-key requests default to 100 cards and may request up to
+        capabilities. API-key requests default to 100 cards and may request up to
         500; browser requests remain unbounded when pagination is omitted.
       security:
         - ApiKeyBearer: []
@@ -4358,7 +4370,7 @@ paths:
       description: |
         Returns team metadata, workflow statuses, active and planned sprints,
         placed cards outside completed sprints, the completed-sprint count, and
-        viewer permissions. The card page is always bounded and defaults to 500.
+        effective viewer capabilities. The card page is always bounded and defaults to 500.
       security:
         - ApiKeyBearer: []
       parameters:
@@ -4409,11 +4421,19 @@ paths:
         Returns a board index plus the number of distinct cards completed in the
         last seven days. API-key requests default to 100 cards and may request up
         to 500; browser requests remain unbounded when pagination is omitted.
+        The acting user's live role must include `teams:sprints:analysis:read`.
       security:
         - ApiKeyBearer: []
       parameters:
         - $ref: '#/components/parameters/CardPageLimit'
         - $ref: '#/components/parameters/PageOffset'
+        - name: sprint
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Include and select this archived sprint for a reports deep link.
       x-routing-server-source: RoutingServer/team/team.routes.js
       x-required-scopes: [teams:read]
       x-sdk-methods:
@@ -4449,7 +4469,8 @@ paths:
       description: |
         Returns sprint velocity by default or a daily cumulative-flow series.
         Explicit cumulative-flow ranges are capped to 90 days; an omitted range
-        covers the team's full history.
+        covers the team's full history. The acting user's live role must include
+        `teams:sprints:analysis:read`.
       security:
         - ApiKeyBearer: []
       parameters:
@@ -4470,6 +4491,18 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/SprintDateInput'
+        - name: projectIds
+          in: query
+          required: false
+          schema:
+            type: array
+            maxItems: 50
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: false
+          description: Limit cumulative-flow results to these linked projects.
       x-routing-server-source: RoutingServer/team/team.routes.js
       x-required-scopes: [teams:read]
       x-sdk-methods:
@@ -4535,11 +4568,12 @@ paths:
       summary: Link a project to a team
       description: |
         Links an existing project owned by the route's organization. Re-linking
-        an existing project is accepted and may return an empty JSON object.
+        an existing project is accepted and may return an empty JSON object. The
+        caller must also be able to read Cards in the Project.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage]
+      x-required-scopes: [teams:manage, cards:read]
       x-sdk-methods:
         typescript: client.teams.projects.add
         python: client.teams.projects.add
@@ -4578,12 +4612,12 @@ paths:
       tags: [Teams]
       summary: Unlink a project from a team
       description: |
-        Removes the project link. Existing board placements for cards from that
-        project are not removed by this operation.
+        Removes the project link only when no cards from that project remain on
+        the Team board. Move or remove those cards first.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage]
+      x-required-scopes: [teams:manage, cards:read]
       x-sdk-methods:
         typescript: client.teams.projects.remove
         python: client.teams.projects.remove
@@ -4596,6 +4630,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
@@ -4996,7 +5032,9 @@ paths:
       operationId: deleteTeamSprint
       tags: [Teams]
       summary: Delete a sprint
-      description: Active sprints must be completed before they can be deleted.
+      description: |
+        Active sprints must be completed first. A planned or completed sprint
+        must also be empty; move or remove every card before deleting it.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
@@ -5006,7 +5044,7 @@ paths:
         python: client.teams.sprints.delete
       responses:
         '204':
-          description: Sprint deleted; card placements remain on the board with no sprint.
+          description: Empty sprint deleted.
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -5157,7 +5195,8 @@ paths:
       summary: Get sprint burndown or burnup
       description: |
         Replays card scope, effort edits, and status changes into UTC daily
-        buckets. Future sprint days have null actual values.
+        buckets. Future sprint days have null actual values. The acting user's
+        live role must include `teams:sprints:analysis:read`.
       security:
         - ApiKeyBearer: []
       parameters:
@@ -5188,6 +5227,55 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/orgs/{orgId}/teams/{teamId}/project-cards:
+    parameters:
+      - $ref: '#/components/parameters/OrgId'
+      - $ref: '#/components/parameters/TeamId'
+    post:
+      operationId: createTeamProjectCard
+      tags: [Teams]
+      summary: Atomically create and place a Project Card
+      description: |
+        Creates a Project-owned Card, optionally assigns an effective Project
+        member, links the Project when separately authorized, and places the Card
+        on this Team board in one transaction. The selected Status and Sprint
+        policy are revalidated under the Team lock before any row is inserted.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/team/team.routes.js
+      x-required-scopes: [teams:write, cards:write]
+      x-sdk-methods:
+        typescript: client.teams.cards.create
+        python: client.teams.cards.create
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamProjectCardRequest'
+      responses:
+        '201':
+          description: Project Card, Team placement, and current history head.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTeamProjectCardResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
@@ -5448,6 +5536,9 @@ components:
         can exercise. Each scope family is a ladder: `projects:manage` implies
         `projects:write` and `projects:read`; `cards:manage` implies `cards:write`
         and `cards:read`; and `teams:manage` implies `teams:write` and `teams:read`.
+        These are named API capability bundles, not blanket domain roles:
+        `manage` exposes only the permissions enumerated for that scope and never
+        bypasses the acting user's current role-based access.
     GrantBearer:
       type: http
       scheme: bearer
@@ -6285,6 +6376,13 @@ components:
         effort:
           type: [integer, 'null']
           minimum: 0
+        assigneeId:
+          type: string
+          format: uuid
+          description: |
+            Optional initial assignee. The server validates current Project
+            membership and creates the Card, assignment, and both history entries
+            in one transaction.
       additionalProperties: false
     UpdateCardRequest:
       type: object
@@ -7069,15 +7167,12 @@ components:
       additionalProperties: true
     AddCardObjectLinkRequest:
       type: object
-      required: [objectId, objectName, objectType]
+      required: [objectId]
       properties:
         objectId:
           type: string
           format: uuid
-        objectName:
-          type: string
-        objectType:
-          type: string
+          description: Object verified in the current Project and selected branch.
         linkType:
           type: string
           enum: [related]
@@ -7182,6 +7277,9 @@ components:
             - deleted
             - opened
             - closed
+            - ownership_transfer_requested
+            - ownership_transfer_declined
+            - ownership_transferred
             - field_updated
             - status_changed
             - sprint_added
@@ -7442,14 +7540,12 @@ components:
       additionalProperties: false
     GetTeamResponse:
       type: object
-      required: [team, viewerPermissions]
+      required: [team, viewerCapabilities]
       properties:
         team:
           $ref: '#/components/schemas/AgileTeam'
-        viewerPermissions:
-          type: array
-          items:
-            type: string
+        viewerCapabilities:
+          $ref: '#/components/schemas/TeamViewerCapabilities'
       additionalProperties: false
     CreateTeamRequest:
       type: object
@@ -7483,20 +7579,11 @@ components:
       required:
         - id
         - name
-        - description
-        - status
-        - created_at
-        - updated_at
-        - organization_id
-        - visibility
         - sprint_id
         - status_id
         - sprint_name
         - status_name
-        - status_color
-        - status_close_mode
-        - org_handle
-        - org_slug
+        - placementAccess
       properties:
         <<: *AgileTeamProperties
         sprint_id:
@@ -7519,6 +7606,12 @@ components:
           type: [string, 'null']
         org_slug:
           type: [string, 'null']
+        placementAccess:
+          type: string
+          enum: [full, summary]
+          description: |
+            `summary` exposes only bounded Team, status, and sprint identifiers
+            and labels when the Project Card reader cannot otherwise read the Team.
       additionalProperties: true
     TeamTransitionState:
       type: string
@@ -7746,6 +7839,52 @@ components:
           additionalProperties:
             $ref: '#/components/schemas/NullableHistoryHeadId'
       additionalProperties: false
+    CreateTeamProjectCardRequest:
+      type: object
+      required: [projectId, name]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Sanitized by the server to a resource name of at most 255 characters.
+        description:
+          type: [string, 'null']
+        resolution:
+          type: [string, 'null']
+          maxLength: 10000
+        deadline:
+          type: [string, 'null']
+          format: date-time
+        effort:
+          type: [integer, 'null']
+          minimum: 0
+        assigneeId:
+          type: [string, 'null']
+          format: uuid
+        statusId:
+          type: [string, 'null']
+          format: uuid
+          description: Defaults to the Team's first not-started Status.
+        sprintId:
+          type: [string, 'null']
+          format: uuid
+          description: Planned or active Sprint; null places the Card in the backlog.
+      additionalProperties: false
+    CreateTeamProjectCardResponse:
+      type: object
+      required: [card, link, historyHeadId, historyHeadSequence]
+      properties:
+        card:
+          $ref: '#/components/schemas/AgileCard'
+        link:
+          $ref: '#/components/schemas/TeamCardLink'
+        historyHeadId:
+          $ref: '#/components/schemas/NullableHistoryHeadId'
+        historyHeadSequence:
+          $ref: '#/components/schemas/NullableHistoryHeadSequence'
+      additionalProperties: false
     TeamCardLink:
       type: object
       required: [id, card_id, team_id, sprint_id, status_id, created_at]
@@ -7780,14 +7919,54 @@ components:
         historyHeadSequence:
           $ref: '#/components/schemas/NullableHistoryHeadSequence'
       additionalProperties: false
+    TeamViewerCapabilities:
+      type: object
+      required:
+        - canReadTeam
+        - canManageTeam
+        - canDeleteTeam
+        - canReadMembers
+        - canInviteMembers
+        - canRemoveMembers
+        - canUpdateMemberRoles
+        - canAddProjects
+        - canRemoveProjects
+        - canCreateSprint
+        - canReadSprints
+        - canManageSprint
+        - canDeleteSprint
+        - canManageBoardCards
+        - canReadAnalysis
+      properties:
+        canReadTeam: { type: boolean }
+        canManageTeam: { type: boolean }
+        canDeleteTeam: { type: boolean }
+        canReadMembers: { type: boolean }
+        canInviteMembers: { type: boolean }
+        canRemoveMembers: { type: boolean }
+        canUpdateMemberRoles: { type: boolean }
+        canAddProjects: { type: boolean }
+        canRemoveProjects: { type: boolean }
+        canCreateSprint: { type: boolean }
+        canReadSprints: { type: boolean }
+        canManageSprint: { type: boolean }
+        canDeleteSprint: { type: boolean }
+        canManageBoardCards: { type: boolean }
+        canReadAnalysis: { type: boolean }
+      additionalProperties: false
+    TeamCardCapabilities:
+      type: object
+      required: [canReadCards, canWriteCards, canDeleteCards]
+      properties:
+        canReadCards: { type: boolean }
+        canWriteCards: { type: boolean }
+        canDeleteCards: { type: boolean }
+      additionalProperties: false
     TeamBoardCard:
       type: object
       required:
         - id
         - name
-        - description
-        - resolution
-        - created_by_user
         - created_at
         - updated_at
         - deadline
@@ -7798,6 +7977,8 @@ components:
         - sprint_id
         - status_id
         - project_name
+        - cardAccess
+        - capabilities
       properties: &TeamBoardCardProperties
         <<: *AgileCardProperties
         link_id:
@@ -7824,15 +8005,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CardTagFilterOption'
+        cardAccess:
+          type: string
+          enum: [full, team-board-summary]
+          description: |
+            `full` includes Project Card fields. `team-board-summary` is the
+            bounded operational projection returned when the caller may see the
+            Team board but lacks `cards:read` for this Card's Project.
+        capabilities:
+          $ref: '#/components/schemas/TeamCardCapabilities'
       additionalProperties: true
     TeamBoardCardWithAssignees:
       type: object
       required:
         - id
         - name
-        - description
-        - resolution
-        - created_by_user
         - created_at
         - updated_at
         - deadline
@@ -7844,6 +8031,8 @@ components:
         - status_id
         - project_name
         - assignees
+        - cardAccess
+        - capabilities
       properties:
         <<: *TeamBoardCardProperties
       additionalProperties: true
@@ -7948,7 +8137,7 @@ components:
       additionalProperties: false
     TeamIndex:
       type: object
-      required: [team, workflowStatuses, sprints, cards, viewerPermissions]
+      required: [team, workflowStatuses, sprints, cards, viewerCapabilities]
       properties: &TeamIndexProperties
         team:
           $ref: '#/components/schemas/AgileTeam'
@@ -7967,10 +8156,8 @@ components:
         meta:
           $ref: '#/components/schemas/OffsetPageMeta'
           description: Present on API-key or explicitly paginated requests.
-        viewerPermissions:
-          type: array
-          items:
-            type: string
+        viewerCapabilities:
+          $ref: '#/components/schemas/TeamViewerCapabilities'
       additionalProperties: true
     TeamOverview:
       type: object
@@ -7981,7 +8168,7 @@ components:
         - cards
         - completedSprintTotal
         - meta
-        - viewerPermissions
+        - viewerCapabilities
       properties:
         <<: *TeamIndexProperties
         completedSprintTotal:
@@ -7990,7 +8177,7 @@ components:
       additionalProperties: true
     TeamReports:
       type: object
-      required: [team, workflowStatuses, sprints, cards, viewerPermissions, stats]
+      required: [team, workflowStatuses, sprints, cards, viewerCapabilities, stats]
       properties:
         <<: *TeamIndexProperties
         stats:
