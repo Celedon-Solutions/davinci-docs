@@ -425,7 +425,7 @@
                     {
                         "group": "General",
                         "icon": "circle-info",
-                        "openapi": "openapi/davinci-public.v2.yaml",
+                        "openapi": "/openapi/davinci-public.v2.yaml",
                         "pages": [
                             "GET /api/v2/programmatic",
                             "GET /api/v2/programmatic/health"
@@ -434,7 +434,7 @@
                     {
                         "group": "Projects",
                         "icon": "folder-tree",
-                        "openapi": "openapi/davinci-public.v2.yaml",
+                        "openapi": "/openapi/davinci-public.v2.yaml",
                         "pages": [
                             "GET /api/v2/programmatic/projects",
                             "GET /api/v2/programmatic/projects/{projectId}",
