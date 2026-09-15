@@ -1,0 +1,28 @@
+---
+title: 'Version 5.1.4 - Performance & Reliability'
+description: 'September 8 2026'
+---
+
+## Version 5.1.4 - Performance & Reliability
+
+This patch improves application performance, agent responsiveness, document layout reliability, and the project-list API.
+
+### Performance & Reliability
+
+- Faster authenticated site rendering and navigation
+- Enabled response compression and upstream connection reuse at the gateway
+- Fixed document pagination and layout issues, including empty reference blocks spilling onto a new page
+- Corrected a storage edge case affecting immutable shared assets and snapshots
+
+### Agent & Toolboxes
+
+- Custom toolboxes now refresh while an agent session is active, so newly enabled, renamed, or updated toolboxes are available without starting a new chat
+- Improved chat model-option saving and context-budget handling
+- Deployments with bridge access disabled now reliably withhold bridge tools from the agent
+
+### API Change
+
+- **Breaking:** `GET /api/v2/projects` no longer returns the `git` object for each project. It now returns nullable `activeBranch`; use `main` when this field is `null`.
+- **Breaking:** `POST /api/v2/projects` responses no longer include `projectList`. Call the project-list endpoint when the updated list is required.
+- **Breaking:** `POST /api/v2/auth/token/refresh` no longer includes a `user` object. Read user identity from the returned access token or call the appropriate user endpoint.
+

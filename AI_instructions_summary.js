@@ -117,10 +117,10 @@ const contextData = `
 
        Reference View: Displays Reference Object content (text, PDF viewer).
 
-    Index: Left panel. Library (Reference Objects and base area where file uploads get added) & Model. Right-click actions, drag-drop rearrange. Filter object types to show in the index. Lock/Unlock objects.
+    Panels and widgets: The Left Panel and Right Panel contain movable widgets. Model and Skills & Rules are on the left by default; Davinci Agent, Source Control, Search, Terminal, Comments, and Validation are on the right by default. Widgets can be moved, ordered, hidden, and restored. The Model panel contains Library (Reference Objects and uploaded files) and Model object trees with right-click actions, drag-and-drop organization, filters, and object locking.
 
     Navigation/UI:
-      Nav Bar (left): Model, Project, Home areas.
+      Header: Home, navigation history, project search, connection status, help, and account controls.
       Home Area: Project lists (Owned, Shared), New Project.
       Project Area: Tabs for Summary (stats, rename, export JSON/SysMLv2), Snapshots, Collaborators, Units, Relationships, Files.
       Header Bar (top): Docs, Version, Nav Arrows, Connection Indicator, Search, Account Management.
