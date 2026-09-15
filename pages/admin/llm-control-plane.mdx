@@ -1,0 +1,264 @@
+---
+title: LLM Control Plane
+description: Configure provider connections, model offerings, profiles, routing, verification, and deployment
+---
+
+## Overview
+
+The LLM Control Plane is the administrator interface for configuring the models used by Davinci. It is available at `/admin/~/llm` to users with a system administration role.
+
+The control plane separates model configuration into reusable layers:
+
+1. **Providers** — connections to model vendors or compatible APIs.
+2. **Model definitions** — shared metadata, capabilities, limits, and base pricing for a model.
+3. **Model offerings** — a model as exposed by one provider, including its exact runtime model ID and provider-specific overrides.
+4. **Profiles** — named bundles of model access for a subscription tier or tenant.
+5. **Assignments** — routes from a workload to a model offering.
+
+<Info>
+The control plane is deployment configuration, not a user chat interface. Changes here affect the model options and AI workloads available to users.
+</Info>
+
+<CardGroup cols={2}>
+  <Card title="Provider Configuration" icon="plug" href="/pages/admin/llm-provider-configuration">
+    Supported provider recipes, authentication methods, endpoints, and Additional options JSON.
+  </Card>
+  <Card title="Model Offering Configuration" icon="sliders" href="/pages/admin/llm-offering-configuration">
+    API and codec compatibility, overrides, pricing, Chat Controls, and Advanced options JSON.
+  </Card>
+</CardGroup>
+
+<Note>
+The reference pages document the supported public configuration surface. Do not assume that an unlisted JSON property is supported merely because the editor accepts valid JSON.
+</Note>
+
+## Configuration Scope
+
+Use the **Tenant Context** selector in the Administration sidebar before editing:
+
+- **All Tenants** edits the global configuration.
+- **A specific tenant** edits that tenant's configuration.
+
+Global configuration is the default for tenants. Tenant-scoped providers, profiles, mappings, and assignments can override the global configuration for that tenant. The scope chip beside the page title shows whether you are editing **Global** or a tenant.
+
+Model definitions are global catalog records. Provider connections, model offerings, profiles, subscription mappings, and assignments can be global or tenant-scoped. A published tenant configuration merges the tenant's resources over the published global configuration.
+
+When troubleshooting a tenant, select that tenant explicitly. Do not assume that the global view includes the tenant's overrides.
+
+## Providers
+
+The **Providers** tab lists provider connections and the model offerings attached to each connection.
+
+### Add A Provider
+
+Select **Add Provider**, then configure the connection, authentication method, APIs, and any provider-specific options. Use the [Provider Configuration reference](/pages/admin/llm-provider-configuration) for supported combinations and exact field formats.
+
+<Warning>
+Credentials are sensitive configuration. Do not paste credentials into documentation, screenshots, exported files, tickets, or chat. When editing an existing provider, leave the credential field blank to preserve the stored value.
+</Warning>
+
+### Check Provider Health
+
+Use the provider's health status to send a test request. The result shows whether the connection is reachable and when it was last checked. A health check validates the connection; it does not publish configuration or verify every model offering.
+
+### Discover Or Add Models
+
+For providers that support model discovery:
+
+1. Expand the provider card.
+2. Select **Discover Models**.
+3. Review the returned runtime model IDs.
+4. Select the models to import.
+5. Select **Import Selected**.
+
+Discovery can match a returned model to an existing model definition or create a new definition. If the match is ambiguous, add the model manually.
+
+Use **Add Model** when discovery is unavailable or when the provider exposes a model that is not returned by discovery.
+
+## Model Definitions And Offerings
+
+### Model Definitions
+
+Expand **Default Model Definitions** to manage shared defaults. A definition describes a model independently of any one provider:
+
+- Publisher, model name, display name, and model kind.
+- Context-window, output, and image-count limits.
+- Capabilities such as tools, streaming, structured output, image input/output, reasoning, audio/video, embeddings, and prompt caching.
+- Base pricing.
+- Embedding dimensions and supported vector sizes.
+- Additional metadata.
+
+Model kinds include general, embedding, image, audio, video, and realtime.
+
+When one model is offered by multiple providers, its definition is the place to keep shared defaults consistent.
+
+### Model Offerings
+
+An offering connects a model definition to a provider's exact runtime route. It selects the provider model ID, API and codec, runtime limits, capabilities, pricing, and user-facing Chat Controls.
+
+Offerings inherit model-definition limits, capabilities, and pricing by default. Use the **Override** controls only when the provider's version differs from the model default. Clear an override to return to inheritance.
+
+The offering's **Off** state prevents profiles and workloads from using it. Archiving removes it from the active configuration while preserving it in the History tab.
+
+Disabling a provider also disables its offerings and dependent assignments. Re-enabling the provider does not automatically restore those dependencies; review and re-enable the required offerings and routes before publishing.
+
+See [Model Offering Configuration](/pages/admin/llm-offering-configuration) for the API and codec matrix, accepted values, Advanced options JSON, Chat Controls, embedding settings, and override behavior.
+
+### Pricing
+
+Pricing can be inherited from the model definition or overridden for one offering. Keep it aligned with the provider's current rates because Davinci uses it for usage and credit calculations. See [Pricing Overrides](/pages/admin/llm-offering-configuration#pricing-overrides) for supported pricing types and formats.
+
+## Profiles And Routing
+
+The **Profiles** tab controls which offerings a group of users can reach.
+
+### Subscription Mappings
+
+At the top of the Profiles tab, map each subscription tier to a profile:
+
+- Free
+- Core
+- Max
+- Team
+
+Tenant mappings override global mappings. An unmapped tier has no profile and therefore no available models.
+
+### Create A Profile
+
+A profile has:
+
+- A display name.
+- A stable lowercase key. The key cannot be changed after creation.
+- An enabled state.
+- A description for administrators.
+
+Expand a profile to configure its routes.
+
+### Profile Routes
+
+Profiles can route these workloads:
+
+- **Chat** — models users can select in agent chat. Mark exactly one enabled chat route as the default.
+- **Tool-call models** — Simple, Standard, and Complex routes for internal tool reasoning.
+- **Summarization** — conversation compaction and summaries.
+- **Image generation** — generated images and graphics.
+- **Reference analysis** — OCR, image, and PDF visual understanding.
+- **Media analysis** — audio and video understanding.
+- **Project names** — automatic project titles.
+- **Embedding** — vector search and retrieval.
+
+Only enabled offerings that support a workload appear as choices. Removing a route prevents users of that profile from using that workload.
+
+An enabled profile must have exactly one default chat model and all three tool-call routes before it can be published. Specialized routes should be configured for each workload the profile is expected to support.
+
+### Chat Controls And Generation Defaults
+
+An offering can define typed chat controls, such as an enum or toggle, and map each control to a provider request field. A profile can then:
+
+- Enable or disable the control.
+- Limit its allowed values.
+- Set the user-facing policy default.
+- Set the default used for generation.
+
+For tool and specialized-workload routes, configure generation defaults when the offering exposes selectable options.
+
+Use the [Chat Controls reference](/pages/admin/llm-offering-configuration#chat-controls) before exposing a control. The selected target and values must be supported by the offering's API and model.
+
+## Drafts And Publishing
+
+LLM edits are staged as a draft. The header reports the number and type of unpublished changes.
+
+### Publish Changes
+
+When the draft is ready:
+
+1. Review the draft summary.
+2. Check provider health and verify the affected offerings.
+3. Select **Publish Changes**.
+4. Review the Design Engine deployment result.
+
+Publishing creates a configuration version and sends the selected scope to connected Design Engines. The result reports how many engines applied the configuration, have not loaded it, or failed to apply it.
+
+Before creating a runtime version, Davinci validates provider, API, codec, model, profile, and assignment compatibility. It also validates workload-specific capabilities and required pricing or embedding settings. Resolve the displayed validation error in the draft and publish again.
+
+<Warning>
+Saving an item is not the same as publishing it. Until publication succeeds, the runtime continues using the previously published configuration.
+</Warning>
+
+If an engine fails to acknowledge the configuration, use the deployment notice's **Retry** action after resolving the reported issue. Confirm that all connected engines are running the current version before treating the change as complete.
+
+A configuration snapshot can be successfully published while one or more Design Engines still run an older version. The runtime status, not the existence of a version in History, determines whether deployment is complete.
+
+### Discard Draft Changes
+
+**Discard Changes** returns the draft to the published configuration. Items added since the last publish may be archived, and the action cannot be undone.
+
+## Verification
+
+Use **Verify Model Offering** from an offering's verification badge or action menu. Verification can run against:
+
+- The current draft configuration.
+- The published configuration.
+
+The dialog shows the applicable checks, live progress, evidence, and prior runs. You can verify one offering or use **Verify All Models** on a provider to run checks in parallel.
+
+<Warning>
+Verification makes real provider calls. Draft verification does not charge Davinci credits. Published verification uses the published runtime and may charge the initiating user account. Provider charges can still apply to any real call. Run verification deliberately, especially when verifying all models on a provider.
+</Warning>
+
+Use **Cancel Run** or **Cancel All** to request cancellation. Closing the dialog stops live browser updates, but runs already started on the server can continue. A completed verification is evidence about the selected configuration at that time; run it again after changing credentials, endpoints, model IDs, codecs, or important runtime settings.
+
+## History, Versions, And Portability
+
+The **History** tab contains:
+
+- **Published versions** — the active version and earlier published snapshots.
+- **Archived items** — providers, model definitions, offerings, profiles, and assignments removed from the active draft.
+
+Version history is scope-specific. Global and tenant publications advance separately, and an effective version identifies the combination of global and tenant configuration used by that scope. Publishing an unchanged draft can reuse the current snapshot instead of creating a duplicate.
+
+### Compare Versions
+
+Select **View changes** to compare two published versions. The diff identifies added, changed, and removed resources and shows field-level values.
+
+### Restore A Version
+
+Restoring a published version brings it back as unpublished changes. The runtime keeps using the current published configuration until you publish the restored draft.
+
+### Restore Archived Items
+
+Review an archived item's scope and details, then select **Restore** to bring it back as an unpublished change.
+
+Restoring an item does not automatically restore its dependencies:
+
+- Restore an offering's provider and model definition before restoring the offering.
+- Restore and enable an offering before restoring an assignment that uses it.
+- Resolve any active assignment already occupying the same profile route.
+
+### Export And Import
+
+From the History tab:
+
+- **Export Draft** downloads the current unpublished configuration.
+- **Export Published** downloads the active published configuration.
+- **Import** previews a JSON configuration before adding it as unpublished changes.
+
+Imported configuration does not include credentials. Configure provider credentials again in the destination deployment. A provider that requires a missing credential remains disabled, and its offerings cannot become active until the credential and provider are enabled. Nothing from an import becomes active until it is published.
+
+Import can also archive draft resources that are absent from the imported configuration. Always review the preview before confirming.
+
+## Recommended Publish Checklist
+
+Before publishing an LLM change, confirm:
+
+- The Tenant Context is correct.
+- Required providers are enabled and healthy.
+- Every offering has the correct provider model ID, API handler, codec, and availability.
+- Pricing and limits match the provider.
+- Embedding dimensions match the vector index expectations. Changing dimensions requires project vectors to be regenerated after publish.
+- Every subscription tier that should have AI access is mapped to an enabled profile.
+- Enabled profiles have exactly one default chat route, all three tool routes, and the specialized routes they need.
+- Verification passes against the intended draft or published source.
+- The deployment notice reports that connected Design Engines applied the new version.
+
+Use [Usage And Billing](/pages/admin/usage-and-billing) after publication to confirm that model attribution, tokens, provider cost, and charged credits match expectations.

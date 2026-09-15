@@ -1,0 +1,181 @@
+---
+title: Users And Access
+description: Provision accounts, recover access, manage roles and sessions, and configure per-user controls
+---
+
+## Overview
+
+Use **Administration → Users** to manage accounts across the deployment. The page combines account provisioning, authentication recovery, role assignment, usage limits, projects, and per-user feature controls.
+
+The separate **Roles** page provides a system-role catalog and direct role lookup. It may be unavailable on self-hosted deployments; the user detail view remains the primary place to understand an individual account.
+
+<Warning>
+User administration can expose personal information and temporary credentials. Share exports and credentials only through approved secure channels.
+</Warning>
+
+## Find And Review Users
+
+Search by name or email, then filter by:
+
+- Account status.
+- Subscription tier.
+- Tenant.
+- System or tenant role.
+- Email-verification state.
+- MFA state.
+- Sign-in method, including password, OAuth, OIDC, or LDAP.
+
+Select **Columns** to include identifiers, tenant, LLM profile override, sessions, sign-in method, project count, storage, and other account fields. Column choices are remembered in the browser.
+
+Select **Export** to download the complete filtered result set with the currently selected columns. Treat the CSV as sensitive because it can contain user identifiers, email addresses, tenant membership, authentication state, and usage-related data.
+
+## Provision A User
+
+Select **Add User** and provide:
+
+1. The user's email address.
+2. An optional display name.
+3. The authentication type.
+4. A provider name when required by OAuth or OIDC.
+5. Whether Davinci should email password credentials.
+
+The account is created in the tenant selected by the Users page tenant filter. If that filter is empty, the current **Tenant Context** is used. Verify the target shown in the form before submitting.
+
+### Authentication Types
+
+- **Password** creates a Davinci password identity and a temporary password.
+- **OAuth** associates the account with a named OAuth provider.
+- **SSO / OIDC** associates the account with the configured identity provider.
+- **LDAP / Directory** prepares the account for directory authentication.
+
+When email delivery is selected for a password account, Davinci attempts to send the temporary password to the user. If delivery is not selected or does not succeed, the temporary password is displayed once for manual delivery.
+
+<Warning>
+Copy a displayed temporary password before closing the result. Do not place it in tickets, documentation, or ordinary chat. The user is required to change it after signing in.
+</Warning>
+
+For deployment-wide provider setup and allowed email domains, see [System Settings And Authentication](/pages/admin/system-settings-authentication).
+
+## Bulk Provision Users
+
+Select **Bulk Add** to create several accounts with the same authentication type, tenant, tier, and optional trial-credit allocation.
+
+Enter one account per line in either form:
+
+```text
+user@example.com
+user@example.com, Display Name
+```
+
+You can submit up to 200 users in one request. A failure for one entry does not prevent the other entries from being processed. Review the result table for created and failed accounts, email-delivery results, and any temporary passwords that require manual delivery.
+
+Trial credits can be entered as credits or a currency amount. The preview converts between the two using the deployment's current credit rate and applies the same amount to each successfully created user.
+
+## User Details
+
+Select a user row to open the detail view.
+
+### Account
+
+The **Account** tab shows identity, status, tenant, sign-in, verification, and limit information. Administrators can:
+
+- Update the display name.
+- Mark an email address as verified.
+- Set an explicit [LLM profile](/pages/admin/llm-control-plane#profiles-and-routing) or return the user to the subscription mapping.
+- Override maximum owned projects and collaborators.
+- Reset the password or MFA enrollment.
+- Unlink an LDAP identity.
+- Deactivate, reactivate, or permanently delete the account.
+
+An empty project or collaborator override means unlimited. These are account-specific values and can differ from the defaults in [New User Defaults](/pages/admin/system-settings-authentication#new-user-defaults).
+
+### Sessions
+
+The **Sessions** tab shows active sessions, including device label, IP address, creation time, last use, and expiration. You can revoke one session or all sessions.
+
+Revocation prevents the selected session from refreshing its access token. Use it when a device is lost, a credential may be compromised, or an access change should take effect promptly.
+
+### Billing And Storage
+
+The **Billing** tab shows balances, subscription state, billing cycle, credit rate, and on-demand usage. It also supports credit adjustments and the on-demand toggle.
+
+The **Storage** tab shows current usage and the account limit. Set a limit in MB, GB, or TB. Setting the limit to zero returns the account to its tier default.
+
+See [Usage And Billing](/pages/admin/usage-and-billing) before changing balances, limits, or paid usage.
+
+### Roles
+
+The **Roles** tab shows current system roles and supports permitted assignments or removals. System-role changes require system-administrator access; lower-scope roles do not grant system-wide administration.
+
+An account can have one system role and one tenant role. Assigning another role in the same scope replaces the current role rather than adding a second role in that scope.
+
+Davinci prevents removal, deactivation, or deletion of the final active system administrator. Promote and verify another administrator before changing the final recovery account.
+
+For the relationship between system, tenant, organization, and project access, see [Roles And Permissions](/pages/browser/roles-permissions).
+
+### Projects
+
+The **Projects** tab separates:
+
+- Projects owned by the user.
+- Projects shared with the user.
+- Deleted projects still eligible for administration.
+
+Deleted projects show their remaining recovery period and can be restored or permanently deleted. See [Projects, Organizations, And Tenants](/pages/admin/resources-and-tenants#deleted-projects) for the lifecycle and deletion safeguards.
+
+### Feature Flags
+
+The **Feature Flags** tab contains account-specific controls:
+
+- **Scratch Pad** overrides the global default for this user.
+- **Onshape Connect Access** controls whether the user can connect an Onshape account.
+- **Personal Access Tokens** controls whether the user can create credentials for the programmatic API.
+
+Per-user Personal Access Token access does not override the deployment-wide API-key switch. Both the global setting and the user setting must allow access. See [Personal Access Tokens](/pages/api/personal-access-tokens).
+
+## Authentication Recovery
+
+### Reset A Password
+
+Choose whether to email a new temporary password or display it for manual delivery. Resetting invalidates the previous password but does not by itself revoke active sessions. Revoke sessions separately when the recovery is security-related.
+
+### Reset MFA
+
+Resetting MFA disables the user's current enrollment. The user must enroll again according to the deployment's MFA policy.
+
+### Unlink LDAP
+
+Unlinking removes the account's directory association. If LDAP was the only sign-in method, Davinci creates password access and provides a temporary password so the account is not left without a sign-in method.
+
+This action is permanent for the existing link. Use it when an account was linked incorrectly, the directory entry was removed, or LDAP is being retired.
+
+### Switch Existing Users To LDAP
+
+The LDAP migration workflow is available from [System Settings](/pages/admin/system-settings-authentication#switch-existing-users-to-ldap). It verifies each selected user against the directory before switching authentication. Users without a matching directory entry are skipped without changing their current sign-in method.
+
+## Account Lifecycle
+
+### Deactivate
+
+Deactivation revokes active sessions and Design Engine access, cancels the user's subscription, and marks the account deleted while retaining the record for possible reactivation. Review billing and owned resources before using it.
+
+### Reactivate
+
+Reactivation requires an authentication method. Password reactivation creates a temporary password and can deliver it by email. OAuth, OIDC, and LDAP reactivation associate the account with the selected provider.
+
+### Permanently Delete
+
+Permanent deletion removes the user and associated data and requires typing the confirmation text shown by the panel.
+
+<Warning>
+Permanent user deletion cannot be undone. Review owned projects, billing, storage, and organization responsibilities before deleting the account. Use deactivation when retention or transfer work is incomplete.
+</Warning>
+
+## Recommended Access-Change Workflow
+
+1. Confirm the user, tenant, and requested access.
+2. Review current roles, sign-in methods, sessions, and owned resources.
+3. Make the smallest necessary change.
+4. Revoke sessions if the change responds to compromise or immediate removal of access.
+5. Confirm that the user retains at least one valid sign-in method.
+6. Review the [Audit Log](/pages/admin/operations#audit-log).

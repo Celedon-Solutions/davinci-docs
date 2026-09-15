@@ -1,0 +1,193 @@
+---
+title: Projects, Organizations, And Tenants
+description: Administer shared resources, ownership, membership, storage, deletion, and tenant context
+---
+
+## Overview
+
+The **Projects**, **Organizations**, and **Tenants** pages provide system-level views of Davinci resources. Use them for support, ownership changes, recovery, and deployment administration rather than ordinary day-to-day collaboration.
+
+For user-facing resource concepts, start with:
+
+- [Projects](/pages/browser/projects)
+- [Organizations](/pages/browser/organizations)
+- [Teams](/pages/browser/teams)
+- [Roles And Permissions](/pages/browser/roles-permissions)
+
+## Projects
+
+Use **Administration → Projects** to search across accessible projects, inspect metadata and storage, and perform project-level administration.
+
+### Find A Project
+
+Search by project name or slug. Filters are available for:
+
+- Visibility: private, internal, or public.
+- A user UUID as owner or member.
+- Last updated within 7, 30, or 90 days.
+- Storage above 100 MB, 1 GB, or 10 GB.
+
+The project table shows owner, visibility, effective member count, storage, and creation and update dates.
+
+### Project Details
+
+Select a project to open four tabs:
+
+- **Details** — identifiers, owner, visibility, direct and effective membership, transfer state, storage, and timestamps.
+- **Members** — direct and inherited access.
+- **Storage** — current project storage.
+- **Actions** — rename, transfer ownership, or schedule deletion.
+
+### Manage Collaborators
+
+The Members tab distinguishes:
+
+- **Direct collaborators**, whose role can be changed or whose membership can be removed.
+- **Organization members**, whose access is inherited from the owning organization.
+- **The owner**, who cannot be managed as an ordinary collaborator.
+
+Add a direct collaborator by user ID and choose Viewer, Project Editor, or Admin. Removing a direct collaborator removes project access immediately.
+
+Inherited organization access cannot be changed from the project. Update the user's organization membership instead.
+
+### Transfer Ownership
+
+Project ownership can be transferred to another user or organization. A user target can be identified by email, username, or UUID; an organization target uses its UUID.
+
+An organization transfer can complete immediately when the required access is available. A user transfer can create a transfer request for the recipient. Review the project's **Transfer State** after submitting the action.
+
+Before transferring:
+
+1. Confirm the destination account or organization.
+2. Verify that the destination should own storage and lifecycle responsibility.
+3. Review organization visibility and inherited access.
+4. Complete any billing or retention checks required by your deployment.
+
+Transfer is different from adding a collaborator: the destination becomes responsible for the project.
+
+### Deleted Projects
+
+Deleting an active project schedules it for permanent deletion after the deployment's grace period. The **Deleted** tab shows:
+
+- Project and owner.
+- Deletion date.
+- Days remaining.
+- Storage usage.
+- Restore and Hard Delete actions.
+
+**Restore** returns an eligible project to active state. **Hard Delete** immediately removes the project and wipes its storage.
+
+<Warning>
+Hard deletion cannot be undone. Use the displayed days remaining rather than assuming a fixed recovery period; deployments can configure the grace window.
+</Warning>
+
+## Organizations
+
+Use **Administration → Organizations** to create, inspect, edit, or delete organizations and to manage organization billing and storage overrides.
+
+### Create An Organization
+
+Select **Add Organization** and provide:
+
+- Name and handle.
+- Tenant.
+- Initial owner from that tenant.
+- Optional description.
+- Private or public visibility.
+
+The owner selector is populated after you choose a tenant. Verify both fields before creating the organization.
+
+Organization visibility affects whether the organization and its public projects can be accessed publicly. See [Organization Visibility](/pages/browser/organizations#organization-visibility).
+
+### Organization Details
+
+The detail view includes:
+
+- **Info** — identifiers, tenant, visibility, description, and creation date.
+- **Members** — current users and their organization roles.
+- **Billing** — usage balances, subscription state, and any grace deadline.
+- **Storage** — current usage, effective limit, and manual limit override.
+- **Edit** — name, handle, visibility, and description.
+
+The current Administration panel lists organization members but does not provide membership editing in this view. Use the organization's normal management workflow for supported member and role changes.
+
+### Subscription Grace
+
+When an organization has a billing account, administrators can set a subscription grace deadline or clear it and mark the organization free.
+
+Clearing grace removes the active subscription requirement represented by that deadline. Confirm the organization's commercial status before using it.
+
+### Storage Override
+
+A manual organization storage limit overrides the billing-plan limit. Resetting the override returns the organization to its automatic plan value.
+
+The override updates Davinci's organization billing record; it does not change payment-provider subscription items. Coordinate plan changes through [Usage And Billing](/pages/admin/usage-and-billing).
+
+### Delete An Organization
+
+Organization deletion is presented as an irreversible action.
+
+<Warning>
+The Administration delete action does not perform the complete project and billing offboarding workflow. Resolve or transfer projects, storage, subscription state, and ownership responsibilities first, then verify those resources after deletion.
+</Warning>
+
+## Tenants
+
+The **Tenants** page is available on supported multi-tenant commercial deployments. It shows each tenant's:
+
+- Name and billing mode.
+- Billing or trial status.
+- User and organization counts.
+- Creation date.
+
+Select a tenant to inspect identifiers, billing mode, status, trial data, counts, custom settings, and creation history.
+
+### Create A Tenant
+
+Select **Add Tenant**, enter a name, and choose:
+
+- **Individual** billing for independently managed accounts.
+- **Team** billing for a group-managed tenant.
+
+When trial creation is enabled, a team tenant can be created as a trial with:
+
+- An existing owner user.
+- A duration within the limit shown by the form.
+- Optional included credits per user.
+- Optional seat and organization limits.
+- An internal reason.
+
+Trial availability and maximum duration are deployment-configured.
+
+### Manage A Trial
+
+For an active trial, administrators can change:
+
+- Trial end date.
+- Included usage per user.
+- Seat limit.
+- Organization limit.
+- Internal reason.
+
+Changing included usage does not rewrite allocations already granted to users. **Clear Trial Now** removes the trial entitlement immediately.
+
+<Warning>
+Clearing a trial can remove access or entitlements without waiting for the scheduled end date. Confirm the tenant's conversion or offboarding state first.
+</Warning>
+
+### Switch Tenant Context
+
+Use the row action or **Switch to this Tenant** in the detail view to change the Administration sidebar's tenant context.
+
+The context switch affects supported admin queries and tenant-aware configuration. It does not change your identity, sign you in as a tenant member, or grant additional permissions. See [Access And Scope](/pages/admin/overview#access-and-scope).
+
+## Resource Administration Checklist
+
+Before a membership, ownership, lifecycle, or tenant change:
+
+1. Confirm the tenant and resource identifier.
+2. Review direct and inherited access.
+3. Identify affected projects, storage, and billing responsibility.
+4. Prefer a reversible action when recovery work is incomplete.
+5. Confirm the result from the resource detail view.
+6. Review the [Audit Log](/pages/admin/operations#audit-log).

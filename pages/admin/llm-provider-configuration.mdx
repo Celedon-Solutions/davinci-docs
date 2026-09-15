@@ -1,0 +1,360 @@
+---
+title: LLM Provider Configuration
+description: Configure supported LLM provider connections, authentication, endpoints, and connection options
+---
+
+## Overview
+
+An LLM provider is a connection from Davinci to a hosted model service, cloud platform, local runtime, or compatible gateway. A provider can expose one or more APIs, and each API can serve several [model offerings](/pages/admin/llm-offering-configuration).
+
+Open **Administration → LLM Control Plane → Providers**, then select **Add Provider** or edit an existing connection.
+
+<Warning>
+The form can display authentication methods and APIs that do not work together. Use the supported recipes on this page rather than assuming every dropdown combination is valid.
+</Warning>
+
+## Provider Fields
+
+### Provider Name
+
+Enter a non-empty administrator-facing name. Davinci creates a stable lowercase provider key from the initial name. The key is used to identify the connection in profiles, exports, and runtime configuration.
+
+Use a distinct name when the same vendor has separate regions, credentials, endpoints, or tenant scopes.
+
+### Base URL
+
+Enter an absolute provider URL, including `http://` or `https://`.
+
+- Hosted provider recipes below include their standard URL.
+- OpenAI-compatible and LiteLLM connections require a reachable URL.
+- Cloud SDK connections such as Bedrock and Vertex normally leave it blank.
+- Do not include a username, password, API key, or bearer token in the URL.
+
+For a private or local provider, the URL must be reachable from the Davinci runtime environment. `localhost` refers to that runtime environment, not necessarily the machine running your browser.
+
+### Authentication Method
+
+Choose one method:
+
+- **API key** — store a provider credential securely in Davinci.
+- **Environment variable** — resolve a key from the runtime environment.
+- **Application default credentials** — use the cloud SDK's workload identity or credential chain.
+- **Token file** — read a bearer token from a mounted file.
+- **No authentication** — connect without credentials.
+
+The supported method depends on the provider recipe.
+
+### Credential / API Key
+
+This field appears for **API key** authentication. Enter the secret value itself.
+
+When editing an existing provider, leave the field blank to preserve the configured credential.
+
+<Warning>
+Use only the dedicated credential field for a provider secret. Never put a secret in Additional options JSON, a URL, a header, an exported configuration, or a screenshot.
+</Warning>
+
+### API Key Environment Variable
+
+This field appears for **Environment variable** authentication. Enter only the variable name, for example:
+
+```text
+PROVIDER_API_KEY
+```
+
+The variable must be available to the Davinci runtime in every environment where the connection is used. Do not enter the secret value.
+
+### Token File Path
+
+This field appears for **Token file** authentication. Enter an absolute path available to the Davinci runtime, for example:
+
+```text
+/run/secrets/provider-token
+```
+
+The file must contain the token value. Enter the path, not the token.
+
+### Region / Location
+
+Enter the cloud region used by the provider, such as `us-east-1`, `us-central1`, or another provider-supported location.
+
+- Bedrock uses the region for its AWS clients.
+- Google Vertex uses `location` from Additional options JSON when present, then falls back to this field.
+- Anthropic on Vertex uses this field as its Vertex region.
+
+### Cloud Project ID
+
+Application-default credentials with a Google or Anthropic Vertex API require a Google Cloud project ID. Enter the project identifier, not its display name.
+
+The named Cloud Project ID field overrides a duplicate `projectId` in Additional options JSON.
+
+### Allowed APIs
+
+Select one or more APIs exposed by the connection:
+
+- `openai.responses`
+- `openai.images`
+- `openai.chat_completions`
+- `anthropic.messages`
+- `google.generate_content`
+- `google.interactions`
+- `bedrock.invoke`
+
+Select only APIs actually implemented by the endpoint. An endpoint that supports OpenAI Chat Completions does not automatically support OpenAI Responses or Images.
+
+### Default API
+
+When more than one API is selected, choose a default. The default must also appear in **Allowed APIs**.
+
+Each model offering still selects its exact API and compatible codec.
+
+## Per-API URL Settings
+
+Advanced connection settings provide one URL field per selected API. Enter:
+
+- A relative path such as `/v1` to append it to the Base URL.
+- A complete absolute URL to override the Base URL for that API.
+- Nothing to use the Base URL unchanged.
+
+For example, Base URL `https://llm.example.com` with extension `/v1` resolves to:
+
+```text
+https://llm.example.com/v1
+```
+
+Do not repeat an extension already included in the Base URL.
+
+## Additional Options JSON
+
+The field accepts a JSON object. Named form fields take precedence over duplicate JSON properties.
+
+### Default Invocation Timeout
+
+```json
+{
+  "defaultTimeoutMs": 60000
+}
+```
+
+`defaultTimeoutMs` must be a positive number of milliseconds. It is used when a model offering does not define its own timeout. The default is 60,000 milliseconds.
+
+### Default HTTP Headers
+
+```json
+{
+  "defaultHeaders": {
+    "X-Application-Name": "Davinci",
+    "X-Environment": "production"
+  }
+}
+```
+
+Header names and values should be strings. Default headers are supported by OpenAI-compatible and direct Anthropic connections.
+
+<Warning>
+Default headers can be included in portable configuration. Do not put authorization values, tokens, session identifiers, or other secrets in this object.
+</Warning>
+
+### Vertex Location
+
+```json
+{
+  "location": "us-central1"
+}
+```
+
+Use `location` when the Vertex location should differ from or explicitly override the provider's Region / Location field.
+
+The Cloud Project ID should normally be entered in its named field. Its corresponding JSON property is `projectId`.
+
+### Provider-Wide Request Defaults
+
+Generation APIs can accept provider-specific request defaults:
+
+```json
+{
+  "extraGenerationBody": {
+    "store": false
+  }
+}
+```
+
+These values apply to every compatible offering on the provider. Use [offering-level options](/pages/admin/llm-offering-configuration#advanced-options-json) when only one model should receive them.
+
+Davinci applies its canonical request fields after these defaults. Provider-wide defaults cannot reliably replace fields controlled by Davinci, such as the selected model or conversation messages.
+
+The merge is shallow: an offering's `extraGenerationBody` replaces the provider-level object rather than merging individual nested fields.
+
+### Complete Example
+
+```json
+{
+  "defaultTimeoutMs": 60000,
+  "defaultHeaders": {
+    "X-Application-Name": "Davinci"
+  },
+  "extraGenerationBody": {
+    "store": false
+  }
+}
+```
+
+Only include options required by the selected provider. Unlisted properties should not be assumed to have an effect.
+
+## Supported Provider Recipes
+
+### OpenAI
+
+- **Base URL:** `https://api.openai.com/v1`
+- **Authentication:** API key or environment variable
+- **APIs:** OpenAI Responses, OpenAI Images, OpenAI Chat Completions
+- **Recommended default API:** OpenAI Responses
+- **Additional options:** `defaultTimeoutMs`
+
+Use only the APIs required by your configured offerings.
+
+### OpenAI-Compatible
+
+- **Base URL:** required
+- **Authentication:** API key, environment variable, or no authentication
+- **APIs:** any OpenAI API surface the endpoint actually implements
+- **Additional options:** `defaultTimeoutMs`, `defaultHeaders`
+
+Verify each selected API separately. Compatibility with Chat Completions does not prove compatibility with Responses, Images, tool calls, structured output, or usage reporting.
+
+### Anthropic
+
+- **Base URL:** `https://api.anthropic.com`
+- **Authentication:** API key or environment variable
+- **API:** Anthropic Messages
+- **Additional options:** `defaultTimeoutMs`
+
+### Google Gemini
+
+- **Base URL:** `https://generativelanguage.googleapis.com`
+- **Authentication:** API key or environment variable
+- **APIs:** Google Generate Content, Google Interactions
+- **Additional options:** `defaultTimeoutMs`
+
+Enable only the API used by the model offering.
+
+### AWS Bedrock
+
+- **Base URL:** blank unless using a supported endpoint override
+- **Authentication:** application default credentials
+- **API:** AWS Bedrock Invoke
+- **Default region:** `us-east-1`
+- **Additional options:** `defaultTimeoutMs`
+
+Bedrock offerings require a model-specific codec. Use Anthropic on Bedrock for Anthropic generation models or Amazon Titan for Titan embeddings.
+
+Model entry is normally manual for this recipe.
+
+### Google Vertex AI
+
+- **Base URL:** blank unless using a supported endpoint override
+- **Authentication:** application default credentials
+- **API:** Google Generate Content
+- **Default region:** `us-central1`
+- **Cloud Project ID:** required
+- **Additional options:** `projectId`, `location`, `defaultTimeoutMs`
+
+```json
+{
+  "projectId": "example-cloud-project",
+  "location": "us-central1",
+  "defaultTimeoutMs": 60000
+}
+```
+
+The named Cloud Project ID and Region / Location fields are preferred for values they expose.
+
+### Anthropic On Vertex AI
+
+- **Base URL:** blank unless using a supported endpoint override
+- **Authentication:** application default credentials
+- **API:** Anthropic Messages
+- **Default region:** `us-east5`
+- **Cloud Project ID:** required
+- **Additional options:** `projectId`, `location`, `defaultTimeoutMs`
+
+### OpenRouter
+
+- **Base URL:** `https://openrouter.ai/api/v1`
+- **Authentication:** API key or environment variable
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`, `defaultHeaders`
+
+If attribution headers are required, configure them explicitly:
+
+```json
+{
+  "defaultHeaders": {
+    "HTTP-Referer": "https://davinci.example.com",
+    "X-Title": "Davinci"
+  }
+}
+```
+
+Replace the example URL with your approved public application URL.
+
+### Groq
+
+- **Base URL:** `https://api.groq.com/openai/v1`
+- **Authentication:** API key or environment variable
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`
+
+### Cerebras
+
+- **Base URL:** `https://api.cerebras.ai/v1`
+- **Authentication:** API key or environment variable
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`
+
+### Ollama
+
+- **Base URL:** a URL reachable from the Davinci runtime
+- **Authentication:** no authentication
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`
+
+Do not assume the browser machine's `localhost` address is reachable by Davinci.
+
+### LiteLLM
+
+- **Base URL:** required
+- **Authentication:** API key, environment variable, or no authentication
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`
+
+### External LiteLLM
+
+- **Base URL:** required
+- **Authentication:** token file, API key, or environment variable
+- **API:** OpenAI Chat Completions
+- **Additional options:** `defaultTimeoutMs`
+
+## Save And Verify
+
+After saving a provider:
+
+1. Confirm the endpoint, authentication method, APIs, and scope.
+2. Run the provider health check.
+3. Discover models when the provider supports reliable discovery, or add an offering manually.
+4. Configure and [verify each model offering](/pages/admin/llm-control-plane#verification).
+5. Publish only after reviewing all affected profiles and routes.
+
+A successful provider health check confirms connection-level access. It does not prove that every model ID, capability, codec, or pricing configuration is correct.
+
+## Portability
+
+Exports never contain provider credentials. Environment-variable names and token-file paths are also omitted.
+
+After importing configuration into another deployment:
+
+- Re-enter required credentials.
+- Reconfigure environment-variable or token-file authentication.
+- Verify network reachability.
+- Run health and model-offering verification.
+- Publish only after the destination runtime accepts the configuration.

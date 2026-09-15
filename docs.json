@@ -412,6 +412,36 @@
                 ]
             },
             {
+                "group": "Administration",
+                "icon": "shield-halved",
+                "pages": [
+                    "pages/admin/overview",
+                    {
+                        "group": "Users And Resources",
+                        "pages": [
+                            "pages/admin/user-access",
+                            "pages/admin/resources-and-tenants"
+                        ]
+                    },
+                    {
+                        "group": "Platform Management",
+                        "pages": [
+                            "pages/admin/usage-and-billing",
+                            "pages/admin/system-settings-authentication",
+                            "pages/admin/operations"
+                        ]
+                    },
+                    {
+                        "group": "LLM Control Plane",
+                        "pages": [
+                            "pages/admin/llm-control-plane",
+                            "pages/admin/llm-provider-configuration",
+                            "pages/admin/llm-offering-configuration"
+                        ]
+                    }
+                ]
+            },
+            {
                 "group": "Developer API",
                 "icon": "code",
                 "pages": [
@@ -462,6 +492,9 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
+                    "pages/release-notes/v5.1.7",
+                    "pages/release-notes/v5.1.6",
+                    "pages/release-notes/v5.1.5",
                     "pages/release-notes/v5.1.4",
                     "pages/release-notes/v5.1.3",
                     "pages/release-notes/v5.1.2",

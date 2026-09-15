@@ -1,0 +1,243 @@
+---
+title: System Settings And Authentication
+description: Configure deployment defaults, sign-in providers, directory access, MFA, and new-user policy
+---
+
+## Overview
+
+Use **Administration → Settings** to configure deployment-wide behavior. The page includes authentication providers, feature flags, account defaults, invitation behavior, and infrastructure information.
+
+<Warning>
+Authentication and access-policy changes can lock users out of Davinci. Keep a tested system-administrator recovery account and change one authentication layer at a time.
+</Warning>
+
+## Infrastructure And Deployment
+
+The read-only Infrastructure section shows the deployment domain, Davinci version, and environment when that information is available.
+
+**Deployment Name** controls the name presented for this Davinci installation.
+
+## Feature Flags
+
+Feature flags set deployment-wide defaults or availability:
+
+- **Disable Public Sign-up** prevents users from registering themselves.
+- **Admin-Provisioned Only** selects the administrator-managed account experience. Pair it with **Disable Public Sign-up** when self-service registration must be blocked.
+- **Scratch Pad** sets the default availability of the Scratch Pad widget. A user can have an explicit override.
+- **Journeys** allows Journey objects to be created and selected.
+- **CAD Objects** allows Geometry and Assembly objects. CAD objects are also enabled when Onshape is available.
+- **Enable Bridge Access** permits bridge relay connections for external integrations.
+- **Enable API Keys** permits Personal Access Tokens and API-key authentication.
+- **Simulation: Class B Physics** exposes additional validated modal, harmonic, random-vibration, shock, transient-thermal, and flow analysis options to the agent.
+- **Simulation: Geometry Parameters** allows simulations to vary supported geometry and CAD parameters.
+
+Most feature toggles save when switched. Confirm the success message before leaving the page.
+
+### API-Key Kill Switch
+
+Disabling **Enable API Keys** is a deployment-wide credential kill switch. Individual user permission does not override it.
+
+To allow programmatic access, both must be enabled:
+
+1. The global API-key feature flag.
+2. The user's Personal Access Token setting under [Users And Access](/pages/admin/user-access#feature-flags).
+
+See [Personal Access Tokens](/pages/api/personal-access-tokens) for user-facing credential guidance.
+
+## Single Sign-On
+
+The SSO section configures an OpenID Connect provider.
+
+### Connection
+
+Configure:
+
+- **Enable SSO**.
+- **SSO Only**, which disables password login as a normal sign-in option.
+- Provider discovery URL.
+- Client ID and client secret.
+- Redirect URI.
+- Post-logout redirect URI.
+- Requested scopes.
+- Message displayed to users.
+
+The redirect and post-logout URLs must also be allowed by the identity provider.
+
+### Claim Mapping
+
+Map provider claims for:
+
+- Email.
+- First name.
+- Last name.
+- Display name.
+- Groups.
+
+The email claim must resolve to the address Davinci should use for the account.
+
+### Group Access Policy
+
+Add one allowed group per row. An empty list allows any successfully authenticated SSO user. Group matching is case-insensitive and supports the wildcard format described by the panel.
+
+The optional deny message is shown when a user authenticates successfully but does not satisfy the group policy.
+
+### Secret Handling
+
+SSO client secrets are stored securely and are never returned to the browser. The page only indicates whether a secret is configured.
+
+When editing SSO, leave the secret field blank to preserve the current secret. Entering a value replaces it.
+
+<Warning>
+Do not enable **SSO Only** until the discovery URL, callback, claims, group policy, and at least one administrator account have been tested end to end.
+</Warning>
+
+## Directory Authentication
+
+The LDAP section supports saving a draft configuration while LDAP is disabled. Enabling LDAP requires a successful connection test.
+
+### Connection
+
+Configure:
+
+- Server URL.
+- Base DN.
+- Bind DN and bind password.
+- User search filter.
+- Login-page message.
+
+Use encrypted `ldaps://` transport whenever possible. **Verify TLS Certificate** should remain enabled unless the directory uses a certificate chain you explicitly trust another way.
+
+**Allow Insecure Transport** permits plaintext `ldap://` connections and should be limited to controlled test environments.
+
+### Account Provisioning
+
+**Directory email domains** controls when Davinci searches LDAP for an email that does not already have an account:
+
+- `*` allows a lookup for any email domain.
+- A comma-separated list limits lookup to those domains.
+- An empty value disables login-time directory lookup, so an administrator must provision accounts.
+
+### Attribute Mapping
+
+Configure the LDAP attributes used for:
+
+- Username.
+- Email.
+- Display name.
+- Stable unique ID.
+- Group search and membership.
+
+<Warning>
+The unique ID attribute links a directory entry to an existing Davinci account. Changing it after accounts are linked can break those links.
+</Warning>
+
+### Group Access Policy
+
+Add one allowed LDAP group or distinguished name per row. An empty list allows any authenticated directory user. Matching is case-insensitive and supports the wildcard behavior described in the panel.
+
+Use the deny message to explain how an excluded user should request access without disclosing directory internals.
+
+### Save And Test
+
+The LDAP workflow is:
+
+1. Enter or update the configuration.
+2. Select **Test connection**.
+3. Resolve any connection, bind, search, TLS, or policy error.
+4. Select **Save LDAP**.
+5. If enabling LDAP for the first time, review the user-migration picker.
+
+Changing an LDAP field invalidates the previous successful test. The save flow tests again when required.
+
+LDAP bind passwords are never returned to the browser. Leave the password field blank to preserve the current value.
+
+## Switch Existing Users To LDAP
+
+When LDAP is enabled, select **Switch users to LDAP** to migrate selected active users.
+
+The picker:
+
+- Preselects password users whose email matches the configured directory domains.
+- Excludes accounts already linked or pending LDAP.
+- Supports search and select-all for the visible results.
+
+For each selected user, Davinci verifies that a directory entry exists before changing authentication. A matching user is linked and their Davinci password is removed. A user without a matching entry is skipped and left unchanged. One failed user does not stop the rest of the batch.
+
+<Warning>
+Confirm directory coverage and a rollback path before a bulk migration. Users who switch successfully must use their directory credentials afterward.
+</Warning>
+
+To recover an incorrectly linked account, use [Unlink LDAP](/pages/admin/user-access#unlink-ldap).
+
+## Multi-Factor Authentication
+
+MFA settings control TOTP enrollment:
+
+- **Enable MFA** allows users to enroll.
+- **Require MFA** requires enrollment.
+- **Recovery Method** indicates administrator reset or recovery codes.
+
+Requiring MFA changes the sign-in requirements for the whole deployment. Communicate the rollout and recovery process before enabling it.
+
+<Note>
+In the current release, changing only **Recovery Method** does not submit the policy. Select the recovery method before changing **Enable MFA** or **Require MFA**, then refresh the page to confirm the saved policy.
+</Note>
+
+Administrators can clear an individual enrollment from [Users And Access](/pages/admin/user-access#reset-mfa).
+
+## OAuth Providers
+
+The OAuth section registers a provider and client ID. The picker can show providers that are not enabled by the current deployment, so confirm provider support before adding one. Configured entries can be removed from the list.
+
+Adding a provider here does not make an incomplete provider deployment usable. Ensure the corresponding callback and credentials are configured in the deployment environment.
+
+## Platform Defaults
+
+### New Chats And Verification
+
+- **Web Search for New Chats** sets whether newly created chats start with web search enabled. Users can change it per chat.
+- **Skip Email Verification** allows new users to proceed without verifying their email.
+
+Skipping email verification weakens assurance that the user controls the address. Use it only when another trusted provisioning or identity layer provides that assurance.
+
+### Invitation Behavior
+
+- **Auto-Accept Project Invites** adds an existing user directly to a project.
+- **Auto-Accept Organization Invites** adds an existing user directly to an organization.
+
+When disabled, normal invitation acceptance is required. See [Roles And Permissions](/pages/browser/roles-permissions) before changing inherited access behavior.
+
+### Business Mailing Address
+
+The business mailing address appears in administrative email footers for compliance. Keep it accurate before sending campaigns from [Notifications](/pages/admin/operations#notifications).
+
+## New User Defaults
+
+These values are applied when an account is provisioned:
+
+- Default license tier.
+- Initial license credits.
+- Optional default LLM tier.
+- Maximum owned projects.
+- Storage amount in GB.
+- Maximum collaborators per project.
+
+Blank project, storage, and collaborator limits mean unlimited. Individual administrators can later apply per-user overrides from [Users And Access](/pages/admin/user-access#account).
+
+The default LLM tier participates in model access. Current subscription-to-profile routing is managed in the [LLM Control Plane](/pages/admin/llm-control-plane#subscription-mappings).
+
+## Allowed Email Domains
+
+Enter a comma-separated allowlist of domains that may register. Use `*` to allow any domain.
+
+Email-domain policy is separate from SSO or LDAP group policy. A deployment can use both domain routing and provider-side access restrictions.
+
+## Authentication Change Checklist
+
+1. Confirm a separate administrator recovery account.
+2. Record the current provider state without copying secrets.
+3. Configure redirect URLs, claims, domains, and group policy.
+4. Test the new provider before making it required.
+5. Migrate a small representative user set first.
+6. Confirm login, logout, MFA, and denied-access behavior.
+7. Review [Users And Access](/pages/admin/user-access) and the [Audit Log](/pages/admin/operations#audit-log).

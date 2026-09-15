@@ -1,0 +1,183 @@
+---
+title: Operations And Communications
+description: Review audit history, monitor Design Engines, manage connections, curate Explore, and communicate with users
+---
+
+## Overview
+
+The Administration panel provides operational tools for investigation, maintenance, public content, and user communication:
+
+- **Audit Log** records administrative and security-relevant activity.
+- **Server** shows Design Engine and active-project state.
+- **Explore** curates featured public projects.
+- **Notifications** manages banners, broadcasts, and email campaigns.
+
+These pages contain deployment and user information that should not be copied into public reports without review.
+
+## Audit Log
+
+Use **Administration → Audit Log** to investigate who performed an action, when it happened, and which resource was affected.
+
+### Search And Filter
+
+Filter by:
+
+- User ID.
+- Action.
+- Start time.
+- End time.
+- The selected **Tenant Context**.
+
+Results can be sorted and show timestamp, action, actor, resource, IP address, and a details preview. Select a row to inspect the complete structured entry.
+
+Depending on the event, details can include tenant, project, resource, user agent, agent task or tool, and approval information.
+
+<Warning>
+Audit entries can contain identifiers, IP addresses, user agents, and operational metadata. Redact unrelated data before sharing an entry outside the authorized support or security team.
+</Warning>
+
+### When To Review Audit History
+
+Review the log after:
+
+- User provisioning, deactivation, deletion, or authentication recovery.
+- System- or tenant-role changes.
+- Project restoration, permanent deletion, or ownership changes.
+- Billing adjustments or reconciliation fixes.
+- Banners, broadcasts, and marketing email.
+- Connection shutdown or project closure.
+- Authentication, feature, or LLM configuration changes.
+
+For usage charges and model-call evidence, use [Metering Events](/pages/admin/usage-and-billing#metering-events).
+
+## Server
+
+Use **Administration → Server** to monitor routing and Design Engine state.
+
+### Status
+
+The page summarizes:
+
+- Deployment license validity.
+- Registered Design Engine count.
+- Whether new project loads are enabled.
+- Active-license usage where applicable.
+
+The Design Engines table shows health, project count, heap and resident memory, load average, uptime, and registered URL.
+
+The Active Projects table shows project, branch, connected users, serving engine, and last activity.
+
+Use **Refresh** for an immediate update or enable the remembered 15-second auto-refresh while actively monitoring an incident or maintenance operation.
+
+### Disable Connections
+
+**Disable Connections** temporarily prevents new project connections. Existing sessions remain active. The current panel requests a five-minute block; select **Enable Connections** to lift it early.
+
+Use this before short maintenance when existing sessions do not need to be interrupted.
+
+### Enable Connections
+
+**Enable Connections** allows new project connections again. Confirm service health before reopening access.
+
+### Close All Projects
+
+**Close All Projects**:
+
+1. Prevents new project loads temporarily.
+2. Force-closes all active project sessions.
+3. Disconnects connected users immediately.
+
+<Warning>
+Close All Projects is a platform-wide disruption. Announce the maintenance window, confirm the environment, and monitor reconnection after service is restored.
+</Warning>
+
+## Explore Feed
+
+Use **Administration → Explore** to choose and order projects featured on the public Explore page.
+
+Only public projects are available to pin.
+
+### Feature A Project
+
+1. Search available public projects by project or owner.
+2. Select **Pin**.
+3. Confirm it appears in Featured Projects.
+4. Use the up and down controls to set its order.
+
+Select **Unpin** to remove a project from the featured list. Unpinning does not change project visibility or delete the project.
+
+<Warning>
+Featuring a project increases its visibility but is not a privacy control. Review the project's content, files, history, owner, and [public-access settings](/pages/browser/roles-permissions#project-visibility) before pinning it.
+</Warning>
+
+## Notifications
+
+Use **Administration → Notifications** for deployment-level communication.
+
+### Site Banner
+
+A site banner is shown to visitors until it expires, is dismissed, or is cleared. Configure:
+
+- Message.
+- Category: announcement, maintenance, warning, critical, or marketing.
+- Optional end time.
+
+Banner text supports limited emphasis, underline, and HTTPS links. Select **Set Banner**, then **Preview** the active banner. **Clear Banner** removes it immediately.
+
+Use a banner for current service status or information that should remain visible while users navigate. Do not include secrets, internal hostnames, or incident details that are not approved for all visitors.
+
+### Broadcast Alert
+
+A broadcast creates an administrative notification for all active users or for the specified tenant. Configure:
+
+- Title and message.
+- Info, warning, or critical severity.
+- Optional tenant target.
+- Optional action link.
+
+Leaving the tenant blank targets all active users across the deployment. Verify the tenant identifier before sending a scoped broadcast.
+
+### Official Email
+
+Enabling **Official email** sends the broadcast as mandatory email to active users with email addresses in the selected audience. It is not subject to ordinary unsubscribe preferences.
+
+Use official email only for required communications such as legal notices, terms changes, or essential account and service notices.
+
+<Warning>
+The official-email confirmation initiates delivery; there is no recall workflow. Obtain content and audience approval before sending.
+</Warning>
+
+### Marketing Email
+
+Marketing email supports:
+
+- Subject.
+- Markdown body and preview.
+- Optional plain-text fallback.
+- Optional tenant target.
+
+If the plain-text body is empty, Davinci uses the Markdown source as the fallback. Sending queues one email notification for each active user with an email address in the selected audience.
+
+Marketing email respects the recipient's marketing-email preference and includes the standard preference-management link. Keep the [business mailing address](/pages/admin/system-settings-authentication#business-mailing-address) current and follow applicable consent requirements.
+
+## Communication Checklist
+
+Before setting a banner or sending a message:
+
+1. Confirm the environment and tenant audience.
+2. Remove internal-only or personal information.
+3. Validate every action link.
+4. Preview formatted content.
+5. Obtain approval for mandatory or deployment-wide communication.
+6. Send to the smallest appropriate audience.
+7. Confirm the recipient count and review the [Audit Log](/pages/admin/operations#audit-log).
+
+## Maintenance Checklist
+
+1. Announce the maintenance window.
+2. Inspect current Design Engines, projects, and connected users.
+3. Disable new connections if existing sessions can continue.
+4. Use Close All Projects only when active sessions must end.
+5. Perform the maintenance and verify service health.
+6. Enable connections.
+7. Monitor active projects and audit history for recovery.

@@ -1,0 +1,27 @@
+---
+title: 'Version 5.1.7 - Workspace & Billing Reliability'
+description: 'September 14 2026'
+---
+
+## Version 5.1.7 - Workspace & Billing Reliability
+
+This patch improves responsive workspace panels, collaborative slides, and billing operations.
+
+### Workspace Improvements
+
+- Search, Comments, and Version Control panels now adapt more cleanly to narrow widths
+- Improved compact controls and handling of long content in workspace panels
+- Clearing Workspace Search now resets the saved query, results, and search indicator
+- Fixed context menus being obscured by workspace resize controls
+
+### Collaboration & Reliability
+
+- Fixed collaborative slide reordering so previews and numbering remain synchronized without unnecessarily rerendering the active slide
+- Fixed a live-update loop that could leave workspace views unresponsive
+
+### Billing
+
+- System administrators now receive in-app and email alerts when a billing event cannot be processed
+- Billing Health now reconciles subscription billing-cycle dates correctly
+- Fixed organization subscription renewals so they update the correct organization account
+- Improved reliability when processing organization billing events

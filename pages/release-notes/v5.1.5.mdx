@@ -1,0 +1,50 @@
+---
+title: 'Version 5.1.5 - Design & Collaboration Updates'
+description: 'September 14 2026'
+---
+
+## Version 5.1.5 - Design & Collaboration Updates
+
+This release expands design-editing workflows, improves large-model performance, and refines Team and Task Card access.
+
+### Design & Editor
+
+- Added validated allowed values for Attributes, with dropdown editing for standard and state-specific values
+- Added optional assembly part labels and high-quality CAD image capture at viewport, HD, 4K, or custom sizes
+- Added persistent manual schematic wire paths, improved orthogonal routing, and more precise component and wire layout controls
+- Added standalone HTML export for supported boards, schematics, code and toolbox views, and diagram views
+- Selected slide elements can now be added directly to chat and reopened at the referenced element
+- Added focused tools for inserting individual slides and applying targeted slide style changes
+- Chat now renders LaTeX equations and links newly created personas and skills from agent results
+- Expanded SysML v2 export for Attribute allowed values and resolved CAD part measurements
+
+### Performance & Agent Improvements
+
+- Improved scrolling and progressive text rendering for large or text-heavy PDFs
+- Reduced rendering and measurement work for assemblies containing repeated parts
+- Improved promoted mates for nested assemblies, including axial interfaces
+- Improved descending motion-study sweeps, collision performance, and cancellation of replaced runs
+- Improved reuse of unchanged agent tools, skills, and prompt context during multi-step work
+- Added more focused editing behavior for documents, slides, attributes, constraints, resources, schedules, tags, and code
+- Improved slide inspection parity with the live presentation and reduced visual popping while media-rich views update
+
+### Collaboration & Reliability
+
+- Added Team ownership transfer requests that an existing member can accept or decline
+- Team-board Task Card actions now respect each viewer's effective project access
+- Improved Task Card layout on narrow screens and added complete tooltips for truncated fields
+- Fixed persona and skill creation for branch-qualified projects
+- Fixed chat save failures caused by uncommon Unicode input
+- Fixed OAuth-backed MCP connections reconnecting before authentication completed
+- Fixed selection, highlighting, duplication, multiline text, and collaborative update issues in slides
+- Fixed focused Properties inputs losing their caret when clicked in an unfocused workspace tab
+
+### Public API & SDK
+
+- Added `POST /api/v2/orgs/{orgId}/teams/{teamId}/project-cards` for creating, optionally assigning, and placing a Project Card on a Team in one operation
+- Card creation now accepts an optional assignee
+- Team list requests can include work-summary data, Team reports can select an archived sprint, and cumulative-flow charts can filter by project
+- Team project links now require Task Card read access; projects with remaining Team cards cannot be unlinked, and non-empty sprints cannot be deleted
+- Card object links now accept the model object ID without caller-supplied object name or type metadata
+- **Breaking:** Team composite responses now return `viewerCapabilities` instead of `viewerPermissions`
+- Updated the official TypeScript and Python SDKs for the new Team and Task Card contracts

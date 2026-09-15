@@ -1,0 +1,201 @@
+---
+title: Usage And Billing
+description: Analyze metering, manage account credits, reconcile payment state, and inspect the product catalog
+---
+
+## Overview
+
+The Administration panel separates billing operations into four areas:
+
+- **Usage** explains where measured consumption came from.
+- **Billing** shows balances and supports user credit adjustments.
+- **Billing Health** compares Davinci billing records with the payment provider.
+- **Stripe Catalog** shows the products and prices Davinci discovered.
+
+Commercial billing pages are hidden on self-hosted deployments. Availability also depends on the configured payment provider and your effective permissions.
+
+<Warning>
+Billing data contains customer, account, and usage information. Export it only when necessary and store it according to your organization's financial-data policy.
+</Warning>
+
+## Usage
+
+Use **Administration → Usage** to investigate LLM, embedding, storage, API, and compute metering.
+
+### Global Filters
+
+The following filters apply to the Overview, Breakdown, Events, and exports:
+
+- Date range: 7, 30, or 90 days, or a custom range of up to 366 days.
+- Granularity: automatic, hour, day, week, or month.
+- Usage kind: LLM calls or embedding calls.
+- Provider.
+- Model.
+- The Administration sidebar's **Tenant Context**.
+
+Select **Apply** after changing filters. Filter chips summarize the active range, tenant, usage kind, and optional provider or model.
+
+### Overview
+
+For LLM usage, the Overview shows:
+
+- Total tokens.
+- Calculated credits.
+- Charged credits.
+- Recorded LLM calls.
+- Input, output, thinking, cache-write, and cache-read tokens over time.
+- Calculated and charged credits over time.
+
+For embedding usage, it shows:
+
+- Calls and input tokens.
+- Provider cost in USD.
+- Embedding tokens and provider cost over time.
+
+**Calculated credits** are the result of the configured metering calculation. **Charged credits** are the amount actually applied to billing. Compare them when investigating policy, failed calls, free operations, or a configuration change.
+
+LLM pricing used for calculation is configured in [Model Offering Configuration](/pages/admin/llm-offering-configuration#pricing-overrides).
+
+### Breakdown
+
+Group the selected usage by:
+
+- Tenant.
+- Organization.
+- User.
+- Project.
+- Provider.
+- Model.
+
+Choose columns for calls, token categories, calculated or charged credits, embedding metrics, identifiers, and metadata. Select a row's metadata action to inspect the underlying structured values.
+
+The table can export either the displayed columns or all available columns. Breakdown exports are limited to 10,000 filtered rows.
+
+### Metering Events
+
+The Events tab exposes the records behind the aggregates. Filter by:
+
+- LLM calls.
+- Embedding calls.
+- Storage.
+- API calls.
+- Compute.
+- All supported event types.
+
+Available columns include actor and resource attribution, model/provider details, token categories, credits, provider cost, latency, status, and correlation identifiers. Select a row to inspect its complete event details.
+
+Provider and model filters apply only to LLM and embedding event types.
+
+Event exports are paged and limited to 50,000 filtered records.
+
+<Note>
+Use the Usage Events view for metering evidence. Use the [Audit Log](/pages/admin/operations#audit-log) to investigate administrative and security-relevant actions.
+</Note>
+
+## Billing
+
+Use **Administration → Billing** for the signed-in administrator's tenant balance overview and direct user billing lookup.
+
+The overview is intended to summarize:
+
+- Included usage.
+- Trial credits.
+- Whether on-demand usage is enabled.
+
+Enter a user ID to view that account's balances and recent transactions. The result includes transaction time, type, amount, and description.
+
+<Note>
+In the current release, balance fields on the standalone Billing page can appear unavailable even when the account has billing data. Use **Administration → Users → Billing** for the full account balance and controls.
+</Note>
+
+### Adjust Credits
+
+Choose **Add Credits** or **Deduct Credits**, enter the credit amount, and add a reason. The adjustment is recorded in the account's transaction history.
+
+The Users detail view also supports adjustments in credits or currency and previews the conversion using the current credit rate. See [Billing And Storage](/pages/admin/user-access#billing-and-storage).
+
+<Warning>
+Credit adjustments directly change usable account balance. Confirm the account, amount, unit, and reason before applying an adjustment.
+</Warning>
+
+### On-Demand And Limits
+
+Per-user on-demand billing and storage limits are managed from the [user detail view](/pages/admin/user-access#billing-and-storage). Organization storage overrides are managed from [Organization Details](/pages/admin/resources-and-tenants#organization-details).
+
+An administrative storage override changes the Davinci billing record. It does not modify a payment-provider subscription item.
+
+## Billing Health
+
+Use **Administration → Billing Health** to compare local billing records with Stripe. The page reports whether payment integration is enabled before allowing reconciliation.
+
+### Run Reconciliation
+
+Select **Run Reconciliation** to create a report. The summary shows:
+
+- Accounts checked and accounts skipped because no Stripe customer is attached.
+- Total checks.
+- Matches.
+- Mismatches.
+- Errors.
+
+Each row compares a local value with the corresponding Stripe value. Enable **Only show errors and warnings** to focus on unresolved issues.
+
+Running reconciliation is diagnostic. It does not apply the suggested fixes.
+
+### Apply A Fix
+
+For a mismatch with a supported remediation, the page explains the proposed change before showing **Fix**. Non-destructive fixes can update fields such as subscription ID, status, or billing-cycle end.
+
+Some fixes are destructive and may:
+
+- Cancel the local subscription.
+- Zero subscription credits.
+- Remove Stripe subscription or customer references.
+
+Destructive fixes require an additional confirmation.
+
+### Fix All Mismatches
+
+**Fix All Mismatches** applies all supported unresolved fixes from the current reconciliation run. The confirmation reports how many fixes are destructive.
+
+<Warning>
+Do not use Fix All as a routine synchronization action. Review every mismatch, confirm which system is authoritative, and preserve any evidence needed for customer support or accounting. Some fixes cannot be undone from the panel.
+</Warning>
+
+After applying fixes, rerun reconciliation and confirm the affected accounts in Billing or the Users page.
+
+## Stripe Product Catalog
+
+The **Stripe Product Catalog** page appears when a payment provider is enabled. It shows:
+
+- Total discovered prices and products.
+- The metered-usage price.
+- Individual plan prices.
+- Group plan prices.
+- Organization plan prices.
+- Organization storage tiers.
+- Whether each value came from Stripe or deployment configuration.
+
+If production-catalog comparison is configured, the page also shows a read-only production catalog for comparison.
+
+### Refresh The Catalog
+
+Select **Refresh Catalog** after changing Stripe products, prices, or metadata. Davinci reloads active prices and updates the in-memory catalog used by billing controllers.
+
+Refreshing does not create or edit Stripe products. Correct product metadata and active prices in Stripe, then refresh again.
+
+### Product Metadata
+
+Davinci discovers a product's billing role, tier, and optional storage amount from metadata attached to the Stripe product. Active monthly and yearly prices are then associated automatically.
+
+The catalog page displays the currently supported metadata names and values. Use that page as the source of truth when configuring products, because supported tiers can change between releases.
+
+## Billing Investigation Workflow
+
+1. Confirm the environment and tenant.
+2. Use **Usage** to identify the actor, resource, provider, model, and event.
+3. Use **Billing** or the user detail view to confirm balances and transaction history.
+4. Run **Billing Health** when local and Stripe state may disagree.
+5. Review suggested fixes individually before applying them.
+6. Rerun reconciliation and verify the account.
+7. Review the [Audit Log](/pages/admin/operations#audit-log) for administrative changes.

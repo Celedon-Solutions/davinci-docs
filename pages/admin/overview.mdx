@@ -1,0 +1,113 @@
+---
+title: Administration Overview
+description: Manage Davinci users, tenants, billing, system configuration, and platform operations
+---
+
+## Overview
+
+The Davinci Administration panel is the operational workspace for managing a Davinci deployment. It is separate from the normal [Browser](/pages/browser/overview) and [Editor](/pages/editor/overview) workflows.
+
+Open the panel from the Davinci Browser or at `/admin`. You must have an assigned system role. The pages and actions available to you depend on your effective permissions, tenant access, deployment type, and payment configuration.
+
+<Warning>
+Administration actions can affect other users or the entire deployment. Confirm the selected tenant context and the target resource before saving a change.
+</Warning>
+
+## Access And Scope
+
+### System Roles
+
+The Administration panel is visible to authorized system-role users. Seeing a page does not guarantee that every action on it is available: the API checks the permissions required for each operation.
+
+System roles are different from project and organization roles. For an explanation of resource ownership and inherited access, see [Roles And Permissions](/pages/browser/roles-permissions).
+
+### Tenant Context
+
+The **Tenant Context** selector filters supported administration views and determines the editing scope for tenant-aware configuration:
+
+- **All Tenants** shows platform-wide data and uses global scope where a page supports global configuration.
+- **A specific tenant** limits supported views to that tenant and uses tenant scope where overrides are supported.
+
+The selected context is remembered for 24 hours and remains active as you move between Administration pages. It does not grant access to a tenant or replace authorization checks.
+
+<Note>
+Not every page is tenant-scoped. Always use the scope indicator and page filters as the source of truth for the operation you are performing.
+</Note>
+
+## Administration Guides
+
+<CardGroup cols={2}>
+  <Card title="Users And Access" icon="users" href="/pages/admin/user-access">
+    Provision accounts, manage roles and sessions, reset authentication, and control account access.
+  </Card>
+  <Card title="Projects, Organizations, And Tenants" icon="diagram-project" href="/pages/admin/resources-and-tenants">
+    Manage shared resources, membership, ownership, deleted projects, and tenant configuration.
+  </Card>
+  <Card title="Usage And Billing" icon="chart-line" href="/pages/admin/usage-and-billing">
+    Analyze usage, adjust credits and limits, reconcile billing, and inspect the Stripe catalog.
+  </Card>
+  <Card title="System Settings And Authentication" icon="key" href="/pages/admin/system-settings-authentication">
+    Configure feature defaults, SSO, LDAP, OAuth, MFA, account defaults, and domain policy.
+  </Card>
+  <Card title="Operations And Communications" icon="server" href="/pages/admin/operations">
+    Review audit events, operate the server, curate Explore, and send administrative messages.
+  </Card>
+  <Card title="LLM Control Plane" icon="microchip" href="/pages/admin/llm-control-plane">
+    Configure model providers, offerings, profiles, routing, verification, and runtime publication.
+  </Card>
+</CardGroup>
+
+## Panel Areas
+
+The sidebar exposes the following areas when they are available for the deployment:
+
+- **Dashboard** — entry points to common administration areas.
+- **Users** — account provisioning, authentication recovery, access, limits, roles, and user-owned resources.
+- **Projects** — project search, membership, lifecycle, restoration, and permanent deletion.
+- **Organizations** — organization details, membership, visibility, and storage settings.
+- **Usage** — usage trends, breakdowns, metering events, and exports.
+- **Billing** and **Billing Health** — account balances, transactions, and payment reconciliation.
+- **Roles** — system- and tenant-role assignment.
+- **Audit Log** — searchable administrative and security-relevant events.
+- **Explore** — featured-project curation.
+- **Tenants** — tenant creation, trials, roles, and configuration.
+- **Notifications** — site banners, in-app broadcasts, and administrative email.
+- **LLM Control Plane** — AI provider, model, profile, and runtime configuration.
+- **Server** — connected services, active projects, capacity, and connection controls.
+- **Stripe Catalog** — configured products and prices.
+- **Settings** — deployment, authentication, feature, and account defaults.
+
+## Deployment Differences
+
+The panel adapts to the deployment:
+
+- Self-hosted deployments do not show commercial **Billing**, **Billing Health**, **Roles**, or **Tenants** pages.
+- **Stripe Catalog** appears only when a payment provider is enabled.
+- Some controls appear only for particular system roles or configured integrations.
+
+This documentation describes all supported Administration areas. A page omitted from your sidebar may not apply to your deployment.
+
+## Safe Administration Workflow
+
+1. Confirm the environment and **Tenant Context**.
+2. Search for and reopen the target resource before changing it.
+3. Review the current value, downstream effects, and any warning shown by the panel.
+4. Make the smallest scoped change that solves the problem.
+5. Confirm the result and re-read the affected resource.
+6. Review [Audit And Operational History](/pages/admin/operations#audit-log) after high-impact changes.
+
+For LLM configuration, saving creates a draft. Follow the separate [publish checklist](/pages/admin/llm-control-plane#recommended-publish-checklist) before making a draft active.
+
+## High-Impact Actions
+
+Take additional care with actions that:
+
+- Permanently delete a user or project.
+- Remove the final administrator capable of recovering the deployment.
+- Change login providers, directory identifiers, or credential policy.
+- Change subscriptions, credits, storage limits, or payment-provider references.
+- Send a broadcast or mandatory email to many users.
+- Disable new connections or close active projects.
+- Publish LLM routing to connected Design Engines.
+
+Where the panel provides a preview, test, impact report, draft, or restore path, use it before choosing an irreversible action.

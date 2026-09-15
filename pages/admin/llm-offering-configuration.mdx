@@ -1,0 +1,701 @@
+---
+title: LLM Model Offering Configuration
+description: Configure model routes, codecs, controls, embedding execution, pricing, limits, and supported advanced options
+---
+
+## Overview
+
+A model offering connects a shared model definition to the exact model ID and API exposed by an [LLM provider](/pages/admin/llm-provider-configuration).
+
+Open **Administration → LLM Control Plane → Providers**, expand a provider, then select **Add Model** or edit an existing offering.
+
+<Warning>
+An offering can save successfully and still be unusable if the provider model ID, API, codec, capabilities, or pricing do not match the real provider. Verify the offering before publishing it.
+</Warning>
+
+## Offering Fields
+
+### Provider
+
+Select the connection that serves the model. Its configured APIs determine the API choices available to the offering.
+
+### Model
+
+Select the shared model definition. The offering inherits that definition's:
+
+- Model kind.
+- Context, output, and image limits.
+- Capabilities.
+- Base pricing.
+- Embedding dimensions.
+
+Use an offering override only when this provider's version differs from the shared definition.
+
+### Offering Name
+
+Enter an optional administrator-facing name. If omitted, Davinci uses the model definition's display name or provider model ID.
+
+Use names that distinguish region, deployment, throughput class, or other meaningful provider differences.
+
+### Model ID
+
+Enter the exact identifier sent to the provider. Examples include a provider model name, deployment name, or Bedrock model identifier.
+
+The value must be non-empty and unique within the provider connection. Do not enter the Davinci display name unless it is also the provider's exact wire model ID.
+
+### API
+
+Select one API configured on the provider. The API determines:
+
+- The request protocol.
+- Available codecs.
+- Supported workloads.
+- Available Chat Control targets.
+- Which Advanced options have an effect.
+
+### Codec
+
+The codec converts Davinci's model request to the provider's wire format. Use only the combinations listed below.
+
+### Enabled
+
+An enabled offering can be assigned to profiles when its provider is also enabled. Turn the offering off to prevent new runtime selection.
+
+### Availability
+
+Availability status is one of:
+
+- `available`
+- `unavailable`
+- `deprecated`
+- `unknown`
+
+The optional reason is administrator-facing context.
+
+<Warning>
+Availability is informational. Setting an offering to unavailable or deprecated does not block runtime selection. Turn the offering off or archive it when it must not be used.
+</Warning>
+
+## API And Codec Compatibility
+
+### OpenAI Chat Completions
+
+- **API:** `openai.chat_completions`
+- **Codec:** `openai.chat_completions`
+- **Workloads:** generation and embeddings
+- **Chat Controls:** generic generation controls plus supported OpenAI controls
+
+Use for OpenAI-compatible services, OpenRouter, Groq, Cerebras, Ollama, and LiteLLM connections that implement the Chat Completions protocol.
+
+### OpenAI Responses
+
+- **API:** `openai.responses`
+- **Codec:** `openai.responses`
+- **Workloads:** generation, embeddings, and image generation
+- **Chat Controls:** generic generation controls plus supported OpenAI controls
+
+### OpenAI Images
+
+- **API:** `openai.images`
+- **Codec:** `openai.images`
+- **Workload:** image generation only
+- **Chat Controls:** not supported
+
+### Anthropic Messages
+
+- **API:** `anthropic.messages`
+- **Codec:** `anthropic.messages`
+- **Workload:** generation
+- **Chat Controls:** generic generation controls and Anthropic controls
+
+This combination is used for both direct Anthropic and Anthropic on Vertex provider connections.
+
+### Google Generate Content
+
+- **API:** `google.generate_content`
+- **Codec:** `google.generate_content`
+- **Workloads:** generation, embeddings, and image generation
+- **Chat Controls:** generic generation controls and Google thinking controls
+
+### Google Interactions
+
+- **API:** `google.interactions`
+- **Codec:** `google.interactions`
+- **Workloads:** generation, embeddings, and image generation
+- **Chat Controls:** generic generation controls and Google thinking controls
+
+### AWS Bedrock Invoke
+
+- **API:** `bedrock.invoke`
+- **Codec for Anthropic generation:** `anthropic.bedrock.invoke`
+- **Codec for Amazon Titan embeddings:** `amazon.titan.bedrock.invoke`
+
+Bedrock requires an explicit compatible codec. Anthropic-specific Chat Control targets are not available through the Bedrock API type; use supported generic generation controls.
+
+## Advanced Options JSON
+
+The field accepts a JSON object. Only the options documented in this section are part of the supported public configuration surface.
+
+<Warning>
+Do not put credentials, authorization headers, tenant identifiers, user data, or internal URLs in Advanced options JSON. This configuration can be exported and copied between environments.
+</Warning>
+
+### Extra Generation Body
+
+Supported generation APIs can receive provider-specific request defaults:
+
+```json
+{
+  "extraGenerationBody": {
+    "store": false
+  }
+}
+```
+
+Use only fields documented by the selected provider and API. Davinci applies canonical request fields after this object, so it cannot reliably replace the selected model, messages, tools, or streaming behavior.
+
+Supported with:
+
+- OpenAI Chat Completions.
+- OpenAI Responses.
+- Anthropic Messages.
+- Google Generate Content.
+- Google Interactions.
+- Anthropic generation through Bedrock.
+
+It is not consumed by the OpenAI Images or Amazon Titan embedding codecs.
+
+### Omit Generation Parameters
+
+Use this when a model rejects otherwise standard generation parameters:
+
+```json
+{
+  "omitGenerationParams": [
+    "temperature",
+    "topP",
+    "seed",
+    "reasoning"
+  ]
+}
+```
+
+Allowed values are exactly:
+
+- `temperature`
+- `topP`
+- `seed`
+- `reasoning`
+
+API behavior:
+
+- OpenAI Chat Completions can omit all four.
+- OpenAI Responses can omit temperature, top-P, and reasoning. It does not emit seed.
+- Anthropic Messages can omit temperature, top-P, and reasoning.
+- Google Generate Content and Interactions can omit all four.
+- Anthropic on Bedrock follows Anthropic generation behavior.
+- OpenAI Images and Amazon Titan embeddings do not use this option.
+
+Do not create a Chat Control for a parameter omitted by the offering.
+
+### Output Token Field
+
+Some OpenAI-compatible Chat Completions models expect a different output-token property:
+
+```json
+{
+  "wireGenerationFields": {
+    "maxOutputTokens": "max_completion_tokens"
+  }
+}
+```
+
+`maxOutputTokens` is the only supported mapping key. Its value must be a non-empty wire-field name.
+
+This option applies only to `openai.chat_completions`. OpenAI Responses always uses its Responses API output-token field.
+
+### Prompt Cache
+
+OpenAI Chat Completions supports:
+
+```json
+{
+  "promptCache": {
+    "key": true
+  }
+}
+```
+
+OpenAI Responses supports:
+
+```json
+{
+  "promptCache": {
+    "key": true,
+    "mode": "implicit",
+    "ttl": "30m",
+    "explicitBreakpoints": true
+  }
+}
+```
+
+- `key`: boolean.
+- `mode`: `implicit` or `explicit`.
+- `ttl`: currently `30m`.
+- `explicitBreakpoints`: boolean.
+
+Anthropic Messages supports:
+
+```json
+{
+  "promptCache": {
+    "automatic": true
+  }
+}
+```
+
+`automatic` is a boolean.
+
+When the model or offering declares prompt-caching support and no explicit Prompt Cache object is supplied, Davinci supplies the appropriate default for OpenAI Responses, OpenAI Chat Completions, or Anthropic Messages.
+
+### Combined OpenAI Chat Completions Example
+
+```json
+{
+  "wireGenerationFields": {
+    "maxOutputTokens": "max_completion_tokens"
+  },
+  "omitGenerationParams": [
+    "temperature",
+    "topP",
+    "seed"
+  ],
+  "promptCache": {
+    "key": true
+  },
+  "extraGenerationBody": {}
+}
+```
+
+### Combined OpenAI Responses Example
+
+```json
+{
+  "omitGenerationParams": [
+    "temperature",
+    "topP"
+  ],
+  "promptCache": {
+    "key": true,
+    "mode": "implicit",
+    "ttl": "30m",
+    "explicitBreakpoints": true
+  },
+  "extraGenerationBody": {
+    "store": false
+  }
+}
+```
+
+### Combined Anthropic Example
+
+```json
+{
+  "omitGenerationParams": [
+    "temperature",
+    "topP"
+  ],
+  "promptCache": {
+    "automatic": true
+  },
+  "extraGenerationBody": {}
+}
+```
+
+### Combined Google Example
+
+```json
+{
+  "omitGenerationParams": [
+    "temperature",
+    "topP",
+    "seed"
+  ],
+  "extraGenerationBody": {}
+}
+```
+
+## Chat Controls
+
+Chat Controls expose safe, predefined model options to users. Use the dedicated editor rather than adding a `chatOptions` property to Advanced options JSON.
+
+The editor rewrites the offering's Chat Controls whenever the offering is saved.
+
+### Choice Control
+
+A choice control contains:
+
+- A unique lowercase key.
+- A non-empty label.
+- An optional description.
+- One supported request target.
+- One or more typed choices.
+- A default that exactly matches one choice.
+
+Conceptually, a reasoning-effort control is:
+
+```json
+{
+  "key": "effort",
+  "label": "Reasoning effort",
+  "description": "Controls how much reasoning the model performs.",
+  "target": "openai.reasoning.effort",
+  "type": "enum",
+  "choices": [
+    {
+      "value": "low",
+      "label": "Low",
+      "description": null
+    },
+    {
+      "value": "medium",
+      "label": "Medium",
+      "description": null
+    },
+    {
+      "value": "high",
+      "label": "High",
+      "description": null
+    }
+  ],
+  "defaultValue": "medium"
+}
+```
+
+Choice values can be strings, finite numbers, or booleans. A default must match both the value and its type.
+
+Keys and targets must each be unique within an offering.
+
+### Toggle Control
+
+The editor can create a boolean toggle with separate On and Off labels. Use a toggle only when the selected target and provider explicitly accept boolean values.
+
+The standard provider-specific targets documented below expect string or numeric values, so they should normally use a Choice control.
+
+### Generic Targets
+
+These targets are available for OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, Google APIs, and Bedrock Invoke:
+
+- `generation.reasoning`
+- `generation.maxInputTokens`
+- `generation.maxOutputTokens`
+- `generation.temperature`
+- `generation.topP`
+
+`generation.seed` is available only for:
+
+- OpenAI Chat Completions.
+- Google Generate Content.
+- Google Interactions.
+
+Value requirements:
+
+- **Maximum input tokens:** positive integer no greater than the effective context limit.
+- **Maximum output tokens:** positive integer no greater than the effective output limit.
+- **Temperature:** number from 0 through 2.
+- **Top-P:** number from 0 through 1.
+- **Seed:** integer.
+- **Reasoning:** non-empty provider-compatible string.
+
+Any non-`none` reasoning option requires the effective **Reasoning** capability to be supported.
+
+### OpenAI Targets
+
+`openai.reasoning.effort`
+
+- APIs: OpenAI Chat Completions and OpenAI Responses.
+- Accepted values: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
+
+`openai.reasoning.mode`
+
+- API: OpenAI Responses.
+- Accepted values: `standard`, `pro`.
+
+`openai.service-tier`
+
+- APIs: OpenAI Chat Completions and OpenAI Responses.
+- Accepted values depend on the provider and model. Davinci does not impose a local value list.
+
+### Anthropic Targets
+
+`anthropic.output-config.effort`
+
+- API: Anthropic Messages.
+- Accepted values: `low`, `medium`, `high`, `xhigh`, `max`.
+
+`anthropic.speed`
+
+- API: Anthropic Messages.
+- Accepted values: `standard`, `fast`.
+
+These targets are not available when Anthropic is routed through `bedrock.invoke`.
+
+### Google Targets
+
+`google.thinking.level`
+
+- APIs: Google Generate Content and Google Interactions.
+- Accepted values: `none`, `minimal`, `low`, `medium`, `high`.
+
+`google.thinking.budget`
+
+- APIs: Google Generate Content and Google Interactions.
+- Accepted values: integers greater than or equal to `-1`.
+
+### Derived Context Control
+
+When token pricing defines a long-context threshold below the model's full context window, Davinci can derive a Context control automatically. You do not need to duplicate it manually.
+
+If the offering already defines a control with key `context` or target `generation.maxInputTokens`, the explicit control takes precedence.
+
+## Embedding Execution
+
+Embedding offerings expose:
+
+- **Vector dimensions:** positive integer.
+- **Batch size:** positive integer; default 100.
+- **Maximum concurrency:** positive integer; default 1.
+
+Vector dimensions inherit from the model definition unless overridden. The named embedding fields take precedence over duplicate Advanced options JSON properties.
+
+An embedding route must target an offering with the Embeddings capability.
+
+Embedding pricing must be input-only token pricing:
+
+- Pricing type is per token.
+- Input price is zero or greater.
+- Output price is zero.
+
+<Warning>
+Changing vector dimensions changes the shape of generated embeddings. Existing project vectors must be regenerated after the new configuration is published.
+</Warning>
+
+## Limit Overrides
+
+Offering limits inherit from the model definition.
+
+- **Context window tokens:** positive integer.
+- **Maximum output tokens:** positive integer.
+- **Maximum image count:** non-negative integer.
+
+Editing a value creates an override. Use **Clear override** to return to inheritance.
+
+Do not enter a larger value unless the exact provider offering supports it.
+
+## Capability Overrides
+
+Capabilities can be inherited, explicitly supported, or explicitly unsupported:
+
+- Tools.
+- Streaming.
+- Structured output.
+- Image input.
+- Image output.
+- Prompt caching.
+- Reasoning.
+- Audio input.
+- Video input.
+- Audio output.
+- Video output.
+- Embeddings.
+
+Use **Supported** only when the provider offering actually implements the capability through the selected API and codec. Capability overrides affect which profiles and workloads can select the offering, but they cannot add a capability the provider lacks.
+
+## Timeouts And Request Size
+
+### Offering Timeout
+
+Enter a positive number of milliseconds. When empty, the offering uses the provider's default timeout, then the platform default of 60,000 milliseconds.
+
+### Maximum Request Size
+
+Enter a positive byte count or leave it empty. Use the provider's documented request-size limit and allow room for encoded images and structured content.
+
+### Request Timeout
+
+The Rate Limits section's **Request timeout** is enforced before the general offering timeout. It controls invocation attempts and time to first streaming content.
+
+Timeout precedence is:
+
+1. Rate-limit request timeout.
+2. Offering timeout.
+3. Provider default timeout.
+4. 60,000 milliseconds.
+
+## Rate Limits
+
+The form exposes:
+
+- **Strategy:** `none`, `time`, `concurrency`, or `both`.
+- **Time window:** positive milliseconds or empty.
+- **Calls per window:** positive integer or empty.
+- **Tokens per window:** positive integer or empty.
+- **Maximum concurrent per connection:** positive integer or empty.
+- **Maximum global concurrent:** positive integer or empty.
+- **Request timeout:** positive milliseconds or empty.
+
+Currently effective controls are:
+
+- Request timeout.
+- Per-connection concurrency when Strategy is `concurrency` or `both`.
+
+The time-window, call-count, token-count, and global-concurrency fields are reserved and must not be relied upon as active enforcement controls.
+
+<Warning>
+Do not use reserved rate fields as security, quota, or cost controls. Enforce provider quotas at the provider and monitor actual usage in [Usage And Billing](/pages/admin/usage-and-billing).
+</Warning>
+
+Treat per-connection concurrency as provider-scoped within the selected configuration. Use a consistent value across offerings attached to the same provider.
+
+## Pricing Overrides
+
+All prices are in USD. An offering inherits its model definition's base pricing until an override is activated.
+
+### Per Token
+
+Configure:
+
+- Input USD per 1 million tokens.
+- Output USD per 1 million tokens.
+- Optional cache-write USD per 1 million tokens.
+- Optional cache-read USD per 1 million tokens.
+
+Example values:
+
+```json
+{
+  "kind": "per_token",
+  "inputUsdPer1MTokens": 1,
+  "outputUsdPer1MTokens": 5,
+  "cacheWriteUsdPer1MTokens": null,
+  "cacheReadUsdPer1MTokens": null,
+  "longContext": null
+}
+```
+
+### Long-Context Token Pricing
+
+Configure a threshold, input rate, and output rate together:
+
+```json
+{
+  "thresholdInputTokens": 200000,
+  "inputUsdPer1MTokens": 2,
+  "outputUsdPer1MTokens": 8,
+  "cacheWriteUsdPer1MTokens": null,
+  "cacheReadUsdPer1MTokens": null
+}
+```
+
+A request above the threshold uses the long-context rates for the entire request.
+
+If regular cache rates are configured, provide the corresponding long-context cache rates.
+
+### Per Image
+
+Configure at least one image rate:
+
+```json
+{
+  "kind": "per_image",
+  "rates": [
+    {
+      "resolution": "1K",
+      "quality": null,
+      "usdPerImage": 0.04
+    }
+  ],
+  "inputTextUsdPer1MTokens": null,
+  "inputImageUsdPerImage": null
+}
+```
+
+The current editor provides 1K, 2K, and 4K output rates plus optional text-input and input-image costs.
+
+### Per Image-Output Token
+
+```json
+{
+  "kind": "per_image_token",
+  "estimator": "openai_grid",
+  "outputUsdPer1MTokens": 10,
+  "inputTextUsdPer1MTokens": null,
+  "inputImageUsdPer1MTokens": null,
+  "cachedInputUsdPer1MTokens": null
+}
+```
+
+Estimator values are:
+
+- `openai_grid`
+- `provider_reported`
+
+### Per Second
+
+Configure either or both media rates:
+
+```json
+{
+  "kind": "per_second",
+  "audioUsdPerSecond": 0.001,
+  "videoUsdPerSecond": null
+}
+```
+
+### Composite Pricing
+
+Composite pricing combines different atomic pricing kinds. Enter a JSON array in the Composite components field:
+
+```json
+[
+  {
+    "kind": "per_token",
+    "inputUsdPer1MTokens": 1,
+    "outputUsdPer1MTokens": 5
+  },
+  {
+    "kind": "per_image",
+    "rates": [
+      {
+        "resolution": "1K",
+        "quality": null,
+        "usdPerImage": 0.04
+      }
+    ]
+  }
+]
+```
+
+The array must contain at least one component and can contain only one component of each pricing kind. Composite components cannot contain another composite.
+
+### Workload Pricing Requirements
+
+- Image-generation assignments require per-image, per-image-token, or compatible composite image pricing.
+- Embedding assignments require input-only per-token pricing with zero output pricing.
+- Other model calls use the effective model or offering pricing for usage calculation.
+
+Review [Usage And Billing](/pages/admin/usage-and-billing) after publishing a pricing change.
+
+## Offering Checklist
+
+Before publishing:
+
+1. Confirm the provider and exact Model ID.
+2. Confirm that the API and codec are compatible.
+3. Remove unsupported generation parameters.
+4. Review inherited and overridden limits, capabilities, and pricing.
+5. Validate every Chat Control target and default.
+6. Confirm embedding dimensions and pricing where applicable.
+7. Turn the offering on.
+8. Run verification against the draft.
+9. Confirm profile routes and publish from the [LLM Control Plane](/pages/admin/llm-control-plane#publish-changes).
