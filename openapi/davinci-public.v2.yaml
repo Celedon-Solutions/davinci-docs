@@ -138,7 +138,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agent/agent.routes.js
-      x-required-scopes: [agent:message]
+      x-required-scopes: ['agent:message']
       x-sdk-methods:
         typescript: client.agentModels.list
         python: client.agent_models.list
@@ -195,7 +195,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.list
         python: client.projects.list
@@ -257,7 +257,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:manage]
+      x-required-scopes: ['projects:manage']
       x-sdk-methods:
         typescript: client.projects.create
         python: client.projects.create
@@ -338,7 +338,7 @@ paths:
         do with the project; those are reported separately because they are derived
         per credential rather than stored on the project.
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.get
         python: client.projects.get
@@ -388,7 +388,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:manage]
+      x-required-scopes: ['projects:manage']
       x-sdk-methods:
         typescript: client.projects.update
         python: client.projects.update
@@ -453,7 +453,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:manage]
+      x-required-scopes: ['projects:manage']
       x-sdk-methods:
         typescript: client.projects.delete
         python: client.projects.delete
@@ -508,7 +508,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.projects.open
         python: client.projects.open
@@ -580,7 +580,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.projects.close
         python: client.projects.close
@@ -629,7 +629,7 @@ paths:
       summary: List project branches
       description: Returns the authoritative git branches for the project from storage.
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.listBranches
         python: client.projects.list_branches
@@ -685,7 +685,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/projectGit.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.branches.create
         python: client.branches.create
@@ -776,7 +776,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/projectGit.routes.js
-      x-required-scopes: [projects:manage]
+      x-required-scopes: ['projects:manage']
       x-sdk-methods:
         typescript: client.branches.delete
         python: client.branches.delete
@@ -856,7 +856,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/projectGit.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.branches.commit
         python: client.branches.commit
@@ -931,7 +931,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/projectGit.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.branches.getChanges
         python: client.branches.get_changes
@@ -992,7 +992,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.listPackages
         python: client.projects.list_packages
@@ -1054,7 +1054,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.content.getTree
         python: client.content.get_tree
@@ -1128,7 +1128,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.content.addObjects
         python: client.content.add_objects
@@ -1223,7 +1223,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.content.getObject
         python: client.content.get_object
@@ -1292,7 +1292,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.content.deleteObject
         python: client.content.delete_object
@@ -1365,7 +1365,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/projectGit.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.branches.getObjectHistory
         python: client.branches.get_object_history
@@ -1453,7 +1453,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.listFiles
         python: client.projects.list_files
@@ -1512,7 +1512,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.projects.deleteFile
         python: client.projects.delete_file
@@ -1572,7 +1572,7 @@ paths:
         `assets.primary.sha256` blob, with a legacy files-prefix fallback for older
         snapshots.
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.projects.downloadFile
         python: client.projects.download_file
@@ -1650,7 +1650,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [sessions:manage]
+      x-required-scopes: ['sessions:manage']
       x-sdk-methods:
         typescript: client.sessions.create
         python: client.sessions.create
@@ -1746,7 +1746,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.sessions.get
         python: client.sessions.get
@@ -1813,7 +1813,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
-      x-required-scopes: [sessions:manage]
+      x-required-scopes: ['sessions:manage']
       x-sdk-methods:
         typescript: client.sessions.delete
         python: client.sessions.delete
@@ -1885,7 +1885,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agent/agent.routes.js
-      x-required-scopes: [agent:message]
+      x-required-scopes: ['agent:message']
       x-sdk-methods:
         typescript: session.sendMessage
         python: session.send_message
@@ -1996,7 +1996,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agent/agent.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: session.messages
         python: session.messages
@@ -2085,7 +2085,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agent/agent.routes.js
-      x-required-scopes: [sessions:manage]
+      x-required-scopes: ['sessions:manage']
       x-sdk-methods:
         typescript: session.stop
         python: session.stop
@@ -2166,7 +2166,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agent/agent.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: session.invokeTool
         python: session.invoke_tool
@@ -2277,7 +2277,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/usage/usage.routes.js
-      x-required-scopes: [usage:read]
+      x-required-scopes: ['usage:read']
       x-sdk-methods:
         typescript: client.usage.get
         python: client.usage.get
@@ -2360,7 +2360,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/usage/usage.routes.js
-      x-required-scopes: [usage:read, projects:read]
+      x-required-scopes: ['usage:read', 'projects:read']
       x-sdk-methods:
         typescript: client.usage.forProject
         python: client.usage.for_project
@@ -2432,7 +2432,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/usage/usage.routes.js
-      x-required-scopes: [usage:read, projects:read]
+      x-required-scopes: ['usage:read', 'projects:read']
       x-sdk-methods:
         typescript: session.usage
         python: session.usage
@@ -2526,7 +2526,7 @@ paths:
       security:
         - GrantBearer: []
       x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: session.upload
         python: session.upload
@@ -2616,7 +2616,7 @@ paths:
       security:
         - GrantBearer: []
       x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: session.download
         python: session.download
@@ -2699,7 +2699,7 @@ paths:
       security:
         - ExecutionGrantBearer: []
       x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.evaluations.create
         python: client.evaluations.create
@@ -2748,7 +2748,7 @@ paths:
         - ExecutionGrantBearer: []
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.evaluations.status
         python: client.evaluations.status
@@ -2781,7 +2781,7 @@ paths:
         - ExecutionGrantBearer: []
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/evaluationRun/evaluationRun.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.evaluations.cancel
         python: client.evaluations.cancel
@@ -2825,7 +2825,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/testRun/testRun.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.tests.run
         python: client.tests.run
@@ -2878,7 +2878,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/testRun/testRun.routes.js
-      x-required-scopes: [projects:read]
+      x-required-scopes: ['projects:read']
       x-sdk-methods:
         typescript: client.tests.status
         python: client.tests.status
@@ -2910,7 +2910,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/testRun/testRun.routes.js
-      x-required-scopes: [projects:write]
+      x-required-scopes: ['projects:write']
       x-sdk-methods:
         typescript: client.tests.cancel
         python: client.tests.cancel
@@ -2950,7 +2950,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/organization/organization.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.organizations.list
         python: client.organizations.list
@@ -3015,7 +3015,7 @@ paths:
         - $ref: '#/components/parameters/CardPageLimit'
         - $ref: '#/components/parameters/CardCursor'
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.search
         python: client.cards.search
@@ -3046,7 +3046,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.create
         python: client.cards.create
@@ -3092,7 +3092,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.getFilterOptions
         python: client.cards.get_filter_options
@@ -3149,7 +3149,7 @@ paths:
             format: uuid
           description: Omit related cards already placed on this team board.
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.listRelated
         python: client.cards.list_related
@@ -3187,7 +3187,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.listAssignableMembers
         python: client.cards.list_assignable_members
@@ -3220,7 +3220,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.get
         python: client.cards.get
@@ -3251,7 +3251,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.update
         python: client.cards.update
@@ -3294,7 +3294,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:manage]
+      x-required-scopes: ['cards:manage']
       x-sdk-methods:
         typescript: client.cards.delete
         python: client.cards.delete
@@ -3335,7 +3335,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.getDetails
         python: client.cards.get_details
@@ -3371,7 +3371,7 @@ paths:
         - $ref: '#/components/parameters/CardDetailLimit'
         - $ref: '#/components/parameters/PageOffset'
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.history.list
         python: client.cards.history.list
@@ -3409,7 +3409,7 @@ paths:
         - $ref: '#/components/parameters/CardDetailLimit'
         - $ref: '#/components/parameters/PageOffset'
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cards.comments.list
         python: client.cards.comments.list
@@ -3440,7 +3440,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.comments.create
         python: client.cards.comments.create
@@ -3491,7 +3491,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.comments.update
         python: client.cards.comments.update
@@ -3537,7 +3537,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.comments.delete
         python: client.cards.comments.delete
@@ -3577,7 +3577,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.tags.add
         python: client.cards.tags.add
@@ -3618,7 +3618,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.tags.set
         python: client.cards.tags.set
@@ -3664,7 +3664,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.tags.remove
         python: client.cards.tags.remove
@@ -3705,7 +3705,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.userLinks.add
         python: client.cards.user_links.add
@@ -3751,7 +3751,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.userLinks.remove
         python: client.cards.user_links.remove
@@ -3795,7 +3795,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.cardLinks.add
         python: client.cards.card_links.add
@@ -3841,7 +3841,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.cardLinks.remove
         python: client.cards.card_links.remove
@@ -3891,7 +3891,7 @@ paths:
           description: Branch containing the referenced object.
         - $ref: '#/components/parameters/IfMatch'
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write, projects:read]
+      x-required-scopes: ['cards:write', 'projects:read']
       x-sdk-methods:
         typescript: client.cards.objectLinks.add
         python: client.cards.object_links.add
@@ -3935,7 +3935,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cards.objectLinks.remove
         python: client.cards.object_links.remove
@@ -3972,7 +3972,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:read]
+      x-required-scopes: ['cards:read']
       x-sdk-methods:
         typescript: client.cardTags.list
         python: client.card_tags.list
@@ -4001,7 +4001,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cardTags.create
         python: client.card_tags.create
@@ -4048,7 +4048,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:write]
+      x-required-scopes: ['cards:write']
       x-sdk-methods:
         typescript: client.cardTags.update
         python: client.card_tags.update
@@ -4087,7 +4087,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/card/card.routes.js
-      x-required-scopes: [cards:manage]
+      x-required-scopes: ['cards:manage']
       x-sdk-methods:
         typescript: client.cardTags.delete
         python: client.card_tags.delete
@@ -4142,7 +4142,7 @@ paths:
             Include open-card counts and planning sprint summaries. This expansion
             additionally requires effective `teams:sprints:read` permission.
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.list
         python: client.teams.list
@@ -4173,7 +4173,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage]
+      x-required-scopes: ['teams:manage']
       x-sdk-methods:
         typescript: client.teams.create
         python: client.teams.create
@@ -4223,7 +4223,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.get
         python: client.teams.get
@@ -4252,7 +4252,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.update
         python: client.teams.update
@@ -4293,7 +4293,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage, cards:write]
+      x-required-scopes: ['teams:manage', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.delete
         python: client.teams.delete
@@ -4336,7 +4336,7 @@ paths:
         - $ref: '#/components/parameters/CardPageLimit'
         - $ref: '#/components/parameters/PageOffset'
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.getIndex
         python: client.teams.get_index
@@ -4386,7 +4386,7 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/CardSort'
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.getOverview
         python: client.teams.get_overview
@@ -4435,7 +4435,7 @@ paths:
             format: uuid
           description: Include and select this archived sprint for a reports deep link.
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.getReports
         python: client.teams.get_reports
@@ -4504,7 +4504,7 @@ paths:
           explode: false
           description: Limit cumulative-flow results to these linked projects.
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.getChart
         python: client.teams.get_chart
@@ -4541,7 +4541,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.projects.list
         python: client.teams.projects.list
@@ -4573,7 +4573,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage, cards:read]
+      x-required-scopes: ['teams:manage', 'cards:read']
       x-sdk-methods:
         typescript: client.teams.projects.add
         python: client.teams.projects.add
@@ -4617,7 +4617,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage, cards:read]
+      x-required-scopes: ['teams:manage', 'cards:read']
       x-sdk-methods:
         typescript: client.teams.projects.remove
         python: client.teams.projects.remove
@@ -4648,7 +4648,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.statuses.list
         python: client.teams.statuses.list
@@ -4677,7 +4677,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.statuses.create
         python: client.teams.statuses.create
@@ -4725,7 +4725,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.statuses.update
         python: client.teams.statuses.update
@@ -4766,7 +4766,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage, cards:write]
+      x-required-scopes: ['teams:manage', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.statuses.delete
         python: client.teams.statuses.delete
@@ -4810,7 +4810,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.statuses.closeAll
         python: client.teams.statuses.close_all
@@ -4853,7 +4853,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.sprints.create
         python: client.teams.sprints.create
@@ -4934,7 +4934,7 @@ paths:
             default: 25
         - $ref: '#/components/parameters/PageOffset'
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.sprints.listCompleted
         python: client.teams.sprints.list_completed
@@ -4970,7 +4970,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.sprints.get
         python: client.teams.sprints.get
@@ -4999,7 +4999,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.sprints.update
         python: client.teams.sprints.update
@@ -5038,7 +5038,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:manage]
+      x-required-scopes: ['teams:manage']
       x-sdk-methods:
         typescript: client.teams.sprints.delete
         python: client.teams.sprints.delete
@@ -5072,7 +5072,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write]
+      x-required-scopes: ['teams:write']
       x-sdk-methods:
         typescript: client.teams.sprints.start
         python: client.teams.sprints.start
@@ -5119,7 +5119,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.sprints.complete
         python: client.teams.sprints.complete
@@ -5163,7 +5163,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.sprints.getDetails
         python: client.teams.sprints.get_details
@@ -5208,7 +5208,7 @@ paths:
             enum: [burndown, burnup]
             default: burndown
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.sprints.getChart
         python: client.teams.sprints.get_chart
@@ -5247,7 +5247,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.cards.create
         python: client.teams.cards.create
@@ -5318,7 +5318,7 @@ paths:
         - $ref: '#/components/parameters/CardPageLimit'
         - $ref: '#/components/parameters/PageOffset'
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:read]
+      x-required-scopes: ['teams:read']
       x-sdk-methods:
         typescript: client.teams.cards.list
         python: client.teams.cards.list
@@ -5354,7 +5354,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.cards.add
         python: client.teams.cards.add
@@ -5402,7 +5402,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.cards.updateSprint
         python: client.teams.cards.update_sprint
@@ -5451,7 +5451,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.cards.updateStatus
         python: client.teams.cards.update_status
@@ -5497,7 +5497,7 @@ paths:
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/team/team.routes.js
-      x-required-scopes: [teams:write, cards:write]
+      x-required-scopes: ['teams:write', 'cards:write']
       x-sdk-methods:
         typescript: client.teams.cards.remove
         python: client.teams.cards.remove

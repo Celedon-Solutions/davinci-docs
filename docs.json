@@ -446,33 +446,16 @@
                 "icon": "code",
                 "pages": [
                     {
-                        "group": "API Reference",
+                        "group": "API Guides",
                         "pages": [
                             "pages/api/introduction",
                             "pages/api/personal-access-tokens"
                         ]
                     },
                     {
-                        "group": "General",
-                        "icon": "circle-info",
-                        "openapi": "openapi/davinci-public.v2.yaml",
-                        "pages": [
-                            "GET /api/v2/programmatic",
-                            "GET /api/v2/programmatic/health"
-                        ]
-                    },
-                    {
-                        "group": "Projects",
+                        "group": "API Reference",
                         "icon": "folder-tree",
-                        "openapi": "openapi/davinci-public.v2.yaml",
-                        "pages": [
-                            "GET /api/v2/programmatic/projects",
-                            "GET /api/v2/programmatic/projects/{projectId}",
-                            "GET /api/v2/programmatic/projects/{projectId}/tree",
-                            "GET /api/v2/programmatic/projects/{projectId}/objects/{objectId}",
-                            "GET /api/v2/programmatic/projects/{projectId}/files",
-                            "GET /api/v2/programmatic/projects/{projectId}/files/{fileId}"
-                        ]
+                        "openapi": "openapi/davinci-public.v2.yaml"
                     }
                 ]
             },
@@ -870,10 +853,6 @@
         {
             "source": "/pages/editor/project-settings/collaboration",
             "destination": "/pages/editor/collaboration/overview"
-        },
-        {
-            "source": "/pages/browser/navigation",
-            "destination": "/pages/browser/navigation"
         },
         {
             "source": "/pages/user-guide/common/hotkeys",
