@@ -838,10 +838,6 @@
             "destination": "/pages/editor/collaboration/overview"
         },
         {
-            "source": "/pages/browser/navigation",
-            "destination": "/pages/browser/navigation"
-        },
-        {
             "source": "/pages/user-guide/common/hotkeys",
             "destination": "/pages/editor/hotkeys"
         },
