@@ -427,8 +427,7 @@
                         "icon": "circle-info",
                         "openapi": "openapi/davinci-public.v2.yaml",
                         "pages": [
-                            "GET /api/v2/programmatic",
-                            "GET /api/v2/programmatic/health"
+                            "GET /api/v2/agent/models"
                         ]
                     },
                     {
@@ -436,12 +435,12 @@
                         "icon": "folder-tree",
                         "openapi": "openapi/davinci-public.v2.yaml",
                         "pages": [
-                            "GET /api/v2/programmatic/projects",
-                            "GET /api/v2/programmatic/projects/{projectId}",
-                            "GET /api/v2/programmatic/projects/{projectId}/tree",
-                            "GET /api/v2/programmatic/projects/{projectId}/objects/{objectId}",
-                            "GET /api/v2/programmatic/projects/{projectId}/files",
-                            "GET /api/v2/programmatic/projects/{projectId}/files/{fileId}"
+                            "GET /api/v2/projects",
+                            "GET /api/v2/projects/{projectId}",
+                            "GET /api/v2/projects/{projectId}/tree",
+                            "GET /api/v2/projects/{projectId}/objects/{objectId}",
+                            "GET /api/v2/projects/{projectId}/files",
+                            "DELETE /api/v2/projects/{projectId}/files/{fileId}"
                         ]
                     }
                 ]
