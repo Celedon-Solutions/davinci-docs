@@ -416,32 +416,16 @@
                 "icon": "code",
                 "pages": [
                     {
-                        "group": "API Reference",
+                        "group": "API Guides",
                         "pages": [
                             "pages/api/introduction",
                             "pages/api/personal-access-tokens"
                         ]
                     },
                     {
-                        "group": "General",
-                        "icon": "circle-info",
-                        "openapi": "openapi/davinci-public.v2.yaml",
-                        "pages": [
-                            "GET /api/v2/agent/models"
-                        ]
-                    },
-                    {
-                        "group": "Projects",
+                        "group": "API Reference",
                         "icon": "folder-tree",
-                        "openapi": "openapi/davinci-public.v2.yaml",
-                        "pages": [
-                            "GET /api/v2/projects",
-                            "GET /api/v2/projects/{projectId}",
-                            "GET /api/v2/projects/{projectId}/tree",
-                            "GET /api/v2/projects/{projectId}/objects/{objectId}",
-                            "GET /api/v2/projects/{projectId}/files",
-                            "DELETE /api/v2/projects/{projectId}/files/{fileId}"
-                        ]
+                        "openapi": "openapi/davinci-public.v2.yaml"
                     }
                 ]
             },
