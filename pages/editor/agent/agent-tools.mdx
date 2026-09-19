@@ -86,7 +86,14 @@ Tools for defining system behavior, state machines, and activity flows.
 Tools for software architecture, code generation, and software component modeling.
 
 ### Simulation
-Tools for setting up and running simulations, analysis, and performance evaluation.
+Tools for the compiled-simulation route: `SetupSimulation` (mesh a geometry and
+validate a boundary-condition program), `CompileSimulation` (build the certified
+Solution Space), `QuerySimulation` (QoIs and certificates at parameter points),
+`OptimizeSimulation` (certified QoI optimization over the parameter box),
+`VerifySimulation` (a full-order truth solve at one point), `CaptureSimulationView`
+(headless renders of the setup or a live field) and `GetSimulationReference` (the
+closed BC-language reference with worked examples). `RunSimulation` executes Python
+simulation code objects.
 
 ### Requirements Engineering
 Tools for creating, linking, and verifying requirements throughout the model.

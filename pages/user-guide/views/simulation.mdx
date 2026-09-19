@@ -5,7 +5,16 @@ icon: /images/objecticons/code.svg
 
 ## Description
 
-The Simulation View provides setup and results visualization for Simulation objects. This view has two modes: Simulation Setup for configuring simulations, and Simulation Result for viewing and analyzing simulation outputs.
+A Davinci Simulation is a **compiled Solution Space**. You set it up once (mesh the
+geometry and apply a parametric boundary-condition program), compile it once (a
+certified reduced-order model with adversarial full-order gates), and from then on
+every parameter combination answers instantly — live 3-D fields, sliders on every
+declared parameter, quantities of interest, and a reduction-error certificate on
+every answer. A full-order verification solve is available at any point of the
+parameter box.
+
+The Simulation View has two modes: **Simulation Setup** and **Simulation Result**
+(the Solution Space explorer).
 
 ## Simulation Setup View
 
@@ -13,28 +22,64 @@ The Simulation View provides setup and results visualization for Simulation obje
     <img height="400" noZoom src="/images/workspace_simulation_setup.png" />  
 </Frame>
 
-The Setup View provides an interactive 3D environment for configuring computational fluid dynamics (CFD) and finite element analysis (FEA) simulations. This includes mesh generation, boundary condition assignment, and material property definition.
+### What a setup is
 
-### Geometry Display
+A simulation references one geometry (a CAD Language part, an assembly, an imported
+STEP, or a circuit board) and carries a Python **BC program**:
 
-The 3D viewer shows the geometry to be simulated, including:
-- **Mesh Visualization**: View the computational mesh with elements and nodes
-- **Boundary Surfaces**: Identify surfaces where boundary conditions are applied
-- **Material Regions**: See different material zones within the geometry
+```python
+def boundary_conditions(mesh, select, param):
+    alloy = material("Aluminum 6061-T6")
+    F = param("F_load", default=500.0, range=(0.0, 2000.0), unit="N",
+              doc="downward load on the top face")
+    return [
+        fix(select.plane("-z")),
+        force(select.plane("+z"), total=[0.0, 0.0, -F]),
+        solid(alloy),
+        qoi("max_displacement", kind="max_displacement"),
+        qoi("max_von_mises", kind="max_von_mises"),
+    ]
+```
 
-**3D Interaction**: Click and drag to rotate the view. Right-click and drag to pan. Scroll to zoom in and out.
+Everything the solver consumes is a *returned descriptor*: boundary conditions
+(`fix`, `force`, `pressure`, `bearing`, `acceleration`, `temperature`, `flux`,
+`convection`, `radiation`, `inflow`/`outflow`/`noslip`), constitutive and coupling
+declarations (`solid(material(...))`, `fluid(...)`, `thermo_elastic(...)`),
+analysis fragments (`modal`, `harmonic`, `random_vibration`, `shock`, `acoustic`,
+`tone_sweep`, `transient`, `optical_surface`/`optical_train`, `geometry`) and
+quantities of interest (`qoi(...)`). A `param(...)` with a range becomes a live
+slider axis only when a returned descriptor consumes it. Every nonzero dimensional
+value carries a unit through `quantity(value, "unit")`; units are audited against the
+project's unit definitions.
 
-### Setup Controls
+### Setup controls
 
-**Mesh Settings**: Configure mesh density, refinement regions, and element types.
+**Geometry**: pick the object to simulate. Assemblies export as one multi-body STEP
+(bodies become `part_1..part_N`; touching bodies bond).
 
-**Boundary Conditions**: Assign inlet, outlet, wall, and symmetry conditions to appropriate surfaces.
+**Target nodes**: the mesh auto-sizer target (clamped to the server maximum).
 
-**Material Selection**: Choose materials from the material library or define custom material properties for each region.
+**Set Up**: meshes the geometry and runs the BC program. The 3-D view paints the
+mesh with every selection the program made (clamps, loads, temperatures, optical
+faces), and the panel lists the realized physics, fragments, parameter axes, QoIs,
+material sources and unit conversions. A program the compiler refuses is reported
+with the offending line and a fix recipe; refusals are capability claims in the
+negative (the compiler will not silently ignore an input it does not consume).
 
-**Physics Settings**: Configure simulation type (CFD, thermal, structural, etc.) and relevant physics parameters.
+**Compile**: builds the certified Solution Space. Progress streams into the
+diagnostics panel; when it lands the status chip turns **LIVE**.
 
-**Run Simulation**: Execute the simulation with current settings. Progress is displayed in the interface.
+**Staleness**: the object tracks what its setup consumed (geometry source, project
+materials, unit definitions, the program, mesh settings). When any of those change,
+a **SETUP STALE** or **LIVE STALE** chip appears with the reason, and a compile of a
+changed program or geometry is refused until you set up again.
+
+### Advanced capabilities
+
+Three admin feature flags widen what the setup offers an author: Class B fragments
+(dynamics, transient thermal, flow, acoustics), geometry axes (uniform scale, stretch
+and CAD parameter families), and optics (optical surfaces and trains). The flags gate
+authoring reach — a program that already declares a gated fragment still compiles.
 
 ## Simulation Result View
 
@@ -42,30 +87,55 @@ The 3D viewer shows the geometry to be simulated, including:
     <img height="400" noZoom src="/images/workspace_simulation_result.png" />  
 </Frame>
 
-The Result View displays simulation outputs with advanced visualization capabilities, including contour plots, vector fields, and streamlines.
+The explorer runs the same online solver as the server: every slider drag re-solves
+the reduced system in well under a millisecond and repaints the surface.
 
-### Result Visualization
+### Parameters and fields
 
-**Field Selection**: Choose which result field to display (pressure, velocity, temperature, stress, etc.).
+**Sliders**: one per certified axis (log axes, vector components and CAD morph axes
+included). Axis playback sweeps a slider in bounce or wrap mode. CAD morph axes stay
+two-way synchronized with the CAD parameter panel.
 
-**Visualization Mode**: Select visualization type:
-- **Contour**: Color-mapped scalar fields showing value distribution
-- **Vector**: Arrow fields showing vector quantities like velocity or force
-- **Streamlines**: Flow paths through vector fields
-- **Isosurfaces**: 3D surfaces of constant value
+**Field selector**: temperature, displacement magnitude and signed components,
+von Mises stress, harmonic displacement and stress amplitude, RMS displacement and
+stress, shock peak displacement, transient temperature, flow speed and pressure —
+whatever the compiled physics provides. Deformation exaggeration is a true ×
+control; the undeformed reference can be shown alongside.
 
-**Color Bar**: A color legend shows the mapping between colors and field values, with min/max indicators.
+**Sections**: x/y/z clip planes with true interior contours where the bundle
+carries volume recovery; solid / transparent / wireframe rendering; frozen colour
+ranges for comparisons.
 
-### Analysis Tools
+**Contribution**: on coupled thermo-elastic studies, view the combined field or the
+mechanical-only / thermal-expansion-only share.
 
-**Slice Planes**: Create cutting planes through the geometry to view internal fields.
+### Fragment panels
 
-**Probes**: Place point probes to read exact values at specific locations.
+Dynamics studies add a drive-point FRF plot with a frequency slider and an animated
+operating-deflection shape, a shock response spectrum, and a rotor-tone waterfall;
+transient studies add a time scrubber with playback; optics studies add wavefront,
+PSF/MTF, Zernike and coronagraph panels.
 
-**Plot Generation**: Extract data along lines or across surfaces for quantitative analysis.
+### Key results and trust
 
-## Use Cases
+**Key results** lists every declared QoI at the current point. The certificate chip
+reports the Class A error bound at the point (or the family's surrogate-certified
+bound, or the held-out gate result for Class B fragments); a point outside the
+certified envelope is flagged amber.
 
-**Flow Analysis**: Set up and analyze fluid flow problems including aerodynamics, hydrodynamics, and internal flows.
+The certificate answers "did the reduced model reproduce Davinci's full-order model on
+this mesh?" It does not establish mesh convergence, constitutive correctness, or that
+the boundary conditions represent reality — treat it as reduction evidence, not
+validation.
 
-**Structural Analysis**: Configure and evaluate structural simulations for stress, strain, and deformation under various loading conditions.
+**Design space** (LHS sampling with backend or WebGPU evaluation) plots QoIs across the
+box; hover a sample to jump the live view to it. With advanced workflows enabled the
+panel also shows sensitivity jets, a certified tolerance Monte Carlo, verify-at-point
+(a full-order solve compared field by field) and the compile gate record.
+
+## Agent tools
+
+`SetupSimulation`, `CompileSimulation`, `QuerySimulation`, `OptimizeSimulation`,
+`VerifySimulation` and `CaptureSimulationView` drive the same objects; the agent's
+numbers come from the same point evaluator the explorer uses, so what it reports is
+what you see.
