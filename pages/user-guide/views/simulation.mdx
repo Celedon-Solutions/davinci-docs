@@ -19,7 +19,8 @@ radiation and temperature-dependent conductivity), linear **structural** statics
 multi-body assemblies) and their **thermo-elastic** coupling as Class A physics; the
 Class B fragments (modal, harmonic, random vibration, shock, acoustic, rotor tone
 sweep, transient thermal, laminar flow) and the optics stack (optical surfaces and
-trains) ride behind the advanced-capability flags described below.
+trains) are gate-validated against full-order references and offered by default;
+geometry axes ride behind an admin flag (see "Advanced capabilities").
 
 The Simulation View has two modes: **Simulation Setup** and **Simulation Result**
 (the Solution Space explorer).
@@ -84,10 +85,14 @@ changed program or geometry is refused until you set up again.
 
 ### Advanced capabilities
 
-Three admin feature flags widen what the setup offers an author: Class B fragments
-(dynamics, transient thermal, flow, acoustics), geometry axes (uniform scale, stretch
-and CAD parameter families), and optics (optical surfaces and trains). The flags gate
-authoring reach — a program that already declares a gated fragment still compiles.
+Three admin feature flags decide what the setup offers an author: Class B fragments
+(dynamics, transient thermal, flow, acoustics) and optics (optical surfaces and
+trains) are on by default — every one of their capabilities has an analytic anchor on
+a converged mesh, a passing authoring brief, kernel parity and an explorer panel; a
+deployment may still switch them off. Geometry axes (uniform scale, stretch and CAD
+parameter families) stay off until the family route's mesh convergence is measured.
+The flags gate authoring reach — a program that already declares a gated fragment
+still compiles.
 
 ## Simulation Result View
 
