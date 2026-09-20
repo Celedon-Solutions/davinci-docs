@@ -176,3 +176,19 @@ panel also shows sensitivity jets, a certified tolerance Monte Carlo, verify-at-
 `VerifySimulation` and `CaptureSimulationView` drive the same objects; the agent's
 numbers come from the same point evaluator the explorer uses, so what it reports is
 what you see.
+
+`VerifySimulation` compares every QoI it can value on the full-order model — steady
+thermal and structural kinds, the dynamics kinds (a full-order modal build of the
+same mesh), transient kinds (the full-order march), flow kinds (the full-order
+steady solve) and the optical wavefront / line-of-sight kinds (a dense retrace) —
+against the Solution Space, and restates the compile's mesh-convergence record.
+`CaptureSimulationView` paints mesh fields; on an optics study `field: "wavefront"`
+renders the train's own panel (wavefront map, PSF, MTF) instead. A transient frame
+reports the declared QoIs and, separately, the static kinds re-read on the state at
+the captured time, so one name never carries two numbers.
+
+Re-running `SetupSimulation` on a compiled object demotes it to the setup state: the
+Solution Space on record answers the previous program and is not served until the
+next compile. Edits that arrive *under* a live object — geometry, materials, units,
+the program itself — are the staleness path: the object is still served, with a
+warning that names the reason.
