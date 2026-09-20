@@ -124,9 +124,31 @@ bound, or the held-out gate result for Class B fragments); a point outside the
 certified envelope is flagged amber.
 
 The certificate answers "did the reduced model reproduce Davinci's full-order model on
-this mesh?" It does not establish mesh convergence, constitutive correctness, or that
-the boundary conditions represent reality — treat it as reduction evidence, not
-validation.
+this mesh?" It does not establish constitutive correctness or that the boundary
+conditions represent reality — treat it as reduction evidence, not validation.
+
+**Mesh convergence** is a separate claim and is measured separately. A compile meshes
+the part with quadratic tetrahedra, adapts the mesh to the declared QoIs (adjoint-based
+error indicators, two or three remesh loops within the node budget, at least two
+elements through every wall the budget allows) and then re-solves every measurable QoI
+on a mesh with twice the nodes. What that acceptance check found is stated in the
+"What these numbers rest on" panel, in each QoI export row and in `QuerySimulation`'s
+output:
+
+- *converged* — the QoI moved less than the tolerance (2%) against the finer mesh;
+  the remaining discretisation error is estimated by Richardson extrapolation.
+- *mesh-dependent* — a peak stress on a rigid `fix()` is a singularity of the model and
+  grows without bound under refinement. It is served with its measured drift, never as
+  converged; support the part on a compliant `bearing()` or `spring()` for a peak that
+  converges.
+- *not measured* — optics, optical-surface and flow QoIs have no bare-mesh evaluator
+  yet; their reduction certificate still holds, their discretisation error is not
+  measured. Assemblies, geometry axes and flow studies keep a uniform mesh (the record
+  says why).
+
+A QoI that has not converged at the node budget is not served at all: the compile refuses
+with `does not converge under mesh refinement` and the recipe (raise **Target nodes**, or
+narrow what the QoI reads).
 
 **Design space** (LHS sampling with backend or WebGPU evaluation) plots QoIs across the
 box; hover a sample to jump the live view to it. With advanced workflows enabled the
