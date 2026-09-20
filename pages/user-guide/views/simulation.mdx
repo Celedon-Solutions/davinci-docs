@@ -187,6 +187,26 @@ renders the train's own panel (wavefront map, PSF, MTF) instead. A transient fra
 reports the declared QoIs and, separately, the static kinds re-read on the state at
 the captured time, so one name never carries two numbers.
 
+## Code objects
+
+A Python code object reads a LIVE study through the same point evaluator, over the
+runtime's `database` bridge:
+
+```python
+from davinci import simulation
+
+study = simulation("Beam study")
+info = await study.describe()                       # axes, QoIs, certificates, mesh status
+pt = await study.query(F=3.0)                        # one point, live
+pts = await study.query([{"F": f} for f in (1, 2, 3, 4)])   # many points, one round trip
+table = await study.sample(n=1024, seed=7)           # the Design space sample, as a table
+```
+
+Each answer carries the certificate class of every QoI and what the mesh-convergence
+check measured about it; a stale study answers with a warning that names the reason,
+and a study that is not LIVE refuses with its state. Samples run on the same
+multi-core backend the result view's Design space sample uses. The API is read-only.
+
 Re-running `SetupSimulation` on a compiled object demotes it to the setup state: the
 Solution Space on record answers the previous program and is not served until the
 next compile. Edits that arrive *under* a live object — geometry, materials, units,
