@@ -143,7 +143,9 @@ conditions represent reality — treat it as reduction evidence, not validation.
 **Mesh convergence** is a separate claim and is measured separately. A compile meshes
 the part with quadratic tetrahedra, adapts the mesh to the declared QoIs (adjoint-based
 error indicators, two or three remesh loops within the node budget, at least two
-elements through every wall the budget allows) and then re-solves every measurable QoI
+elements through every wall the budget allows; the size field is smoothed and graded,
+mirrored across the part's own symmetry planes and kept within about a 3:1 range, so an
+adapted mesh reads as a mesh and not as patches) and then re-solves every measurable QoI
 on a mesh with twice the nodes. What that acceptance check found is stated in the
 "What these numbers rest on" panel, in each QoI export row and in `QuerySimulation`'s
 output:
