@@ -4804,7 +4804,7 @@ paths:
       summary: Close every open card in a workflow status
       description: |
         Atomically closes every still-open project card currently placed in this
-        team status. The status must use `manual` or `automatic` close mode. The
+        team status. Bulk close is available on every workflow status. The
         caller must be able to write every affected project; any denial or stale
         history head rolls back the complete operation.
       security:
