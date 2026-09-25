@@ -1,0 +1,45 @@
+---
+title: 'Version 5.2.0 - Simulation, Engineering Workflows & Collaboration'
+description: 'September 24 2026'
+---
+
+## Version 5.2.0 - Simulation, Engineering Workflows & Collaboration
+
+Version 5.2 expands Davinci's engineering analysis capabilities while making CAD workflows, project collaboration, and automation more reliable.
+
+### Simulation & Engineering Analysis
+
+- Expanded simulation support across structural, dynamic, transient, thermal, fluid, fatigue, contact, acoustics, radiation, and environmental analysis
+- Added improved mesh quality and accuracy with second-order tetrahedral elements, adaptive meshing, and mesh-convergence reporting
+- Added expanded optics and STOP analysis, including telescope models, ray tracing, coronagraphs, deformable mirrors, stray light, wavefronts, PSF, and MTF results
+- Added clearer simulation setup, compilation, verification, and result reporting
+- Added interactive explorer panels for inspecting simulation results and comparing outputs across design studies
+
+### CAD, Assemblies & Motion
+
+- Improved assembly solving, mates, imported-part interfaces, collision checks, and assembly diagnostics
+- STEP imports now preserve detected geometric features to support more reliable assembly workflows
+- Added motion-study stages, tracked mechanisms, closed-path motion, pose playback, and stored motion artifacts
+- Improved joint control, motion-study validation, compile error reporting, and CAD authoring feedback
+
+### Agent & Automation
+
+- Code objects can now access compiled studies through the simulation API to describe, query, and sample results
+- Added a Python simulation interface for runtime analysis workflows
+- Improved agent support for simulation authoring, imported geometry, project context, and persistent artifacts
+- Added clearer validation messages, simulation staleness information, and recovery guidance
+
+### Teams, Task Cards & Project Management
+
+- Added required fields and configurable mover-assignment actions for task-card status transitions
+- Improved kanban filters, sprint handling, close-on-move behavior, card refreshes, and team board layouts
+- Added project memory capabilities and more reliable project storage accounting
+- Updated the public API and Python and TypeScript SDKs for the latest team and task-card workflows
+
+### Workspace & Documents
+
+- Improved simulation, assembly, and motion-study views in the workspace
+- Improved document tables, slides, PDF forms, signatures, exports, and collaborative editing
+- Added a faster search path for large projects to reduce client-side lag
+- Added numerous reliability fixes across workspace panels, previews, and rendered results
+
