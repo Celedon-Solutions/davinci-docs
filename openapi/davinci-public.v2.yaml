@@ -9931,6 +9931,25 @@ components:
         lastMessageId:
           type: [string, 'null']
           description: The `messageId` of the most recent prompt the agent took.
+        error:
+          $ref: '#/components/schemas/AgentFailure'
+      additionalProperties: true
+    AgentFailure:
+      type: object
+      description: |
+        Why the run failed. Present only while `status` is `failed`, so the read that
+        tells you the run is over also tells you why — closing the session afterwards
+        loses nothing.
+      required: [message]
+      properties:
+        message:
+          type: string
+          description: What went wrong, as the transcript records it.
+        category:
+          type: [string, 'null']
+          description: |
+            The model provider's error category when the failure came from the provider,
+            such as `context_window`, `rate_limit`, or `unavailable`; otherwise null.
       additionalProperties: true
     AgentStatus:
       type: string
@@ -9943,7 +9962,8 @@ components:
         - `running` — a run is in progress.
         - `paused` — a run was stopped and can be continued with a new prompt.
         - `completed` — the run finished.
-        - `failed` — the run ended in an error. The transcript says why.
+        - `failed` — the run ended in an error. `agent.error` says why, as does the
+          transcript.
         - `unknown` — the machine could not be reached for this field. Retry; anything
           else in the same response is still valid.
 
