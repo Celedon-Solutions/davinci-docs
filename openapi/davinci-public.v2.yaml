@@ -1121,10 +1121,18 @@ paths:
         commit. A response reporting fewer objects than were sent does not happen —
         the request either applies in full or fails.
 
-        Every object is checked against the schema for its `type` before anything
-        is written, so one bad object fails the whole request and the project is
-        left untouched. Any type the model defines can be written here; the 400
-        names what was wrong with each object it refused.
+        Every object needs a parent: its own `parent`, or the request's `parentId`.
+        Top-level model content goes in the Model package,
+        `00000000-0000-0000-0000-0000000model`, and references in the Library,
+        `00000000-0000-0000-0000-00000library`.
+
+        Every object is checked against the schema for its `type`, then against
+        the project the way the Davinci agent's own writes are: its parent has to
+        exist and be able to hold its type, its children have to exist, and its
+        relationship types have to be ones the project defines. One bad object
+        fails the whole request and the project is left untouched. Any type the
+        model defines can be written here; the 400 names what was wrong with each
+        object it refused.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
@@ -1136,13 +1144,14 @@ paths:
         - lang: typescript
           label: TypeScript SDK
           source: |
-            import { DavinciClient } from '@celedon/davinci-sdk';
+            import { DavinciClient, MODEL_PACKAGE_ID } from '@celedon/davinci-sdk';
 
             const client = new DavinciClient({
               apiKey: process.env.DAVINCI_API_KEY!,
             });
 
             const { addedCount } = await client.content.addObjects(projectId, {
+              parentId: MODEL_PACKAGE_ID,
               objects: {
                 [crypto.randomUUID()]: { type: 'requirement', name: 'Dry mass under 500 kg' },
               },
@@ -1153,12 +1162,13 @@ paths:
           source: |
             import os
             import uuid
-            from davinci_sdk import DavinciClient
+            from davinci_sdk import MODEL_PACKAGE_ID, DavinciClient
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
                 result = client.content.add_objects(
                     project_id,
                     objects={str(uuid.uuid4()): {"type": "requirement", "name": "Dry mass under 500 kg"}},
+                    parent_id=MODEL_PACKAGE_ID,
                 )
                 print(result.added_count)
       parameters:
@@ -1180,9 +1190,10 @@ paths:
           description: |
             Nothing was written. `INVALID_OBJECTS` means the `objects` map itself was
             missing, empty, or not a map. `INVALID_OBJECT` means at least one object
-            failed its schema: `details.objects` maps each refused id to what is
-            wrong with it, and `details.validTypes` lists every writable type when a
-            `type` was the problem.
+            was refused: `details.objects` maps each refused id to what is wrong
+            with it — a field its schema does not allow, no parent, or a parent that
+            does not exist or cannot hold its type — and `details.validTypes` lists
+            every writable type when a `type` was the problem.
           content:
             application/json:
               schema:
@@ -9730,8 +9741,9 @@ components:
 
             Each body is validated against the schema for its `type`. Fields
             differ by type, anything the type does not define is refused rather
-            than dropped, and every field is optional except `type` — the model
-            supplies the rest.
+            than dropped, and every field is optional except `type` and `parent`,
+            which `parentId` can supply for the whole request — the model supplies
+            the rest.
 
             `tags` is refused here rather than accepted and discarded: creation
             does not carry them. Assign them once the object exists.
@@ -9749,14 +9761,17 @@ components:
                 type: string
               parent:
                 type: string
-                format: uuid
-                description: Overrides `parentId` for this object.
+                description: |
+                  Id of the object this one belongs under: a package, a part, or
+                  another object that can hold its type, or
+                  `00000000-0000-0000-0000-0000000model` for the top of the Model
+                  package. Required unless `parentId` is given; overrides it.
             additionalProperties: true
         parentId:
           type: [string, 'null']
-          format: uuid
           description: |
-            Parent for objects that do not name one themselves. An id, so a UUID.
+            Parent for every object that does not name its own, such as
+            `00000000-0000-0000-0000-0000000model` for the top of the Model package.
       additionalProperties: false
     AddObjectsResponse:
       type: object
@@ -9806,8 +9821,10 @@ components:
           description: Resolution for raster content in PDF exports. Defaults to 300.
         parentId:
           type: string
-          format: uuid
-          description: Package to save the file in. Defaults to the exported object's parent.
+          description: |
+            Package to save the file in, such as the Library,
+            `00000000-0000-0000-0000-00000library`. Defaults to the exported
+            object's parent.
       additionalProperties: false
     ExportObjectResponse:
       type: object
