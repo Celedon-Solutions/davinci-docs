@@ -116,9 +116,19 @@ To commit your changes:
 2. Enter a descriptive commit message
 3. Click **Commit**
 
-<Note>Commits require at least one change and a commit message. Commits are manual and occur only when explicitly performed by a user.</Note>
+<Note>Commits require at least one change and a commit message. A commit happens only when someone asks for one: by clicking **Commit**, or by asking the Davinci Agent to commit.</Note>
 
 Commits capture the current state of all changes and create a permanent record in project history.
+
+### Asking the Agent to Commit
+
+You can ask the Davinci Agent to commit, for example: "Commit these changes with the message 'Add bracket requirements'". The agent checks the uncommitted changes, tells you what the commit will include, and commits them.
+
+- The agent commits only when your request asks it to. Mentioning commits, such as asking about the last commit or asking for a commit message, is not enough.
+- The commit is authored as you. In the Graph it shows **via Davinci Agent** beside your name, and its details say whether the message is your words or the agent's. Administrators can find agent commits in the audit log.
+- You need permission to commit on the project, and the agent needs its Git write capability.
+- The agent does not commit when there are no changes, when the branch has moved since it looked, when objects have unresolved merge conflicts, or while another commit is running.
+- An agent commit stays in the project's history. Nothing is pushed, merged, published, or deployed.
 
 ## Graph
 
