@@ -1348,6 +1348,120 @@ paths:
           $ref: '#/components/responses/InternalError'
         '503':
           $ref: '#/components/responses/ProjectNotReady'
+  /api/v2/projects/{projectId}/objects/{objectId}/exports:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ObjectId'
+    post:
+      operationId: exportProjectObject
+      tags: [Content]
+      summary: Export an object to a file
+      description: |
+        Exports an object in one of the formats the editor's Export menu offers for
+        it, and saves the file to the project as a reference: a document as `pdf`
+        or `docx`, slides as `pptx` or `pdf`, a table as `xlsx`, a figure as `png`
+        or `svg`. The file is the one the Export menu produces, with the same
+        styles, page size, and headers and footers.
+
+        Download the bytes from `file.contentUrl`. PDF exports report `pageCount`,
+        so a caller can check that a document fits.
+
+        The export runs on the server, in the same exporters the editor uses,
+        whether or not anyone has the project open. The saved file is
+        uncommitted until the branch is committed.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:write]
+      x-sdk-methods:
+        typescript: client.content.exportObject
+        python: client.content.export_object
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const exported = await client.content.exportObject(projectId, documentId, { format: 'pdf' });
+            console.log(exported.file.id, exported.pageCount);
+            const pdf = await client.projects.downloadFile(projectId, exported.file.id);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                exported = client.content.export_object(project_id, document_id, format="pdf")
+                print(exported.file.id, exported.page_count)
+                pdf = client.projects.download_file(project_id, exported.file.id)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportObjectRequest'
+      responses:
+        '201':
+          description: The object was exported and the file saved to the project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportObjectResponse'
+        '400':
+          description: The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            Project or object not found. Error code is `OBJECT_NOT_FOUND` when the
+            project was readable but the object was not in it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '422':
+          description: |
+            The export failed (`EXPORT_FAILED`), most often because the object
+            does not offer the requested format; the message lists the formats it
+            does offer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: |
+            The export could not run right now: the export service is unavailable
+            (`EXPORT_UNAVAILABLE`), or the project could not save the file
+            (`PROJECT_NOT_READY`). Retry after a moment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '504':
+          description: The browser did not finish the export in time (`EXPORT_TIMED_OUT`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
   /api/v2/projects/{projectId}/objects/{objectId}/history:
     parameters:
       - $ref: '#/components/parameters/ProjectId'
@@ -9668,6 +9782,66 @@ components:
           minItems: 1
           items:
             type: string
+      additionalProperties: true
+    ExportObjectRequest:
+      type: object
+      required: [format]
+      properties:
+        format:
+          type: string
+          minLength: 1
+          description: |
+            A format the Export menu offers for the object, such as `pdf`, `docx`,
+            `pptx`, `xlsx`, `png`, `svg`, or `html`. Case-insensitive. Print PDF,
+            which ends in the browser's print dialog, is not offered.
+        displayType:
+          type: string
+          description: |
+            View to export, for objects with more than one (for example `table` or
+            `tree`). Defaults to the view the object opens in.
+        dpi:
+          type: integer
+          minimum: 72
+          maximum: 600
+          description: Resolution for raster content in PDF exports. Defaults to 300.
+        parentId:
+          type: string
+          format: uuid
+          description: Package to save the file in. Defaults to the exported object's parent.
+      additionalProperties: false
+    ExportObjectResponse:
+      type: object
+      required: [objectId, format, file, pageCount]
+      properties:
+        objectId:
+          type: string
+        format:
+          type: string
+          description: The format exported, lower-case.
+        file:
+          type: object
+          description: The reference the export was saved as.
+          required: [id, name, mimeType, size, contentUrl]
+          properties:
+            id:
+              type: string
+              description: Id of the new reference object.
+            name:
+              type: string
+            mimeType:
+              type: string
+            size:
+              type: integer
+              minimum: 0
+              description: Size in bytes.
+            contentUrl:
+              type: string
+              description: API path that downloads the file's bytes.
+          additionalProperties: true
+        pageCount:
+          type: [integer, 'null']
+          minimum: 1
+          description: Number of pages, for PDF exports; null for other formats.
       additionalProperties: true
     CreateBranchRequest:
       type: object
