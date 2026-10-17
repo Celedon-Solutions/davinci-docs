@@ -2648,6 +2648,10 @@ paths:
         session's live connection, so any other value is rejected.
 
         Bodies up to 2 GB are accepted and streamed rather than buffered.
+
+        Word and PowerPoint files become an editable Davinci document or slide
+        deck by default. Set `officeImport` to `pdf` to bring them in as a PDF
+        instead, or `keepAsReference` to attach the original file unconverted.
       security:
         - GrantBearer: []
       x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
@@ -2697,6 +2701,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadFileResponse'
+        '400':
+          description: |
+            `officeImport` is neither `native` nor `pdf`. Error code is
+            `INVALID_OFFICE_IMPORT`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
         '401':
           $ref: '#/components/responses/GrantRejected'
         '403':
@@ -2713,10 +2725,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: |
+            The Word or PowerPoint file could not be converted as `officeImport`
+            asked. Error code is `OFFICE_CONVERSION_FAILED` or `WORD_IMPORT_FAILED`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
         '429':
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
+        '503':
+          description: |
+            The converter `officeImport` needs is unavailable. Error code is
+            `OFFICE_CONVERSION_UNAVAILABLE` or `WORD_IMPORT_UNAVAILABLE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '504':
+          description: |
+            The conversion `officeImport` asked for did not finish in time. Error
+            code is `OFFICE_CONVERSION_TIMED_OUT`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
 
   /api/v1/file/download/{ownerId}/{projectId}/{fileName}:
     parameters:
@@ -10629,6 +10665,28 @@ components:
             Preserve a ZIP or 7z upload as one archive reference instead of
             extracting it immediately. Set this when the archive will be passed
             to `session.extract_archive()` later.
+        officeImport:
+          type: string
+          enum: [native, pdf]
+          description: |
+            How a Word (.docx) or PowerPoint (.pptx, .pptm, .ppsx, .ppsm, .potx,
+            .potm) file comes in. `native`, the default, converts it into an
+            editable Davinci document or slide deck. `pdf` converts it to a PDF
+            first, which then becomes a PDF reference with a page image per page,
+            as an uploaded PDF does. Other file types ignore it.
+
+            When it is omitted and a Word file cannot be converted, the file is
+            attached as a reference instead. When it is set and the conversion
+            fails, the upload fails: `422` when the file cannot be converted,
+            `503` or `504` when the converter is unavailable or too slow.
+        keepAsReference:
+          type: boolean
+          default: false
+          description: |
+            Attach the file exactly as uploaded, as one reference, without
+            converting it: for example the original Word or PowerPoint file
+            rather than a document, slides or a PDF. Takes precedence over
+            `officeImport`.
       # Closed deliberately. Other engine form fields used for progress tracking
       # and import options remain outside the published contract.
       additionalProperties: false
@@ -10638,9 +10696,11 @@ components:
         The objects the upload created, keyed by id.
 
         One file does not always mean one object. A STEP assembly becomes a tree,
-        a PDF becomes a document plus a page image per page, and a source file
-        becomes a code object — so the answer is a map rather than a single
-        record. A plain file that needs no conversion yields exactly one entry.
+        a PDF becomes a document plus a page image per page, a Word file a
+        document with its tables and pictures, a PowerPoint file a slide deck
+        with its pictures and tables, and a source file becomes a code object —
+        so the answer is a map rather than a single record. A plain file that
+        needs no conversion yields exactly one entry.
       required: [object]
       properties:
         object:

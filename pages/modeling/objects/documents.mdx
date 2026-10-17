@@ -369,13 +369,16 @@ PDF export is ideal for final distribution where the recipient needs read-only a
 Documents support importing content from external sources:
 
 ### From Word Documents
-Drag and drop .docx files into your workspace to import them as Davinci documents. The import process converts:
+Drag and drop .docx files into your workspace and Davinci asks how to bring them in: open them as Davinci documents you can edit, or upload them as PDFs that keep their original layout. Opening a file as a document converts:
 
 - Paragraphs and headings to corresponding Davinci blocks
 - Bold, italic, and underline formatting  
 - Basic text colors
 - Lists (numbered and bulleted)
 - Embedded tables become Davinci table blocks
+- Embedded pictures become image blocks
+
+A Word file uploaded as a PDF becomes a PDF reference with a page image per page, the same as an uploaded PDF. Files uploaded through the API become documents unless the upload asks for `officeImport: "pdf"`.
 
 <Note>Complex Word formatting like styles, themes, and advanced layout features may not transfer perfectly. Review imported documents for formatting consistency.</Note>
 

@@ -329,7 +329,14 @@ The refresh operation clears cached figure images and re-renders them from curre
 
 ## Importing PowerPoint
 
-Upload a PowerPoint file (.pptx, .pptm, .ppsx, .ppsm, .potx or .potm) by dragging it into the Editor or with the Library's upload button, and Davinci converts it into an editable slide object. The pictures and tables in the file become reference and table objects under the slides. Save older .ppt files as .pptx before uploading them.
+Upload a PowerPoint file (.pptx, .pptm, .ppsx, .ppsm, .potx or .potm) by dragging it into the Editor or with the Library's upload button, and Davinci asks how to bring it in:
+
+- **Open as Davinci Slides** converts it into an editable slide object. The pictures and tables in the file become reference and table objects under the slides.
+- **Upload as PDF** converts it to a PDF that keeps its original layout, which becomes a PDF reference with a page image per page, the same as an uploaded PDF.
+
+Dropping several Word and PowerPoint files together asks once for all of them. Files uploaded through the API become slides unless the upload asks for `officeImport: "pdf"`, or `keepAsReference: true` to attach the original file. Save older .ppt files as .pptx before uploading them.
+
+The rest of this section describes opening a file as slides.
 
 The import keeps:
 - Slide order, size and backgrounds
