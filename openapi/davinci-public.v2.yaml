@@ -2652,6 +2652,8 @@ paths:
         Word and PowerPoint files become an editable Davinci document or slide
         deck by default. Set `officeImport` to `pdf` to bring them in as a PDF
         instead, or `keepAsReference` to attach the original file unconverted.
+        Older .doc and .ppt files are attached as they are unless `officeImport`
+        is `pdf`.
       security:
         - GrantBearer: []
       x-routing-server-source: DesignEngine/src/api/routes/fileRoutes.js
@@ -10673,7 +10675,9 @@ components:
             .potm) file comes in. `native`, the default, converts it into an
             editable Davinci document or slide deck. `pdf` converts it to a PDF
             first, which then becomes a PDF reference with a page image per page,
-            as an uploaded PDF does. Other file types ignore it.
+            as an uploaded PDF does. Older .doc and .ppt files can only be
+            converted to PDFs: `pdf` converts them, and otherwise they are
+            attached as references. Other file types ignore it.
 
             When it is omitted and a Word file cannot be converted, the file is
             attached as a reference instead. When it is set and the conversion
