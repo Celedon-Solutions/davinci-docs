@@ -84,7 +84,7 @@ tags:
     description: |
       What your models cost, broken down by model, project, session, or day. These
       read the usage ledger, which records one event per completed provider call —
-      not your credit balance, which is `/api/v2/billing`.
+      not your balances and limits, which are `/api/v2/users/me/accounting`.
 
       Usage is reported on an interval rather than per call, so a run that is still
       going may not be fully counted yet. Every response carries `asOf`, the moment
@@ -1880,7 +1880,7 @@ paths:
         a `409` means it refused, which happens when the run it belonged to has ended.
         Recreate the session in that case rather than retrying the message.
 
-        The agent can change anything in the project and spends credits doing it, which
+        The agent can change anything in the project and is charged for AI usage doing it, which
         is why this needs the `agent:message` scope rather than a project write.
       security:
         - ApiKeyBearer: []
@@ -2154,7 +2154,7 @@ paths:
       summary: Invoke one of the agent's tools directly
       description: |
         Runs a single tool and returns its result, with no model in the loop. Faster and
-        deterministic where the agent is neither, and it spends no LLM credits.
+        deterministic where the agent is neither, and it incurs no LLM charges.
 
         This needs a session because a tool belongs to one: the tools available are the
         ones the session's project has open, and the tool acts on that project's live
@@ -2264,7 +2264,7 @@ paths:
       tags: [Usage]
       summary: What you spent
       description: |
-        Credits and tokens charged to your account, optionally narrowed by project,
+        Dollars and tokens charged to your account, optionally narrowed by project,
         session, or time, and optionally broken down by model, project, session, or
         day.
 
@@ -2276,7 +2276,7 @@ paths:
         an interval, so check `asOf` before treating a total as final.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-routing-server-source: RoutingServer/billing/reporting/accountingReport.routes.js
       x-required-scopes: [usage:read]
       x-sdk-methods:
         typescript: client.usage.get
@@ -2309,7 +2309,7 @@ paths:
 
             const usage = await client.usage.get({ groupBy: 'model' });
             for (const row of usage.groups ?? []) {
-              console.log(row.model, row.credits);
+              console.log(row.model, row.amountUsd);
             }
         - lang: python
           label: Python SDK
@@ -2320,7 +2320,7 @@ paths:
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
                 usage = client.usage.get(group_by="model")
                 for row in usage.groups or []:
-                    print(row.model, row.credits)
+                    print(row.model, row.amount_usd)
       responses:
         '200':
           description: Usage totals for the scope, and the breakdown if one was asked for.
@@ -2359,7 +2359,7 @@ paths:
         the project rather than only the one you name.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-routing-server-source: RoutingServer/billing/reporting/accountingReport.routes.js
       x-required-scopes: [usage:read, projects:read]
       x-sdk-methods:
         typescript: client.usage.forProject
@@ -2379,7 +2379,7 @@ paths:
             });
 
             const usage = await client.usage.forProject(projectId, { groupBy: 'day' });
-            console.log(usage.totals.credits, usage.asOf);
+            console.log(usage.totals.amountUsd, usage.asOf);
         - lang: python
           label: Python SDK
           source: |
@@ -2388,7 +2388,7 @@ paths:
 
             with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
                 usage = client.usage.for_project(project_id, group_by="day")
-                print(usage.totals.credits, usage.as_of)
+                print(usage.totals.amount_usd, usage.as_of)
       responses:
         '200':
           description: Usage totals for the project.
@@ -2431,7 +2431,7 @@ paths:
         so read `asOf` — or read this after `waitUntilDone` returns.
       security:
         - ApiKeyBearer: []
-      x-routing-server-source: RoutingServer/usage/usage.routes.js
+      x-routing-server-source: RoutingServer/billing/reporting/accountingReport.routes.js
       x-required-scopes: [usage:read, projects:read]
       x-sdk-methods:
         typescript: session.usage
@@ -2455,7 +2455,7 @@ paths:
               await session.waitUntilDone();
 
               const usage = await session.usage();
-              console.log(`That run cost ${usage.totals.credits} credits`);
+              console.log(`That run cost $${usage.totals.amountUsd}`);
             });
         - lang: python
           label: Python SDK
@@ -2469,7 +2469,7 @@ paths:
                     session.wait_until_done()
 
                     usage = session.usage()
-                    print(f"That run cost {usage.totals.credits} credits")
+                    print(f"That run cost ${usage.totals.amount_usd}")
       responses:
         '200':
           description: Usage totals for the session.
@@ -6376,9 +6376,7 @@ components:
         - name
         - slug
         - handle
-        - handleType
         - description
-        - tier
         - visibility
         - createdAt
         - updatedAt
@@ -6394,14 +6392,7 @@ components:
           type: string
         handle:
           type: string
-        handleType:
-          type: string
-        handleVerifiedAt:
-          type: [string, 'null']
-          format: date-time
         description:
-          type: string
-        tier:
           type: string
         visibility:
           type: string
@@ -10296,11 +10287,11 @@ components:
       additionalProperties: true
     UsageTotals:
       type: object
-      required: [credits, promptTokens, completionTokens, reasoningTokens, cacheWriteTokens, cacheReadTokens, eventCount]
+      required: [amountUsd, promptTokens, completionTokens, reasoningTokens, cacheWriteTokens, cacheReadTokens, eventCount]
       properties:
-        credits:
+        amountUsd:
           type: number
-          description: Credits charged, to six decimal places.
+          description: Dollars charged (USD), to six decimal places.
         promptTokens:
           type: integer
         completionTokens:
@@ -10316,7 +10307,7 @@ components:
           type: integer
           description: |
             Charged calls counted. Not all of them are token-priced — image generation
-            and web search are charged per call, so a non-zero `credits` with zero
+            and web search are charged per call, so a non-zero `amountUsd` with zero
             tokens is normal rather than a gap.
       additionalProperties: true
     UsageGroup:
