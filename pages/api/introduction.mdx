@@ -65,6 +65,16 @@ Use branch names when you need to inspect project data outside the main branch, 
 
 Most successful API responses return JSON envelopes. File downloads are different: successful download responses return raw file bytes with content headers such as `Content-Type`, `Content-Disposition`, and `Content-Length`.
 
+## Creating Objects
+
+`POST /api/v2/projects/{projectId}/objects` adds objects to a project. Every object needs a parent: its own `parent`, or a `parentId` for the whole request. Top-level model content goes in the Model package, `00000000-0000-0000-0000-0000000model`, which the SDKs name `MODEL_PACKAGE_ID`.
+
+Objects are checked the same way the Davinci agent's own writes are. The parent has to exist and be able to hold the object's type, children have to exist, and relationship types have to be ones the project defines. If any object fails, nothing is written, and the `400` response lists what was wrong with each refused object under `error.details.objects`.
+
+## Exports
+
+`POST /api/v2/projects/{projectId}/objects/{objectId}/exports` exports an object in a format its Export menu offers, such as a document as `pdf` or `docx`, and saves the file to the project. The response returns the file's id, a `contentUrl` to download it from, and the page count for PDFs. The export runs on the server with the same exporters as the editor, so nobody needs the project open. See [Exports](/pages/editor/exports).
+
 ## Errors
 
 JSON errors use a consistent envelope:

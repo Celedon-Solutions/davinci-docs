@@ -33,3 +33,12 @@ See [SysML v2 Export](/pages/modeling/overview/sysml-export) for detailed mappin
 - Use JSON when you need model data for custom tooling.
 - Use SysML v2 when you need standards-oriented system-model interchange.
 - Use artifact exports when sharing human-readable documents, tables, or presentations.
+
+## Exporting Without The Menu
+
+The project agent and API callers can export an object in any format its Export menu offers, for example a document as PDF or DOCX, slides as PPTX, or a table as XLSX. The file is the one the menu produces, with the same styles, page size, and headers and footers, and it is saved to the project as a reference next to the object. PDF exports also report their page count, so you can check that a document fits on the pages it should.
+
+- **Agent:** ask the agent to export the object. It uses the `ExportObject` tool in the References toolbox.
+- **API:** call `POST /api/v2/projects/{projectId}/objects/{objectId}/exports` with a `format`, or `client.content.exportObject` in the TypeScript SDK (`client.content.export_object` in Python). The response carries the saved file's id and a `contentUrl` to download it.
+
+These exports run on the server, in the same exporters as the Export menu, so nobody needs the project open. Print PDF is only available from the menu, because it ends in the browser's print dialog.
