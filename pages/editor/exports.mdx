@@ -18,6 +18,7 @@ Exports are available from Project Settings and from supported object or project
 | `SysML v2` | Systems engineering interchange | Exports a standards-oriented `.sysml` representation with export-only transformations. |
 | `SysML v2 JSON` | Structured SysML-oriented analysis | Exports structured JSON for workflows that need machine-readable SysML-style data. |
 | Document/table/presentation exports | Artifact sharing | Available from supported artifact views. |
+| `ZIP` | Package contents as files | Available from the Export menu on a package. Downloads every reference file and code object under the package, with nested packages as folders. |
 
 ## SysML Exports
 
@@ -28,6 +29,7 @@ See [SysML v2 Export](/pages/modeling/overview/sysml-export) for detailed mappin
 ## Choosing A Format
 
 - Use `.DAF` when you want to preserve a project for another Davinci environment.
+- Use `ZIP` on a package when you want all of its reference files, such as the output of a code analysis, in one download.
 - Use JSON when you need model data for custom tooling.
 - Use SysML v2 when you need standards-oriented system-model interchange.
 - Use artifact exports when sharing human-readable documents, tables, or presentations.
