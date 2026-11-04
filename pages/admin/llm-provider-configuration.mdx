@@ -108,6 +108,17 @@ When more than one API is selected, choose a default. The default must also appe
 
 Each model offering still selects its exact API and compatible codec.
 
+### Runtime Defaults
+
+The **Runtime defaults** section configures default concurrency, retry budget, and timeout limits inherited by all model offerings on the provider unless an offering overrides them:
+
+- **Request / first-token timeout (ms)** (`defaultTimeoutMs`, default `60000`) — default wait for first streaming content or a non-streaming response.
+- **Max attempts (initial + retries)** (`retryCount`, default `5`) — total attempts before failing or falling back (`1` = no retries).
+- **Max concurrent requests / replica** (`maxConcurrentPerConnection`, optional) — connection-wide concurrency cap per Design Engine replica.
+- **Stream idle timeout (ms)** (`streamIdleTimeoutMs`, default `90000`) — maximum inactivity gap between streamed chunks.
+- **Stream absolute timeout (ms)** (`streamAbsoluteTimeoutMs`, default `300000`) — maximum total wall-clock time for a single stream attempt.
+- **Max request size (bytes)** (`maxRequestSizeBytes`, optional) — default payload limit before old images or messages are trimmed.
+
 ## Per-API URL Settings
 
 Advanced connection settings provide one URL field per selected API. Enter:

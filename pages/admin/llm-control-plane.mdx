@@ -12,7 +12,7 @@ The control plane separates model configuration into reusable layers:
 1. **Providers** — connections to model vendors or compatible APIs.
 2. **Model definitions** — shared metadata, capabilities, limits, and base pricing for a model.
 3. **Model offerings** — a model as exposed by one provider, including its exact runtime model ID and provider-specific overrides.
-4. **Profiles** — named bundles of model access for a subscription tier or tenant.
+4. **Profiles** — named bundles of model access assigned to entitlement groups or individual users.
 5. **Assignments** — routes from a workload to a model offering.
 
 <Info>
@@ -112,22 +112,15 @@ Pricing can be inherited from the model definition or overridden for one offerin
 
 The **Profiles** tab controls which offerings a group of users can reach.
 
-### Subscription Mappings
+### Assigning Profiles To Groups And Users
 
-At the top of the Profiles tab, map each subscription tier to a profile:
-
-- Free
-- Core
-- Max
-- Team (Group)
-
-Tenant mappings override global mappings. An unmapped tier has no profile and therefore no available models.
+LLM profiles are assigned through [Entitlement Groups](/pages/admin/user-access#entitlement-groups-administration--groups) (`/admin/~/groups`, where each user group can set its LLM profile option and `base` provides the baseline default) or per-user overrides on the [User Entitlements](/pages/admin/user-access#entitlements) tab.
 
 ### Create A Profile
 
 A profile has:
 
-- A display name.
+- A display name (shown to administrators when assigning profiles to groups and users).
 - A stable lowercase key. The key cannot be changed after creation.
 - An enabled state.
 - A description for administrators.
@@ -256,9 +249,9 @@ Before publishing an LLM change, confirm:
 - Every offering has the correct provider model ID, API handler, codec, and availability.
 - Pricing and limits match the provider.
 - Embedding dimensions match the vector index expectations. Changing dimensions requires project vectors to be regenerated after publish.
-- Every subscription tier that should have AI access is mapped to an enabled profile.
+- Every entitlement group that should have AI access is assigned to an enabled profile.
 - Enabled profiles have exactly one default chat route, all three tool routes, and the specialized routes they need.
 - Verification passes against the intended draft or published source.
 - The deployment notice reports that connected Design Engines applied the new version.
 
-Use [Usage And Billing](/pages/admin/usage-and-billing) after publication to confirm that model attribution, tokens, provider cost, and charged credits match expectations.
+Use [Usage And Costs](/pages/admin/usage-and-billing) after publication to confirm that model attribution, tokens, provider cost, and charged credits match expectations.

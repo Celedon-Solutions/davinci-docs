@@ -1,13 +1,13 @@
 ---
 title: Administration Overview
-description: Manage Davinci users, tenants, billing, system configuration, and platform operations
+description: Manage Davinci users, entitlements, tenants, accounting, LLM models, MCP servers, system configuration, and platform operations
 ---
 
 ## Overview
 
 The Davinci Administration panel is the operational workspace for managing a Davinci deployment. It is separate from the normal [Browser](/pages/browser/overview) and [Editor](/pages/editor/overview) workflows.
 
-Open the panel from the Davinci Browser or at `/admin`. You must have an assigned system role. The pages and actions available to you depend on your effective permissions, tenant access, deployment type, and payment configuration.
+Open the panel from the Davinci Browser or at `/admin`. You must have an assigned system administration role (`system_admin`). The pages and actions available to you depend on your effective permissions, tenant context, deployment type, and payment configuration.
 
 <Warning>
 Administration actions can affect other users or the entire deployment. Confirm the selected tenant context and the target resource before saving a change.
@@ -19,14 +19,14 @@ Administration actions can affect other users or the entire deployment. Confirm 
 
 The Administration panel is visible to authorized system-role users. Seeing a page does not guarantee that every action on it is available: the API checks the permissions required for each operation.
 
-System roles are different from project and organization roles. For an explanation of resource ownership and inherited access, see [Roles And Permissions](/pages/browser/roles-permissions).
+System roles are different from project, organization, and team roles. For an explanation of resource ownership and inherited access, see [Roles And Permissions](/pages/browser/roles-permissions).
 
 ### Tenant Context
 
 The **Tenant Context** selector filters supported administration views and determines the editing scope for tenant-aware configuration:
 
 - **All Tenants** shows platform-wide data and uses global scope where a page supports global configuration.
-- **A specific tenant** limits supported views to that tenant and uses tenant scope where overrides are supported.
+- **A specific tenant** limits supported views to that tenant and uses tenant scope where overrides are supported (for example, in the [LLM Control Plane](/pages/admin/llm-control-plane) and [MCP Servers](/pages/integrations/overview)).
 
 The selected context is remembered for 24 hours and remains active as you move between Administration pages. It does not grant access to a tenant or replace authorization checks.
 
@@ -37,55 +37,57 @@ Not every page is tenant-scoped. Always use the scope indicator and page filters
 ## Administration Guides
 
 <CardGroup cols={2}>
-  <Card title="Users And Access" icon="users" href="/pages/admin/user-access">
-    Provision accounts, manage roles and sessions, reset authentication, and control account access.
+  <Card title="Users, Entitlements, And Access" icon="users" href="/pages/admin/user-access">
+    Provision accounts, manage entitlement groups and overrides, configure seats and trials, reset authentication, and control sessions.
   </Card>
   <Card title="Projects, Organizations, And Tenants" icon="diagram-project" href="/pages/admin/resources-and-tenants">
-    Manage shared resources, membership, ownership, deleted projects, and tenant configuration.
+    Manage shared resources, membership, ownership, deleted projects, and tenant subscriptions, seats, and accounting.
   </Card>
-  <Card title="Usage And Billing" icon="chart-line" href="/pages/admin/usage-and-billing">
-    Analyze usage, adjust credits and limits, reconcile billing, and inspect the Stripe catalog.
+  <Card title="Usage And Costs" icon="chart-line" href="/pages/admin/usage-and-billing">
+    Analyze token and tool usage, inspect pool costs and transactions, and settle pending charges.
   </Card>
   <Card title="System Settings And Authentication" icon="key" href="/pages/admin/system-settings-authentication">
-    Configure feature defaults, SSO, LDAP, OAuth, MFA, account defaults, and domain policy.
+    Configure feature flags, SSO, LDAP, OAuth, MFA, new-user accounting defaults, organization AI funding, and email domain policy.
   </Card>
   <Card title="Operations And Communications" icon="server" href="/pages/admin/operations">
-    Review audit events, operate the server, curate Explore, and send administrative messages.
+    Review audit events, operate Design Engine servers, curate Explore, and send administrative messages.
   </Card>
   <Card title="LLM Control Plane" icon="microchip" href="/pages/admin/llm-control-plane">
-    Configure model providers, offerings, profiles, routing, verification, and runtime publication.
+    Configure model providers, runtime defaults, offerings, profiles, verification, and runtime publication.
   </Card>
 </CardGroup>
 
 ## Panel Areas
 
-The sidebar exposes the following areas when they are available for the deployment:
+The Administration sidebar exposes the following areas when they are available for the deployment:
 
-- **Dashboard** — entry points to common administration areas.
-- **Users** — account provisioning, authentication recovery, access, limits, roles, and user-owned resources.
-- **Projects** — project search, membership, lifecycle, restoration, and permanent deletion.
-- **Organizations** — organization details, membership, visibility, and storage settings.
-- **Usage** — usage trends, breakdowns, metering events, and exports.
-- **Billing** and **Billing Health** — account balances, transactions, and payment reconciliation.
-- **Roles** — system- and tenant-role assignment.
-- **Audit Log** — searchable administrative and security-relevant events.
-- **Explore** — featured-project curation.
-- **Tenants** — tenant creation, trials, roles, and configuration.
-- **Notifications** — site banners, in-app broadcasts, and administrative email.
-- **LLM Control Plane** — AI provider, model, profile, and runtime configuration.
-- **Server** — connected services, active projects, capacity, and connection controls.
-- **Stripe Catalog** — configured products and prices.
-- **Settings** — deployment, authentication, feature, and account defaults.
+- **Dashboard** (`/admin`) — quick entry points to common administration areas.
+- **Users** (`/admin/~/users`) — account provisioning, authentication recovery, per-user entitlements and overrides, seat type, accounting balances, roles, sessions, and user-owned projects.
+- **Projects** (`/admin/~/projects`) — project search, membership, lifecycle, restoration, and permanent deletion.
+- **Organizations** (`/admin/~/orgs`) — organization details, membership, workspace entitlements, AI funding and billing, and storage overrides.
+- **Usage** (`/admin/~/usage`) — LLM token, LLM call, embedding call, and tool call trends, breakdowns, and metering events.
+- **Costs** (`/admin/~/billing`) — USD cost breakdowns across Included Usage, Credit Balance, On-Demand Usage, and Overflow pools, payer summaries, and transaction ledger.
+- **Accounting Health** (`/admin/~/billing-health`) — payment-provider status and deferred/pending meter charge sweeps.
+- **Roles** (`/admin/~/roles`) — system- and tenant-role assignment.
+- **Groups** (`/admin/~/groups`) — entitlement groups (`base`, plan groups, and custom admin groups) that govern features, limits, and LLM profiles for users and organizations.
+- **Audit Log** (`/admin/~/audit`) — searchable administrative and security-relevant events.
+- **Explore** (`/admin/~/explore`) — featured-project curation.
+- **Tenants** (`/admin/~/tenants`) — tenant creation, member and organization attachment, seat caps, subscriptions, trials, and tenant accounting.
+- **Notifications** (`/admin/~/notifications`) — site banners, in-app broadcasts, and administrative email.
+- **LLM Control Plane** (`/admin/~/llm`) — AI provider, model definition, offering, profile, and runtime configuration.
+- **MCP Servers** (`/admin/~/mcp`) — system-wide and tenant-scoped [Model Context Protocol servers and policies](/pages/integrations/overview#adding-an-mcp-server-in-the-davinci-browser).
+- **Server** (`/admin/~/server`) — connected Design Engines, active projects, license capacity, and connection controls.
+- **Settings** (`/admin/~/settings`) — deployment, authentication, feature flags, and new-user accounting defaults.
 
 ## Deployment Differences
 
 The panel adapts to the deployment:
 
-- Self-hosted deployments do not show commercial **Billing**, **Billing Health**, **Roles**, or **Tenants** pages.
-- **Stripe Catalog** appears only when a payment provider is enabled.
+- Self-hosted deployments (`on_prem` and `private_hosted`) hide multi-tenant **Roles** and **Tenants** pages.
+- **Usage**, **Costs**, **Accounting Health**, and **Groups** remain available on all deployments so administrators can monitor usage, manage credit balances and on-demand limits, and configure feature and limit entitlements.
 - Some controls appear only for particular system roles or configured integrations.
 
-This documentation describes all supported Administration areas. A page omitted from your sidebar may not apply to your deployment.
+This documentation describes all supported Administration areas. A page omitted from your sidebar does not apply to your deployment configuration.
 
 ## Safe Administration Workflow
 
@@ -102,10 +104,10 @@ For LLM configuration, saving creates a draft. Follow the separate [publish chec
 
 Take additional care with actions that:
 
-- Permanently delete a user or project.
+- Permanently delete a user, organization, or project, or disband a tenant.
 - Remove the final administrator capable of recovering the deployment.
 - Change login providers, directory identifiers, or credential policy.
-- Change subscriptions, credits, storage limits, or payment-provider references.
+- Modify entitlement groups (especially the `base` group), subscriptions, credit balances, or storage limits.
 - Send a broadcast or mandatory email to many users.
 - Disable new connections or close active projects.
 - Publish LLM routing to connected Design Engines.

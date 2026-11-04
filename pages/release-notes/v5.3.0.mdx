@@ -11,6 +11,7 @@ Version 5.3 introduces object-level and merge review workflows, staged subtree c
 
 - Added [Object Reviews](/pages/user-guide/views/review) to track review state (**Needs Review**, **Reviewed**, **Re-review Needed**, and **Review Not Required**) across model objects, with automatic invalidation when direct edits or computed values change
 - Added a dedicated **Review** object view that separates root-cause changes from grouped downstream follow-on effects, with inline and side-by-side field diffs and per-object commit history
+- Added a clickable **Review Status** indicator for the focused object on the right side of the workspace bottom bar (next to the current object type) and a **Reviews** count in the bottom-bar validation summary
 - Added a **Reviews** filter to the [Validation](/pages/editor/widgets/validation) panel with subtree grouping, root-cause and follow-on badges, bulk **Mark All Reviewed**, and one-click exemption for configured object types
 - Added per-user server-side **Staged Changes** and **Subtree Commits** in [Source Control](/pages/editor/widgets/source-control), allowing you to stage specific objects (and automatically include coupled relationships or equations) to commit a focused subset of changes while keeping unstaged work intact across refreshes and devices
 - Added **Merge Reviews** (`Requires Review`) in Source Control to propose, preview, approve, or close branch merges with pinned branch heads before applying them, plus a split badge on the Source Control widget for pending merge requests
@@ -41,6 +42,7 @@ Version 5.3 introduces object-level and merge review workflows, staged subtree c
 - Expanded [MCP authentication options](/pages/integrations/overview) to support automatic and custom OAuth, machine-to-machine OAuth, Bearer tokens, API keys, and Basic authentication, with shared or per-user credentials managed from **Settings → Integrations**
 - Renamed team billing plans to **[Groups](/pages/browser/groups)** to clearly distinguish centralized group billing and seat management from organization **[Teams](/pages/browser/teams)** (Kanban boards, sprints, and Task Cards)
 - Added standalone organization billing accounts, refreshed **Wallet & Limits** and **Plan & Invoices** pages across personal, organization, and group scopes, and added usage activity charts
+- Added **Entitlement Groups** (`/admin/~/groups`) and per-user/per-organization **Entitlements** in the [Administration](/pages/admin/overview) panel, along with updated **Costs**, **Accounting Health**, **Tenants**, and **LLM Runtime Controls** views
 - Added an **Effort Totals** toggle to organization Team Kanban board column headers
 
 ### Workspace, Documents & Slides

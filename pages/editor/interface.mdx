@@ -46,6 +46,27 @@ Key sections of the Model Area:
 - **Left Panel** — the widget rail and selected panel content
 - **Workspace** — tabbed view where you open, view, and edit objects
 - **Right Panel** — a resizable panel for the active workspace
+- **Bottom Bar** — workspace switcher, branch and validation status, focused-object context, and panel controls
+
+## Bottom Bar
+
+The Bottom Bar runs across the bottom of the Editor and is split into left and right regions:
+
+### Left Side (Workspace, Branch & Validation Status)
+- **Connection Status** — appears when saving, syncing, or reconnecting, with hover details for the last sync time or active server commit/update status.
+- **Workspaces** — create a new workspace (`+`), browse workspace history, switch between active or pinned [workspaces](/pages/editor/agent/workspaces), or rename, duplicate, and delete workspaces.
+- **Current Branch & Sync** — shows the active Git branch and uncommitted change count badge (clicks to open [Source Control](/pages/editor/widgets/source-control)), plus a quick **Sync Changes** button.
+- **Validation Summary** — live counts for Errors, TBDs, Inconsistencies, Stale values, and objects needing Review (clicks to open [Validation](/pages/editor/widgets/validation)).
+
+### Right Side (Focused Tab Context & Panel Controls)
+- **Focused Object Context** — dynamically updates for the active workspace tab:
+  - **Document tabs**: word count (`N Words`) and current page (`Page X / Y`).
+  - **Code, Toolbox & Simulation Setup tabs**: cursor line/column (`Ln X, Col Y`) and language (`Python`, `C++`, `JavaScript`, `TypeScript`).
+  - **Review Status**: the focused object's current review state (**Needs Review**, **Reviewed**, **Needs Re-review**, or **Review Not Required**), which clicks directly to the object's [Review](/pages/user-guide/views/review) view.
+  - **Object Type**: the icon and type name of the focused model object.
+- **Model Statistics** — total object count and hierarchy depth (`N Objects, M Depth`), which clicks to open **Project Settings → Summary**.
+- **Project Memory** — opens the Project Memory graph in a workspace tab.
+- **Left & Right Panel Toggles** — collapse or restore the Left Panel (`Cmd/Ctrl + Shift + I`) and Right Panel (`Cmd/Ctrl + Shift + P`).
 
 ## Project Settings
 
