@@ -1,28 +1,117 @@
 ---
 title: Integrations Overview
-description: Understand where integrations are configured and how they are used in Davinci
+description: Connect MCP servers, Onshape, and external engineering tools to Davinci and manage user credentials
 ---
 
 ## Overview
 
-Integrations connect Davinci to external tools and services. Some integrations are configured from the Davinci Browser or account settings, while others are used inside the Davinci Editor after they are connected.
-
-Use this section to understand what an integration connects to, where it is configured, and how it appears in project workflows.
-
-## Where Integrations Are Managed
-
-Integration settings can appear in different places depending on scope:
-
-- **Account connections** — user-owned connections such as personal tokens and third-party account links.
-- **Organization or team administration** — shared integrations or governance settings where available.
-- **Editor project settings** — project-scoped integration and tool configuration, such as MCP servers or custom toolboxes.
-
-If an integration is not visible, your deployment, role, or project settings may not allow access to that integration.
-
-## Where Integrations Are Used
-
-Most integration output is used inside the Davinci Editor. For example, imported CAD can become geometry objects, configuration attributes, references, or model context for the Davinci Agent and Model Review.
+Integrations connect Davinci to external engineering tools, APIs, databases, CAD platforms, and custom services. Some integrations are configured at the organization, tenant, or system level in the Davinci Browser, while individual user credentials and project-level connections are managed from Account Settings and the Davinci Editor.
 
 ## Current Integrations
 
-TBD
+<CardGroup cols={2}>
+  <Card title="MCP Servers" icon="plug" href="/pages/editor/project-settings/mcp">
+    Connect external Model Context Protocol (MCP) servers to give the Davinci Agent access to internal APIs, databases, documentation, issue trackers, and custom engineering tools.
+  </Card>
+  <Card title="Onshape Integration" icon="cube" href="/pages/integrations/onshape">
+    Link your Onshape account to import and synchronize Part Studios, assemblies, drawings, configuration parameters, mass properties, and rendered CAD geometry (*In Testing*).
+  </Card>
+</CardGroup>
+
+- **Model Context Protocol (MCP) Servers** — Standard protocol for connecting external tool and context providers to the Davinci Agent. MCP servers can be registered centrally for an entire deployment or organization, or added directly to individual projects.
+- **[Onshape Integration](/pages/integrations/onshape)** (*In Testing*) — Connects Davinci model objects (`kind: "onshape"`) to live Onshape CAD documents, supporting Part Studio and assembly imports, bi-directional configuration parameter sync, and mass-property queries. Connect your Onshape account under **Settings → Integrations** (`/~/settings/integrations`).
+
+## Where Integrations Are Managed
+
+Integration settings appear in three places depending on scope:
+
+| Location | Path | What It Manages |
+| --- | --- | --- |
+| **Organization / Admin Settings (Browser)** | `/{org-handle}/~/settings#mcp-servers` or `/admin/~/mcp` | Register approved **MCP servers** for an organization, tenant, or system, and configure **MCP policy** (whether projects can add their own servers and whether file sharing is allowed). |
+| **User Account Integrations (Browser)** | `/~/settings/integrations` | View and manage your personal **MCP server** sign-ins and API keys/tokens across all scopes, and connect or disconnect your **Onshape** account. |
+| **Project Settings (Editor)** | **Project Settings → MCP** | Enable or disable approved MCP servers for a project, configure auto-connect and file sharing, sign in or add per-user keys, and add project-specific MCP servers. |
+
+If an integration or policy toggle is disabled, your deployment, organization policy, or role permissions may restrict access.
+
+## Adding An MCP Server In The Davinci Browser
+
+Organization Owners and Admins can register approved MCP servers on the organization's **Settings** page (`/{org-handle}/~/settings#mcp-servers`). System and tenant administrators use the same workflow under **Administration → MCP Servers** (`/admin/~/mcp`).
+
+### MCP Policy Controls
+
+Above the server list, administrators control two policy toggles that apply to projects within that scope:
+
+- **Allow project-defined servers**: When enabled, project editors can add custom MCP servers directly inside a project. When turned off, projects can only use approved servers registered at the organization, tenant, or system level.
+- **Allow MCP file sharing**: When enabled, agents may send project files (via temporary one-time links) to MCP servers that permit file sharing. When turned off, no MCP server receives project files.
+
+### Example: Adding An Organization MCP Server
+
+The following example walks through registering an internal engineering documentation or issue-tracking MCP server in the Davinci Browser so projects in your organization can use its tools:
+
+<Steps>
+  <Step title="Open Organization MCP Settings">
+    In the Davinci Browser, open your organization, select the **Settings** tab (`/{org-handle}/~/settings#mcp-servers`), and scroll to the **MCP servers** section. Click **Add server**.
+  </Step>
+  <Step title="Enter Server Details">
+    In the **Add MCP server** modal under **Server**, provide:
+    - **Name**: A clear display name (for example, `Company Engineering Docs` or `Jira Tracker`).
+    - **Server URL**: The MCP endpoint URL (for example, `https://mcp.example.com/mcp`).
+    - **Description** *(optional)*: A short summary explaining what tools or data the server provides.
+    - **Transport**: Choose **Streamable HTTP** (recommended) or **Server-Sent Events (legacy)**.
+  </Step>
+  <Step title="Configure Authentication And Credential Mode">
+    Under **Authentication**, select the **Method** required by your MCP server:
+    - **No authentication**: For internal or public endpoints that do not require credentials.
+    - **OAuth (automatic client registration)** or **OAuth (your own client ID)**: Each user signs in with their own account via OAuth. Copy the displayed **Redirect URI** and register it with your identity provider.
+    - **OAuth machine-to-machine**: Server-to-server OAuth using a shared **Client ID**, **Client secret**, **Expected issuer**, and optional space-separated **Scopes**.
+    - **Bearer token**, **API key header** (with a custom **Header name** such as `X-API-Key`), or **Username and password**: Select **Whose credential**:
+      - **One shared credential for everyone**: Enter the token, API key, or password once in this modal so all authorized project members share it.
+      - **Each user enters their own**: Leave the credential personal so each member provides their own API key, token, or password before connecting.
+  </Step>
+  <Step title="Configure Access And Advanced Options">
+    Under **Access** and **Advanced**, configure how projects and agents interact with the server:
+    - **On by default in projects**: Automatically enables the server in projects (individual projects can still turn it off).
+    - **Projects may share files**: Permits projects to opt in to sharing project files with this server.
+    - **Organization members only**: Ensures outside project collaborators cannot use the organization's MCP server.
+    - **Advanced**: Set **Timeout (seconds)** (`1`–`300`), **Tool approval** (**Never ask**, **Ask before tools that change data**, or **Ask before every tool**), optional **Extra headers** (`Header-Name: value`, one per line), and **Prefix tool names** to prevent tool-name collisions across servers.
+  </Step>
+  <Step title="Test Connection And Save">
+    Click **Test connection** to verify that Davinci can reach the server and inspect the discovered tool count, estimated token usage, and latency. If the server uses interactive OAuth, you can click **Sign in** directly from the test result to verify the OAuth flow. Once verified, click **Add server** (or **Save**).
+  </Step>
+</Steps>
+
+## Adding And Managing User Credentials For MCPs
+
+When an MCP server is configured with **Each user enters their own** credential (`Bearer token`, `API key header`, or `Username and password`) or uses interactive **OAuth**, each user authenticates with their own credentials.
+
+You can add, update, or revoke your personal MCP credentials from either the **Davinci Editor** or **Account Settings** in the Davinci Browser.
+
+### Adding Credentials From A Project (Davinci Editor)
+
+<Steps>
+  <Step title="Open Project MCP Settings">
+    Open your project in the Davinci Editor and navigate to **Project Settings → MCP** ([MCP Configuration](/pages/editor/project-settings/mcp)). Approved organization and system servers appear under **Approved servers**, and project-specific servers appear under **Project servers**.
+  </Step>
+  <Step title="Enable The Server For The Project">
+    Ensure the server's toggle on the right is switched **On**.
+  </Step>
+  <Step title="Provide Your Credential Or Sign In">
+    Check the status prompt on the server row:
+    - **Needs your key** (per-user Bearer token, API key, or Basic auth): Click **Add key**. In the **Your credential for `<Server Name>`** dialog, enter your personal **Token**, **API key**, or **Username** and **Password**, then click **Save**.
+    - **Sign-in required** (interactive OAuth): Click **Sign in** to open the identity provider popup window and authorize access.
+  </Step>
+  <Step title="Verify Connected Tools">
+    Once authenticated, the server connects and displays a green status indicator (`Connected · N tools`). Click the status label at any time to view the list of tools exposed to the Davinci Agent, or click the remove (`×`) icon on the row to clear your saved credential.
+  </Step>
+</Steps>
+
+### Managing Credentials In Account Settings (Davinci Browser)
+
+All of your saved MCP sign-ins and personal keys across the platform can be managed centrally from your account settings in the Davinci Browser:
+
+1. Click your avatar in the top-right corner of the Davinci Browser and select **Settings** (or go directly to `/~/settings/integrations`).
+2. Open the **Integrations** tab.
+3. Under **MCP servers**, review every MCP server you have connected to, including its URL, scope (**System**, **Tenant**, **Organization**, or **Project**), and connection or token-renewal status:
+   - **Update**: Available on per-user Bearer token, API key, and Username/password servers. Click **Update** to enter a new personal token, API key, or password when rotating credentials.
+   - **Connect / Reconnect**: Available on interactive OAuth servers. Click to sign in or refresh your OAuth authorization.
+   - **Disconnect**: Removes your saved credential or OAuth session for that MCP server.

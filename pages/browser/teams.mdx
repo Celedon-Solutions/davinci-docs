@@ -1,0 +1,134 @@
+---
+title: Teams
+description: Coordinate Task Cards across projects with organization team boards, sprints, workflow statuses, and reports
+---
+
+## Overview
+
+Teams are organization-scoped project management workspaces in the Davinci Browser (`/{org-handle}/~/teams`). While projects own models and Task Cards, an organization **Team** brings cards from one or more linked projects onto a shared Kanban board with sprints, customizable workflow statuses, and sprint analytics.
+
+<Note>
+- **Teams vs. Groups**: **Teams** live inside an [Organization](/pages/browser/organizations) and manage agile boards, sprints, and Task Cards across projects. **[Groups](/pages/browser/groups)** manage centralized billing, seat subscriptions, spending limits, and linked organizations.
+- **Task Cards vs. Model Tasks**: **Task Cards** track operational day-to-day work, assignees, and sprint progress. Model **[Task](/pages/modeling/objects/task)** objects represent WBS and schedule elements inside a project's system model.
+</Note>
+
+## Finding And Creating Teams
+
+Open an organization in the Davinci Browser and select the **Teams** tab (`/{org-handle}/~/teams`), or open your teams from the Home dashboard.
+
+Organization Owners, Admins, and members with team creation permission (`teams:create`) can click **New Team** and configure:
+
+- **Team name** — display name for the team (up to 128 characters).
+- **Team description** — optional plain-text summary (up to 280 characters).
+- **Visibility**:
+  - **Private** — only invited team members and the Organization Owner can discover and view the team.
+  - **Internal** — all members of the owning organization can discover and access the team, inheriting team permissions that match their organization role.
+
+## Team Workspace Tabs
+
+Opening a team lands on the **Board** tab by default. Depending on your permissions, a team workspace includes up to six tabs:
+
+### Overview
+
+The **Overview** tab (`?tab=overview`) combines sprint planning with team context:
+
+- **Sprints & Backlog Table**: Organizes cards into collapsible sections for **Active** sprints, **Planned** sprints, and the **Backlog** (cards on the team that are not assigned to a sprint). Completed sprints are available in the expandable **Past sprints** archive, which supports search and end-date filtering.
+- **Linked Projects**: Lists the projects connected to this team. Team Admins can click `+` to link additional projects or unlink a project once all of its cards have been removed from the team.
+- **About & Team Members**: Displays the team description, owning organization link, and member roster preview.
+- **Upcoming Deadlines**: Highlights open Task Cards on the team that are due within the next 7 days.
+
+### Task Cards
+
+The **Task Cards** tab (`?tab=cards`) provides a full list view of every card placed on the team across linked projects:
+
+- Search cards by title or text.
+- Filter by card state (**Open** / **Closed**), workflow status, sprint, project, assignee, or tag.
+- Sort by creation date, update time, deadline, effort, or name.
+- Create new cards or add existing cards from linked projects.
+
+### Board
+
+The **Board** tab is an interactive Kanban board for day-to-day execution:
+
+- **Sprint / Backlog Switcher**: Use the top-left selector to switch between any **Active** sprint and the **Backlog**. By default, the board opens to the active sprint whose end date is soonest (or the Backlog if no sprint is active).
+- **Search, Sort, & Filters**: Filter visible cards on the board by text search, tag, assignee, or project, and sort cards within columns by creation date, update time, deadline, effort, or name.
+- **Effort Totals Toggle**: Click the gauge button in the toolbar to toggle column header badges between card counts and total effort points.
+- **Create or Add Cards**: Click **Create card** to create a new Task Card in a linked project and place it directly on the board, or click **Add from project** to pick existing cards from linked projects.
+- **Complete Sprint**: When viewing an active sprint, Team Admins can click **Complete sprint** in the toolbar to finish the sprint and move any remaining open cards to another sprint or back to the **Backlog**.
+
+### Reports
+
+The **Reports** tab (`?tab=reports`) provides sprint and team-level analytics:
+
+- **Sprint Reports**:
+  - Select any **Active** or **Completed** (past) sprint and switch between a **Burndown chart** and a **Burnup chart**.
+  - View 7-day summary metrics (**completed**, **created**, and **due soon**) and a **Recent Activity** table of recently updated cards.
+- **Overall Reports**:
+  - **Cumulative Flow Chart**: Visualizes card counts across workflow statuses over time (**Last 7 days**, **Last 14 days**, **Last 30 days**, **Last 90 days**, or a **Custom range**), with a **Projects** filter to scope the chart to specific linked projects.
+  - **Velocity Chart**: Compares completed work across completed sprints.
+
+### Members
+
+The **Members** tab (`?tab=members`) lists everyone with direct membership on the team, their role, and when they were added:
+
+- **Add Member**: Team Owners and Admins can invite existing organization members to the team with a selected team role and revoke pending invitations.
+- **Manage Member**: Update a member's team role or remove them from the team.
+- **Leave Team**: Team members who are not the Team Owner can remove themselves using **Leave team**.
+
+### Settings
+
+The **Settings** tab (`?tab=settings`) is available to Team Owners and Admins (and recipients of a pending ownership transfer request):
+
+- **General**: Edit the **Team Name**, change **Visibility** (**Private** or **Internal**), and update the **Team Description**.
+- **Workflow Statuses**: Create, edit, reorder, and delete board columns and their automated status actions.
+- **Ownership**: The Team Owner can request a **Transfer Team Ownership** to another team member. The current owner remains owner until the selected member accepts, at which point the previous owner becomes a **Team Admin**.
+- **Danger Zone**: **Delete Team** permanently removes the team, its board, sprints, and member assignments (available to users with `teams:delete`, such as the Team Owner or Organization Owner/Admin). Deleting a team does not delete linked projects or their Task Cards.
+
+## Workflow Statuses And Automated Actions
+
+Each team defines its own ordered workflow statuses (columns), which can be managed from **Settings → Workflow Statuses** or directly from the **Board** tab (**Add column** and column header `...` menus).
+
+Every status belongs to one of three categories:
+
+- **Not started**
+- **In progress**
+- **Done**
+
+In addition to a name, color, description, and category, each status can enable automated entry rules when a card is moved into that column:
+
+| Status Action | Behavior |
+| --- | --- |
+| **Close card when added to status** | Automatically sets the card's project-global state to **Closed** when moved into this status. Columns can also manually close all open cards in the column via **Close All Status Cards** in the column menu. |
+| **Add mover to card assignees** | Automatically adds the user who moved the card into this status to the card's assignees. |
+| **Require card fields** | Requires selected fields (**Name**, **Description**, **Resolution**, **Deadline**, **Effort**) to be populated on the card before it can be moved into this status. |
+
+## Sprints
+
+Sprints let a team group Task Cards into time-boxed iterations:
+
+1. **Create a Sprint**: On the **Overview** tab, click **Create Sprint** and provide a name, optional description, and optional start and end dates. New sprints start in the **Planned** state.
+2. **Start a Sprint**: Click **Start sprint** on a planned sprint section and confirm its start and end dates. Up to **two sprints** can be active at the same time; if another sprint is already active, Davinci prompts you to either close the previous sprint (and move its remaining cards) or run both sprints concurrently.
+3. **Complete a Sprint**: Click **Complete sprint** from the **Board** toolbar or **Overview** section header. If the sprint still has open cards that are not in a **Done** status, choose whether to hand them off to another sprint or return them to the **Backlog**.
+4. **Delete a Sprint**: Empty sprints can be deleted from the sprint section menu on the **Overview** tab. Any cards in the sprint must be moved or removed before deletion.
+
+## Linked Projects And Task Card Access
+
+- **Linking Projects**: A team can link any project in the organization where the admin has Task Card read access. A project cannot be unlinked while any of its cards remain on the team board.
+- **Project-Global Card State**: A Task Card's **Open** / **Closed** state belongs to the card in its owning project and is preserved independently of which team boards the card is placed on.
+- **Removing vs. Deleting a Card**:
+  - **Remove from team** unlinks the card from the team's board and sprints while keeping the card intact in its project.
+  - **Delete card** permanently deletes the Task Card from its project and removes it from all team boards.
+- **Privacy & Project Permissions**: Team boards respect each viewer's effective project permissions. If a team member views a card from a linked project they do not have project access to, Davinci shows a read-only team summary without exposing restricted project model content, and card mutations require write access to the card's project.
+
+## Team Roles And Permissions
+
+Team roles control what members can do on the team board and in team settings:
+
+| Role | Typical Access |
+| --- | --- |
+| **Owner** | Full control over the team, including settings, workflow statuses, sprints, linked projects, members, ownership transfer, and deleting the team. |
+| **Admin** | Manage team settings, workflow statuses, sprints, linked projects, and members, plus full board and card operations. |
+| **Contributor** | View the team, sprints, and reports, and place, move, create, or remove Task Cards on the board (subject to project access). |
+| **Viewer** | Read-only access to the team's overview, board, cards, and sprint reports. |
+
+For **Internal** teams, organization members automatically inherit the team role matching their organization role (Organization Owners inherit **Admin** access on teams, and Organization Owners can access both **Private** and **Internal** teams). Direct team membership and organization-inherited permissions combine additively. See [Roles And Permissions](/pages/browser/roles-permissions) for details.

@@ -1,51 +1,78 @@
 ---
-title: Teams
-description: Manage team members, organizations, usage, projects, and administrative controls
+title: Groups
+description: Manage group members, organizations, shared usage, billing, and administrative controls
 ---
 
 ## Overview
 
-Teams provide centralized management for groups of users and the organizations and projects they work with. A team can manage access, usage, billing, and administrative controls across multiple members.
+Groups provide centralized billing and administration for a group of users and the organizations and projects they work with. A group can manage seat memberships, shared AI usage, on-demand spending budgets, billing, and linked organizations from one place.
 
-Teams are broader than organizations. Organizations own projects. Teams manage people, usage, and governance across a group.
+Groups are broader than organizations. Organizations own projects, while groups manage people, billing, usage pools, and governance across multiple users and organizations.
 
-## What Teams Manage
+<Note>
+**Groups vs. Organization Teams**: **Groups** manage group-wide billing, seats, spending limits, and linked organizations. Within an [Organization](/pages/browser/organizations), **[Teams](/pages/browser/teams)** refer to project-management boards, sprints, and task cards.
+</Note>
 
-Depending on deployment and permissions, teams can manage:
+## What Groups Manage
 
-- Team members and invitations.
-- Member roles and permissions.
-- Team usage and spending controls.
-- Team billing and subscription settings.
-- Organizations associated with the team.
-- Projects owned by users or organizations within the team.
-- Audit and administrative visibility.
+Depending on deployment and permissions, a group can manage:
 
-More team governance features are planned. Only visible user-facing behavior should be treated as available.
+- Group members, seat types (**Full** and **Read-only**), and email invitations.
+- Member roles and administrative permissions.
+- Included AI usage and per-member on-demand spending limits.
+- Group subscription billing, credit balances, and unified invoices.
+- Organizations created in or linked to the group, including organization storage tiers.
+- Activity and usage breakdowns across group members.
 
-## Team Hub
+## Group Management
 
-The Team hub is the Browser area for team management. Members may see different tabs based on their permissions:
+Open **Group** from your avatar menu or the Browser navigation menu (at `/team`). Members see tabs based on their permissions:
 
-- **Overview** — team summary and member count.
-- **Members** — roster, invitations, roles, and member usage where permitted.
-- **Billing** — subscription, usage, on-demand settings, and billing controls where permitted.
-- **Settings** — team name, team ID, and disband controls where permitted.
+- **Overview** — group summary, member and organization counts, next usage reset, on-demand usage gauge, and spend by member.
+- **Members** — member roster, seat types, included usage, per-member on-demand limits, and pending invitations.
+- **Organizations** — organizations associated with the group, their storage usage and storage tiers, and controls to create or link organizations.
+- **Activity** — AI and tool usage breakdown across the group over time.
+- **Wallet & Limits** — group Included Usage pool, Credit Balance, On-Demand limit, and default per-member spending limit (visible to billing and admin roles).
+- **Plan & Invoices** — group subscription plan, Stripe billing portal access, and invoice history (visible to billing and admin roles).
+- **Settings** — group display name, Group ID, and **Disband Group** controls (visible to users with billing management permissions).
 
-## Team Roles
+## Group Roles And Seats
 
-Team roles determine who can manage members, billing, settings, and support workflows.
+### Roles
 
-Typical roles include:
+Group roles determine who can manage members, organizations, billing, settings, and support workflows:
 
-- **Owner** — full control over the team.
-- **Admin** — manage members, roles, and settings.
-- **Billing** — view and manage billing and usage controls.
-- **Support** — support-level visibility where enabled.
-- **Member** — see team-level information and participate in team-managed work.
+- **Owner** — full control over the group, including billing, members, organizations, and disbanding the group.
+- **Admin** — manage members, invitations, roles, organizations, and group settings.
+- **Billing** — view and manage group billing, wallet limits, per-member spending limits, and invoices.
+- **Support** — support-level visibility across group resources where enabled.
+- **Member** — view group summary, members, organizations, and activity, and use group-funded AI usage according to seat type and spending limits.
 
-## Teams And Organizations
+### Seat Types
 
-Teams can include or manage organizations. Organization-owned projects remain owned by the organization, while team controls can provide higher-level usage, billing, membership, and governance.
+- **Full seats** — billed per seat on the group subscription; each full seat includes AI usage each period plus access to group on-demand usage within the member's spending limit.
+- **Read-only seats** — group plans include read-only seats at no extra cost for members who do not consume paid AI usage.
+
+## Joining A Group
+
+When you are invited to a group, you receive an in-app notification and email invitation. Clicking **Accept** opens the **Join Group** confirmation dialog explaining what changes:
+
+- **Managed Plan** — your personal subscription is converted to a Group subscription managed by the group administrator.
+- **Group Credits** — your Included Usage resets to the group allocation, while your personal Credit Balance stays with you.
+- **On-Demand Usage** — overage billing is handled by the group, and your individual spending limit is set by the group administrator.
+- **Access & Permissions** — you gain access to group resources while your personal projects and data remain yours.
+- **Owned Organizations** — any organizations you own are associated with the group (organizations already linked to another group stay where they are).
+- **Leave Anytime** — you can leave the group at any time from your account settings.
+
+## Groups And Organizations
+
+Groups can create new organizations or link existing organizations by handle (once accepted by the organization admin). Organization-owned projects remain owned by the organization, while the group manages the organization's billing relationship and storage tiers.
 
 See [Organizations](/pages/browser/organizations) for organization-owned project management.
+
+## Leaving Or Disbanding A Group
+
+- **Leaving a Group**: Members who are not the group creator can leave the group from their personal billing settings (**Leave Group**). Leaving a group removes access to group billing and reverts your account to the **Free** plan.
+- **Disbanding a Group**: Group owners and billing administrators can permanently dissolve a group from **Group → Settings** (**Disband Group**) or from their personal billing settings. Disbanding cancels the group subscription with proration, deletes organizations billed through the group, and reverts all members to free-tier accounts.
+
+See [Cancel Or Unsubscribe](/pages/browser/usage-plans-billing/cancel-or-unsubscribe) for more details before making changes.

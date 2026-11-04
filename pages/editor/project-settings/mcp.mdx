@@ -1,127 +1,65 @@
 ---
 title: MCP Configuration
+description: Configure and connect Model Context Protocol (MCP) servers in a project
 ---
 
-The MCP Configuration view allows you to connect external Model Context Protocol (MCP) servers to your project, extending your AI agent's capabilities with specialized tools and resources.
+The **MCP Servers** tab in Project Settings allows you to connect external Model Context Protocol (MCP) servers to your project, extending the Davinci Agent's capabilities with specialized tools, data sources, and external integrations.
 
 <Frame>
     <img src="/images/mcp-settings.png" /> 
 </Frame>
 
-## What is MCP?
+## What Is MCP?
 
-**Model Context Protocol (MCP)** is an open standard that enables AI agents to connect to external servers that provide specialized tools, data sources, and capabilities. MCP servers act as extensions to your agent, allowing it to interact with external services, databases, APIs, and custom functionality.
+**Model Context Protocol (MCP)** is an open standard that enables AI agents to connect to external servers that provide tools, resources, and domain-specific actions. In Davinci, MCP servers let the agent query external databases, issue trackers, documentation systems, CAD/PLM services, and custom internal APIs.
 
-Common examples of MCP servers include:
+MCP servers are stored outside Git version control, so enabling a server, updating credentials, or adding a project server applies across the project without dirtying your working tree or creating merge conflicts.
 
-- Database connectors (PostgreSQL, MongoDB, etc.)
-- API integrations (GitHub, Slack, etc.)
-- File system access
-- Web scraping tools
-- Custom business logic servers
+<Info>
+For organization-wide and system-wide MCP server registration, policy controls, and managing your saved credentials from the Davinci Browser (`/~/settings/integrations`), see [Integrations Overview](/pages/integrations/overview).
+</Info>
 
-## Managing MCP Servers
+## Approved Servers Vs. Project Servers
 
-### Adding an MCP Server
+The project MCP tab separates servers into two sections:
 
-To add a new MCP server, click the **Add Server** button in the header.
+- **Approved servers**: Provided by your organization, tenant, or system administrators. Project managers (`project:mcp:manage`) can toggle an approved server **On** or **Off** for the project without re-entering its endpoint configuration.
+- **Project servers**: Custom MCP servers added directly to this project. If your organization or system administrator has turned off **Allow project-defined servers** in [MCP policy](/pages/integrations/overview#mcp-policy-controls), the **Add Server** button is hidden and the project can only use **Approved servers**.
 
-You'll need to provide:
+## Enabling And Configuring A Server In A Project
 
-- **Server Name**: A friendly name for the server (e.g., "GitHub Integration")
-- **Server URL**: The endpoint URL for the MCP server (e.g., `https://api.example.com/mcp`)
-- **Description** (optional): A brief description of what the server does
+Each server row displays its name, scope badge (**System**, **Tenant**, **Organization**, or **Project**), URL, authentication method, live connection status, and an **On / Off** toggle.
 
-<Note>
-Server names and URLs must be unique within your project. You cannot add duplicate servers.
-</Note>
+When a server is toggled **On** for the project, two per-project options appear on the row:
 
-### Connecting to a Server
+- **Connect automatically**: Automatically connects to the server a few seconds after the project opens in the Editor (servers that require interactive user sign-in wait until you sign in once).
+- **Share files**: Allows the Davinci Agent to send project files to this server using temporary one-time links that expire after one hour. This toggle is only available when both the organization/system policy (**Allow MCP file sharing**) and the server definition allow file sharing.
 
-After adding an MCP server, you'll need to connect to it before it can be used:
+## Connecting And Authenticating
 
-1. Locate the server in the MCP Servers table
-2. Click the **Connect** button in the Status column
-3. If the server requires OAuth authentication, a popup window will open for authorization
-4. Once authenticated, the server will show as "Connected" with a green indicator
+Depending on how the server's authentication is configured, the server row displays the action needed to connect:
 
-<Note>
-Some MCP servers require OAuth authentication. The connection process will automatically handle the OAuth flow, opening a popup window for you to authorize access.
-</Note>
+- **No authentication / Shared credential**: Turning the server **On** connects automatically, or you can click **Connect**.
+- **Per-user API key, Bearer token, or Basic auth (`Needs your key`)**: Click **Add key** to open **Your credential for `<Server Name>`**, enter your personal **Token**, **API key**, or **Username** and **Password**, and click **Save**.
+- **Interactive OAuth (`Sign-in required`)**: Click **Sign in** to open the identity provider in a popup window and authorize access.
 
-### Enabling and Disabling Servers
+Once connected, the status indicator shows a green dot with the number of loaded tools (for example, `Connected · 5 tools`). Click the status text to inspect the exact tool names and statuses loaded by the Design Engine.
 
-Once connected, you can enable or disable an MCP server using the toggle in the Status column.
+To remove your saved personal sign-in or key for a server, click the remove (`×`) button on the server row, or manage all of your saved MCP credentials from your [Integrations page](/pages/integrations/overview#managing-credentials-in-account-settings-davinci-browser) (`/~/settings/integrations`).
 
-| Status | Description              |
-|--------|--------------------------|
-| `Enabled` | The server is active and its tools are available to the AI agent. |
-| `Disabled` | The server is connected but its tools are temporarily unavailable. |
+## Adding Or Editing A Project MCP Server
 
-<Note>
-You must connect to a server before you can enable it. Disconnected servers will show a "Connect" button instead of a toggle.
-</Note>
+When **Allow project-defined servers** is enabled and you have permission to manage project MCP servers (`project:mcp:manage`), click **Add Server** under **Project servers**:
 
-### Viewing Server Status
+1. **Name & Server URL**: Enter a display name (for example, `Company Docs`) and the MCP server endpoint URL (for example, `https://mcp.example.com/mcp`).
+2. **Description**: Optional summary of what the server provides.
+3. **Transport**: Select **Streamable HTTP** or **Server-Sent Events (legacy)**.
+4. **Authentication**:
+   - **No authentication**
+   - **OAuth (automatic client registration)** or **OAuth (your own client ID)** — displays the **Redirect URI** to register with your identity provider.
+   - **OAuth machine-to-machine** — uses a **Client ID**, **Client secret**, **Expected issuer**, and optional **Scopes**.
+   - **Bearer token**, **API key header** (with custom **Header name**, default `X-API-Key`), or **Username and password** — choose **One shared credential for everyone** or **Each user enters their own**.
+5. **Project Options**: Choose whether to enable **Connect automatically** and **Allow file sharing**.
+6. **Test Connection & Save**: Click **Test connection** to verify connectivity and preview the server's tools before saving, then click **Add** (or **Save**).
 
-The **State** column displays the current connection status and available tools for each server:
-
-- **Connection Status**: Green dot indicates connected, red dot indicates disconnected
-- **Tool Count**: Shows how many tools the server provides (e.g., "5 tools")
-
-### Editing Server Details
-
-To edit a server's configuration:
-
-1. Hover over the server row to reveal action buttons
-2. Click the edit icon on the right side
-3. Update the server name, URL, or description
-4. Click **Save** to apply changes
-
-<Warning>
-Changing a server's URL may require reconnecting to establish a new connection.
-</Warning>
-
-### Deleting Servers
-
-To remove an MCP server:
-
-1. Hover over the server row to reveal action buttons
-2. Click the trash icon on the right side
-3. Confirm the deletion
-
-<Warning>
-Deleting an MCP server is permanent. The agent will no longer have access to that server's tools.
-</Warning>
-
-## Refreshing Server List
-
-If you've made changes to MCP servers elsewhere or need to update the connection status, click the **Refresh** button to reload the server list.
-
-## Using MCP Server Tools
-
-Once an MCP server is connected and enabled, its tools automatically become available to your AI agent during conversations. The agent can discover and use these tools as needed to complete tasks.
-
-You don't need to explicitly tell the agent which MCP tools to use—it will automatically select the appropriate tools based on the task context.
-
-## Version Control and Conflicts
-
-MCP server configurations are tracked by Davinci's version control system.
-
-- **Branching**: Different branches can have different MCP server configurations
-- **Conflicts**: If the same server is configured differently in two branches being merged, a conflict will occur
-- **Resolution**: You must resolve any MCP server conflicts before you can add new servers. The interface will display the conflicting configurations side-by-side
-
-<Note>
-When merge conflicts exist for MCP servers, the "Add Server" button will be disabled until all conflicts are resolved.
-</Note>
-
-## MCP Server Table Columns
-
-| Column | Description |
-| :--- | :--- |
-| **Status** | Shows connection button or enable/disable toggle depending on connection state. |
-| **Server Details** | The server name and URL. Click to view more information. |
-| **State** | Current connection status (connected/disconnected) and number of available tools. |
-| **Actions** | Edit or delete the server (visible on hover). |
-
+To edit or remove a project-scoped server, use the **Edit server** (pencil) or **Delete server** (trash) icons on the server row. Organization-scoped servers display an external link icon that opens the organization's MCP settings page (`/{org-handle}/~/settings#mcp-servers`) for authorized organization admins.
