@@ -232,6 +232,7 @@
                                     "pages/modeling/common/equations",
                                     "pages/modeling/common/relationships",
                                     "pages/modeling/common/inheritance",
+                                    "pages/modeling/common/subclasses",
                                     "pages/modeling/common/units"
                                 ]
                             },
@@ -303,6 +304,7 @@
                             "pages/modeling/common/equations",
                             "pages/modeling/common/relationships",
                             "pages/modeling/common/inheritance",
+                            "pages/modeling/common/subclasses",
                             "pages/modeling/common/units"
                         ]
                     },
@@ -393,7 +395,8 @@
                                 "group": "Analysis",
                                 "pages": [
                                     "pages/modeling/objects/code",
-                                    "pages/modeling/objects/toolbox"
+                                    "pages/modeling/objects/toolbox",
+                                    "pages/modeling/objects/trade"
                                 ]
                             },
                             {

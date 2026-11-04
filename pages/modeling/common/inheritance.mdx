@@ -16,6 +16,15 @@ Inheritance is useful for product variants, reusable system patterns, specialize
 
 Object inheritance is different from state-value inheritance, risk rollups, and task scheduling rollups. This page describes inheritance created with **Extend Object** and **New Object from Extension**.
 
+## Inheritance and Project Subclasses
+
+Object inheritance and [Project Subclasses](/pages/modeling/common/subclasses) can be used together, but they serve different purposes:
+
+- **Inheritance** creates a specialized object that receives fields and supported structure from a base object.
+- **Project subclassing** assigns a project-defined category to an object and can constrain relationship endpoints.
+
+The effective subclass can flow through an object's inheritance chain, but a subclass is not the same as the object's `extends` relationship. Use inheritance for reusable variants and synchronized structure; use project subclasses for project-specific classification and typing.
+
 ## How to Use Inheritance
 
 Start with a base object that contains the information shared by every variant. Create a specialization from that base, then edit only the details that should be different.

@@ -1,0 +1,132 @@
+---
+title: Trade Study
+description: Compare design alternatives and apply a selected configuration to your model
+icon: /images/objecticons/study.svg
+---
+
+<img height="20" noZoom src="/images/objecticons/study.svg" />
+
+## Description
+
+A Trade Study is an analysis object for comparing design alternatives against defined criteria. A study captures the alternatives, measurements, prerequisites, and evaluation method so that a design decision can be reviewed and applied to the model.
+
+Trade Studies are different from the [Design Space Explorer](/pages/user-guide/views/design-space-explorer). The Design Space Explorer provides a temporary what-if calculation, while a Trade Study records a reusable decision and can apply its selected result to the model.
+
+## Trade Study Types
+
+Davinci supports two types of Trade Studies.
+
+### Structural Trade Studies
+
+Structural studies compare alternative model objects for a target. Supported candidates include Parts, Entities, Items, Requirements, and Ports.
+
+When you apply a structural configuration, Davinci can:
+
+- Make the target extend the selected candidate
+- Create the corresponding structural objects needed by the selected alternative
+- Rewrite configured equations and relationships through the selected mapping
+- Recompute dependent objects
+
+Davinci warns you when applying a configuration will replace or remove content authored directly under the target. Structural trade relationships, such as the target, candidate, criterion, and variable connections, are managed by the Trade Study workflow rather than as ordinary editable relationships.
+
+### Parametric Trade Studies
+
+Parametric studies compare numeric values instead of selecting a structural alternative. Define variables with lower and upper bounds, step counts, and optional logarithmic spacing. Davinci evaluates the variable combinations and reports their effect on the selected outputs.
+
+Use a parametric study when the design decision is a range of values, such as mass, length, power, capacity, or another numeric attribute.
+
+## Configuring a Study
+
+A Trade Study can include:
+
+- **Target**: The object or model area affected by the study.
+- **Candidates or variables**: Structural alternatives, or numeric inputs for a parametric study.
+- **Prerequisites**: Other decisions that must be resolved before this study can be evaluated.
+- **Criteria**: Measurements used to compare configurations.
+- **Mappings**: Equation and relationship changes required when applying a structural candidate.
+- **Applied configuration**: The configuration currently selected for the model.
+
+Keep the study's criteria and mappings explicit. This makes the decision understandable to reviewers and helps Davinci identify dependent objects when the result is applied.
+
+## Criteria and Scoring
+
+Criteria can be measured from attributes, tests, or constraints. Configure each criterion with the direction that represents a better result:
+
+- **Minimize** values such as cost, mass, or duration.
+- **Maximize** values such as performance, capacity, or reliability.
+- Use a **gate** to exclude configurations that do not meet a required condition.
+
+Davinci supports these ranking methods:
+
+- **Weighted Sum**: Normalize criterion values and combine them using their weights.
+- **Pugh**: Compare each configuration against a selected reference configuration.
+- **Pareto**: Identify configurations that are not dominated across the selected criteria.
+
+Review the individual criterion values as well as the overall ranking. A high-ranked configuration can still fail a gate or require a trade-off that is not appropriate for the project.
+
+## Applying a Configuration
+
+To use the result of a study:
+
+1. Configure the candidates or variables and criteria.
+2. Evaluate the available configurations.
+3. Review the score, criteria values, and impact evaluation.
+4. Select a configuration, or choose the best available result.
+5. Review the proposed model changes.
+6. Apply the configuration.
+
+Applying a configuration is a model update, not just a change to the study's display. Davinci records the applied selection and, for structural studies, updates the target and its dependent structure according to the configured mapping.
+
+Structural applications can be undone. Undo restores the previous structural mappings, equations, relationships, nested trade state, and lock or stale state when those values were changed by the application.
+
+<Warning>
+Do not change the inheritance of a trade-driven target directly. Apply or undo the Trade Study configuration so that Davinci can maintain the structural counterparts and configured mappings.
+</Warning>
+
+## Locking, Stale Results, and Review
+
+Applying a configuration locks the study by default so that the recorded decision is not changed accidentally. Unlock the study when you need to revise the analysis.
+
+A result becomes **stale** when a prerequisite, study input, preferred configuration, or target changes. A stale result must be reviewed before it is reused. Depending on the change, you may need to reevaluate the study, apply a different configuration, or mark the updated result as reviewed.
+
+Use the impact evaluation before applying a structural configuration to inspect the objects, dependents, equations, and other Trade Studies that may be affected.
+
+## Parametric Sweeps
+
+Parametric studies can evaluate a range of variable combinations as a sweep. Use sweeps to compare many points instead of testing each value manually.
+
+Sweeps support:
+
+- Grid sampling
+- Latin-hypercube sampling
+- Saved points for later comparison
+- Output plots and result tables
+- Applying a selected point, including the best point identified by the study
+
+Sweep results include the model state used for evaluation. If the model or study changes, previously calculated results may become stale and should be reevaluated before they are applied.
+
+## Best Practices
+
+- Use structural studies for discrete alternatives and parametric studies for numeric ranges.
+- Define criteria and gates before choosing a preferred configuration.
+- Include mappings for external equations and relationships before applying a structural candidate.
+- Run an impact evaluation before applying a configuration that changes a large subtree.
+- Review warnings about replaced or removed target content.
+- Keep applied studies locked until the decision needs to be revised.
+- Reevaluate stale studies instead of relying on an old ranking.
+
+Trade Studies are not object-inheritance templates. For reusable specialized model objects, see [Object Inheritance](/pages/modeling/common/inheritance). For project-defined type classifications, see [Project Subclasses](/pages/modeling/common/subclasses).
+
+## Properties Fields
+
+The Trade Study Properties view includes the study definition and its current decision state:
+
+- Study kind and target
+- Candidates or variables
+- Prerequisites
+- Criteria, gates, and ranking method
+- Configuration mappings
+- Applied configuration
+- Lock and stale status
+- Sweep variables and saved results, when configured
+

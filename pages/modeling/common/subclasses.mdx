@@ -1,0 +1,78 @@
+---
+title: Project Subclasses
+description: Define project-specific classifications for model objects and relationship endpoints
+icon: tags
+---
+
+## Overview
+
+Project subclasses let you define project-specific types within an existing Davinci object type. For example, a project can define specialized Part types such as `Sensor`, `Controller`, or `PowerModule` without creating a new built-in object type.
+
+A project subclass has a **base type** and a project-defined name. Objects can be assigned to a subclass, and relationship endpoint definitions can use a subclass to describe which specialized objects they accept.
+
+<Info>
+Project subclassing is separate from [Object Inheritance](/pages/modeling/common/inheritance). A subclass classifies an object; inheritance creates a specialized object that derives fields and structure from a base object.
+</Info>
+
+## Managing Project Subclasses
+
+Project subclasses are managed from **Project Settings → Schema → Project Subclasses**.
+
+From the Project Subclasses panel, you can:
+
+- Create a subclass for a supported base object type
+- Rename an existing subclass
+- Search the project subclass list
+- Edit its color and custom SVG icon
+- Review the objects and definitions that use it
+
+The base object type is selected when the subclass is created and cannot be changed later. If a classification should apply to a different base type, create a new subclass for that type.
+
+## Assigning a Subclass
+
+Assign a project subclass to an object from the object's Properties view when the subclass's base type matches the object type. Davinci shows the effective subclass as a badge in the Properties header.
+
+Subclasses can also be used in structured relationship endpoint definitions. An endpoint can specify both a base type and a subclass, allowing the relationship to accept only the intended specialized objects.
+
+Included or foreign objects cannot receive a local project subclass assignment. Define the subclass in the project that owns the object instead.
+
+## Subclasses and Inheritance
+
+Project subclasses and object inheritance answer different questions:
+
+- **Subclass**: What project-defined category does this object belong to?
+- **Inheritance**: Which base object supplies this object's fields and model structure?
+
+An object can have both. A specialization can inherit the effective subclass from its base through its `extends` chain unless it has its own applicable assignment. The subclass badge describes the effective classification; the inheritance link describes the base object.
+
+Use subclasses when you need project-specific categories, filtering, relationship typing, or generated-object defaults. Use inheritance when you need a reusable object definition with synchronized fields and structural counterparts.
+
+## Renaming and Deleting
+
+Renaming a subclass updates the objects assigned to it and the structured relationship endpoint definitions that reference it. Rename a subclass when the classification changes but its meaning and base type remain the same.
+
+Davinci prevents deleting a subclass while it is still used by objects or relationship definitions. Before deleting one:
+
+1. Find and remove its object assignments.
+2. Update or remove relationship endpoint definitions that use it.
+3. Confirm that generated or dependent model content no longer expects the subclass.
+4. Delete the unused subclass from Project Subclasses.
+
+Deleting a subclass does not provide a replacement classification for the affected objects. Reassign objects first when they need to remain typed.
+
+## Generated Objects and Defaults
+
+Generated-object workflows can validate a subclass against the generated object's base type and apply the subclass's configured defaults. This keeps generated content consistent with the project's schema while preventing a subclass from being assigned to an incompatible object type.
+
+## Export Behavior
+
+SysML v2 exports preserve project subclass definitions and subclass usage typing where supported. The exported definitions describe the project-specific subclass separately from ordinary inheritance and redefinition.
+
+## Best Practices
+
+- Use clear names that describe the project-specific meaning of the subclass.
+- Keep each subclass tied to one stable base object type.
+- Use subclasses for classification and accepted endpoint types, not as a substitute for inheritance.
+- Review object assignments and relationship definitions before renaming or deleting a subclass.
+- Use [Object Inheritance](/pages/modeling/common/inheritance) when variants need shared fields, children, and controlled overrides.
+

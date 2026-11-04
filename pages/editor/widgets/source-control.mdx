@@ -47,6 +47,29 @@ To merge changes from one branch into another:
 
 <Warning>Merges cannot be performed when uncommitted changes are present on the current branch. Commit or undo your changes before merging.</Warning>
 
+#### Merge Reviews
+
+When a merge needs review before it is applied, enable **Requires Review** in the merge dialog. A merge review records the source and target branches and pins the branch heads used for the review. Creating the request does not merge the branches.
+
+To review a merge:
+
+1. Switch to the target branch.
+2. Open the merge request from the Source Control view.
+3. Inspect the merge preview, including additions, modifications, deletions, and conflicts.
+4. Approve the request, release an existing approval, close the request, or complete the merge according to your permissions.
+
+An approval policy can allow anyone with Git write access, project administrators, or specifically named approvers to approve a request. The approval policy is evaluated from the target branch version recorded by the request.
+
+Merge reviews use the following states:
+
+- **Open**: The request is waiting for review.
+- **Approved**: An authorized reviewer approved the pinned merge.
+- **Merged**: The approved changes were applied to the target branch.
+- **Closed**: The request was closed without merging.
+- **Stale**: One of the pinned branch heads changed, so the request must be reviewed again.
+
+The request must be approved and completed from the target branch. If the source or target branch moves after the request is created, review the updated branch state and create a new request when necessary.
+
 #### Merge Conflicts
 
 Conflicts occur when the same object or field has been modified in different ways on both branches. You must select which version to keep or manually resolve the differences.
@@ -119,6 +142,23 @@ To commit your changes:
 <Note>Commits require at least one change and a commit message. A commit happens only when someone asks for one: by clicking **Commit**, or by asking the Davinci Agent to commit.</Note>
 
 Commits capture the current state of all changes and create a permanent record in project history.
+
+### Subtree Commits
+
+You can commit only a selected part of the model instead of committing every outstanding change on the branch. This workflow is sometimes called a **subtree commit** or **scoped commit**.
+
+To create a scoped commit:
+
+1. Review the objects listed in **Changes**.
+2. Stage the objects that belong in the commit, or use **Stage All** when the whole change set is ready.
+3. Enter a descriptive commit message.
+4. Click **Commit Changes**.
+
+Davinci expands a staged selection when necessary to keep the model structurally valid. For example, a selection can include coupled relationship or equation changes, newly added ancestors, or descendants of deleted objects. The additional objects are part of the same scoped commit because they are required to represent the selected change correctly.
+
+Staged changes use a snapshot of the selected objects. Changes that are not staged remain uncommitted on the branch after the commit and are reconciled with the new branch state. Staged selections are preserved across refreshes and device switches, and are rechecked when another commit, rollback, or merge changes the branch.
+
+Use **Unstage All** to return to an ordinary full-change commit. Staging does not discard or undo changes that are left outside the commit.
 
 ### Asking the Agent to Commit
 
