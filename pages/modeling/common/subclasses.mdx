@@ -16,7 +16,7 @@ Project subclassing is separate from [Object Inheritance](/pages/modeling/common
 
 ## Managing Project Subclasses
 
-Project subclasses are managed from **Project Settings → Schema → Project Subclasses**.
+Project subclasses are managed from the [Schema tab in Project Settings](/pages/editor/project-settings/relationship-settings) (**Project Settings → Schema → Project Subclasses**).
 
 From the Project Subclasses panel, you can:
 
@@ -30,7 +30,7 @@ The base object type is selected when the subclass is created and cannot be chan
 
 ## Assigning a Subclass
 
-Assign a project subclass to an object from the object's Properties view when the subclass's base type matches the object type. Davinci shows the effective subclass as a badge in the Properties header.
+You can create an object with a project subclass directly from the **Add Object** menu in the Index by selecting the subclass under its base object type, or assign a subclass through the Davinci Agent and model importers when the subclass's base type matches the object type. Davinci displays the object's effective subclass as a read-only badge in the Properties header.
 
 Subclasses can also be used in structured relationship endpoint definitions. An endpoint can specify both a base type and a subclass, allowing the relationship to accept only the intended specialized objects.
 
@@ -45,24 +45,26 @@ Project subclasses and object inheritance answer different questions:
 
 An object can have both. A specialization can inherit the effective subclass from its base through its `extends` chain unless it has its own applicable assignment. The subclass badge describes the effective classification; the inheritance link describes the base object.
 
-Use subclasses when you need project-specific categories, filtering, relationship typing, or generated-object defaults. Use inheritance when you need a reusable object definition with synchronized fields and structural counterparts.
+Use subclasses when you need project-specific categories, filtering, or relationship endpoint typing. Use inheritance when you need a reusable object definition with synchronized fields and structural counterparts.
 
 ## Renaming and Deleting
 
-Renaming a subclass updates the objects assigned to it and the structured relationship endpoint definitions that reference it. Rename a subclass when the classification changes but its meaning and base type remain the same.
+Renaming a subclass updates the objects assigned to it and the structured relationship endpoint definitions that reference it. Rename a subclass when the classification name changes but its meaning and base type remain the same.
 
-Davinci prevents deleting a subclass while it is still used by objects or relationship definitions. Before deleting one:
+When you delete a subclass from **Project Subclasses**, Davinci shows how many objects and relationship definitions currently use it and asks you to confirm:
 
-1. Find and remove its object assignments.
-2. Update or remove relationship endpoint definitions that use it.
-3. Confirm that generated or dependent model content no longer expects the subclass.
-4. Delete the unused subclass from Project Subclasses.
+- Objects assigned to the deleted subclass are automatically reset to their base object type.
+- Structured relationship endpoint definitions referencing the deleted subclass automatically revert to the base object type.
 
-Deleting a subclass does not provide a replacement classification for the affected objects. Reassign objects first when they need to remain typed.
+If you want those objects or relationship endpoints to use a different subclass instead of reverting to the base type, rename the subclass or reassign them before deleting it.
 
-## Generated Objects and Defaults
+<Note>
+When deleting a subclass through the Davinci Agent, the agent requires existing object and relationship references to be cleared or reassigned first so in-use classifications are not removed unintentionally.
+</Note>
 
-Generated-object workflows can validate a subclass against the generated object's base type and apply the subclass's configured defaults. This keeps generated content consistent with the project's schema while preventing a subclass from being assigned to an incompatible object type.
+## Agent Generation and Validation
+
+When the Davinci Agent generates objects with a requested subclass, it validates that the subclass exists in the project and matches the generated object's base type, then applies that subclass as the default classification for the generated objects of that type.
 
 ## Export Behavior
 

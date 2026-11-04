@@ -45,11 +45,11 @@ To merge changes from one branch into another:
     <img noZoom src="/images/vc-conflict-popup.png" />
 </Frame>
 
-<Warning>Merges cannot be performed when uncommitted changes are present on the current branch. Commit or undo your changes before merging.</Warning>
+<Warning>Direct merges cannot be performed when uncommitted changes or unresolved conflicts are present on the current branch. Commit or undo your changes before merging directly, or create a merge review request instead.</Warning>
 
 #### Merge Reviews
 
-When a merge needs review before it is applied, enable **Requires Review** in the merge dialog. A merge review records the source and target branches and pins the branch heads used for the review. Creating the request does not merge the branches.
+When a merge needs review before it is applied, enable **Requires Review** in the merge dialog. A merge review records the source and target branches and pins the committed branch heads used for the review. Creating a merge review request is allowed even if you have uncommitted local changes, because it pins the committed branch heads without merging immediately.
 
 To review a merge:
 
@@ -150,15 +150,15 @@ You can commit only a selected part of the model instead of committing every out
 To create a scoped commit:
 
 1. Review the objects listed in **Changes**.
-2. Stage the objects that belong in the commit, or use **Stage All** when the whole change set is ready.
+2. Stage the objects that belong in the commit, or click **Stage All Changes** (`+`) when the whole change set is ready.
 3. Enter a descriptive commit message.
-4. Click **Commit Changes**.
+4. Click **Commit Staged (N)** (or **Commit Changes** when committing all changes).
 
 Davinci expands a staged selection when necessary to keep the model structurally valid. For example, a selection can include coupled relationship or equation changes, newly added ancestors, or descendants of deleted objects. The additional objects are part of the same scoped commit because they are required to represent the selected change correctly.
 
 Staged changes use a snapshot of the selected objects. Changes that are not staged remain uncommitted on the branch after the commit and are reconciled with the new branch state. Staged selections are preserved across refreshes and device switches, and are rechecked when another commit, rollback, or merge changes the branch.
 
-Use **Unstage All** to return to an ordinary full-change commit. Staging does not discard or undo changes that are left outside the commit.
+Use **Unstage All Changes** (`-`) to clear the staged list and return to an ordinary full-change commit. Staging does not discard or undo changes that are left outside the commit.
 
 ### Asking the Agent to Commit
 

@@ -208,7 +208,6 @@
                             "pages/editor/agent/persona",
                             "pages/editor/agent/planning",
                             "pages/editor/agent/agent-tools",
-                            "pages/editor/agent/model-review",
                             "pages/editor/agent/tips"
                         ]
                     },

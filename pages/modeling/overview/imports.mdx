@@ -17,19 +17,20 @@ Do not expect a 1:1 mapping between SysML 1.x and SysML v2 in Davinci. Davinci c
 | Topic | What Davinci Does | Important Caveat |
 | :--- | :--- | :--- |
 | Input formats | Imports raw `.xml` / `.xmi`, `.mdzip`, and ZIPs containing model payloads | ZIPs may contain multiple candidate models, and supporting files still matter |
-| Import scope | Builds a wrapper package tagged `sysml-import` and inserts converted objects under it | This is a structural conversion |
+| Import scope | Builds a wrapper package tagged `sysml-import` containing `Containment` and `Diagrams` packages | `Containment` holds the model hierarchy; `Diagrams` groups imported view artifacts by diagram type |
 | SysML version gap | Converts SysML 1.x into Davinci objects using best-fit rules | SysML 1.x is **not** a 1:1 match for SysML v2, so expect semantic differences |
-| Packages and blocks | `uml:Model` / `uml:Package` become `package`; most structural classes become `part` | Plain `uml:Class` meaning depends on context and stereotypes |
+| UAF support | Detects UAF/UPDM models and maps UAF 1.2 concepts, subclasses, relationships, and comment rollups | Seeds UAF subclasses and custom relationship types into the project catalog |
+| Packages and blocks | `uml:Model` / `uml:Package` become `package`; most structural classes and composite part usages become `part` | Plain `uml:Class` meaning depends on context and stereotypes; typed usages link back via `extends` |
 | Requirements | Requirement stereotypes and requirement-like classes become `requirement` | MagicDraw often stores requirements as plain `uml:Class` in a requirements package |
 | Behaviors | Activities and interactions become `action` | `UseCase` becomes `capability`, not `action` |
-| State machines | State machines, states, pseudostates, and final states become `state`; transitions become `transition` | State behavior is directly converted into Davinci-native state structures, actions tend to be grouped under the transition if occuring on the transition |
-| Data and values | Structural properties usually become `attribute`; behavior data nodes often become `item` | Mapping is context-sensitive, especially under behaviors and constraint blocks |
+| State machines | State machines, states, pseudostates, and final states become `state`; transitions become `transition` | TimeEvent and ChangeEvent triggers resolve across files; transition-owned guard constraints are folded into the transition conditional |
+| Data and values | Structural properties usually become `attribute`; behavior data nodes often become `item`; rollup patterns wire sum equations | Mapping is context-sensitive, especially under behaviors and constraint blocks |
 | ValueTypes and DataTypes | Scalar value types usually become attribute/unit-like data; structured data types can become `part` | Scalar ValueTypes may disappear as standalone objects because they are registered as units |
-| Interfaces and flows | `uml:InformationFlow` becomes `interface`; flow/property-style constructs often become `item` | Flow specifications are not always preserved as the same SysML interface definitions |
+| Interfaces and flows | `uml:InformationFlow` and port-to-port connectors become `interface`; flow/property-style constructs often become `item` | Usage-specific ports are materialized under part usages so connectors and IBDs wire accurately |
 | Constraints | Constraints become `constraint`; constraint parameters become `attribute` | Untyped `ConstraintProperty` usage slots are skipped |
-| Relationships | Maps stereotypes and XMI types deterministically; port-to-port connectors become `connect` | Some relationships fall back to generic types like `trace`, and generalization is not imported as a normal edge |
-| Diagrams | Converts importable diagrams into Davinci dashboards | Diagrams with no surviving imported scope are skipped, and some table semantics are dropped |
-| Cross-file references | Uses supporting/shared files for stereotypes, timing, and diagram metadata | Importing only a visible primary XML file can produce incomplete results |
+| Relationships | Maps framework/profile stereotypes and XMI types deterministically; port-to-port connectors become `connect` | UAF and profile relationships are registered on the project; `Generalization` becomes `extends` inheritance |
+| Diagrams | Converts tables into `matrix` artifacts and other diagrams (including allocation matrices) into `figure` artifacts | Diagrams are organized under `Diagrams/<Category>`; diagrams with no surviving imported scope are skipped |
+| Cross-file references | Uses supporting/shared files for stereotypes, timing/change events, and diagram metadata | Importing only a visible primary XML file can produce incomplete results |
 
 ## Supported Inputs
 
@@ -43,12 +44,12 @@ If you upload a generic ZIP archive, Davinci first inspects it and lets you choo
 
 ## Import Flow
 
-When you import a SysML 1.x model, Davinci follows this flow:
+When you import a SysML 1.x or UAF model, Davinci follows this flow:
 
 1. Davinci inspects the file or archive and extracts the model files it can use.
-2. The XML/XMI parser builds an intermediate model from elements, stereotypes, relationships, activities, interactions, diagrams, and metadata.
-3. The deterministic converter maps that intermediate model into Davinci object types.
-4. Davinci creates a wrapper package for the import, validates the result, registers any discovered units or custom relationship types, and inserts the objects into the workspace.
+2. The XML/XMI parser detects the dialect (`SysML`, `UAF`, `BPMN`, or `TOGAF`) and specification version, then builds an intermediate model from elements, profile stereotypes, relationships, activities, interactions, diagrams, and metadata.
+3. The converter maps that intermediate model into Davinci object types, project subclasses, inheritance links, action sequences, and Figure/Matrix diagram artifacts.
+4. Davinci creates a wrapper package for the import (with `Containment` and `Diagrams` subpackages), validates the result, registers any discovered project subclasses, custom relationship types, or units, and inserts the objects into the workspace.
 
 Think of this as a structural conversion. Davinci tries to give you a usable model in Davinci, not a perfect one-to-one copy of every SysML editing construct.
 
@@ -67,11 +68,12 @@ Davinci does more than just read one XML file and convert it directly.
 
 ### Cross-File Prepass
 
-Before Davinci extracts elements, it scans all model files for cross-file timing and annotation context:
+Before Davinci extracts elements, it scans all model files for cross-file timing, event, and annotation context:
 
-- `uml:TimeEvent` definitions are indexed first so transition triggers can resolve even when the event lives in a different file.
-- stereotype metadata is collected from all files, including profile and shared files
-- diagram metadata is collected from all files, not only the primary model file
+- `uml:TimeEvent` and `uml:ChangeEvent` definitions are indexed first so transition triggers can resolve into conditional expressions even when the event lives in a different file.
+- stereotype metadata, profile generalizations, and metaclass bindings are collected from all files, including profile and shared files
+- annotated comment maps and UAF comment rollups are collected across files
+- diagram metadata (including table and dependency matrix configurations) is collected from all files, not only the primary model file
 
 ### Primary And Supporting Files
 
@@ -79,54 +81,99 @@ Only primary model files contribute the main model elements, relationships, acti
 
 Supporting or shared files still matter because they can provide:
 
-- stereotype definitions
-- diagram ownership and metadata
-- referenced timing information
+- stereotype definitions and profile generalization chains
+- diagram ownership, table configurations, and dependency matrix metadata
+- referenced timing and change-event information
 - cross-file type/profile context
 
 In other words, a supporting file is still part of the import, even if it does not contribute the main object tree.
 
-### File Dialects
+### File Dialects And UAF Support
 
-Davinci can detect SysML, UAF, BPMN, and TOGAF-style exports, but this import path is built primarily for SysML/UML content. If you import a non-SysML dialect, expect a best-effort result rather than full support.
+Davinci inspects the root XML namespaces to detect the model dialect:
+
+- **SysML 1.x** and **UAF (Unified Architecture Framework)** are first-class supported dialects on this import path.
+- **BPMN** and **TOGAF / ArchiMate** exports can also be detected and imported on a best-effort basis.
+- **ReqIF (`.reqif`, `.reqifz`, or XML containing `<REQ-IF>`)** is automatically detected and routed to Davinci's dedicated ReqIF importer rather than the SysML XMI pipeline.
+
+## Unified Architecture Framework (UAF) Support
+
+Davinci includes built-in semantic mapping for **UAF 1.2** (along with legacy UPDM/vendor aliases and provisional UAF 2.0 metadata). You can also initialize a project with UAF definitions up front by choosing **UAF** in the **Framework** selector when creating a new project.
+
+### How UAF Elements Map Into Davinci
+
+When Davinci detects a UAF or UPDM model (or when UAF stereotypes are present), it resolves elements against the UAF semantic map:
+
+- **Base object type + Project Subclass**: UAF stereotypes map to the appropriate Davinci base type and assign the canonical UAF concept as the object's [Project Subclass](/pages/modeling/common/subclasses) (`subclassId`).
+  - *Operational and Resource Performers / Architecture*: `OperationalPerformer`, `System`, `ResourcePerformer`, `CapabilityConfiguration`, `Software`, `Technology`, `OperationalArchitecture`, `ResourceArchitecture`, and `HighLevelOperationalConcept` become `part` with their UAF subclass.
+  - *Organizations, Personnel, and Posts*: `Organization`, `ActualOrganization`, `Person`, `ActualPerson`, `Post`, `ActualPost`, `OrganizationalResource`, and `ActualResponsibleResource` become `entity` with their UAF subclass.
+  - *Capabilities and Strategic Elements*: `Capability`, `EnterpriseGoal`, `EnterpriseObjective`, `EnterpriseVision`, `VisionStatement`, `Challenge`, `Driver`, and `Opportunity` become `capability`.
+  - *Activities, Functions, and Responsibilities*: `OperationalActivity`, `StandardOperationalActivity`, `Function`, `ServiceFunction`, `ProjectActivity`, `Responsibility`, `ActualResponsibility`, and `ActualEffect` become `action`.
+  - *Interfaces and Ports*: `OperationalInterface`, `ResourceInterface`, `ServiceInterface`, `ResourceServiceInterface`, `OperationalPort`, and `ResourcePort` become `port`, while `ResourceService` and `Service` become `interface`.
+  - *Information and Exchanges*: `OperationalInformation`, `ResourceInformation`, `ConceptItem`, `Resource`, `Effect`, `ActualOutcome`, and `MeasurableElement` become `item` (legacy aliases like `OperationalItem`, `ResourceItem`, `OperationalExchange`, and `ResourceExchange` also resolve to their canonical UAF concepts).
+  - *Measurements*: `MeasurementSet` becomes `package` (with `MeasurementSet` subclass), while `Measurement`, `ActualMeasurement`, `ProjectTheme`, and `Viewpoint` become `attribute`.
+  - *Projects, Phases, Risks, and Standards*: `ActualProject`, `StrategicPhase`, `StructuralPart`, and `TemporalPart` become `task`; `Risk` and `ActualRisk` become `risk`; `Standard` becomes `document`.
+- **InstanceSpecification support**: UAF elements serialized as `uml:InstanceSpecification` (such as `ActualProject`, `ActualRisk`, `ActualOrganization`, or `EnterpriseMission`) preserve their semantic UAF base type and subclass instead of being dropped or flattened into generic parts.
+- **Scenario-owned strategic elements**: UAF models often nest `EnterpriseGoal` or `EnterpriseObjective` classes inside scenario Activities; Davinci preserves their `capability` mapping and relationships rather than converting them into message items.
+
+### UAF Subclass And Relationship Seeding
+
+When a UAF model is imported:
+
+- Davinci seeds the full catalog of UAF concepts into **Project Settings → Schema → Project Subclasses**, including their UAF semantic definitions, so you can continue authoring UAF-typed objects after import.
+- UAF relationship stereotypes (such as `IsCapableToPerform`, `Implements`, `Supports`, `PerformsInContext`, `Exhibits`, `MapsToCapability`, and `OwnsProcess`) are mapped deterministically and registered as project relationship types with their endpoint constraints rather than being downgraded to generic SysML relationships.
+
+### UAF Comment Rollups
+
+UAF models frequently store metadata on stereotyped `uml:Comment` elements instead of standard properties. During import, Davinci rolls these comments into the target element and removes the redundant comment nodes:
+
+- `Alias`: Used as a fallback name when the annotated element has no name.
+- `Definition`, `Information`, and `Metadata`: Appended to the target element's `documentation`.
+- `ArchitectureMetadata`: Added to the target element's `tags`.
+- `VisionStatement`: Materialized as a `capability` object rather than merged as plain comment text.
 
 ## What Davinci Creates
 
-## Structural Objects
+## Structural Objects, Usages, And Inheritance
 
 Davinci maps these structural objects deterministically:
 
 - `uml:Model` and `uml:Package` become `package`
 - most structural `uml:Class` and block-like elements become `part`
+- composite part properties (`PartProperty` or `aggregation="composite"` with a block type) become child `part` usages; if an exported usage is unnamed, Davinci uses its classifier block name
 - actor/stakeholder/external-role style classes become `entity`
 - `uml:Class` inside a requirements package, or with a requirement stereotype, becomes `requirement`
 
 One important edge case: your source model may not store requirements as explicit `sysml:Requirement` nodes. In MagicDraw exports, requirements often come through as plain `uml:Class` elements, so Davinci uses stereotypes and package context to decide whether to import them as requirements.
 
-## Stereotypes Become Tags
+### Typed Usages And Generalization Become `extends`
 
-Davinci does not preserve SysML stereotypes as a separate editable stereotype system. Instead, imported stereotypes are usually added onto the resulting Davinci objects as tags.
+Davinci preserves both UML `Generalization` and typed usage relationships through [Object Inheritance](/pages/modeling/common/inheritance) (`extends`):
 
-That means a stereotype can matter in two different ways during import:
+- **Generalization**: When one classifier specializes another via `uml:Generalization`, Davinci merges inherited fields/children along the generalization chain and wires `extends` from the specialization to the base object.
+- **Typed usages**: When a part usage, port usage, or `CallBehaviorAction` points to a classifier or behavior definition (`type` or `behavior`), Davinci wires the usage to extend the corresponding base definition.
+- **Usage-specific ports**: When a composite part usage is typed by a block that owns ports, Davinci materializes usage-specific `port` objects under the part usage (extending the block's port definitions) so connectors and internal block diagrams resolve to the exact part instance's ports.
 
-- it can influence what Davinci object type gets created
-- it can also survive on the imported object as a tag for later reference
+## Stereotypes, Subclasses, And Tags
 
-This is useful because you often still want to see source-model classification hints even after the object has been translated into Davinci's own object model.
+Stereotypes can influence an imported object in three ways:
 
-There are a few important cleanup rules:
+1. **Framework Subclass Mapping**: When a stereotype matches a known framework concept (such as a UAF 1.2 stereotype), Davinci assigns the canonical Davinci `baseType` and sets the object's `subclassId` to that concept.
+2. **Profile Stereotype Generalization Chains**: When an element uses a custom profile stereotype that generalizes a mapped concept or metaclass, Davinci materializes reusable base definitions under a `Profile Stereotypes` package and links the imported object to them via `extends`.
+3. **Tags**: Stereotypes are also preserved as normalized tags on the imported object for filtering and reference.
 
-- some import-only or overly generic stereotype names are filtered out instead of being kept as tags
-- tags that simply duplicate the final Davinci object type are removed
-- the final tag set is normalized from the source stereotype names rather than preserving a full profile/stereotype definition system
+There are a few important cleanup rules for stereotype tags:
 
-## Values, Data Types, And Attributes
+- tool-internal stereotypes (such as `MagicDraw_Profile`, `MD_Customization`, `Validation_Profile`, `DiagramProfile`, and `Free_Form_Elements`) and diagram-only legend elements are ignored
+- generic SysML stereotypes (`Block`, `ValueProperty`, `ValueType`, `PartProperty`) and tags that simply duplicate the final Davinci object type are removed
+
+## Values, Data Types, Attributes, And Rollups
 
 Davinci treats scalar and structured data definitions differently:
 
-- scalar `ValueType` or `DataType` definitions are usually treated as attribute/unit-like data
-- structured `DataType` definitions with owned named properties are promoted to `part` so their internal fields survive as children
-- scalar ValueTypes extracted as units are removed from the imported object set and registered as units instead
+- scalar `ValueType` or `DataType` definitions are usually treated as attribute/unit-like data, with ISO-80000 and compound unit names normalized into standard symbols (such as `kg`, `m/s`, or `N*m`)
+- structured `DataType` definitions with owned named properties (including abstract base or specializing DataTypes connected by `Generalization`) are promoted to `part` so their internal fields survive as children
+- scalar ValueTypes extracted as units are removed from the imported object set and registered as project units instead
 
 This is one of the most important behaviors to understand before you import:
 
@@ -135,10 +182,15 @@ This is one of the most important behaviors to understand before you import:
 
 Davinci also maps properties based on context:
 
-- properties under structural elements usually become `attribute`
+- properties under structural elements usually become `attribute` (unless they are composite part usages, which become `part`)
 - properties under behavior contexts can become `item`
 - properties under constraint blocks are treated as equation parameters and become `attribute`
-- untyped `ConstraintProperty` elements are skipped because they are considered empty usage slots
+- untyped `ConstraintProperty` elements and self-typed `isDerivedUnion` collection properties are skipped
+- MagicDraw internal structured-expression XML blobs on constraints are cleared rather than imported as raw XML strings
+
+### Rollup Pattern Detection
+
+When a model uses the standard SysML rollup pattern (a pattern block with a self-typed `isDerivedUnion` collection property, a non-derived input `ValueProperty` such as `mass`, and a derived total `ValueProperty` such as `totalMass`), Davinci automatically detects the pattern across specializing blocks and wires sum equations on each participant's total attribute (`[own_input] + [child1_total] + ...`), tagging the computed attribute with `isDerived` and `rollup:sum`.
 
 ## Interfaces, Flows, And Items
 
@@ -236,14 +288,16 @@ Davinci handles state-machine content separately from activity and interaction c
 
 - `uml:StateMachine`, `uml:ProtocolStateMachine`, `uml:State`, `uml:FinalState`, and `uml:Pseudostate` become `state`
 - `uml:Transition` becomes `transition`
-- transition timing can resolve from `uml:TimeEvent` definitions discovered in other files
+- transition `conditional` expressions are assembled from `uml:TimeEvent` triggers (`mod(t, ...)`), `uml:ChangeEvent` expressions, and transition guards resolved across all model files
+- transition-owned guard `uml:Constraint` elements are folded into the transition's `conditional` expression rather than imported as separate child constraint objects
+- state `entry`, `doActivity`, and `exit` behaviors are resolved onto the state's `entry`, `do`, and `exit` fields
 
 ## Constraints And Parametrics
 
 Davinci also maps constraints deterministically:
 
 - `ConstraintBlock` stereotype becomes `constraint`
-- `uml:Constraint` becomes `constraint`
+- `uml:Constraint` becomes `constraint` (except transition guard constraints, which are folded into the parent transition)
 - `ConstraintParameter` elements become `attribute`
 - typed `ConstraintProperty` elements become `attribute`
 - untyped `ConstraintProperty` elements are skipped
@@ -252,14 +306,14 @@ If a constraint usage slot does not point to a typed constraint block, Davinci d
 
 ## Comments And Notes
 
-Davinci does not treat all comments the same way.
+Davinci does not treat all comments the same way:
 
-- annotated comments are usually merged back into the objects they describe
-- some free-floating `uml:Comment` elements can become standalone Davinci objects
+- annotated comments are usually merged into the `documentation` of the objects they describe
+- UAF stereotyped comments (`Alias`, `Definition`, `Information`, `Metadata`, `ArchitectureMetadata`, and `VisionStatement`) follow the [UAF Comment Rollups](#uaf-comment-rollups) rules above
+- rich HTML/table comments attached directly to a class without an `annotatedElement` (such as title blocks or revision history tables) are absorbed into the parent class's `documentation`
+- other free-floating `uml:Comment` elements can become standalone Davinci objects (while malformed unnamed HTML-wrapped elements are skipped)
 
 For standalone comments, Davinci may infer the object type from the surrounding package name. For example, comments under requirement-like containers may become `requirement`, while comments under behavior-like containers may become `action`.
-
-So depending on how your source model encodes comments, you may see them merged into nearby objects or imported as their own objects.
 
 ## How Relationships Come Through
 
@@ -268,58 +322,57 @@ Davinci maps relationships deterministically, but not one-to-one.
 ### Core Rules
 
 - structural containment relationships are filtered out because parent/child structure is handled separately
-- `Generalization` is not imported as a normal relationship; it is handled through inheritance or `extends`-style structure
-- pre-identified port-to-port connectors become `connect` with `inout` direction
+- `Generalization` is not imported as a normal relationship; it is handled through [Object Inheritance](/pages/modeling/common/inheritance) (`extends`)
+- pre-identified port-to-port connectors create an `interface` object between the resolved ports (including usage-specific ports on part instances) and wire bidirectional `connect` relationships
+- multi-valued stereotype reference attributes (such as `Stakeholder.concern`) are expanded into individual relationship edges
 
 The important nuance is that Davinci starts from the SysML containment tree when building the imported structure, but it does not treat that tree as untouchable final parentage. Later conversion passes can reparent objects when the importer has stronger evidence for a more useful Davinci hierarchy, especially around behavior-derived content and other assembly-time restructuring.
 
 ### Relationship Mapping Rules
 
-For other relationships, Davinci applies stereotype and XMI-type rules first:
+For other relationships, Davinci applies framework, profile, and XMI-type rules:
 
-- known SysML stereotypes map directly to Davinci relationship types
-- known profile relationship stereotypes can map to built-in types or become new custom relationship types
-- if no stronger rule applies, the importer falls back to more generic relationship types such as `trace`
+- profile relationships that match a framework map (such as UAF relationships) are mapped deterministically to their canonical relationship name and registered in the project's relationship catalog so they are never downgraded to generic SysML edges
+- known SysML stereotypes map directly to built-in Davinci relationship types
+- other profile relationship stereotypes applied to UML relationship metaclasses (`Association`, `Dependency`, `Abstraction`, `InformationFlow`, etc.) are registered as custom relationship types on the project
+- if no stronger rule applies, the importer uses AI-assisted or rule-based interpretation and falls back to generic relationship types such as `trace`
 
 Davinci also applies a name-based physical-flow upgrade:
 
 - relationship names containing terms like `power`, `data`, `signal`, `fluid`, `thermal`, `mechanical`, `optical`, `chemical`, or `radio` can be upgraded from generic mappings into typed physical-flow relationships
 
-Davinci usually treats direction as outgoing from source to target. Port-to-port connectors are the main bidirectional exception.
+Davinci usually treats direction as outgoing from source to target. Port-to-port connectors and bidirectional framework relationships use `inout`.
 
-## How Diagrams Turn Into Dashboards
+## How Diagrams Turn Into Figures And Matrices
 
-When possible, Davinci converts imported diagram metadata into dashboards.
+Davinci converts imported diagram metadata into native [Figure](/pages/modeling/objects/figure) and [Matrix](/pages/modeling/objects/matrix) artifacts, organized under a top-level `Diagrams` package with child packages for each diagram category (mirroring the Cameo/MagicDraw diagram browser, such as `SysML Block Definition Diagrams` or `Dependency Matrices`).
 
-During this step, Davinci:
+During diagram conversion, Davinci:
 
-- resolves each diagram's referenced XMI IDs against the objects that actually survived import
-- removes redundant ancestor scope where needed
-- chooses a Davinci block type from the source diagram type
-- creates a dashboard under the diagram owner when a valid owner and scope remain
+- resolves each diagram's referenced XMI IDs (including part-usage ports and property classifier fallbacks) against the objects that survived import
+- converts **Generic Tables, Requirement Tables, Diagram Tables, and Glossary Tables** into `matrix` artifacts, translating MagicDraw built-in columns, attribute/tag columns, custom DSL relation expressions, and multi-hop metachains into Matrix columns
+- converts **Block Definition Diagrams (BDD), Internal Block Diagrams (IBD), Parametric, Requirement, Use Case, Package, Activity, State Machine, and Sequence diagrams** into `figure` artifacts with matching layout modes (`tree`, `block`, `activity`, `state`, or `sequence`)
+- converts **Dependency and Allocation Matrices** into `figure` artifacts in allocation-matrix mode, including row/column scopes, UAF row/column element types, direct relationship criteria, multi-hop metachains, and derived UAF mapping expressions (such as `SV-5b` Operational Activity to System mappings)
 
-This gives you useful view objects, but there are important limits:
+Important limits for imported diagrams:
 
-- diagrams with no resolved imported elements are skipped
-- profile diagrams are not processed into Davinci dashboards
-- relationship-style diagrams may be pruned if no connected imported objects remain
-- some MagicDraw table columns are dropped when there is no Davinci equivalent
-- package diagrams can suppress some scope detail compared to the original source view
+- diagrams with no resolved imported elements or valid scope are skipped
+- relationship-style diagrams may prune disconnected scope elements
+- unsupported MagicDraw custom column expressions are omitted when no Davinci Matrix query equivalent exists
 
 ## Cleanup Davinci Applies Automatically
 
 Before Davinci inserts the imported objects, it applies several cleanup steps:
 
-- imported objects are wrapped in a package tagged `sysml-import`
-- children are sorted by type and name
+- imported objects are placed in a wrapper package tagged `sysml-import`, split into `Containment` (the semantic model tree) and `Diagrams` (imported Figure and Matrix artifacts grouped by diagram type)
+- children are sorted by Davinci type order and natural numeric/alphabetical name order
 - embedded newlines are stripped from object names
-- empty unnamed packages are removed
-- long names can receive an auto-generated `shortName`
+- empty unnamed packages are removed (unless they carry a `subclassId`, participate in inheritance, or have relationships)
+- long names (more than 7 words) receive an auto-generated `shortName`
 - self-referencing attribute values are cleared
 - action sequences are forced to end with `end()`
-- tags that simply duplicate the final Davinci type are removed
-
-These are intentional cleanup steps, not import bugs.
+- tags that duplicate the final Davinci type or generic SysML stereotypes are removed
+- dangling references are cleaned before structure validation
 
 ## What To Expect After Import
 
@@ -348,9 +401,9 @@ This is expected. Davinci often turns scalar value types into unit metadata inst
 
 Davinci discards untyped constraint properties because they do not carry enough useful model semantics on their own.
 
-### Diagrams Are Best-Effort Views
+### Diagrams Are Best-Effort Artifacts
 
-Davinci recreates diagrams as dashboards instead of preserving native SysML diagram definitions. Expect to lose some layout intent, special table semantics, and diagram-only decoration.
+Davinci recreates diagrams as native `figure` and `matrix` artifacts under the `Diagrams` package instead of preserving native MagicDraw diagram layout definitions. Expect to lose some manual canvas coordinates, custom table expressions without a Davinci query equivalent, and diagram-only decoration.
 
 ### A Successful Import Still Needs Review
 
@@ -398,16 +451,17 @@ To get the cleanest results:
 3. Use clear package naming, especially for requirements-heavy sections.
 4. Expect scalar value types to become units rather than standalone objects.
 5. Upload diagram images alongside the XMI or MDZIP when you want Davinci to review, explain, or help update the imported model afterward. The structured model data is useful, but the diagram images preserve visual intent, layout, and notation that do not survive cleanly in XMI alone.
-6. Review imported dashboards, constraints, relationships, and state behavior after import.
+6. Review imported Figures, Matrices, constraints, relationships, subclasses, and state behavior after import.
 
 ## Quick Summary
 
-Davinci's current SysML 1.x importer gives you a deterministic structural conversion pipeline.
+Davinci's current SysML 1.x and UAF importer gives you a deterministic structural and semantic conversion pipeline:
 
-- it understands archives, supporting files, and cross-file timing context
-- it maps many common SysML constructs into useful Davinci objects
-- it treats structured vs scalar data definitions differently
-- it converts diagrams into dashboards when enough scope survives
+- it understands archives, supporting files, profile generalizations, and cross-file timing/change-event context
+- it detects UAF 1.2 models and seeds UAF project subclasses, relationship types, and comment rollups
+- it maps common SysML and UAF constructs into Davinci objects, wiring `extends` inheritance for generalizations and typed usages
+- it treats structured vs scalar data definitions differently and wires sum equations for detected SysML rollup patterns
+- it organizes the imported model into `Containment` and `Diagrams`, converting tables into `matrix` artifacts and diagrams/allocation matrices into `figure` artifacts
 - it intentionally skips or simplifies constructs that do not translate cleanly
 
-For migration work, you will get the best results if you import complete exports, include diagram images for follow-up review, and plan for a review pass afterward. Most importantly, treat SysML 1.x import as a translation into Davinci, not as a strict SysML 1.x to SysML v2 equivalence.
+For migration work, you will get the best results if you import complete exports, include diagram images for follow-up review, and plan for a review pass afterward. Most importantly, treat SysML 1.x and UAF import as a translation into Davinci, not as a strict SysML 1.x to SysML v2 equivalence.
