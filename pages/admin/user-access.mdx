@@ -1,13 +1,13 @@
 ---
-title: Users And Access
-description: Provision accounts, recover access, manage roles and sessions, and configure per-user controls
+title: Users, Entitlements, And Access
+description: Provision accounts, manage entitlement groups and overrides, configure seats and trials, recover authentication, and control sessions
 ---
 
 ## Overview
 
-Use **Administration → Users** to manage accounts across the deployment. The page combines account provisioning, authentication recovery, role assignment, usage limits, projects, and per-user feature controls.
+Use **Administration → Users** (`/admin/~/users`) to manage accounts across the deployment, and **Administration → Groups** (`/admin/~/groups`) to manage the entitlement groups that control which features, limits, and LLM profiles users and organizations receive.
 
-The separate **Roles** page provides a system-role catalog and direct role lookup. It may be unavailable on self-hosted deployments; the user detail view remains the primary place to understand an individual account.
+The separate **Roles** page (`/admin/~/roles`) provides a system-role catalog and direct role lookup. It is hidden on self-hosted deployments; the user detail view remains the primary place to inspect and manage an individual account.
 
 <Warning>
 User administration can expose personal information and temporary credentials. Share exports and credentials only through approved secure channels.
@@ -18,14 +18,13 @@ User administration can expose personal information and temporary credentials. S
 Search by name or email, then filter by:
 
 - Account status.
-- Subscription tier.
 - Tenant.
 - System or tenant role.
 - Email-verification state.
 - MFA state.
 - Sign-in method, including password, OAuth, OIDC, or LDAP.
 
-Select **Columns** to include identifiers, tenant, LLM profile override, sessions, sign-in method, project count, storage, and other account fields. Column choices are remembered in the browser.
+Select **Columns** to include identifiers, tenant, seat type, sessions, sign-in method, project count, storage, and other account fields. Column choices are remembered in the browser.
 
 Select **Export** to download the complete filtered result set with the currently selected columns. Treat the CSV as sensitive because it can contain user identifiers, email addresses, tenant membership, authentication state, and usage-related data.
 
@@ -35,7 +34,7 @@ Select **Add User** and provide:
 
 1. The user's email address.
 2. An optional display name.
-3. The authentication type.
+3. The authentication type (**Password**, **OAuth**, **SSO / OIDC**, or **LDAP / Directory**).
 4. A provider name when required by OAuth or OIDC.
 5. Whether Davinci should email password credentials.
 
@@ -58,7 +57,7 @@ For deployment-wide provider setup and allowed email domains, see [System Settin
 
 ## Bulk Provision Users
 
-Select **Bulk Add** to create several accounts with the same authentication type, tenant, tier, and optional trial-credit allocation.
+Select **Bulk Add** to create up to 200 accounts at once with the same authentication type, tenant, optional admin entitlement group grant, and optional starting credit balance.
 
 Enter one account per line in either form:
 
@@ -67,71 +66,103 @@ user@example.com
 user@example.com, Display Name
 ```
 
-You can submit up to 200 users in one request. A failure for one entry does not prevent the other entries from being processed. Review the result table for created and failed accounts, email-delivery results, and any temporary passwords that require manual delivery.
+Configure:
 
-Trial credits can be entered as credits or a currency amount. The preview converts between the two using the deployment's current credit rate and applies the same amount to each successfully created user.
+- **Auth Type** and optional **Provider Name**.
+- **Admin group grant** — optionally assign all created users to a user entitlement group (or leave as `None (default group only)` so they receive `base` defaults).
+- **Credit Balance** — optional one-time starting credit balance entered in **Credits** or **Dollars ($)**. The preview converts between the two using the current credit rate and applies the same amount to each created user.
+- **Email credentials to users** — whether to email temporary passwords automatically.
+
+A failure for one entry does not prevent the other entries from being processed. Review the result table for created and failed accounts, email-delivery results, and any temporary passwords that require manual delivery.
+
+## Entitlement Groups (`Administration → Groups`)
+
+Entitlement groups (`/admin/~/groups`) control which features, limits, and LLM profiles users and organizations receive across the platform.
+
+### How Entitlements Resolve
+
+Every entitlement key resolves in four steps:
+
+1. **Subject Override** — A per-user or per-organization override set on that subject's **Entitlements** tab beats every group.
+2. **Active Groups** — Across all active groups a subject belongs to, the **most permissive** value wins (`On` beats `Off`, `Unlimited` beats numeric limits, largest numeric limit wins, and the highest-ranked LLM profile wins). Every user automatically belongs to the `base` group.
+3. **System Catalog Default** — Used whenever a key is left at *Catalog default* across all of the subject's active groups.
+4. **License & Seat Ceiling** — The deployment/tenant license and read-only seat status clamp the final effective result.
+
+### Managing Entitlement Groups
+
+The **Groups** table lists each group's name and key, target subject type (**Users** or **Organizations**), management source (`system`, `billing`, or `admin`), active member count, and a summary of its configured entitlements.
+
+- **System baseline (`base`)**: Every user is in `base`. Editing `base` changes the default limits, LLM profile, and features for all users who do not have a more permissive group or override.
+- **Billing-managed groups**: Plans such as `core`, `max`, `team` (Group plan), and `org_owner` are assigned automatically when subscriptions change, though administrators can inspect or customize the entitlements those groups grant.
+- **Admin-managed groups**: Click **New group** to create a custom group with a lowercase key (for example, `pilots` or `power_users`), name, description, and target (**Users** or **Organizations**). Admin-created groups can be archived when no longer needed.
+
+Click any group row to open its detail modal and configure:
+
+- **Limits** — Set each limit (such as maximum owned projects or maximum collaborators per project) to **Catalog default**, **Custom limit**, or **Unlimited**.
+- **Options** — For user groups, select the **LLM profile** granted by the group (or leave at **Catalog default**).
+- **Features** — Set feature flags and rollouts (such as Scratch Pad, Journeys, CAD Objects, Onshape Connect, Personal Access Tokens, Simulation options, or organization AI funding) to **Catalog default**, **On**, or **Off**.
+- **Members** — View all users or organizations currently in the group, how they were added (`Default group`, `Billing plan`, `Tenant membership`, `Trial`, or `Admin grant`), and when their membership ends.
 
 ## User Details
 
-Select a user row to open the detail view.
+Select a user row on `/admin/~/users` to open the User Details modal, which is organized into seven tabs: **Account**, **Entitlements**, **Sessions**, **Billing**, **Storage**, **Roles**, and **Projects**.
 
 ### Account
 
-The **Account** tab shows identity, status, tenant, sign-in, verification, and limit information. Administrators can:
+The **Account** tab shows identity, avatar, status, seat type (**Full** or **Read-only**), tenant, sign-in, verification, and session information. Administrators can:
 
-- Update the display name.
-- Mark an email address as verified.
-- Set an explicit [LLM profile](/pages/admin/llm-control-plane#profiles-and-routing) or return the user to the subscription mapping.
-- Override maximum owned projects and collaborators.
-- Reset the password or MFA enrollment.
-- Unlink an LDAP identity.
-- Deactivate, reactivate, or permanently delete the account.
+- Update the **Display Name** or remove the user's custom avatar image.
+- **Move** the user to a different tenant (or back to `Default (Standalone)`).
+- Mark an unverified email address as **Verified**.
+- **Reset Password** or **Reset MFA**.
+- **Unlink LDAP** if the account is linked to a directory.
+- **Deactivate**, **Reactivate**, or **Permanently Delete** (`Delete Forever`) the account.
 
-An empty project or collaborator override means unlimited. These are account-specific values and can differ from the defaults in [New User Defaults](/pages/admin/system-settings-authentication#new-user-defaults).
+### Entitlements
+
+The **Entitlements** tab shows every resolved limit, option, and feature for the user along with its source (`Catalog default`, `Group: <name>`, `Override`, or `Platform` ceiling). From this tab, administrators can:
+
+- **Seat type**: Switch the user between a **Full** seat and a **Read-only** seat (read-only seats can view, export, and comment, but cannot edit models or use AI).
+- **Group memberships**: View active group memberships and grant a new **Admin grant** group membership with an optional expiration date, or remove an existing admin grant.
+- **Trial**: Grant the user a time-limited trial of any user group (for example, `max`) with a duration in days and an optional trial credit balance in USD, or **Revoke trial** on an active trial.
+- **Limits, Options, and Features Overrides**: Set or **Clear** a per-user override on any settable limit (such as max owned projects or collaborators), option (such as the user's **LLM profile**), or feature flag (such as Scratch Pad, Onshape Connect, or Personal Access Tokens).
+
+<Note>
+Per-user **Personal Access Token** entitlement does not override the deployment-wide **Enable API Keys** kill switch in System Settings. Both must allow access. See [Personal Access Tokens](/pages/api/personal-access-tokens).
+</Note>
 
 ### Sessions
 
-The **Sessions** tab shows active sessions, including device label, IP address, creation time, last use, and expiration. You can revoke one session or all sessions.
+The **Sessions** tab lists active sessions, including device label, IP address, creation time, last use, and expiration. You can revoke one session or all sessions.
 
 Revocation prevents the selected session from refreshing its access token. Use it when a device is lost, a credential may be compromised, or an access change should take effect promptly.
 
 ### Billing And Storage
 
-The **Billing** tab shows balances, subscription state, billing cycle, credit rate, and on-demand usage. It also supports credit adjustments and the on-demand toggle.
+The **Billing** tab shows the user's accounting pools (**Included Usage**, **Credit Balance**, and **On-Demand Usage**), funding scope (**Individual** vs. **Group Member**), and usage period start. Administrators can:
 
-The **Storage** tab shows current usage and the account limit. Set a limit in MB, GB, or TB. Setting the limit to zero returns the account to its tier default.
+- **Adjust Balance**: **Add** (`credit`) or **Deduct** (`debit`) a dollar amount (`$`) on either the **Credit Balance** pool or the **Included Usage** pool, with a required reason recorded in the ledger.
+- **On-Demand Usage Limit**: Configure the user's per-period on-demand spending limit (`Off`, `$25`, `$50`, `$100`, `$500`, `Unlimited`, or custom amount) when the account is managed internally, and configure accounting setting locks.
 
-See [Usage And Billing](/pages/admin/usage-and-billing) before changing balances, limits, or paid usage.
+The **Storage** tab shows current storage usage, effective limit, manual override state, and any active storage grace deadline. Set an explicit storage cap in **MB**, **GB**, or **TB**, or apply `0` to return the account to its automatic plan limit.
+
+See [Usage And Costs](/pages/admin/usage-and-billing) before changing balances, limits, or paid usage.
 
 ### Roles
 
-The **Roles** tab shows current system roles and supports permitted assignments or removals. System-role changes require system-administrator access; lower-scope roles do not grant system-wide administration.
+The **Roles** tab shows current system and tenant roles (`system_admin`, `system_support`, `system_billing`, `tenant_admin`, `tenant_support`, `tenant_billing`) and supports assigning or removing roles. System-role changes require system-administrator access.
 
 An account can have one system role and one tenant role. Assigning another role in the same scope replaces the current role rather than adding a second role in that scope.
 
 Davinci prevents removal, deactivation, or deletion of the final active system administrator. Promote and verify another administrator before changing the final recovery account.
 
-For the relationship between system, tenant, organization, and project access, see [Roles And Permissions](/pages/browser/roles-permissions).
-
 ### Projects
 
 The **Projects** tab separates:
 
-- Projects owned by the user.
-- Projects shared with the user.
-- Deleted projects still eligible for administration.
-
-Deleted projects show their remaining recovery period and can be restored or permanently deleted. See [Projects, Organizations, And Tenants](/pages/admin/resources-and-tenants#deleted-projects) for the lifecycle and deletion safeguards.
-
-### Feature Flags
-
-The **Feature Flags** tab contains account-specific controls:
-
-- **Scratch Pad** overrides the global default for this user.
-- **Onshape Connect Access** controls whether the user can connect an Onshape account.
-- **Personal Access Tokens** controls whether the user can create credentials for the programmatic API.
-
-Per-user Personal Access Token access does not override the deployment-wide API-key switch. Both the global setting and the user setting must allow access. See [Personal Access Tokens](/pages/api/personal-access-tokens).
+- **Owned Projects**
+- **Shared Projects**
+- **Deleted Projects** still within their recovery window, which can be restored or permanently deleted. See [Projects, Organizations, And Tenants](/pages/admin/resources-and-tenants#deleted-projects).
 
 ## Authentication Recovery
 
@@ -157,25 +188,16 @@ The LDAP migration workflow is available from [System Settings](/pages/admin/sys
 
 ### Deactivate
 
-Deactivation revokes active sessions and Design Engine access, cancels the user's subscription, and marks the account deleted while retaining the record for possible reactivation. Review billing and owned resources before using it.
+Deactivation revokes active sessions and Design Engine access, cancels the user's subscription, and marks the account suspended while retaining the record for possible reactivation. Review billing and owned resources before using it.
 
 ### Reactivate
 
-Reactivation requires an authentication method. Password reactivation creates a temporary password and can deliver it by email. OAuth, OIDC, and LDAP reactivation associate the account with the selected provider.
+Reactivation requires selecting an authentication method (**Password**, **OAuth**, **SSO / OIDC**, or **LDAP / Directory**). Password reactivation creates a temporary password and can deliver it by email.
 
 ### Permanently Delete
 
-Permanent deletion removes the user and associated data and requires typing the confirmation text shown by the panel.
+Permanent deletion (`Delete Forever`) removes the user and associated data and requires typing the confirmation text shown by the panel.
 
 <Warning>
 Permanent user deletion cannot be undone. Review owned projects, billing, storage, and organization responsibilities before deleting the account. Use deactivation when retention or transfer work is incomplete.
 </Warning>
-
-## Recommended Access-Change Workflow
-
-1. Confirm the user, tenant, and requested access.
-2. Review current roles, sign-in methods, sessions, and owned resources.
-3. Make the smallest necessary change.
-4. Revoke sessions if the change responds to compromise or immediate removal of access.
-5. Confirm that the user retains at least one valid sign-in method.
-6. Review the [Audit Log](/pages/admin/operations#audit-log).

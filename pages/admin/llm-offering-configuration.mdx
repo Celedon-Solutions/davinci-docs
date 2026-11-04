@@ -511,51 +511,17 @@ Capabilities can be inherited, explicitly supported, or explicitly unsupported:
 
 Use **Supported** only when the provider offering actually implements the capability through the selected API and codec. Capability overrides affect which profiles and workloads can select the offering, but they cannot add a capability the provider lacks.
 
-## Timeouts And Request Size
+## Runtime Controls
 
-### Offering Timeout
+An offering's **Runtime controls** section inherits its defaults from the selected [LLM provider](/pages/admin/llm-provider-configuration#runtime-defaults) unless overridden on the offering:
 
-Enter a positive number of milliseconds. When empty, the offering uses the provider's default timeout, then the platform default of 60,000 milliseconds.
+- **Request / first-token timeout (ms)** (`timeoutMs`) — wait for first streaming content or a non-streaming response (inherits provider `defaultTimeoutMs` or platform default `60,000` ms).
+- **Max attempts (initial + retries)** (`retryCount`) — total attempts before failing or falling back (`1` = no retries; inherits provider `retryCount` or `5`).
+- **Stream idle timeout (ms)** (`streamIdleTimeoutMs`) — maximum inactivity gap between streamed chunks (inherits provider `streamIdleTimeoutMs` or `90,000` ms).
+- **Stream absolute timeout (ms)** (`streamAbsoluteTimeoutMs`) — maximum total wall-clock time for a single stream attempt (inherits provider `streamAbsoluteTimeoutMs` or `300,000` ms).
+- **Max request size (bytes)** (`maxRequestSizeBytes`) — payload limit before older images or messages are trimmed (inherits provider `maxRequestSizeBytes`).
 
-### Maximum Request Size
-
-Enter a positive byte count or leave it empty. Use the provider's documented request-size limit and allow room for encoded images and structured content.
-
-### Request Timeout
-
-The Rate Limits section's **Request timeout** is enforced before the general offering timeout. It controls invocation attempts and time to first streaming content.
-
-Timeout precedence is:
-
-1. Rate-limit request timeout.
-2. Offering timeout.
-3. Provider default timeout.
-4. 60,000 milliseconds.
-
-## Rate Limits
-
-The form exposes:
-
-- **Strategy:** `none`, `time`, `concurrency`, or `both`.
-- **Time window:** positive milliseconds or empty.
-- **Calls per window:** positive integer or empty.
-- **Tokens per window:** positive integer or empty.
-- **Maximum concurrent per connection:** positive integer or empty.
-- **Maximum global concurrent:** positive integer or empty.
-- **Request timeout:** positive milliseconds or empty.
-
-Currently effective controls are:
-
-- Request timeout.
-- Per-connection concurrency when Strategy is `concurrency` or `both`.
-
-The time-window, call-count, token-count, and global-concurrency fields are reserved and must not be relied upon as active enforcement controls.
-
-<Warning>
-Do not use reserved rate fields as security, quota, or cost controls. Enforce provider quotas at the provider and monitor actual usage in [Usage And Billing](/pages/admin/usage-and-billing).
-</Warning>
-
-Treat per-connection concurrency as provider-scoped within the selected configuration. Use a consistent value across offerings attached to the same provider.
+Editing any field activates an offering-level override; use **Clear overrides** in the Runtime controls header to return to inheriting from the provider. Connection-wide concurrency (`Max concurrent requests / replica`) is configured on the provider.
 
 ## Pricing Overrides
 

@@ -327,6 +327,33 @@ Figures in slides cache their rendered images for performance. When diagrams or 
 
 The refresh operation clears cached figure images and re-renders them from current model data.
 
+## Importing PowerPoint
+
+Upload a PowerPoint file (.pptx, .pptm, .ppsx, .ppsm, .potx or .potm) by dragging it into the Editor or with the Library's upload button, and Davinci asks how to bring it in:
+
+- **Open as Davinci Slides** converts it into an editable slide object. The pictures and tables in the file become reference and table objects under the slides.
+- **Upload as PDF** converts it to a PDF that keeps its original layout, which becomes a PDF reference with a page image per page, the same as an uploaded PDF.
+
+Dropping several Word and PowerPoint files together asks once for all of them. Files uploaded through the API become slides unless the upload asks for `officeImport: "pdf"`, or `keepAsReference: true` to attach the original file. Older .ppt files can be uploaded as PDFs or attached as they are; to edit one as slides, save it as .pptx first.
+
+The rest of this section describes opening a file as slides.
+
+The import keeps:
+- Slide order, size and backgrounds
+- Text with its bold, italic, underline, size, color, alignment, bullets and numbering
+- Pictures, including crops, recoloring, tiled textures and circular or rounded frames
+- Tables with merged cells, fills, borders, padding and alignment
+- Rectangles, rounded rectangles, ellipses and lines
+- Slide layouts, which become templates
+
+Charts, SmartArt, gradient shapes and shapes Davinci has no element for are drawn as vector images.
+
+When the import finishes, a summary lists what could not be reproduced exactly, for example fonts other than Arial, strikethrough, animations or speaker notes. The same list is saved in the slide object's documentation, where the Agent can read it as well.
+
+### Round trips with PowerPoint
+
+A PowerPoint file exported from Davinci also carries the slides it came from. Importing it again restores them exactly, including templates, references, figures, tables and text formatting. Slides edited in PowerPoint take the edits from the file and keep everything else: moved, resized or recolored shapes, changed text, added and deleted shapes, recropped pictures, edited table cells and duplicated slides all come back.
+
 ## Exporting Presentations
 
 ### Export to PDF
@@ -351,6 +378,8 @@ PPTX export converts slides to PowerPoint format, preserving:
 - Text content and basic formatting
 - Images and shapes
 - Slide layout and dimensions
+
+The file also carries the Davinci slides, so importing it back restores them. See [Round trips with PowerPoint](#round-trips-with-powerpoint).
 
 <Warning>Dynamic model references convert to their current display values in exports. Exported presentations don't maintain live connections to model data.</Warning>
 

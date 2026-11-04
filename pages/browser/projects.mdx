@@ -54,10 +54,42 @@ Project permissions come from several possible sources:
 - The project owner has full control.
 - Direct project members receive permissions from their project role.
 - Organization members can inherit project permissions for organization-owned projects.
-- Team or tenant administrators may receive administrative access to organization-owned projects.
+- Group or tenant administrators may receive administrative access to organization-owned projects.
 - Public projects grant limited read-only access to non-members.
 
 Direct project roles and organization-inherited roles can combine. Assigning a narrower direct project role does not remove stronger access a user already inherits from the owning organization.
+
+## Collaborators And Review Settings
+
+The **Collaborators** tab on the project page in the Davinci Browser lets you view project members, manage invitations, and—for Project Owners and Project Admins—configure project-wide **Object Reviews** and **Merge Approval** policies. These settings are stored in the project database rather than in Git-tracked model files, so they apply consistently across all branches without dirtying the working tree.
+
+### Managing Collaborators And Invitations
+
+- **Collaborators Table**: Lists everyone with access to the project, their effective role (**Owner**, **Admin**, **Project Editor**, or **Viewer**), when they were added, and (for organization-owned projects) whether their access is direct or inherited from the organization.
+- **Add Collaborator**: Project Owners and Admins can invite users by email with a selected project role and revoke pending invitations before they are accepted.
+- **Edit Or Remove Access**: Use the row actions menu (`...`) to update a collaborator's project role or remove them from the project. Direct collaborators who are not the project owner can also remove themselves using **Leave project**.
+
+### Object Reviews Settings
+
+Project Owners and Project Admins (`project:manage`) can view and configure how [Object Reviews](/pages/user-guide/views/review) work across the project:
+
+| Setting | Description |
+| --- | --- |
+| **Enable Object Reviews** | Master toggle to enable or pause object reviews for the project. When paused, review UI indicators and automatic edit invalidations are hidden, while all existing review history is preserved. |
+| **Review Authority** | Controls who can mark objects as reviewed, revoke reviews, or mark objects as exempt:<ul><li>**Anyone with edit access**: Owners, Admins, and Editors.</li><li>**Admins only**: Only Project Owners and Project Admins.</li><li>**Specific reviewers**: Only the specific collaborators added to the **Reviewers** list.</li></ul> |
+| **Re-review Triggers** | Controls how calculated value changes affect existing reviews:<ul><li>**All computed values (Recommended)**: Re-review when any calculated value, rollup, constraint, requirement satisfaction, risk metric, or test verdict changes.</li><li>**Verdicts & satisfaction only**: Re-review only when pass/fail outcomes or equation errors change.</li><li>**Direct edits only**: Ignore calculated value changes; only direct edits to an object or its children trigger re-review.</li></ul> |
+| **Mark Reviewed on Commit** | Sets the default state for the **Mark Reviewed on Commit** toggle in the Editor's [Source Control](/pages/editor/widgets/source-control) panel for users with review authority. |
+| **Exempt Object Types** | Selects object types that automatically start with status **Review Not Required** when created. Existing objects of these types can be updated in bulk from the **Reviews** filter in the Editor's [Validation](/pages/editor/widgets/validation) panel. |
+
+### Merge Approval Settings
+
+Below Object Reviews on the **Collaborators** tab, Project Owners and Project Admins can configure **Merge Request Approvers** independently of object reviews:
+
+- **Anyone with edit access**: Owners, Admins, and Editors can approve merge requests.
+- **Admins only**: Only Project Owners and Project Admins can approve merge requests.
+- **Specific approvers**: Only the collaborators explicitly added to the **Approvers** list can approve merge requests.
+
+Changes to Object Reviews and Merge Approval settings take effect immediately and sync live to any open Editor sessions on the project.
 
 ## Creating And Importing Projects
 
@@ -69,7 +101,7 @@ Project exports and imports using `.DAF` retain uploaded reference files. JSON e
 
 Project settings exist in two places:
 
-- **Browser project settings** manage project-level metadata and access, such as name, visibility, collaborators, and deletion.
-- **Editor project settings** manage model-level configuration, such as files, units, relationships, tags, secrets, toolboxes, exports, and model health.
+- **Browser project settings** manage project-level metadata, access, and review governance—such as project name, description, visibility, ownership transfer, deletion, collaborators, **Object Reviews** settings, and **Merge Approval** policies.
+- **Editor project settings** manage model-level configuration, such as files, units, relationships, subclasses, tags, secrets, dependencies, toolboxes, personas, MCP servers, exports, and model health.
 
 See [Editor project settings](/pages/editor/project-settings/project) for in-project configuration.

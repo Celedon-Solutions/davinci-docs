@@ -130,6 +130,7 @@
                     "pages/browser/projects",
                     "pages/browser/organizations",
                     "pages/browser/teams",
+                    "pages/browser/groups",
                     "pages/browser/roles-permissions",
                     "pages/browser/account",
                     "pages/browser/notifications",
@@ -139,7 +140,7 @@
                             "pages/browser/usage-plans-billing/overview",
                             "pages/browser/usage-plans-billing/change-individual-plan",
                             "pages/browser/usage-plans-billing/add-organization",
-                            "pages/browser/usage-plans-billing/upgrade-to-team",
+                            "pages/browser/usage-plans-billing/upgrade-to-group",
                             "pages/browser/usage-plans-billing/cancel-or-unsubscribe"
                         ]
                     }
@@ -208,70 +209,10 @@
                             "pages/editor/agent/persona",
                             "pages/editor/agent/planning",
                             "pages/editor/agent/agent-tools",
-                            "pages/editor/agent/model-review",
                             "pages/editor/agent/tips"
                         ]
                     },
-                    "pages/editor/exports",
-                    {
-                        "group": "Digital Modeling",
-                        "pages": [
-                            {
-                                "group": "Overview",
-                                "pages": [
-                                    "pages/modeling/overview/systemmodeling",
-                                    "pages/modeling/overview/language",
-                                    "pages/modeling/overview/mentions",
-                                    "pages/modeling/overview/imports",
-                                    "pages/modeling/overview/sysml-export"
-                                ]
-                            },
-                            {
-                                "group": "Common",
-                                "pages": [
-                                    "pages/modeling/common/equations",
-                                    "pages/modeling/common/relationships",
-                                    "pages/modeling/common/inheritance",
-                                    "pages/modeling/common/units"
-                                ]
-                            },
-                            {
-                                "group": "Scripts",
-                                "pages": [
-                                    "pages/modeling/python-database-api"
-                                ]
-                            },
-                            {
-                                "group": "Object Views",
-                                "pages": [
-                                    "pages/user-guide/views/activity",
-                                    "pages/user-guide/views/artifact",
-                                    "pages/user-guide/views/block",
-                                    "pages/user-guide/views/code",
-                                    "pages/user-guide/views/connectome",
-                                    "pages/user-guide/views/dependency-graph",
-                                    "pages/user-guide/views/design-space-explorer",
-                                    "pages/user-guide/views/digital-thread",
-                                    "pages/user-guide/views/gantt",
-                                    "pages/user-guide/views/help",
-                                    "pages/user-guide/views/history",
-                                    "pages/user-guide/views/package",
-                                    "pages/user-guide/views/pie",
-                                    "pages/user-guide/views/plot",
-                                    "pages/user-guide/views/properties",
-                                    "pages/user-guide/views/reference",
-                                    "pages/user-guide/views/risk",
-                                    "pages/user-guide/views/rollup",
-                                    "pages/user-guide/views/sequence",
-                                    "pages/user-guide/views/slide",
-                                    "pages/user-guide/views/state",
-                                    "pages/user-guide/views/table",
-                                    "pages/user-guide/views/toolbox",
-                                    "pages/user-guide/views/tree"
-                                ]
-                            }
-                        ]
-                    }
+                    "pages/editor/exports"
                 ]
             },
             {
@@ -302,7 +243,14 @@
                             "pages/modeling/common/equations",
                             "pages/modeling/common/relationships",
                             "pages/modeling/common/inheritance",
+                            "pages/modeling/common/subclasses",
                             "pages/modeling/common/units"
+                        ]
+                    },
+                    {
+                        "group": "Scripts",
+                        "pages": [
+                            "pages/modeling/python-database-api"
                         ]
                     },
                     {
@@ -313,6 +261,7 @@
                             "pages/user-guide/views/block",
                             "pages/user-guide/views/code",
                             "pages/user-guide/views/connectome",
+                            "pages/user-guide/views/dependency-graph",
                             "pages/user-guide/views/design-space-explorer",
                             "pages/user-guide/views/digital-thread",
                             "pages/user-guide/views/gantt",
@@ -320,11 +269,13 @@
                             "pages/user-guide/views/geometry",
                             "pages/user-guide/views/help",
                             "pages/user-guide/views/history",
+                            "pages/user-guide/views/notebooks",
                             "pages/user-guide/views/package",
                             "pages/user-guide/views/pie",
                             "pages/user-guide/views/plot",
                             "pages/user-guide/views/properties",
                             "pages/user-guide/views/reference",
+                            "pages/user-guide/views/review",
                             "pages/user-guide/views/risk",
                             "pages/user-guide/views/rollup",
                             "pages/user-guide/views/sequence",
@@ -391,7 +342,8 @@
                                 "group": "Analysis",
                                 "pages": [
                                     "pages/modeling/objects/code",
-                                    "pages/modeling/objects/toolbox"
+                                    "pages/modeling/objects/toolbox",
+                                    "pages/modeling/objects/trade"
                                 ]
                             },
                             {
@@ -475,16 +427,31 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
-                    "pages/release-notes/v5.2.0",
-                    "pages/release-notes/v5.1.7",
-                    "pages/release-notes/v5.1.6",
-                    "pages/release-notes/v5.1.5",
-                    "pages/release-notes/v5.1.4",
-                    "pages/release-notes/v5.1.3",
-                    "pages/release-notes/v5.1.2",
-                    "pages/release-notes/v5.1.1",
-                    "pages/release-notes/v5.1.0",
-                    "pages/release-notes/v5.0.0",
+                    "pages/release-notes/v5.3.0",
+                    {
+                        "group": "Prior Versions",
+                        "pages": [
+                            "pages/release-notes/v5.2.0",
+                            "pages/release-notes/v5.1.7",
+                            "pages/release-notes/v5.1.6",
+                            "pages/release-notes/v5.1.5",
+                            "pages/release-notes/v5.1.4",
+                            "pages/release-notes/v5.1.3",
+                            "pages/release-notes/v5.1.2",
+                            "pages/release-notes/v5.1.1",
+                            "pages/release-notes/v5.1.0",
+                            "pages/release-notes/v5.0.0",
+                            "pages/release-notes/archive"
+                        ]
+                    }
+                ]
+            },
+            {
+                "group": "Release Notes Archive",
+                "icon": "box-archive",
+                "hidden": true,
+                "searchable": true,
+                "pages": [
                     "pages/release-notes/v4.6.0",
                     "pages/release-notes/v4.5.3",
                     "pages/release-notes/v4.5.2",
@@ -496,15 +463,6 @@
                     "pages/release-notes/v4.3.0",
                     "pages/release-notes/v4.2.20",
                     "pages/release-notes/v4.2.19",
-                    "pages/release-notes/archive"
-                ]
-            },
-            {
-                "group": "Release Notes Archive",
-                "icon": "box-archive",
-                "hidden": true,
-                "searchable": true,
-                "pages": [
                     "pages/release-notes/v4.2.18",
                     "pages/release-notes/v4.2.17",
                     "pages/release-notes/v4.2.16",
@@ -653,7 +611,11 @@
         },
         {
             "source": "/pages/overview/get-started/teams",
-            "destination": "/pages/browser/usage-plans-billing/upgrade-to-team"
+            "destination": "/pages/browser/usage-plans-billing/upgrade-to-group"
+        },
+        {
+            "source": "/pages/browser/usage-plans-billing/upgrade-to-team",
+            "destination": "/pages/browser/usage-plans-billing/upgrade-to-group"
         },
         {
             "source": "/pages/user-guide/editor/overview",

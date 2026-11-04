@@ -75,3 +75,12 @@ Conflicts are merge conflicts that occur when the same object has been modified 
 Clicking on a conflict card will navigate you directly to the object with the conflict, where you can review the conflicting changes and choose which version to keep.
 
 [Read More About Merge Conflicts](/pages/editor/widgets/source-control#merge-conflicts)
+
+## Reviews
+
+When [Object Reviews](/pages/user-guide/views/review) are enabled for the project, the Validation panel includes a **Reviews** filter toggle (clipboard-check icon).
+
+- **Needs Re-review (`NEEDS RE-REVIEW`)**: Surfaces root-cause objects whose edits or upstream changes invalidated a prior review, with their impacted downstream and parent objects listed under **Affected Objects**.
+- **Needs Review (`NEEDS REVIEW`)**: Groups unreviewed objects under their topmost unreviewed container so you can review new subtrees efficiently.
+- **Open Review**: Each review card includes an **Open Review** button in the bottom-right corner that opens the object directly in the [Review View](/pages/user-guide/views/review).
+- **Apply Exempt Types to Existing Objects**: If a Project Admin has configured default **Exempt Object Types** on the project's [Collaborators](/pages/browser/projects#collaborators-and-review-settings) page and existing objects in the model match those types, a banner at the top of the Reviews filter lets authorized reviewers mark all matching existing objects and their subobjects as **Review Not Required** in one commit.

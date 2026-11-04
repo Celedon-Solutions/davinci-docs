@@ -1,22 +1,23 @@
 ---
 title: Projects, Organizations, And Tenants
-description: Administer shared resources, ownership, membership, storage, deletion, and tenant context
+description: Administer shared resources, ownership, membership, entitlements, storage, deletion, and tenant subscriptions and accounting
 ---
 
 ## Overview
 
-The **Projects**, **Organizations**, and **Tenants** pages provide system-level views of Davinci resources. Use them for support, ownership changes, recovery, and deployment administration rather than ordinary day-to-day collaboration.
+The **Projects**, **Organizations**, and **Tenants** pages provide system-level views of Davinci resources. Use them for support, ownership changes, recovery, entitlement and accounting management, and deployment administration rather than ordinary day-to-day collaboration.
 
 For user-facing resource concepts, start with:
 
 - [Projects](/pages/browser/projects)
 - [Organizations](/pages/browser/organizations)
 - [Teams](/pages/browser/teams)
+- [Groups](/pages/browser/groups)
 - [Roles And Permissions](/pages/browser/roles-permissions)
 
 ## Projects
 
-Use **Administration → Projects** to search across accessible projects, inspect metadata and storage, and perform project-level administration.
+Use **Administration → Projects** (`/admin/~/projects`) to search across accessible projects, inspect metadata and storage, and perform project-level administration.
 
 ### Find A Project
 
@@ -83,111 +84,92 @@ Hard deletion cannot be undone. Use the displayed days remaining rather than ass
 
 ## Organizations
 
-Use **Administration → Organizations** to create, inspect, edit, or delete organizations and to manage organization billing and storage overrides.
+Use **Administration → Organizations** (`/admin/~/orgs`) to create, inspect, edit, or delete organizations and to manage organization entitlements, AI funding, billing, and storage overrides.
 
 ### Create An Organization
 
 Select **Add Organization** and provide:
 
-- Name and handle.
-- Tenant.
-- Initial owner from that tenant.
-- Optional description.
-- Private or public visibility.
-
-The owner selector is populated after you choose a tenant. Verify both fields before creating the organization.
+- **Name** and **Handle** (`slug`).
+- **Tenant**.
+- **Owner** from that tenant (populated after selecting the tenant).
+- Optional **Description**.
+- Optional **Starting Credit Balance (USD)** when organization AI funding is enabled in System Settings.
+- **Private** or **Public** visibility.
 
 Organization visibility affects whether the organization and its public projects can be accessed publicly. See [Organization Visibility](/pages/browser/organizations#organization-visibility).
 
 ### Organization Details
 
-The detail view includes:
+Selecting an organization row opens a six-tab detail modal:
 
-- **Info** — identifiers, tenant, visibility, description, and creation date.
-- **Members** — current users and their organization roles.
-- **Billing** — usage balances, subscription state, and any grace deadline.
-- **Storage** — current usage, effective limit, and manual limit override.
-- **Edit** — name, handle, visibility, and description.
+- **Info** — avatar (with option to remove custom avatar image), identifiers, handle/slug, tenant, visibility, description, and creation date.
+- **Members** — current organization members and their roles.
+- **Entitlements** — workspace entitlement group memberships and per-organization overrides for workspace keys (projects owned by the organization resolve workspace entitlements from the organization rather than the acting user). See [Entitlement Groups](/pages/admin/user-access#entitlement-groups-administration--groups).
+- **Billing** — the organization's accounting pools (**Included Usage**, **Credit Balance**, and **On-Demand Usage**), AI funding controls, storage grace deadline, and member spending limits.
+- **Storage** — current storage usage, effective limit, and manual storage limit override in GB.
+- **Edit** — update name, slug, visibility, and description, or delete the organization.
 
-The current Administration panel lists organization members but does not provide membership editing in this view. Use the organization's normal management workflow for supported member and role changes.
+### Organization Billing, AI Funding, And Storage Grace
 
-### Subscription Grace
+When the organization's entitlements allow it to pay for AI usage (`Organization AI Funding` in System Settings or an organization entitlement group/override), the **Billing** tab exposes:
 
-When an organization has a billing account, administrators can set a subscription grace deadline or clear it and mark the organization free.
-
-Clearing grace removes the active subscription requirement represented by that deadline. Confirm the organization's commercial status before using it.
+- **Adjust Credit Balance** — **Add** or **Deduct** USD on the organization's Credit Balance with a required reason.
+- **Organization Pays for AI Usage** — toggle whether AI usage in the organization's projects is billed to the organization (`org`) or to individual members (`members`).
+- **On-Demand Usage Limit** — set the organization's per-period on-demand limit (`Off`, `$25`, `$50`, `$100`, `$500`, `Unlimited`, or custom amount) and per-member spending limits.
+- **Storage Grace Deadline** — set or clear the date by which the organization's storage usage must return under its limit or be covered by a storage tier.
 
 ### Storage Override
 
-A manual organization storage limit overrides the billing-plan limit. Resetting the override returns the organization to its automatic plan value.
+On the **Storage** tab, a manual organization storage limit override (in GB) supersedes the automatic plan or tier limit. Selecting **Reset to Billing Plan** clears the manual override.
 
-The override updates Davinci's organization billing record; it does not change payment-provider subscription items. Coordinate plan changes through [Usage And Billing](/pages/admin/usage-and-billing).
+The override updates Davinci's organization accounting record; it does not modify external payment-provider subscription items.
 
 ### Delete An Organization
 
-Organization deletion is presented as an irreversible action.
+Organization deletion is presented as an irreversible action on the **Edit** tab.
 
 <Warning>
-The Administration delete action does not perform the complete project and billing offboarding workflow. Resolve or transfer projects, storage, subscription state, and ownership responsibilities first, then verify those resources after deletion.
+Resolve or transfer projects, storage, subscription state, and ownership responsibilities before deleting an organization, then verify those resources afterward.
 </Warning>
 
 ## Tenants
 
-The **Tenants** page is available on supported multi-tenant commercial deployments. It shows each tenant's:
-
-- Name and billing mode.
-- Billing or trial status.
-- User and organization counts.
-- Creation date.
-
-Select a tenant to inspect identifiers, billing mode, status, trial data, counts, custom settings, and creation history.
+The **Tenants** page (`/admin/~/tenants`) is available on multi-tenant deployments. It lets administrators search and filter tenants by **Billing Mode** (`Team` or `Individual`) and **Subscription Status** (`Active`, `Trial`, or `No subscription`), and displays each tenant's user count, organization count, and creation date.
 
 ### Create A Tenant
 
-Select **Add Tenant**, enter a name, and choose:
+Select **Add Tenant**, enter a **Name**, and choose:
 
-- **Individual** billing for independently managed accounts.
-- **Team** billing for a group-managed tenant.
+- **Team (shared AI pool, seats, & organizations)** for a group-managed tenant.
+- **Individual** for independently managed accounts.
 
-When trial creation is enabled, a team tenant can be created as a trial with:
+You can optionally select or enter an **Initial Owner / Admin** (who is moved into the tenant as `tenant_admin` with an initial organization created automatically). When trial creation is enabled for a Team tenant, check **Create as trial group** to configure:
 
-- An existing owner user.
-- A duration within the limit shown by the form.
-- Optional included credits per user.
-- Optional seat and organization limits.
-- An internal reason.
+- **Trial Duration (days)** within the deployment's maximum limit.
+- **Included Usage per Month (USD)**.
+- **Seat Limit** and **Organization Limit**.
+- **Reason** (internal note).
 
-Trial availability and maximum duration are deployment-configured.
+### Tenant Detail Tabs
 
-### Manage A Trial
+Selecting a tenant opens the Tenant Details modal, which provides a **Switch Admin Context to Tenant** button in the footer and five tabs:
 
-For an active trial, administrators can change:
+#### 1. Overview & Settings
+- Edit the tenant's **Name**, **Billing Mode** (`Team` or `Individual`), and **Tenant Owner**.
+- **Trial Management** (when the tenant is on an active trial): Adjust the **Trial End Date**, **Included Usage per Month (USD)**, **Seat Limit**, **Organization Limit**, and **Internal Reason**, or click **Clear Trial Now** to end the trial immediately.
+- **Disband & Delete Tenant** (for non-default tenants): Detaches all members back to the `default` tenant, detaches all organizations to standalone ownership, closes the tenant accounting record, and deletes the tenant.
 
-- Trial end date.
-- Included usage per user.
-- Seat limit.
-- Organization limit.
-- Internal reason.
+#### 2. Members
+- **Move / Add Existing User to This Tenant**: Pick a standalone user or enter an email, username, or UUID, choose their **Tenant Role** (`Member`, `Tenant Admin`, `Tenant Billing`, or `Tenant Support`) and **Seat Type** (`Full Seat` or `Read-only Seat`), and optionally check **Also attach standalone organizations owned by this user into the tenant**.
+- **Current Members Table**: Change any member's **Tenant Role** or **Seat Type** (`Full` / `Read-only`) inline, or click **Detach to Default** to move the user back to the `default` tenant.
 
-Changing included usage does not rewrite allocations already granted to users. **Clear Trial Now** removes the trial entitlement immediately.
+#### 3. Organizations
+- **Attach Existing Standalone Organization**: Select a standalone organization to link into the tenant.
+- **Tenant Organizations Table**: View all organizations in the tenant, jump to their detail view on the Organizations page, or click **Detach to Standalone**.
 
-<Warning>
-Clearing a trial can remove access or entitlements without waiting for the scheduled end date. Confirm the tenant's conversion or offboarding state first.
-</Warning>
+#### 4. Subscription
+- Inspect or configure the tenant's **Edition** (`Hosted / Team (everything)` or `Community`), **Full seats** cap, **Read-only seats** cap, **Organizations** cap, **Ends** date, and **Trial** flag/reason. Subscriptions managed by an external billing provider are displayed read-only.
 
-### Switch Tenant Context
-
-Use the row action or **Switch to this Tenant** in the detail view to change the Administration sidebar's tenant context.
-
-The context switch affects supported admin queries and tenant-aware configuration. It does not change your identity, sign you in as a tenant member, or grant additional permissions. See [Access And Scope](/pages/admin/overview#access-and-scope).
-
-## Resource Administration Checklist
-
-Before a membership, ownership, lifecycle, or tenant change:
-
-1. Confirm the tenant and resource identifier.
-2. Review direct and inherited access.
-3. Identify affected projects, storage, and billing responsibility.
-4. Prefer a reversible action when recovery work is incomplete.
-5. Confirm the result from the resource detail view.
-6. Review the [Audit Log](/pages/admin/operations#audit-log).
+#### 5. Accounting
+- View the tenant's accounting pools (**Included Usage**, **Credit Balance**, and **On-Demand Usage**), adjust balances in USD, configure the tenant's on-demand limit and shared included-usage settings, and manage default or per-member spending limits.

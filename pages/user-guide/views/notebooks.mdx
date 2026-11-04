@@ -1,0 +1,69 @@
+---
+title: Jupyter Notebooks
+icon: /images/code-icon.png
+---
+
+<img width="50" noZoom src="/images/code-icon.png" />
+
+## Description
+A Jupyter notebook in Davinci is a code object with the language `jupyter`. It keeps the notebook's markdown, code and saved outputs, runs its code cells in the project's Python runtime, and exports back to a standard `.ipynb` file.
+
+## Importing a Notebook
+Drop or upload an `.ipynb` file into the Library or Model to create a notebook object. The file is stored exactly as it was written, so exporting a notebook you have not changed gives back the same file. Notebooks saved in the older nbformat 3 format are upgraded to nbformat 4 on import.
+
+To start a notebook from scratch, create a code object and set its language to `jupyter`.
+
+## Notebook View
+Opening a notebook shows its cells in order, with each code cell's saved outputs beneath it.
+
+- **Code cells** are edited in place. Changes save automatically.
+- **Markdown cells** are shown rendered. Double-click one to edit it; it renders again when you click away. Math (`$...$`, `$$...$$`), tables, images and attachments are supported.
+- **Raw cells** are kept as written and never run.
+
+Hover over a cell to run it, add a code cell below it, move it, switch it between code and markdown, or delete it. The `Code` and `Markdown` buttons in the header add a cell below the selected cell, and `Clear outputs` removes every output.
+
+| Shortcut | Action |
+|---|---|
+| `Shift + Enter` | Run the cell (or render a markdown cell) and move to the next cell |
+| `Ctrl/Cmd + Enter` | Run the cell and stay on it |
+
+## Running Cells
+`Run all` runs every code cell from the top, in one Python session, the way a fresh Jupyter kernel would. Running stops at the first cell that raises an error, and `Stop` halts the run.
+
+Running a single cell first re-runs the code cells above it without changing their outputs, so the cell sees the variables and imports it expects. Only that cell's outputs and execution count change.
+
+<Note>Each run starts a new Python session. Variables do not carry over between runs the way they do in a long-lived Jupyter kernel.</Note>
+
+Outputs are saved into the notebook, so they stay with the object and appear in exports. Text, tables (including pandas DataFrames), Matplotlib and other figures, images, SVG, Markdown, LaTeX, JSON and errors with tracebacks are all shown inline.
+
+<Info>HTML outputs are shown without running their scripts, as Jupyter does for notebooks it does not trust. Interactive widgets (`ipywidgets`) and JavaScript-only outputs can't be displayed.</Info>
+
+## Project Access
+Code cells have the same access to the project as Python code objects:
+
+```python
+mass = [@object]                          # reference a model value
+data = database.load([@table])            # read project data
+with file.open("results.csv") as f:       # open a project file
+    ...
+import helpers                            # import a project code object by name
+```
+
+## IPython Features
+Notebook code can use the IPython features notebooks commonly rely on:
+
+- `display()` and the `IPython.display` classes (`HTML`, `Markdown`, `Math`, `Image`, `JSON`, `SVG`, ...), including display handles and `clear_output`.
+- Rich object displays such as `_repr_html_` and `_repr_latex_`, and the last expression of a cell as its output (end the line with `;` to hide it).
+- Magics: `%time`, `%%time`, `%timeit`, `%%timeit`, `%%capture`, `%%writefile`, `%run`, `%env`, `%cd`, `%pwd`, `%who`, `%whos`, `%precision`, `%matplotlib`, `%%html`, `%%markdown`, `%%latex`, `%%svg`, and help with `object?`.
+- Shell commands with `!command`, `%%bash` and `%%sh` when the project runs code on the server. The browser runtime has no shell.
+- Top-level `await`.
+
+<Note>`%pip install` checks whether a package is available but does not install it. Add packages to the project's Python dependencies instead.</Note>
+
+Notebooks written for other kernels, such as R or Julia, can be opened and edited, but their code cells won't run.
+
+## Exporting
+Use the download button in the header, or `Export` with the `ipynb` format, to save the notebook as an `.ipynb` file with its outputs. Notebooks that you edit or run are written in the same layout Jupyter uses.
+
+## Working with the Agent
+The agent can read a notebook's cells and outputs, create notebooks, add, change, move and delete cells, and run the whole notebook or a single cell. Ask it to explain a notebook, fix a failing cell, or add an analysis; its runs save outputs into the notebook like yours do.

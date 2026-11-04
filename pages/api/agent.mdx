@@ -63,3 +63,24 @@ key is rejected with `UNKNOWN_MODEL` and the valid keys in
 `error.details.availableModels`. Model options are checked against the selected
 model's effective definitions before the run starts; omitted options use their
 published defaults.
+
+## When a run ends
+
+Waiting returns the run's terminal state. A terminal state is not necessarily a
+good one: when `status` is `failed`, `error.message` says why, and
+`error.category` names the provider's error category when the failure came from
+the model provider. Read it before closing the session — the same read that
+reports the failure carries the reason.
+
+```typescript
+const state = await session.waitUntilDone();
+if (state.status === 'failed') {
+  console.error(state.error?.message, state.error?.category);
+}
+```
+
+```python
+state = session.wait_until_done()
+if state.status == "failed":
+    print(state.error.message, state.error.category)
+```

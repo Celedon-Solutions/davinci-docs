@@ -94,15 +94,69 @@ Examples of supported array values:
 
 <Note>String and date attributes are scalar-only. Arrays of strings and arrays of dates are not supported.</Note>
 
-## Reading a Named State Value
+## State-Based Values
 
-In any equation, `[attribute-uuid].state([state-uuid])` reads that Attribute's effective value for the named State. Davinci resolves state equations first, rolls up triggered states, inherits from parent states, and falls back to the Attribute's default value when no override applies.
+An Attribute can take different values depending on the active [State](/pages/modeling/objects/states) of the system or component that owns it. For example, a `Power Draw` attribute on a Part might have a default value of `10 W`, `2 W` in `Standby`, and `45 W` in `Transmit`.
 
-An Attribute can define explicit values for every State or Action in the state branches owned by its host, including nested substates. For example, an Attribute under a Part may define values for both `TPO` and `TPO > Idle`. State branches owned by nested Parts are separate and are not valid for the outer Part's Attribute.
+### Adding and Editing State Values
+
+For attributes whose main value is not an equation referencing other objects:
+
+1. Open the Attribute's **Properties** view.
+2. In the **Value** section header, click **Add State Value**.
+3. Enter the value (or choose an allowed option if the attribute uses [Enumerations](#enumerations-allowed-options)).
+4. Search for and select a valid State owned by the attribute's host object, then click **Add**.
+
+Each explicit state override appears in a table below the main value row, where you can edit its value or remove the override using the trash icon.
+
+<Note>
+An Attribute can define explicit state values for States in the state branches owned by its host object, including nested substates (for example, `Operating` and `Operating > Boost`). States owned by a different or nested Part belong to a separate state scope and cannot be assigned to the outer Part's attribute.
+</Note>
+
+### State Inheritance and Derived State Propagation
+
+Davinci resolves state-based values using three rules:
+
+- **State hierarchy inheritance**: If an attribute has no explicit value for a nested substate, it inherits the value from the nearest ancestor State that defines one, and falls back to the attribute's default value when no ancestor state override applies.
+- **Triggered state rollups**: When a high-level State triggers other states through transitions, Davinci rolls up the resulting state values automatically.
+- **Derived state propagation in equations**: When an attribute's main equation references other attributes (via `@` / `[uuid]`), Davinci automatically computes and displays read-only **derived state values** across the referenced states. Adding an equation with object references to an attribute clears any manual `stateValues` overrides so the equation rollup remains authoritative.
+
+### Reading a Named State Value in Equations
+
+In any equation, `[attribute-uuid].state([state-uuid])` (entered using `@Attribute.state(@State)`) reads that Attribute's effective value for the named State. Davinci resolves state equations first, rolls up triggered states, inherits from parent states, and falls back to the Attribute's default value when no override applies.
 
 The accessor always selects its explicit state rather than an ambient state used to evaluate the surrounding equation. The receiver must be an Attribute and the argument must be a State. For array values, use a 1-based index such as `[attribute].state([state])[1]` or reduce the result with `min()`, `max()`, or `mean()` when a scalar is required.
 
 This syntax does not execute code. Only `[code-uuid].method(args)` with a Code receiver is callable.
+
+## Enumerations (Allowed Options)
+
+Attributes can define an ordered list of allowed literal options (`enums`) to constrain their main value and any state-specific values to a fixed set of choices.
+
+### Configuring Allowed Options
+
+To configure enumerations on an attribute (when its value does not contain equation references):
+
+1. Open the Attribute's **Properties** view.
+2. In the **Value** section header, click **Enums** to open **Set Allowed Options**.
+3. Click **Add Option** to add each allowed value, or use the trash icon to remove options.
+4. Click **Save**.
+
+When at least one allowed option is configured:
+
+- The Attribute's main **Value** input and all **State Value** inputs become dropdown selectors restricted to those options (in Properties, Tables, and Rollup views).
+- Every option must be unique and compatible with the attribute's **Kind**:
+  - `String`: Any non-empty literal string (recommended for categorical labels such as `Low`, `Medium`, `High`, or `Critical`).
+  - `Number`: Finite numeric literals (such as `1`, `2.5`, `10`).
+  - `Boolean`: `true` or `false`.
+  - `Date`: ISO dates in `YYYY-MM-DD` format.
+- Enum-constrained attributes cannot contain equation references (`[uuid]`) or authored N-D tensor cells.
+- If you update the allowed options list and the current main value or a state value is no longer in the list, Davinci clears the outdated selection so it can be reselected from the updated options.
+- Removing all options and saving restores free-form value and equation input.
+
+<Info>
+SysML v2 import and export preserve attribute enumerations (`enums`) and their selected literal values.
+</Info>
 
 ## Unit Conversion and Validation
 
@@ -178,6 +232,14 @@ Short name of the object.
   <Warning>If the units of the equation or reference either do not match or can not be converted, an error will occur. Mouseover the error box to see the details of the error.</Warning>
 
   <Info>See the allowed [mathematical operations/syntax](/pages/modeling/common/equations) and [base units](/pages/modeling/common/units) for details on what is allowed.</Info>
+</ParamField>
+
+<ParamField path="State Values" type="object">
+  Optional per-state values (`stateValues`) keyed by host-owned [State](/pages/modeling/objects/states) IDs, plus read-only derived state values propagated from referenced attributes.
+</ParamField>
+
+<ParamField path="Enums" type="string[]">
+  Optional ordered list of allowed literal values (`enums`). When populated, the attribute's main value and state values are selected from a dropdown of these options instead of free-form equations.
 </ParamField>
 
 <ParamField path="Relationships" type="connection">

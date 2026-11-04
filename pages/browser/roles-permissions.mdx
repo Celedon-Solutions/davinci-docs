@@ -40,7 +40,7 @@ When you open a project, Davinci resolves access in this order:
 1. Project owner.
 2. Direct project membership.
 3. Organization membership for organization-owned projects.
-4. Tenant/team-level administration for organization-owned projects.
+4. Tenant/group-level administration for organization-owned projects.
 5. Public project visibility.
 6. No access.
 
@@ -86,11 +86,24 @@ Organizations can be:
 
 Organization visibility and project visibility work together. For an organization-owned project to be public to anonymous users, both the project and the owning organization must be public.
 
-## Teams And Tenant Administration
+## Team Roles And Visibility
 
-Teams can provide higher-level administration across users, organizations, projects, usage, and audit visibility. Team or tenant administrators may inherit project administration access for organization-owned projects depending on their permissions.
+Organization [Teams](/pages/browser/teams) use their own role and visibility model within an organization:
 
-Team-level access does not replace organization and project roles. It adds an administrative layer above them.
+| Team Role | Typical access |
+| --- | --- |
+| **Owner** | Full team control, including settings, workflow statuses, sprints, linked projects, members, ownership transfer, and team deletion. |
+| **Admin** | Manage team settings, workflow statuses, sprints, linked projects, and members, plus all board and card actions. |
+| **Contributor** | View the team and reports, and create, place, move, or remove Task Cards on the board (subject to project access). |
+| **Viewer** | Read-only access to the team's overview, board, cards, and sprint reports. |
+
+Teams can be **Private** (visible only to invited team members and the Organization Owner) or **Internal** (visible to all members of the owning organization). On **Internal** teams, organization members automatically inherit the matching team role (**Owner** maps to **Admin**), and direct team roles combine additively with inherited organization access.
+
+## Groups And Tenant Administration
+
+Groups can provide higher-level administration across users, organizations, projects, usage, and audit visibility. Group or tenant administrators may inherit project administration access for organization-owned projects depending on their permissions.
+
+Group-level access does not replace organization and project roles. It adds an administrative layer above them.
 
 ## API Keys And Agent Permissions
 

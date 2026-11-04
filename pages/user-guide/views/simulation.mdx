@@ -85,14 +85,15 @@ changed program or geometry is refused until you set up again.
 
 ### Advanced capabilities
 
-Three admin feature flags decide what the setup offers an author: Class B fragments
+Four admin feature flags decide what the setup offers an author: Class B fragments
 (dynamics, transient thermal, flow, acoustics) and optics (optical surfaces and
 trains) are on by default — every one of their capabilities has an analytic anchor on
 a converged mesh, a passing authoring brief, kernel parity and an explorer panel; a
 deployment may still switch them off. Geometry axes (uniform scale, stretch and CAD
-parameter families) stay off until the family route's mesh convergence is measured.
-The flags gate authoring reach — a program that already declares a gated fragment
-still compiles.
+parameter families) stay off until the family route's mesh convergence is measured,
+and system simulations (see "System simulations") stay off until their graduation
+report is green. The flags gate authoring reach — a program that already declares a
+gated fragment, or defines `system()`, still sets up, compiles and runs.
 
 ## Simulation Result View
 
@@ -170,12 +171,170 @@ box; hover a sample to jump the live view to it. With advanced workflows enabled
 panel also shows sensitivity jets, a certified tolerance Monte Carlo, verify-at-point
 (a full-order solve compared field by field) and the compile gate record.
 
+## System simulations
+
+A simulation whose program defines `system(cad, param)` instead of
+`boundary_conditions(...)` is a **system simulation**: it runs the dynamics of a whole
+system over time under declared scenarios: the **multibody** motion of a linked
+assembly (or of bodies the program builds), the physical **networks** that power, load
+and cool it, and the **controls** that command it, all solved together. It reports
+signals, poses, joint reactions, actuator efforts, currents, temperatures, events and
+QoIs, and its **linear analysis** gives modes, frequency responses and loop margins. It
+is the same simulation object; nothing is meshed.
+
+```python
+def system(cad, param):
+    sc = mbs.from_cad(cad)
+    gear, oleo = sc.joint("gear_swing"), sc.joint("oleo_extend")
+    aluminium, steel = quantity(2700, "kg/m^3"), quantity(7850, "kg/m^3")
+    return [
+        sc,
+        mbs.body(sc.body("door_left"), density=aluminium),
+        mbs.body(sc.body("door_right"), density=aluminium),
+        mbs.body(sc.body("main_strut"), density=steel),
+        mbs.body(sc.body("bogie"), density=steel),
+        mbs.drive_from_motion(sc.motion("main_gear_deploy"), durations=[quantity(2, "s")] * 3),
+        scenario("deploy", duration=quantity(6, "s"), analysis="inverse_dynamics",
+                 environment=[env.gravity()], output_dt=quantity(10, "ms")),
+        qoi("peak trunnion torque", kind="max_abs", signal=gear.effort),
+        qoi("peak oleo force", kind="max_abs", signal=oleo.effort),
+        qoi("deployed trunnion load", kind="final", signal=gear.reaction.force_magnitude),
+    ]
+```
+
+**Bodies and joints.** `mbs.from_cad(cad)` reads the linked assembly: one body per
+instance with mass properties measured from its materials, its joints and couplings, and
+its motion studies. A moving part without a material is refused (`missing_inertia`, with
+the parts named) until the program gives it a mass, either explicitly
+(`mass=`, `inertia=`) or with `density=`, which fills the part's measured solid. Without
+an assembly the program builds its own bodies (`mbs.body(name, mass=, inertia=,
+position=)`), frames on them and joints between them (`revolute`, `prismatic`,
+`cylindrical`, `ball`, `rigid`, `generic`).
+
+**Loads and motion.** Springs, dampers, bushings, forces, torques, joint efforts and
+actuators load the bodies. `mbs.drive(joint, value)` prescribes a joint over time, and
+`mbs.drive_from_motion` runs one of the assembly's motion studies, each stage rest to rest.
+
+**Networks.** Motors, inverters, batteries, gears, wheels, heat capacities, convection,
+pipes, pumps and hydraulic cylinders are components with ports in their domain
+(electrical, magnetic, rotational, translational, thermal, thermal-fluid, hydraulic).
+`connect(...)` joins ports: across a node the potentials (voltage, angle, temperature,
+pressure) are equal and the flows (current, torque, heat, volume flow) balance.
+`mbs.flange(joint)` puts a joint into a network, so a motor and gearbox drive a body of
+the assembly. A component the library lacks is written with `component(...)` from its
+own equations. Every network needs its reference (a ground, a fixed flange or an
+inertia, an ambient, a reservoir); one without is refused before it runs, naming what
+could anchor it. Losses can heat the model: a motor or inverter with `thermal=True`
+carries a heat port to wire into the cooling.
+
+**Controls.** PID loops (with saturation and anti-windup), filters, transfer functions
+and state-space blocks run with the plant; sampled blocks on a `ctrl.clock` model a
+digital controller with a zero-order hold; state machines switch modes on conditions,
+and `ctrl.behavior` runs one of the project's own state machines as a sampled block (the
+simulation goes stale when it is edited).
+
+**Scenarios.** `transient` integrates the equations of motion; `inverse_dynamics` follows
+a fully prescribed motion and reports the efforts and reactions it takes; `equilibrium`
+finds the static pose; `linearize` and `frequency_response` linearize the system about
+its initial state, an equilibrium or an instant of a transient and report its modes
+(`natural_frequency`, `damping_ratio`, `eigenvalue`), frequency responses, and a
+loop's `gain_margin`, `phase_margin` and `bandwidth` at a `ctrl.loop_break`. Scenarios can chain (`after=`), step a parameter mid-run
+(`faults=`), and react to events (`when(...)`). QoIs read any signal: joint
+coordinates, rates and efforts, reaction forces and moments, body positions and
+velocities, and expressions of them, through kinds such as `max_abs`, `final`, `rms`,
+`integral`, `time_when` and `settling_time`.
+
+**Reactions.** A joint's `reaction` is its constraint load on its source (moving) body,
+at the source frame, with components along the target frame's axes (the joint axis
+first). When joints over-constrain the bodies (a planar loop of revolutes, for example)
+equilibrium fixes only some reaction components. The setup lists the joints and
+components it leaves indeterminate, and a QoI that reads one is refused
+(`redundant_reactions`) rather than reporting an arbitrary split: read a determinate
+component (a pin's in-plane force), or make the joint set compatible.
+
+**Trust.** Compile runs every scenario at its default parameters, then re-runs it at a
+tenth of its tolerance and half its step. A QoI is served with certificate B only when
+its scenario completed, the QoI moved less than 1% on the re-run, the constraints held
+(drift below 1e-6 relative) and the energy audit closed (residual below 1e-4 of the
+peak energy flow; a larger residual flags the QoI). The certificate is numerical
+evidence about the run, not validation of the model.
+
+**System explorer.** The result view plays a run back in 3-D on the linked assembly (or
+on a schematic of the bodies when there is none), with the QoIs, signal plots against
+time with event ticks, the run's credibility record and the event list. Every panel
+follows the playback time, and clicking a QoI or an event moves playback to that instant.
+Sliders on the declared parameters pick another point: **Run** requests a run of the
+scenario there, and **Verify** a run under the compile's gates, whose QoIs carry
+certificates.
+
+### Stress along a system's runs (motion_loads)
+
+A field simulation of one moving body's part reads that body's loads from a system
+simulation with `motion_loads(source=<the system simulation's id>, body=<the body>)`.
+Every joint and force element acting on the body is one of its attachments, and every
+attachment wrench and spin product becomes a unit load case on the free body, held by
+inertia relief. The stress at any instant of a run is the exact superposition of the case
+stresses, so the program returns no supports and no other loads, only the part's
+material:
+
+```python
+def boundary_conditions(mesh, select, param):
+    return [
+        solid(material("Steel 4340 (Q&T)")),
+        motion_loads(source="<system simulation id>", body="main_strut",
+                     regions={"gear_swing": select.plane("+x") | select.plane("-x")},
+                     distribution={"oleo_extend": "rbe3"}),
+        qoi("peak stress", kind="max_von_mises", over="time"),
+        qoi("worst instant", kind="critical_instant", count=3),
+        qoi("deploy damage", kind="miner_damage", blocks={"deploy": 20000}),
+    ]
+```
+
+**Where the loads enter.** Each attachment enters through its CAD interface on the part;
+an attachment with no matching face (a sketch anchor, or a force element at a point) is
+refused until `regions=` names the faces that carry it. A wrench spreads as an RBE3 spider
+(force uniform per unit area, moment through the region's polar inertia); a pin in a bore
+may use `distribution="bearing"`, cosine contact pressure resolved onto angle bins with
+the resultant exact.
+
+**Load histories.** `max_von_mises` with `over="time"` is the peak over the runs' samples,
+`critical_instant` the time of the worst one (its record lists the largest peaks), and
+**fatigue_history**'s `miner_damage` the Miner damage of a duty cycle,
+`blocks={scenario: repeats}`: rainflow (ASTM E1049) of each node's signed von Mises,
+Goodman against the ultimate strength and the material's Basquin S-N curve. A material
+without S-N constants is refused for damage. The runs are the source's latest compile run
+of each scenario.
+
+**Load history panel.** The result view adds a scenario and time scrubber with playback
+(the *Von Mises at t* field), the envelope over the runs, the critical instants (click one
+to jump there), the surface peak against time, and with a damage QoI the damage field and
+the rainflow exceedance curve of the worst node.
+
+**Trust.** The compile asserts the superposition against a full-order solve at random
+channel weights (1e-6) and that the relieved cases leave no load on the solver's support,
+and refuses a part whose FE mass differs from the system body's by more than 0.5% (centre
+of mass 1% of the radius of gyration, inertia 2%). Each run is checked for quasi-static
+validity: when the load spectrum's 99% energy frequency passes a third of the part's first
+free-free mode the answer is flagged, because the dynamic response then needs a flexible
+body. An attachment whose reactions the system leaves indeterminate is refused: the recipe
+is a compatible joint set, a bushing for the joint's compliance, or a flexible body. When
+the source's attachments change, the field simulation's setup goes stale. Like the system
+route, this stays off for authoring until its graduation report is green.
+
 ## Agent tools
 
 `SetupSimulation`, `CompileSimulation`, `QuerySimulation`, `OptimizeSimulation`,
 `VerifySimulation` and `CaptureSimulationView` drive the same objects; the agent's
 numbers come from the same point evaluator the explorer uses, so what it reports is
 what you see.
+
+On a system simulation, `SetupSimulation` with `requestedPhysics` naming any of
+`multibody`, `network`, `controls` and `linear_analysis` has the system program written
+from the request and the linked assembly, and sets it up.
+`CompileSimulation` runs and gates every scenario, `QuerySimulation` answers from the
+runs (or makes a new, ungated one), `VerifySimulation` re-runs a scenario at a parameter
+point under the compile's gates, and `CaptureSimulationView` shows the assembly posed at
+an instant of a run, with its signals plotted.
 
 `VerifySimulation` compares every QoI it can value on the full-order model — steady
 thermal and structural kinds, the dynamics kinds (a full-order modal build of the
@@ -206,6 +365,18 @@ Each answer carries the certificate class of every QoI and what the mesh-converg
 check measured about it; a stale study answers with a warning that names the reason,
 and a study that is not LIVE refuses with its state. Samples run on the same
 multi-core backend the result view's Design space sample uses. The API is read-only.
+
+A system simulation answers from its runs:
+
+```python
+swing = simulation("Swing test")
+pt = await swing.query(L=1.5, scenario="swing")            # QoIs of the run at that point
+sig = await swing.signals(["arm.q"], scenario="swing", t1=2.0)
+sig["arm.q"].t, sig["arm.q"].values                        # SI units
+```
+
+A query never starts a run: a point no run has reached raises with the points that have
+runs.
 
 Re-running `SetupSimulation` on a compiled object demotes it to the setup state: the
 Solution Space on record answers the previous program and is not served until the
