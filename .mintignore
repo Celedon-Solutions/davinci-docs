@@ -1,2 +1,4 @@
 db-schema/
 AI_instructions_summary.js
+build/
+scripts/
