@@ -1,0 +1,98 @@
+---
+title: Review View
+icon: /images/review-icon.svg
+---
+
+<img width="50" noZoom src="/images/review-icon.svg" />
+
+## Description
+
+The Review View tracks engineering sign-off, review status, and change invalidation for any model object in Davinci. It connects model verification directly to version control so that every review action is recorded as an auditable Git commit, while subsequent edits or upstream calculation changes automatically flag affected objects for re-review.
+
+You can open the Review View from an object's view switcher, by clicking the review status badge in the workspace bottom bar or Properties View metadata bar, or by clicking **Open Review** on a review card in [Validation](/pages/editor/widgets/validation).
+
+<Note>
+Object Reviews can be enabled, paused, and configured by Project Owners and Project Admins on the project's **Collaborators** tab in the Davinci Browser. See [Collaborators And Review Settings](/pages/browser/projects#collaborators-and-review-settings).
+</Note>
+
+---
+
+## Review Statuses
+
+Every model object (except the project root) carries one of four review states:
+
+| Status | Badge | Meaning |
+| --- | --- | --- |
+| **Reviewed** | Green check | One or more authorized reviewers have signed off on the current state of the object and its required contained objects. |
+| **Needs Review** | Yellow warning | The object has not yet been reviewed, or its review requirement was recently enabled. |
+| **Needs Re-review** | Yellow warning | The object was previously **Reviewed**, but a direct edit, a change to a contained child object, or a change to an upstream calculated value invalidated the prior sign-off. |
+| **Review Not Required** | Gray exempt | The object (and its contained subtree) is exempt from review. Edits to exempt objects do not invalidate parent reviews. |
+
+### Multi-Reviewer Sign-Offs
+
+Multiple authorized users can review the same object. When an object is **Reviewed**, the status header displays a reviewer pill for each active sign-off showing the reviewer's name, role, timestamp, and commit note.
+
+---
+
+## Review Actions
+
+When you have review authority on the project and the object is unlocked, the Review View header provides action controls on the right side of the status bar:
+
+- **Mark Reviewed and Commit (N)**: Marks the object—and any eligible contained descendants that are not exempt—as **Reviewed**, prompts for a commit confirmation and message, and commits the updated review state to Git. If marking the object as reviewed completes thelast unreviewed child under an eligible parent container, the parent container is automatically promoted to **Reviewed** in the same commit.
+- **Update Review and Commit (N)**: Appears when you have already reviewed an object (or its descendants) and new non-invalidating changes have occurred since your sign-off. Clicking this updates your sign-off timestamp and note to cover the latest state and commits to Git.
+- **Revoke Review**: Removes your active review sign-off from the object. If other reviewers have also signed off, their reviews remain active unless you choose **Revoke All Reviews** from the overflow menu (`...`). When the last active review is revoked, the object transitions to **Needs Review** and any **Reviewed** parent containers are invalidated.
+- **Review Not Required / Require Review**: Available in the overflow menu (`...`) (or as the primary button when an object is already exempt). **Review Not Required** marks the object and its entire descendant subtree as exempt from review and commits the change. **Require Review** restores an exempt object and its non-exempt descendants back to **Needs Review**.
+
+<Info>
+You can also mark objects as reviewed directly from [Source Control](/pages/editor/widgets/source-control) when committing changes by enabling the **Mark Reviewed on Commit** toggle above the commit button.
+</Info>
+
+---
+
+## Automatic Invalidation & Root-Cause Analysis
+
+When a **Reviewed** object—or any non-exempt object inside its containment hierarchy—is modified, Davinci automatically transitions the affected object and its **Reviewed** ancestors to **Needs Re-review**.
+
+### Root Causes vs. Follow-On Effects
+
+Rather than forcing you to hunt through a deep hierarchy or equation chain to see why an assembly or requirement lost its review, the Review View performs just-in-time root-cause analysis against the object's last reviewed baseline:
+
+- **Root Causes**: The specific object(s) where an authored field, relationship, child addition, or child deletion occurred. Each root cause card displays the exact before-and-after field diffs since the last review.
+- **Follow-On Effects**: Downstream objects or parent rollups whose calculated values changed as a consequence of a root-cause edit. Follow-on effects are grouped under their triggering root cause in an expandable list so you can inspect the full impact chain at a glance.
+- **Prior Reviews**: Displays the reviewers who had signed off on the object prior to invalidation, along with their original timestamps and notes.
+
+### Computed & Derived Value Invalidation
+
+Project Owners and Admins can control whether changes to calculated values (such as downstream equations, rollups, constraint outcomes, test verdicts, and requirement satisfaction) trigger **Needs Re-review** using the **Re-review Triggers** setting on the project's **Collaborators** tab:
+
+1. **All computed values (Recommended)**: Any semantic change to a calculated value, rollup, constraint, requirement satisfaction, risk metric, or test verdict invalidates downstream reviews.
+2. **Verdicts & satisfaction only**: Only pass/fail outcomes (Requirement satisfaction, Constraint result, Test verdict) or equation evaluation errors invalidate downstream reviews; purely numeric drift does not.
+3. **Direct edits only**: Calculated value changes never invalidate reviews; only direct authored edits to an object or its contained children trigger **Needs Re-review**.
+
+---
+
+## Object Inheritance & Reviews
+
+Davinci's review system integrates with [Object Inheritance](/pages/modeling/common/inheritance):
+
+- **Pure Inherited Objects**: When an extended object (and its child subtree) inherits 100% of its fields and structure from its base object without any local overrides or divergent computed values, it automatically inherits the base object's review status (`Reviewed via inheritance from ...`).
+- **Overridden Specializations**: As soon as an extended object overrides a field, adds a local tag, reference, relationship, or child, or resolves to a different computed value than its base, it requires its own separate review and no longer inherits the base object's sign-off.
+
+---
+
+## Contained Objects Breakdown
+
+When viewing a container object (such as a Package, Part, Requirement, Document, or Slide) that owns descendants, the Review View displays a **Contained Objects** table below the status card.
+
+- **Filter Pills**: Filter the subtree between **All**, **Needs Review** (including **Needs Re-review**), **Reviewed**, and **Review Not Required**. When any descendants need review, the table defaults to the **Needs Review** filter so you can focus immediately on open items.
+- **Hierarchy & Role Badges**: Rows are indented by containment depth and badged with **Root Cause** or **Follow-on** pills when an invalidation occurred inside the subtree.
+- **Quick Navigation**: Click any object's name to open that object in the workspace, or click its status badge on the right to jump directly to that child's **Review View**.
+
+---
+
+## Tracking Reviews Across the Project
+
+In addition to inspecting individual objects in the Review View, you can manage reviews across the entire model using [Validation](/pages/editor/widgets/validation):
+
+- Enable the **Reviews** filter (clipboard-check icon) at the top of the Validation panel to list all invalidation root causes (**NEEDS RE-REVIEW**) and unreviewed hierarchies (**NEEDS REVIEW**), along with their affected downstream and parent objects.
+- If a Project Admin has configured **Exempt Object Types** after objects of those types were already created in the model, the Validation panel's **Reviews** filter displays an **Apply Exempt Types to Existing Objects** banner so you can mark all matching existing objects and their subobjects as **Review Not Required** in one commit.

@@ -17,12 +17,12 @@ This directory is the Mintlify documentation site for Davinci. It is tracked as 
 Run the local Mintlify preview from the repository root with Docker:
 
 ```bash
-docker run --rm -p 3000:3000 -v "$PWD/docs:/docs" -w /docs node:24-alpine sh -c "npm install -g mintlify@latest >/tmp/mintlify-install.log && mintlify dev --host 0.0.0.0 --port 3000"
+docker run --rm -p 3000:3000 -v "$PWD/docs:/docs" -v mintlify-cache:/root/.mintlify -w /docs node:24-alpine sh -c "npm install -g --allow-scripts=sharp,esbuild mintlify@latest >/tmp/mintlify-install.log && mintlify dev --host --no-open --port 3000"
 ```
 
 Then open `http://localhost:3000`.
 
-This keeps `node`, `npm`, and Mintlify out of the host environment. The command installs Mintlify inside the disposable container and mounts the local `docs/` directory so edits update the preview.
+This keeps `node`, `npm`, and Mintlify out of the host environment. The command installs Mintlify inside the disposable container (allowing required `sharp` and `esbuild` install scripts), caches the Mintlify runtime in the `mintlify-cache` Docker volume, and mounts the local `docs/` directory so edits update the preview.
 
 ## Editing Docs
 
