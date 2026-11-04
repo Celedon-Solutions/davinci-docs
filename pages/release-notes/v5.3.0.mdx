@@ -1,0 +1,58 @@
+---
+title: 'Version 5.3.0 - Reviews, Trade Studies & Schema Customization'
+description: 'November 4 2026'
+---
+
+## Version 5.3.0 - Reviews, Trade Studies & Schema Customization
+
+Version 5.3 introduces object-level and merge review workflows, staged subtree commits, structural and parametric Trade Studies, customizable Project Subclasses, and expanded UAF 1.2 model import and MCP integration capabilities, alongside broad workspace and platform performance improvements.
+
+### Reviews, Staged Commits & Version Control
+
+- Added [Object Reviews](/pages/user-guide/views/review) to track review state (**Needs Review**, **Reviewed**, **Re-review Needed**, and **Review Not Required**) across model objects, with automatic invalidation when direct edits or computed values change
+- Added a dedicated **Review** object view that separates root-cause changes from grouped downstream follow-on effects, with inline and side-by-side field diffs and per-object commit history
+- Added a **Reviews** filter to the [Validation](/pages/editor/widgets/validation) panel with subtree grouping, root-cause and follow-on badges, bulk **Mark All Reviewed**, and one-click exemption for configured object types
+- Added per-user server-side **Staged Changes** and **Subtree Commits** in [Source Control](/pages/editor/widgets/source-control), allowing you to stage specific objects (and automatically include coupled relationships or equations) to commit a focused subset of changes while keeping unstaged work intact across refreshes and devices
+- Added **Merge Reviews** (`Requires Review`) in Source Control to propose, preview, approve, or close branch merges with pinned branch heads before applying them, plus a split badge on the Source Control widget for pending merge requests
+- Added project-wide **Object Reviews** and **Merge Approval** settings on the project [Collaborators](/pages/browser/projects#collaborators-and-review-settings) page, **Mark Reviewed on Commit**, and approval badges in History and Commit views
+- Added an **Uncommitted Changes** summary view and unified diff previews for inspecting working changes, past commits, document field deltas, and child object updates
+
+### Trade Studies & Systems Modeling
+
+- Added [Trade Study](/pages/modeling/objects/trade) objects (`trade`) for comparing design alternatives against weighted, Pugh, or Pareto criteria and gates
+- Added **Structural Trade Studies** for comparing candidate Parts, Entities, Items, Requirements, or Ports, complete with impact evaluation, equation and relationship mappings, one-click application to the model, and full undo support
+- Added **Parametric Trade Studies** for sweeping numeric variable ranges using grid or Latin-hypercube sampling, interactive trade plots, and saved result points
+- Added [Project Subclasses](/pages/modeling/common/subclasses) under **Project Settings → [Schema](/pages/editor/project-settings/relationship-settings)**, allowing projects to specialize base object types with custom names, colors, SVG icons, semantic definitions, and subclass-constrained relationship endpoints
+- Added support for referencing [Test](/pages/modeling/objects/tests) objects in equations using `.result` and `.verdict` fields
+- Scoped [Attribute](/pages/modeling/objects/attributes) state values (`stateValues`) to States owned by the attribute's host object, with automatic derived state value propagation and enum dropdown support
+
+### SysML v1.x, UAF 1.2 & Interoperability
+
+- Expanded the [SysML v1.x importer](/pages/modeling/overview/imports) with first-class **UAF 1.2** (Unified Architecture Framework) support, mapping UAF stereotypes into base object types and Project Subclasses, seeding UAF relationship types, and rolling up stereotyped UAF comments
+- Added a **Framework** selector when creating a new project so teams can seed UAF subclasses and relationships up front
+- Imported SysML v1.x and MagicDraw diagrams now convert into native [Figure](/pages/modeling/objects/figure) and [Matrix](/pages/modeling/objects/matrix) artifacts organized under a `Diagrams` package, including table diagrams and multi-hop allocation matrices
+- Added automatic SysML rollup pattern detection during import to wire sum equations across specializing blocks, and improved `Generalization` and typed-usage mapping to [Object Inheritance](/pages/modeling/common/inheritance) (`extends`)
+- Expanded SysML v2 export to preserve Trade Study objects, Project Subclass definitions, and N-D array shapes, units, and element kinds
+- Added bulk `.zip` download for project files
+
+### MCP Integrations, Groups & Billing
+
+- Added multi-scope **MCP Server** management across System, Tenant, Organization, and Project ([Project Settings → MCP](/pages/editor/project-settings/mcp)) levels, with policy controls for project-defined servers and file sharing
+- Expanded [MCP authentication options](/pages/integrations/overview) to support automatic and custom OAuth, machine-to-machine OAuth, Bearer tokens, API keys, and Basic authentication, with shared or per-user credentials managed from **Settings → Integrations**
+- Renamed team billing plans to **[Groups](/pages/browser/groups)** to clearly distinguish centralized group billing and seat management from organization **[Teams](/pages/browser/teams)** (Kanban boards, sprints, and Task Cards)
+- Added standalone organization billing accounts, refreshed **Wallet & Limits** and **Plan & Invoices** pages across personal, organization, and group scopes, and added usage activity charts
+- Added an **Effort Totals** toggle to organization Team Kanban board column headers
+
+### Workspace, Documents & Slides
+
+- Added drag-and-drop from the Index and workspace tabs directly into [Agent Chat](/pages/editor/widgets/agent-chat), a right-click **Add to Chat** option, a jump-to-latest button, and improved thinking token display
+- Improved **Documents** and **Slides** with native spellchecking, smoother image and video loading and placement, video context-menu controls, multi-row/column table deletion, and inherited neighbor styling when inserting rows or columns
+- Added VS Code-style find and search in Code views and automatic resizing for HTML code previews
+- Improved [Figure](/pages/modeling/objects/figure) layouts in block and activity modes, added arrowheads to relationships and port edges in block views, and added N-hop support for allocation matrix figures
+
+### Performance & Reliability
+
+- Virtualized the model Index and Commit views for significantly faster rendering and scrolling on large models
+- Background vector indexing and reference caching no longer block project loading or commits, and client payloads are smaller and faster to load
+- Added a dedicated search worker for faster workspace search and default suggestions
+- Improved large-file project copying, linked-project include caching, and overall container startup and memory efficiency
