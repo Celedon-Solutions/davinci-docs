@@ -1,10 +1,37 @@
 #sidebar {
-  top: 4rem !important;
+  top: 4rem;
 }
 
 #sidebar-content {
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
   padding-bottom: 2rem;
 }
+
+#sidebar-content ul {
+  gap: 1px;
+}
+
+#sidebar-content ul > li + li {
+  margin-top: 1px;
+}
+
+#sidebar-content ul a,
+#sidebar-content ul button {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  min-height: 1.5rem;
+}
+
+#sidebar-content #sidebar-title,
+#sidebar-content h5 {
+  margin-bottom: 0.35rem;
+}
+
+#sidebar-content .mt-6,
+#sidebar-content .mt-8 {
+  margin-top: 1rem;
+}
+
