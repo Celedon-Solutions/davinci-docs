@@ -31,9 +31,25 @@ The Background section appears at the top of the Persona Settings page. Enter in
 User Background is stored per-user, per-project. Each user can set their own background for each project they work on.
 </Note>
 
+## Default persona for new chats
+
+The New chats section, under Background, chooses the persona a new chat starts with. Chats you have already started keep the persona they were using.
+
+Davinci checks three places, in order:
+
+1. **My default**, if you have set one and that persona still exists
+2. **Project default**, if a project owner or admin has set one and that persona still exists
+3. **Standard Persona**, the built-in persona
+
+Choose **Project default** in My default to follow the project. Choose **Standard Persona** there when you want the built-in persona even if the project default is something else.
+
+Project owners and admins set the project default. Editors can set their own default and can see the project default, but cannot change it. If the persona you chose is later removed, new chats use the Standard Persona.
+
+These defaults are saved with the project, but they are not part of the project file and are not tracked by version control. They apply to every branch. A branch that does not contain the chosen persona uses the Standard Persona until that persona exists on the branch.
+
 ## Personas
 
-The Personas section displays all available personas for the current project.
+The Personas section displays all available personas for the current project. The Standard Persona is listed first. It is built in, so it cannot be edited, exported, or deleted.
 
 ### Creating a New Persona
 
