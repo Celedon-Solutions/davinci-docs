@@ -84,3 +84,79 @@ state = session.wait_until_done()
 if state.status == "failed":
     print(state.error.message, state.error.category)
 ```
+
+## Chats
+
+Every conversation you have with a project's agent through the API is kept as a
+chat, and it outlives the session that had it. Chats from any API client (an app,
+a script, a terminal) share one list per project. The web app's chats are
+listed separately.
+
+A new session starts in a fresh chat; `session.chatId` names it. Nothing is
+saved until the first message is sent, so a session that never sends one leaves
+no chat behind.
+
+```typescript
+const { chats } = await client.chats.list(projectId);
+for (const chat of chats) console.log(chat.id, chat.title, chat.messageCount);
+
+// Read a chat without a session.
+const transcript = await client.chats.messages(projectId, chats[0].id, { limit: 50 });
+
+// Continue it from a session, or start over in a fresh one.
+await session.switchChat(chats[0].id);
+await session.switchChat(null);
+
+await client.chats.delete(projectId, chats[0].id);
+```
+
+```python
+chats = client.chats.list(project_id).chats
+for chat in chats:
+    print(chat.id, chat.title, chat.message_count)
+
+transcript = client.chats.messages(project_id, chats[0].id, limit=50)
+
+session.switch_chat(chats[0].id)
+session.switch_chat(None)
+
+client.chats.delete(project_id, chats[0].id)
+```
+
+A run keeps going after you switch away from its chat, so one session can have
+several chats working at once. Read a chat's messages to follow its run, or
+switch back to carry on in it. Closing the session stops every run it has going.
+
+You don't have to switch to work in another chat. Pass `chatId` when sending a
+message, stopping, or waiting, and the call goes to that chat while the session
+stays in its own. Leave it out and the call goes to the current chat. A session
+read lists every chat this session has a run in under `agent.chats`; the other
+`agent` fields describe the current chat.
+
+```typescript
+await session.sendMessage({ message: 'Redo the bracket', chatId: otherChatId });
+const state = await session.waitUntilDone({ chatId: otherChatId });
+
+const { chats } = await session.status();
+await session.stop({ chatId: otherChatId });
+```
+
+```python
+session.send_message("Redo the bracket", chat_id=other_chat_id)
+state = session.wait_until_done(chat_id=other_chat_id)
+
+chats = session.status().chats
+session.stop(chat_id=other_chat_id)
+```
+
+Sending to a chat in your list that this session has no run in claims it for
+this session, the same way switching into it would, but leaves the session's
+current chat where it is. Stopping only reaches chats this session has; naming
+any other chat returns `CHAT_NOT_FOUND`.
+
+A chat belongs to one session at a time. Switching into a chat that another of
+your sessions is in, or left a run going in, takes it over. That session's run
+there is stopped, and if it was in the chat it moves to a fresh one.
+`takenOverFrom` in the response lists the sessions it was taken from. Deleting
+a chat stops any run in it first, and a session that was in it moves to a fresh
+chat.

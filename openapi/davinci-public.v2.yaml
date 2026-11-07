@@ -9468,6 +9468,17 @@ components:
             activeBranch:
               type: [string, 'null']
               description: Most recently active running branch associated with the caller, or null.
+            lastOpenedAt:
+              type: [string, 'null']
+              format: date-time
+              description: |
+                When the caller last opened this project, from any client (web app,
+                mobile app, or an API session), as an ISO 8601 UTC timestamp. Per
+                caller: other users' opens never appear here. Null when the caller
+                has never opened the project.
+            lastOpenedBranch:
+              type: [string, 'null']
+              description: Branch the caller opened at `lastOpenedAt`, or null when the caller has never opened the project.
       additionalProperties: true
     Branch:
       type: object
@@ -9488,7 +9499,8 @@ components:
     ProjectMetadata:
       description: |
         Stored project metadata. `ProjectSummary` is this plus the live `inUse`
-        and `activeBranch` fields that only the list endpoint computes.
+        and `activeBranch` fields and the per-caller `lastOpenedAt` and
+        `lastOpenedBranch` fields that the list endpoint computes.
       type: object
       required: [id, name]
       properties:
@@ -9776,6 +9788,9 @@ components:
 
             `tags` is refused here rather than accepted and discarded: creation
             does not carry them. Assign them once the object exists.
+
+            `approval` is refused too: review state is set by the project review
+            workflow, not by whoever creates the object.
           additionalProperties:
             type: object
             required: [type]

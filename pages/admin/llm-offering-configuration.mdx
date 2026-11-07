@@ -507,7 +507,11 @@ Capabilities can be inherited, explicitly supported, or explicitly unsupported:
 - Video input.
 - Audio output.
 - Video output.
+- SVG output.
+- GIF output.
 - Embeddings.
+
+SVG output and GIF output apply to image-generation offerings. Davinci sends SVG and animated GIF requests only to offerings with that capability, such as GPT Image 2.6 through the OpenAI Images API. An offering with SVG output enabled must be priced as a composite with a per-token component, because the provider bills the tokens its SVG authoring model spends in addition to the image tokens.
 
 Use **Supported** only when the provider offering actually implements the capability through the selected API and codec. Capability overrides affect which profiles and workloads can select the offering, but they cannot add a capability the provider lacks.
 

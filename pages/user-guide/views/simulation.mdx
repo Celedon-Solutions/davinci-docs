@@ -18,9 +18,10 @@ radiation and temperature-dependent conductivity), linear **structural** statics
 (fixtures, forces, pressures, body accelerations, springs, preloaded contacts,
 multi-body assemblies) and their **thermo-elastic** coupling as Class A physics; the
 Class B fragments (modal, harmonic, random vibration, shock, acoustic, rotor tone
-sweep, transient thermal, laminar flow) and the optics stack (optical surfaces and
-trains) are gate-validated against full-order references and offered by default;
-geometry axes ride behind an admin flag (see "Advanced capabilities").
+sweep, transient thermal, transient structural, laminar flow) and the optics stack (optical surfaces and
+trains) are gate-validated against full-order references and offered by default, as
+are system simulations (see "System simulations"); geometry axes ride behind an admin
+flag (see "Advanced capabilities").
 
 The Simulation View has two modes: **Simulation Setup** and **Simulation Result**
 (the Solution Space explorer).
@@ -55,11 +56,36 @@ Everything the solver consumes is a *returned descriptor*: boundary conditions
 `convection`, `radiation`, `inflow`/`outflow`/`noslip`), constitutive and coupling
 declarations (`solid(material(...))`, `fluid(...)`, `thermo_elastic(...)`),
 analysis fragments (`modal`, `harmonic`, `random_vibration`, `shock`, `acoustic`,
-`tone_sweep`, `transient`, `optical_surface`/`optical_train`, `geometry`) and
-quantities of interest (`qoi(...)`). A `param(...)` with a range becomes a live
-slider axis only when a returned descriptor consumes it. Every nonzero dimensional
-value carries a unit through `quantity(value, "unit")`; units are audited against the
-project's unit definitions.
+`tone_sweep`, `transient`, `transient_structural`, `optical_surface`/`optical_train`,
+`geometry`) and quantities of interest (`qoi(...)`). A `param(...)` with a range becomes
+a live slider axis only when a returned descriptor consumes it. Every nonzero
+dimensional value carries a unit through `quantity(value, "unit")`; units are audited
+against the project's unit definitions.
+
+**Time histories.** A `profile=` (`step_profile()`, `ramp(...)`, `pulse_profile(...)`,
+`sine_profile(...)`) shapes a load in time. On `flux()`/`convection()` it rides a returned
+`transient(t_end=..., dt=..., T0=...)`, a heat-up or cool-down history. On
+`force()`/`pressure()` it rides a returned `transient_structural(t_end=...)`: the response
+to suddenly applied, ramped, pulsed or oscillating loads, as the static response to the
+loads at each instant plus a modal correction (mode-acceleration Newmark on the modal
+basis, which the setup adds). A load without a profile acts as a step from t = 0. Omit
+`dt` and the compile takes a twentieth of the first mode's period at the stiffest point
+of the parameter box; an explicit `dt` that resolves less is refused with the one that
+would, and a history is at most 20,000 steps. Omit `n_modes` too: a sudden load excites
+modes far above the first, and the compile computes 60 and keeps the fewest that leave
+at most 6% of the loads' static deflection to the modes it drops. With too few modes the
+history misses those modes' ringing, and the full-order gate below refuses it. `peak_dynamic_displacement` (the largest
+surface |u| anywhere in the history) and `dynamic_displacement_at_time(time=...)` are its
+QoIs; the static kinds still read the steady solve under the full loads, so an undamped
+step's peak reads about twice `max_displacement`. The compile gates the history against a
+full-order Newmark integration on the same step (5%).
+
+```python
+force(select.plane("+x"), total=[0.0, 0.0, -F], profile=step_profile()),
+transient_structural(t_end=quantity(20, "ms"), damping=0.02),
+qoi("peak", kind="peak_dynamic_displacement"),
+qoi("at 5 ms", kind="dynamic_displacement_at_time", time=quantity(5, "ms")),
+```
 
 ### Setup controls
 
@@ -86,14 +112,13 @@ changed program or geometry is refused until you set up again.
 ### Advanced capabilities
 
 Four admin feature flags decide what the setup offers an author: Class B fragments
-(dynamics, transient thermal, flow, acoustics) and optics (optical surfaces and
-trains) are on by default — every one of their capabilities has an analytic anchor on
-a converged mesh, a passing authoring brief, kernel parity and an explorer panel; a
-deployment may still switch them off. Geometry axes (uniform scale, stretch and CAD
-parameter families) stay off until the family route's mesh convergence is measured,
-and system simulations (see "System simulations") stay off until their graduation
-report is green. The flags gate authoring reach — a program that already declares a
-gated fragment, or defines `system()`, still sets up, compiles and runs.
+(dynamics, transient thermal and structural, flow, acoustics), optics (optical surfaces and trains) and
+system simulations (see "System simulations") are on by default — every capability they
+offer has an analytic anchor on a converged mesh, a passing authoring brief, kernel
+parity and an explorer panel; a deployment may still switch them off. Geometry axes
+(uniform scale, stretch and CAD parameter families) stay off until the family route's
+mesh convergence is measured. The flags gate authoring reach — a program that already
+declares a gated fragment, or defines `system()`, still sets up, compiles and runs.
 
 ## Simulation Result View
 
@@ -112,7 +137,8 @@ two-way synchronized with the CAD parameter panel.
 
 **Field selector**: temperature, displacement magnitude and signed components,
 von Mises stress, harmonic displacement and stress amplitude, RMS displacement and
-stress, shock peak displacement, transient temperature, flow speed and pressure —
+stress, shock peak displacement, transient temperature, the displacement of a structural
+history at the scrubbed time, flow speed and pressure —
 whatever the compiled physics provides. Deformation exaggeration is a true ×
 control; the undeformed reference can be shown alongside.
 
@@ -127,8 +153,11 @@ mechanical-only / thermal-expansion-only share.
 
 Dynamics studies add a drive-point FRF plot with a frequency slider and an animated
 operating-deflection shape, a shock response spectrum, and a rotor-tone waterfall;
-transient studies add a time scrubber with playback; optics studies add wavefront,
-PSF/MTF, Zernike and coronagraph panels.
+transient studies add a time scrubber with playback (thermal: the peak temperature
+against time; structural: the peak surface displacement against time, the time of the
+peak and its multiple of the static deflection, with the displacement at the scrubbed
+time painted and warped on one colour bar for the whole history); optics studies add
+wavefront, PSF/MTF, Zernike and coronagraph panels.
 
 ### Key results and trust
 
@@ -180,7 +209,9 @@ assembly (or of bodies the program builds), the physical **networks** that power
 and cool it, and the **controls** that command it, all solved together. It reports
 signals, poses, joint reactions, actuator efforts, currents, temperatures, events and
 QoIs, and its **linear analysis** gives modes, frequency responses and loop margins. It
-is the same simulation object; nothing is meshed.
+is the same simulation object; nothing is meshed. Flexible bodies and thermal blocks
+reduced from a field simulation, and FMU co-simulation, are not yet available to
+programs.
 
 ```python
 def system(cad, param):
@@ -233,6 +264,14 @@ digital controller with a zero-order hold; state machines switch modes on condit
 and `ctrl.behavior` runs one of the project's own state machines as a sampled block (the
 simulation goes stale when it is edited).
 
+**Contact.** Compliant joint stops and latches (`mbs.stop`, `mbs.latch`), Stribeck and
+LuGre joint friction (`mbs.friction`), contact between convex shapes on the bodies
+(`mbs.sphere`, `mbs.capsule`, `mbs.box`, `mbs.hull`, or `mbs.convex_decomposition` of a
+part's collision mesh, with `mbs.contact` naming the pair and its law) and Fiala or Magic
+Formula tires (`mbs.tire`) on roads from `env.road` make up **contact_dynamics**. A latch
+engages at its angle and then holds the joint like a stiff spring; engagements and stops
+appear in the run's events, and their efforts are signals a QoI can read.
+
 **Scenarios.** `transient` integrates the equations of motion; `inverse_dynamics` follows
 a fully prescribed motion and reports the efforts and reactions it takes; `equilibrium`
 finds the static pose; `linearize` and `frequency_response` linearize the system about
@@ -266,6 +305,19 @@ follows the playback time, and clicking a QoI or an event moves playback to that
 Sliders on the declared parameters pick another point: **Run** requests a run of the
 scenario there, and **Verify** a run under the compile's gates, whose QoIs carry
 certificates.
+
+**Studies.** The explorer's Studies section runs one scenario at many points of a box of
+the declared parameters: a sweep (full factorial), a Latin hypercube, a Sobol sequence,
+Monte Carlo, Saltelli sensitivity indices, or an optimization of one QoI (SLSQP, using the
+engine's gradients where a run has them). Each point is an ungated run, so a study's
+statistics, indices and optimum carry credibility class C. A study also fits a surrogate of
+each QoI that tests, requirement margins and trade criteria read between runs through
+`[simulation](scenario=..., p=...).qoi`. A surrogate whose leave-one-out error is over 5%
+of the QoI's range over the study is too coarse to answer: the point reads as unavailable
+until a run or a denser study covers it, and the study lists each surrogate's error. A
+trade sweep whose criteria read system QoIs that no run or study answers offers **Run the
+missing studies**, which runs a Latin hypercube over the box the sweep needs and sweeps
+again.
 
 ### Stress along a system's runs (motion_loads)
 
@@ -329,8 +381,8 @@ numbers come from the same point evaluator the explorer uses, so what it reports
 what you see.
 
 On a system simulation, `SetupSimulation` with `requestedPhysics` naming any of
-`multibody`, `network`, `controls` and `linear_analysis` has the system program written
-from the request and the linked assembly, and sets it up.
+`multibody`, `network`, `controls`, `linear_analysis` and `contact_dynamics` has the system
+program written from the request and the linked assembly, and sets it up.
 `CompileSimulation` runs and gates every scenario, `QuerySimulation` answers from the
 runs (or makes a new, ungated one), `VerifySimulation` re-runs a scenario at a parameter
 point under the compile's gates, and `CaptureSimulationView` shows the assembly posed at
@@ -338,13 +390,16 @@ an instant of a run, with its signals plotted.
 
 `VerifySimulation` compares every QoI it can value on the full-order model — steady
 thermal and structural kinds, the dynamics kinds (a full-order modal build of the
-same mesh), transient kinds (the full-order march), flow kinds (the full-order
+same mesh), transient thermal kinds (the full-order march), transient structural kinds
+(the mesh's own modes and full-order static solutions), flow kinds (the full-order
 steady solve) and the optical wavefront / line-of-sight kinds (a dense retrace) —
 against the Solution Space, and restates the compile's mesh-convergence record.
 `CaptureSimulationView` paints mesh fields; on an optics study `field: "wavefront"`
 renders the train's own panel (wavefront map, PSF, MTF) instead. A transient frame
 reports the declared QoIs and, separately, the static kinds re-read on the state at
-the captured time, so one name never carries two numbers.
+the captured time, so one name never carries two numbers. `field: "transient_displacement"`
+paints a structural history at `timeS` (by default the instant it peaks) and states that
+instant's peak beside the history's.
 
 ## Code objects
 
@@ -382,4 +437,13 @@ Re-running `SetupSimulation` on a compiled object demotes it to the setup state:
 Solution Space on record answers the previous program and is not served until the
 next compile. Edits that arrive *under* a live object — geometry, materials, units,
 the program itself — are the staleness path: the object is still served, with a
-warning that names the reason.
+warning that names the reason and the object that moved (the geometry, the material,
+the behavior or the source system simulation, by name).
+
+**Refresh.** A stale simulation shows **Refresh** beside its stale chip in the setup
+view and the system explorer. One click sets it up again, compiles it and, for a system
+simulation, re-runs the points requested of the previous compile (the most recent
+twelve, each scenario, point and kind once), since a compile replaces the runs with its
+own. A point the new setup no longer accepts, such as one outside a changed parameter
+range, is skipped and said in the status line rather than forced. The agent's stale
+warnings name the same causes and the same steps.
