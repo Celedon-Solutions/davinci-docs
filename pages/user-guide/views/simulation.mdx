@@ -314,10 +314,14 @@ statistics, indices and optimum carry credibility class C. A study also fits a s
 each QoI that tests, requirement margins and trade criteria read between runs through
 `[simulation](scenario=..., p=...).qoi`. A surrogate whose leave-one-out error is over 5%
 of the QoI's range over the study is too coarse to answer: the point reads as unavailable
-until a run or a denser study covers it, and the study lists each surrogate's error. A
-trade sweep whose criteria read system QoIs that no run or study answers offers **Run the
-missing studies**, which runs a Latin hypercube over the box the sweep needs and sweeps
-again.
+until a run or a denser study covers it, and the study lists each surrogate's error.
+Opening a study plots one QoI over its runs: a curve along the parameter of a
+one-parameter study, a scatter against a chosen parameter when there are several (the
+others move between points too), and the QoI by evaluation for an optimization. A study
+run on an earlier setup of the system is marked so: its numbers describe that setup, and
+its surrogates no longer answer between runs. A trade sweep whose criteria read system
+QoIs that no run or study answers offers **Run the missing studies**, which runs a Latin
+hypercube over the box the sweep needs and sweeps again.
 
 ### Stress along a system's runs (motion_loads)
 
