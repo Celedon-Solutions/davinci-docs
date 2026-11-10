@@ -64,6 +64,66 @@ key is rejected with `UNKNOWN_MODEL` and the valid keys in
 model's effective definitions before the run starts; omitted options use their
 published defaults.
 
+## Send images
+
+A prompt can carry up to 10 images for the agent to look at: a photo of a part,
+a sketch, a screenshot of a drawing. A prompt may be images alone.
+
+```typescript
+import { readFile } from 'node:fs/promises';
+
+await session.sendMessage({
+  message: 'Model a bracket that matches this sketch',
+  images: [{ mimeType: 'image/jpeg', bytes: await readFile('sketch.jpg') }],
+});
+```
+
+```python
+session.send_message(
+    "Model a bracket that matches this sketch",
+    images=["sketch.jpg"],
+)
+```
+
+Over HTTP, `images` is a list of `{ "mimeType": ..., "data": ... }` with the
+file base64-encoded in `data`. Images are PNG, JPEG or WebP, at most 10 MB each,
+and the whole request at most 50 MB. The format is read from the bytes, so a
+mislabelled file still works, but HEIC photos are refused with
+`UNSUPPORTED_IMAGE_TYPE`. Convert them to JPEG first.
+
+The model must be able to read images. Each entry from `agentModels.list` has
+`supportsImages`; sending images to a model without it returns
+`MODEL_CANNOT_READ_IMAGES` before anything runs. Images over 2000 pixels on a
+side or about 3.7 MB are scaled down before the model sees them, so sending them
+at that size or smaller saves upload time and loses nothing.
+
+A transcript describes each prompt's images instead of including them:
+`images` on the entry lists each one's `index`, `mimeType` and `byteSize`.
+Fetch the bytes by the chat, the entry's `messageId` and the index. This works
+for any transcript, including one read from a session; use its `chatId`.
+
+```typescript
+const transcript = await client.chats.messages(projectId, chatId);
+for (const entry of transcript.messages) {
+  for (const image of entry.images ?? []) {
+    const { mimeType, bytes } = await client.chats.messageImage(
+      projectId, chatId, entry.messageId!, image.index,
+    );
+  }
+}
+```
+
+```python
+transcript = client.chats.messages(project_id, chat_id)
+for entry in transcript.messages:
+    for image in entry.images or []:
+        picture = client.chats.message_image(
+            project_id, chat_id, entry.message_id, image.index
+        )
+```
+
+A prompt's images never change, so a fetched image can be cached.
+
 ## When a run ends
 
 Waiting returns the run's terminal state. A terminal state is not necessarily a
@@ -107,6 +167,9 @@ const transcript = await client.chats.messages(projectId, chats[0].id, { limit: 
 await session.switchChat(chats[0].id);
 await session.switchChat(null);
 
+// Rename it, or clear the title with null.
+await client.chats.rename(projectId, chats[0].id, 'Bracket redesign');
+
 await client.chats.delete(projectId, chats[0].id);
 ```
 
@@ -120,8 +183,15 @@ transcript = client.chats.messages(project_id, chats[0].id, limit=50)
 session.switch_chat(chats[0].id)
 session.switch_chat(None)
 
+client.chats.rename(project_id, chats[0].id, "Bracket redesign")
+
 client.chats.delete(project_id, chats[0].id)
 ```
+
+A chat is titled from its opening message. Renaming it sets a title that is kept
+as the conversation goes on; `null` clears it, and the chat stays untitled. A
+title is trimmed and may be up to 200 characters. A fresh chat can't be renamed
+until something has been sent in it; renaming one returns `CHAT_EMPTY`.
 
 A run keeps going after you switch away from its chat, so one session can have
 several chats working at once. Read a chat's messages to follow its run, or

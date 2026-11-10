@@ -10427,11 +10427,17 @@ components:
       properties:
         name:
           type: [string, 'null']
+        category:
+          type: [string, 'null']
+          description: |
+            What kind of work the tool does, such as `thinking` for the agent's
+            reasoning, `asking` for a question to you, or `editing`. Treat an
+            unrecognized value as a general tool — new categories can appear.
         status:
           type: [string, 'null']
           description: |
             `working` while it runs, `complete` when it succeeded, otherwise the severity
-            of what went wrong.
+            of what went wrong. A tool its run ended without finishing reads `error`.
         params:
           description: The arguments the agent chose. Null when the tool takes none.
         result:
