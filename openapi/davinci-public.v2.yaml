@@ -62,6 +62,27 @@ tags:
 
       It is also where the agent lives. Send it a prompt, read its status from the
       session, read the transcript back, and stop a run that is going the wrong way.
+  - name: Chats
+    description: |
+      Your persistent conversations with a project's agent. A chat outlives the
+      session it was started in: list your chats, read any of them back, move a
+      session into one to carry on where it left off, and delete the ones you are
+      done with.
+
+      A new session starts in a fresh chat, whose id is in the session's `chatId`.
+      A chat is only stored once something is sent in it, so a session that never
+      sends a message leaves nothing behind. A run keeps going after its session
+      moves to another chat, so one session can have several chats working at
+      once. Name a chat's `chatId` on `sendAgentMessage` or `stopAgent` to reach it
+      without moving the session; `agent.chats` on the session read reports every
+      chat the session has a run in. A chat belongs to one session at a time;
+      moving a session into a chat another session has, or sending in it, takes it
+      over, and if that other session was in it, it continues in a fresh chat of
+      its own.
+
+      These are the chats started through the API — from the SDKs, a terminal, or
+      an app built on them. Chats started in the Davinci web app are a separate set
+      and do not appear here.
   - name: AgentModels
     description: |
       Chat models available to your account. The returned keys are the values accepted
@@ -111,8 +132,9 @@ tags:
   - name: Cards
     description: |
       Project-scoped agile cards, their index hierarchy, comments, tags, assignees,
-      card dependencies, and design-object references. Project access is checked
-      on every call; an inaccessible project is reported as not found.
+      card dependencies, and design-object references, plus the caller's assigned
+      cards across projects. Project access is checked on every call; an
+      inaccessible project is reported as not found.
   - name: Teams
     description: |
       Organization-scoped team boards, linked projects, workflow columns, sprints,
@@ -1051,6 +1073,18 @@ paths:
         it shows uncommitted state — which is the state a caller that just wrote
         something is asking about. The storage-backed reads are cheaper but only show
         the last save.
+
+        The whole tree is returned with an `ETag` that changes whenever any object's
+        id, name, type, parent, `shortName`, `subclassId`, or children change,
+        including uncommitted edits. Send it back as `If-None-Match` to get `304`
+        with no body when nothing changed; the server does not build the tree to
+        answer it. The value is opaque, and a project reopened on a different
+        replica issues a new one.
+
+        `ids` returns only the named nodes, and `q` searches names. Either one
+        narrows `tree` but leaves `objectCount` as the project total, and neither
+        is conditional: no `ETag` is issued and `If-None-Match` is ignored. They
+        cannot be combined.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
@@ -1084,13 +1118,37 @@ paths:
                     print(node.type, node.name)
       parameters:
         - $ref: '#/components/parameters/Branch'
+        - $ref: '#/components/parameters/TreeIfNoneMatch'
+        - $ref: '#/components/parameters/TreeIds'
+        - $ref: '#/components/parameters/TreeQuery'
+        - $ref: '#/components/parameters/TreeSearchLimit'
       responses:
         '200':
           description: The project's objects.
+          headers:
+            ETag:
+              $ref: '#/components/headers/TreeETag'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectTree'
+        '304':
+          description: |
+            The tree is unchanged since the `If-None-Match` value was issued. No body.
+          headers:
+            ETag:
+              $ref: '#/components/headers/TreeETag'
+        '400':
+          description: |
+            Invalid filter. Error code is `INVALID_IDS` when `ids` is empty, names more
+            than 100 ids, or contains a value that is not an object id;
+            `INVALID_QUERY` when `q` is empty or longer than 200 characters;
+            `INVALID_LIMIT` when `limit` is not an integer from 1 to 100; and
+            `CONFLICTING_FILTERS` when `ids` and `q` are both sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1231,6 +1289,12 @@ paths:
       description: |
         Returns one object with its computed values resolved, from the running
         project. Fields vary by object type.
+
+        `fields` returns only the listed top-level fields, plus `id`, `name`, and
+        `type`, which are always included. Use it to leave heavy fields such as
+        geometry `data` out of the response. Selected fields are exactly what the
+        full read returns, so `resolvedValues` on a geometry or assembly is still
+        the resolved one.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/project/project.routes.js
@@ -1261,6 +1325,7 @@ paths:
                 print(result.object)
       parameters:
         - $ref: '#/components/parameters/Branch'
+        - $ref: '#/components/parameters/ObjectFields'
       responses:
         '200':
           description: The object.
@@ -1268,6 +1333,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetObjectResponse'
+        '400':
+          description: |
+            Error code is `INVALID_FIELDS` when `fields` is not a comma-separated list
+            of names.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2001,9 +2074,17 @@ paths:
         finished — a run takes as long as the work takes. Follow it with `getSession`
         and read `agent.status`, or let the SDK's `waitUntilDone` do that for you.
 
+        The prompt goes to the session's current chat unless `chatId` names another.
+        A session can have runs going in several chats at once; `agent.chats` on the
+        session read lists all of them.
+
         Acceptance is not the same as success. A `202` means the agent took the prompt;
         a `409` means it refused, which happens when the run it belonged to has ended.
         Recreate the session in that case rather than retrying the message.
+
+        Images can go with the prompt in `images`, base64-encoded, and a prompt may
+        be images alone. They are checked before anything runs: the selected model
+        must read images, and each must be a PNG, JPEG or WebP.
 
         The agent can change anything in the project and is charged for AI usage doing it, which
         is why this needs the `agent:message` scope rather than a project write.
@@ -2062,8 +2143,17 @@ paths:
             Invalid request. Error code is `MISSING_MESSAGE`, `MESSAGE_TOO_LARGE`,
             `INVALID_MESSAGE_ID`, `INVALID_CONTEXT`, `INVALID_PERSONA`,
             `UNKNOWN_PERSONA`, `INVALID_MODEL`, `UNKNOWN_MODEL`,
-            `INVALID_MODEL_OPTIONS`, `INVALID_WEB_SEARCH`, `LLM_OPTION_UNKNOWN`,
-            or `LLM_OPTION_VALUE_UNAVAILABLE`.
+            `INVALID_MODEL_OPTIONS`, `INVALID_WEB_SEARCH`, `INVALID_CHAT_ID`,
+            `LLM_OPTION_UNKNOWN`, `LLM_OPTION_VALUE_UNAVAILABLE`, `INVALID_IMAGES`,
+            `TOO_MANY_IMAGES`, `INVALID_IMAGE`, `UNSUPPORTED_IMAGE_TYPE`,
+            `IMAGE_TOO_LARGE`, or `MODEL_CANNOT_READ_IMAGES`.
+
+            `MISSING_MESSAGE` means neither words nor images were sent.
+
+            An image error names the offending image's position in `details.index`.
+            `UNSUPPORTED_IMAGE_TYPE` is what an iPhone's HEIC photo gets: convert it
+            to JPEG first. `MODEL_CANNOT_READ_IMAGES` carries `details.model` (null
+            for the account default); pick a model whose `supportsImages` is true.
 
             `UNKNOWN_PERSONA` names a persona the project does not define, and
             carries `details.definedPersonas` — the ids that would have worked. The
@@ -2087,14 +2177,25 @@ paths:
           description: |
             No such session, it belongs to another user, or it belongs to a different
             project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+            `CHAT_NOT_FOUND` when `chatId` names a chat that is not in your list.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
         '409':
           description: |
-            The agent refused the message (`MESSAGE_REFUSED`), or the project the
-            session opened is no longer running (`PROJECT_NOT_RUNNING`).
+            The agent refused the message (`MESSAGE_REFUSED`), the project the
+            session opened is no longer running (`PROJECT_NOT_RUNNING`), or another
+            session took the named chat at the same moment (`CHAT_SWITCH_CONFLICT`;
+            try again).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: |
+            The request is over 50 MB (`PAYLOAD_TOO_LARGE`). Send smaller images —
+            the model never sees more than 2000 pixels on a side anyway.
           content:
             application/json:
               schema:
@@ -2200,9 +2301,11 @@ paths:
       tags: [Sessions]
       summary: Stop the agent without closing the session
       description: |
-        Halts the current run. The session survives, the project stays open, and the
-        conversation so far is kept — so you can send a new prompt afterwards without
-        starting over. Use `deleteSession` when you actually want to finish.
+        Halts the run in the session's current chat, or in the chat named by `chatId`.
+        The session survives, the project stays open, and the conversation so far is
+        kept — so you can send a new prompt afterwards without starting over. Runs in
+        the session's other chats carry on. Use `deleteSession` when you actually want
+        to finish; that stops all of them.
 
         Stopping when nothing is running is not an error; `stopped` is `false` and the
         status is whatever it already was. That makes this safe to call defensively,
@@ -2237,6 +2340,12 @@ paths:
                 session = client.sessions.resume(project_id, session_id)
                 result = session.stop()
                 print(result.stopped, result.status)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopAgentRequest'
       responses:
         '200':
           description: The run was halted, or there was none to halt.
@@ -2244,6 +2353,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopAgentResponse'
+        '400':
+          description: Invalid request. Error code is `INVALID_CHAT_ID`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2252,6 +2367,7 @@ paths:
           description: |
             No such session, it belongs to another user, or it belongs to a different
             project than the one in the path. Error code is `SESSION_NOT_FOUND`.
+            `CHAT_NOT_FOUND` when `chatId` names a chat this session does not have.
           content:
             application/json:
               schema:
@@ -2260,6 +2376,511 @@ paths:
           description: |
             The project this session opened is no longer running. Error code is
             `PROJECT_NOT_RUNNING`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/sessions/{sessionId}/chat:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SessionId'
+    put:
+      operationId: switchSessionChat
+      tags: [Chats]
+      summary: Move a session into another chat, or start a fresh one
+      description: |
+        Sets which chat the session's prompts go to. Name a `chatId` from `listChats`
+        to carry on that conversation — the agent picks it up with its history.
+        Omit `chatId`, or send `null`, to start a fresh chat; like a new session's
+        first chat, it is only stored once you send something in it.
+
+        A run in the session's previous chat keeps going to the end, and that chat
+        stays in your list if anything was said in it. Read its messages to follow
+        the run, or switch back to carry on in it. Closing the session stops every
+        run it has going.
+
+        A chat belongs to one session at a time. If another of your sessions is in
+        the chat you name, or left a run going there, this session takes it over:
+        the other session's run in it is stopped, and if it was in that chat it
+        continues in a fresh one. Its ids are returned in `takenOverFrom`.
+
+        Naming the chat the session is already in changes nothing.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: session.switchChat
+        python: session.switch_chat
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { chats } = await client.chats.list(projectId);
+            const session = await client.sessions.create(projectId);
+            await session.switchChat(chats[0].id);
+            await session.sendMessage('Where did we leave the bracket?');
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                chats = client.chats.list(project_id).chats
+                with client.sessions.create(project_id) as session:
+                    session.switch_chat(chats[0].id)
+                    session.send_message("Where did we leave the bracket?")
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchSessionChatRequest'
+      responses:
+        '200':
+          description: The session is in the chat.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwitchSessionChatResponse'
+        '400':
+          description: '`chatId` is not a chat id. Error code is `INVALID_CHAT_ID`.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such session (`SESSION_NOT_FOUND`), or no such chat among yours in this
+            project (`CHAT_NOT_FOUND`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            Another session moved into the same chat at the same moment. Error code is
+            `CHAT_SWITCH_CONFLICT`; retry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/chats:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listChats
+      tags: [Chats]
+      summary: List your chats in a project
+      description: |
+        Your API chats in the project, most recently active first. Only chats in
+        which something was sent are listed — a session's fresh chat appears once
+        its first message is.
+
+        Chats are per user: a collaborator on the same project has their own.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.chats.list
+        python: client.chats.list
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { chats } = await client.chats.list(projectId);
+            for (const chat of chats) {
+              console.log(chat.id, chat.title, chat.updatedAt);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                for chat in client.chats.list(project_id).chats:
+                    print(chat.id, chat.title, chat.updated_at)
+      responses:
+        '200':
+          description: Your chats.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/chats/{chatId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ChatId'
+    patch:
+      operationId: renameChat
+      tags: [Chats]
+      summary: Rename a chat
+      description: |
+        Sets the chat's title, or clears it with `null`. The title is trimmed and may
+        be up to 200 characters.
+
+        A chat is named from its opening message only when it has no title, so a
+        title set here is kept as the conversation goes on. Clearing it leaves the
+        chat untitled; it is not named again.
+
+        A chat can be renamed once something has been sent in it. A session's fresh
+        chat is not stored until then, so renaming it answers `CHAT_EMPTY`.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: client.chats.rename
+        python: client.chats.rename
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { chat } = await client.chats.rename(projectId, chatId, 'Bracket redesign');
+            console.log(chat.title);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                chat = client.chats.rename(project_id, chat_id, "Bracket redesign").chat
+                print(chat.title)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenameChatRequest'
+      responses:
+        '200':
+          description: The chat was renamed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenameChatResponse'
+        '400':
+          description: |
+            `title` is missing, empty, longer than 200 characters, or neither a string
+            nor null. Error code is `INVALID_TITLE`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No such chat among yours in this project. Error code is `CHAT_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '409':
+          description: |
+            Nothing has been sent in the chat yet, so it is not stored and cannot be
+            named. Error code is `CHAT_EMPTY`; send a message first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      operationId: deleteChat
+      tags: [Chats]
+      summary: Delete a chat
+      description: |
+        Deletes the chat and its whole conversation. This cannot be undone.
+
+        If one of your sessions has a run going in the chat, the run is stopped. If
+        that session was in the chat it continues in a fresh one. Its id is returned
+        in `releasedSessionId`.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [sessions:manage]
+      x-sdk-methods:
+        typescript: client.chats.delete
+        python: client.chats.delete
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            await client.chats.delete(projectId, chatId);
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                client.chats.delete(project_id, chat_id)
+      responses:
+        '200':
+          description: The chat was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteChatResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No such chat among yours in this project. Error code is `CHAT_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/chats/{chatId}/messages:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ChatId'
+    get:
+      operationId: listChatMessages
+      tags: [Chats]
+      summary: Read a chat's conversation
+      description: |
+        The transcript of any of your chats, whether or not a session is in it. The
+        shape matches `listAgentMessages`.
+
+        A chat one of your sessions is in is read from the running agent, so it is
+        current (`source: live`) and `sessionId` names that session. Any other chat
+        is read from its saved copy (`source: persisted`), which is complete because
+        nothing is running in it.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.chats.messages
+        python: client.chats.messages
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const transcript = await client.chats.messages(projectId, chatId, { limit: 50 });
+            for (const entry of transcript.messages) {
+              console.log(entry.role, entry.kind, entry.text);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                transcript = client.chats.messages(project_id, chat_id, limit=50)
+                for entry in transcript.messages:
+                    print(entry.role, entry.kind, entry.text)
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+          description: Most recent entries to return.
+      responses:
+        '200':
+          description: The conversation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatTranscript'
+        '400':
+          description: '`limit` is out of range. Error code is `INVALID_LIMIT`.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No such chat among yours in this project. Error code is `CHAT_NOT_FOUND`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v2/projects/{projectId}/chats/{chatId}/messages/{messageId}/images/{index}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ChatId'
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The `messageId` of the prompt the image was sent with.
+      - name: index
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+        description: The image's `index` in that prompt's `images`.
+    get:
+      operationId: getChatMessageImage
+      tags: [Chats]
+      summary: Fetch an image sent with a prompt
+      description: |
+        The bytes of one image a prompt carried, as the model was given it — so
+        possibly downscaled from what was sent. A transcript lists each prompt's
+        images by `index`, `mimeType` and `byteSize`; this returns one of them.
+
+        A prompt's images never change, so the response can be cached for good.
+        Use the transcript's `chatId`, including for transcripts read through
+        `listAgentMessages`.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.chats.messageImage
+        python: client.chats.message_image
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const transcript = await client.chats.messages(projectId, chatId);
+            for (const entry of transcript.messages) {
+              for (const image of entry.images ?? []) {
+                const { mimeType, bytes } = await client.chats.messageImage(
+                  projectId, chatId, entry.messageId!, image.index,
+                );
+                console.log(mimeType, bytes.byteLength);
+              }
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                transcript = client.chats.messages(project_id, chat_id)
+                for entry in transcript.messages:
+                    for image in entry.images or []:
+                        picture = client.chats.message_image(
+                            project_id, chat_id, entry.message_id, image.index
+                        )
+                        print(picture.mime_type, len(picture.data))
+      responses:
+        '200':
+          description: The image bytes, typed by `Content-Type`.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                enum: [image/png, image/jpeg, image/webp]
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: |
+            No such chat among yours in this project (`CHAT_NOT_FOUND`), or the chat
+            has no prompt with that `messageId` carrying an image at that index
+            (`IMAGE_NOT_FOUND`).
           content:
             application/json:
               schema:
@@ -3124,6 +3745,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrganizationsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /api/v2/users/me/cards:
+    get:
+      operationId: listMyCards
+      tags: [Cards]
+      summary: List cards assigned to you across projects
+      description: |
+        Returns an offset-paginated page of cards assigned to the caller, across
+        every project where the caller currently holds card read access. Cards in
+        projects the caller can no longer read are left out rather than reported.
+        Accepts a personal access token with `cards:read` (or a scope that implies
+        it) or a browser session access token; execution grants are refused.
+
+        `isOpen` picks the card set: open (default), closed, or both. Values within
+        one repeated or comma-separated filter are ORed; distinct filter dimensions
+        are ANDed. The singular `projectId`, `teamId`, and `assigneeId` merge into
+        their plural lists. `includeNoTeam` extends the team facet with cards having
+        no team placement. Deadline and effort bounds are inclusive; within either
+        range, its include-no-value flag ORs null-valued cards with bounded
+        matches, and using only the flag matches only null-valued cards. Reversed
+        ranges return `INVALID_CARD_DEADLINE_RANGE` or `INVALID_CARD_EFFORT_RANGE`.
+
+        `stats` always counts the caller's open accessible cards and ignores every
+        filter and `isOpen`. `filterOptions` lists the facet values present across
+        the caller's accessible cards in the selected `isOpen` set, unaffected by
+        the other filters, so a picker does not empty itself as filters narrow.
+      security:
+        - ApiKeyBearer: []
+      parameters:
+        - $ref: '#/components/parameters/MyCardsIsOpen'
+        - $ref: '#/components/parameters/MyCardsPageLimit'
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/MyCardsQuery'
+        - $ref: '#/components/parameters/MyCardsProjectId'
+        - $ref: '#/components/parameters/MyCardsProjectIds'
+        - $ref: '#/components/parameters/MyCardsTeamId'
+        - $ref: '#/components/parameters/CardTeamIds'
+        - $ref: '#/components/parameters/CardStatusIds'
+        - $ref: '#/components/parameters/CardSprintIds'
+        - $ref: '#/components/parameters/MyCardsAssigneeId'
+        - $ref: '#/components/parameters/CardAssigneeIds'
+        - $ref: '#/components/parameters/CardTagIds'
+        - $ref: '#/components/parameters/CardIncludeNoTeam'
+        - $ref: '#/components/parameters/CardDeadlineFrom'
+        - $ref: '#/components/parameters/CardDeadlineTo'
+        - $ref: '#/components/parameters/CardIncludeNoDeadline'
+        - $ref: '#/components/parameters/CardEffortMin'
+        - $ref: '#/components/parameters/CardEffortMax'
+        - $ref: '#/components/parameters/CardIncludeNoEffort'
+        - $ref: '#/components/parameters/MyCardsSort'
+      x-routing-server-source: RoutingServer/userAccount/userAccount.routes.js
+      x-required-scopes: [cards:read]
+      x-sdk-methods:
+        typescript: client.cards.listMine
+        python: client.cards.list_mine
+      responses:
+        '200':
+          description: One page of the caller's assigned cards with dashboard counters and facets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyCardsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -6155,6 +6847,97 @@ components:
         type: string
         maxLength: 2048
       description: Opaque cursor returned as `meta.nextCursor` or `meta.previousCursor`.
+    MyCardsIsOpen:
+      name: isOpen
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: ['true', 'false', 'all']
+        default: 'true'
+      description: Open cards only (`true`), closed cards only (`false`), or both (`all`).
+    MyCardsPageLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+      description: Maximum cards returned.
+    MyCardsQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 200
+      description: |
+        Case-insensitive substring search across card name, description, and
+        resolution, and the names of the card's project, placed teams, and their
+        workflow statuses.
+    MyCardsProjectId:
+      name: projectId
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 300
+      description: Bare project id to match. Merged into `projectIds`.
+    MyCardsProjectIds:
+      name: projectIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      style: form
+      explode: true
+      description: Match cards in any selected project. Also accepted as one comma-separated value.
+    MyCardsTeamId:
+      name: teamId
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 255
+      description: |
+        Team id to match, merged into `teamIds`. The value `__none__` is a legacy
+        alias for `includeNoTeam=true`; prefer `includeNoTeam`.
+    MyCardsAssigneeId:
+      name: assigneeId
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Co-assignee user id to match. Merged into `assigneeIds`.
+    MyCardsSort:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - created_asc
+          - created_desc
+          - updated_asc
+          - updated_desc
+          - deadline_asc
+          - deadline_desc
+          - effort_asc
+          - effort_desc
+          - name_asc
+          - name_desc
+        default: deadline_asc
+      description: |
+        Stable card sort; card ID is the deterministic tie-breaker. Deadline and
+        effort sorts place cards with no value last in both directions.
     IfMatch:
       name: If-Match
       in: header
@@ -6198,6 +6981,66 @@ components:
       schema:
         type: string
         default: main
+    TreeIfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+      description: |
+        An `ETag` from an earlier whole-tree read. When it still describes the tree,
+        the response is `304` with no body. Ignored when `ids` or `q` is sent.
+    TreeIds:
+      name: ids
+      in: query
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        minItems: 1
+        maxItems: 100
+        items:
+          type: string
+      description: |
+        Comma-separated object ids, at most 100. Only those nodes are returned, in the
+        order asked; ids not in the project are left out. Cannot be combined with `q`.
+    TreeQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+      description: |
+        Case-insensitive text matched against each node's `name` and `shortName`.
+        Nodes whose name starts with it come first, then those with a word that
+        starts with it, then those that only contain it. Cannot be combined with `ids`.
+    TreeSearchLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Most nodes a `q` search returns. Ignored without `q`.
+    ObjectFields:
+      name: fields
+      in: query
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      description: |
+        Comma-separated top-level fields to return. `id`, `name`, and `type` are always
+        included, and names the object does not have are ignored. Omit for the whole
+        object.
     BranchPath:
       name: branch
       in: path
@@ -6222,6 +7065,14 @@ components:
         type: string
         format: uuid
       description: Session id from `createSession`.
+    ChatId:
+      name: chatId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Chat id from `listChats` or a session's `chatId`.
     TestId:
       name: testId
       in: path
@@ -6330,6 +7181,12 @@ components:
         Break the totals down. Omit to receive totals only — `totals` is always
         present and always covers the whole scope, whether or not you group.
   headers:
+    TreeETag:
+      description: |
+        Opaque, quoted tag for the whole tree's current state. Issued only when
+        neither `ids` nor `q` is sent.
+      schema:
+        type: string
     CardHistoryETag:
       description: Quoted latest card history head after the committed mutation.
       schema:
@@ -7155,6 +8012,251 @@ components:
           format: uuid
         teamName:
           type: string
+      additionalProperties: false
+    MyCardsResponse:
+      type: object
+      description: One page of the caller's assigned cards, with dashboard counters and facets.
+      required: [cards, stats, filterOptions, meta]
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCard'
+        stats:
+          $ref: '#/components/schemas/MyCardsStats'
+        filterOptions:
+          $ref: '#/components/schemas/MyCardsFilterOptions'
+        meta:
+          $ref: '#/components/schemas/MyCardsPageMeta'
+      additionalProperties: false
+    MyCard:
+      type: object
+      required:
+        - id
+        - name
+        - projectId
+        - projectName
+        - deadline
+        - effort
+        - resolution
+        - isOpen
+        - authorDisplayName
+        - createdAt
+        - closedAt
+        - updatedAt
+        - assignees
+        - teams
+        - tags
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Card name, or `Untitled` when the card has none.
+        projectId:
+          type: string
+          format: uuid
+          description: Bare id of the project the card belongs to.
+        projectName:
+          type: string
+        deadline:
+          type: [string, 'null']
+          format: date-time
+        effort:
+          type: [integer, 'null']
+          minimum: 0
+        resolution:
+          type: [string, 'null']
+        isOpen:
+          type: boolean
+        authorDisplayName:
+          type: [string, 'null']
+          description: Display name of the card's creator, or null when unknown.
+        createdAt:
+          type: [string, 'null']
+          format: date-time
+        closedAt:
+          type: [string, 'null']
+          format: date-time
+          description: When the card was last closed. Always null for an open card.
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardAssignee'
+        teams:
+          type: array
+          description: The card's team board placements.
+          items:
+            $ref: '#/components/schemas/MyCardTeamPlacement'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardTag'
+      additionalProperties: false
+    MyCardAssignee:
+      type: object
+      required: [id, displayName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          description: Empty when the user has no display name.
+      additionalProperties: false
+    MyCardTeamPlacement:
+      type: object
+      description: |
+        A placement on a team board. `full` placements are on teams the caller can
+        read and also carry `organizationId`; `summary` placements omit it.
+      required:
+        - id
+        - name
+        - statusId
+        - statusName
+        - statusColor
+        - sprintId
+        - sprintName
+        - placementAccess
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        statusId:
+          type: [string, 'null']
+          format: uuid
+        statusName:
+          type: [string, 'null']
+        statusColor:
+          type: [string, 'null']
+          description: Hex color of the workflow status, the same value project card search returns as `status_color`.
+        sprintId:
+          type: [string, 'null']
+          format: uuid
+        sprintName:
+          type: [string, 'null']
+        placementAccess:
+          type: string
+          enum: [full, summary]
+        organizationId:
+          type: [string, 'null']
+          format: uuid
+          description: Present only when `placementAccess` is `full`.
+      additionalProperties: false
+    MyCardTag:
+      type: object
+      required: [id, name, color]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+      additionalProperties: false
+    MyCardsStats:
+      type: object
+      description: |
+        Counters over every open card assigned to the caller in a readable project,
+        regardless of filters and `isOpen`. Day boundaries use the server's clock.
+      required: [openCount, dueSoon7d, overdue]
+      properties:
+        openCount:
+          type: integer
+          minimum: 0
+        dueSoon7d:
+          type: integer
+          minimum: 0
+          description: Open cards due between the start of today and the end of the seventh day from today.
+        overdue:
+          type: integer
+          minimum: 0
+          description: Open cards whose deadline is before the start of today.
+      additionalProperties: false
+    MyCardsFilterOptions:
+      type: object
+      required: [projects, teams, assignees, tags, statuses, sprints]
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardsFilterOption'
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardsFilterOption'
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardsAssigneeFilterOption'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardTag'
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardsFilterOption'
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyCardsFilterOption'
+      additionalProperties: false
+    MyCardsFilterOption:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      additionalProperties: false
+    MyCardsAssigneeFilterOption:
+      type: object
+      required: [id, displayName]
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: [string, 'null']
+      additionalProperties: false
+    MyCardsPageMeta:
+      type: object
+      required: [limit, total, pageStart, pageEnd, hasMore, previousOffset, nextOffset]
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+          description: Cards matching every filter, across all pages.
+        pageStart:
+          type: integer
+          minimum: 0
+          description: One-based position of the first card on this page, or 0 when the page is empty.
+        pageEnd:
+          type: integer
+          minimum: 0
+          description: One-based position of the last card on this page, or `offset` when the page is empty.
+        hasMore:
+          type: boolean
+        previousOffset:
+          type: [integer, 'null']
+          minimum: 0
+        nextOffset:
+          type: [integer, 'null']
+          minimum: 0
       additionalProperties: false
     RelatedCardsResponse:
       type: object
@@ -9714,9 +10816,10 @@ components:
     ProjectTree:
       type: object
       description: |
-        Flat list of project objects excluding the project object itself. New
-        projects contain reserved `Model` and `Library` packages whose `parent`
-        is the project id; callers must not assume a parentless node exists.
+        Flat list of project objects excluding the project object itself, or only
+        those selected by `ids` or `q`. New projects contain reserved `Model` and
+        `Library` packages whose `parent` is the project id; callers must not
+        assume a parentless node exists.
       required: [objectCount, tree]
       properties:
         objectCount:
@@ -9747,6 +10850,12 @@ components:
         childrenCount:
           type: integer
           minimum: 0
+        shortName:
+          type: [string, 'null']
+          description: The object's short name, or null when it has none.
+        subclassId:
+          type: [string, 'null']
+          description: Id of the subclass the object belongs to, or null.
       additionalProperties: true
     GetObjectResponse:
       type: object
@@ -9755,8 +10864,9 @@ components:
         object:
           type: object
           description: |
-            The full object, with computed values resolved. Fields vary by `type`, so
-            only `id`, `name`, and `type` are guaranteed.
+            The full object, with computed values resolved, or only the requested
+            `fields`. Fields vary by `type`, so only `id`, `name`, and `type` are
+            guaranteed.
           required: [id, name, type]
           properties:
             id:
@@ -10146,6 +11256,15 @@ components:
             Account or organization that owns the project. Files live under the owner's
             storage namespace, not the caller's, which is why a shared or org-owned
             project needs this rather than your own user id.
+        chatId:
+          type: string
+          format: uuid
+          description: |
+            The chat the session's prompts go to. A new session starts in a fresh
+            chat; `switchSessionChat` moves it to another. If another session takes
+            this chat over, the next read shows the fresh chat this session moved to.
+            Always present on sessions this server returns; absent from servers
+            that predate chat switching, where the chat id is the session id.
         dataPlane:
           $ref: '#/components/schemas/DataPlaneAccess'
         agent:
@@ -10166,6 +11285,35 @@ components:
         lastMessageId:
           type: [string, 'null']
           description: The `messageId` of the most recent prompt the agent took.
+        error:
+          $ref: '#/components/schemas/AgentFailure'
+        chats:
+          type: array
+          description: |
+            The run in every chat this session has one in, the current chat's included.
+            The fields above describe the current chat only; this list is how one poll
+            follows runs going on in other chats. A chat whose run was never started,
+            or was taken over by another session, is not listed. Absent from servers
+            that predate addressing chats by id.
+          items:
+            $ref: '#/components/schemas/ChatRunState'
+      additionalProperties: true
+    ChatRunState:
+      type: object
+      description: What the agent is doing in one of the session's chats.
+      required: [chatId, status]
+      properties:
+        chatId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        taskId:
+          type: [string, 'null']
+          description: Identifies the run. Also names the stored conversation.
+        lastMessageId:
+          type: [string, 'null']
+          description: The `messageId` of the most recent prompt sent in this chat.
         error:
           $ref: '#/components/schemas/AgentFailure'
       additionalProperties: true
@@ -10215,13 +11363,27 @@ components:
         - unknown
     SendAgentMessageRequest:
       type: object
-      required: [message]
       properties:
         message:
           type: string
-          minLength: 1
           maxLength: 100000
-          description: What you want the agent to do.
+          description: |
+            What you want the agent to do. Required unless `images` are attached;
+            a message of images alone is recorded as `[Image]`.
+        images:
+          type: array
+          maxItems: 10
+          description: |
+            Pictures for the agent to look at with this prompt — a photo of a part,
+            a sketch, a screenshot. The selected model must read images (see
+            `supportsImages` on `listAgentModels`), or the prompt is refused with
+            `MODEL_CANNOT_READ_IMAGES` before anything runs.
+
+            Images larger than 2000 pixels on a side or about 3.7 MB are scaled
+            down before the model sees them, so sending them smaller saves upload
+            time without losing anything. The whole request may be up to 50 MB.
+          items:
+            $ref: '#/components/schemas/AgentMessageImageInput'
         messageId:
           type: string
           description: |
@@ -10255,6 +11417,18 @@ components:
           type: boolean
           default: false
           description: Whether the agent may use web search for this prompt.
+        chatId:
+          type: string
+          format: uuid
+          description: |
+            The chat to send the prompt in. Omit it to use the session's current chat.
+
+            Naming another chat sends the prompt there without moving the session:
+            later calls that name no chat still go to the current one. The chat can
+            be one this session already has a run in, or any chat from `listChats`.
+            A chat another of your sessions has is taken over from it, the same as
+            with `switchSessionChat`, and that session's id is returned in
+            `takenOverFrom`.
         persona:
           type: string
           maxLength: 200
@@ -10272,6 +11446,43 @@ components:
 
             An id the project does not define is refused with `UNKNOWN_PERSONA` rather
             than quietly falling back to a default.
+      additionalProperties: false
+    AgentMessageImageInput:
+      type: object
+      required: [mimeType, data]
+      properties:
+        mimeType:
+          type: string
+          enum: [image/png, image/jpeg, image/webp]
+          description: |
+            What you believe the image is. The bytes decide: a JPEG labelled
+            `image/png` is treated as the JPEG it is. HEIC and other formats are
+            refused, so convert photos to JPEG before sending.
+        data:
+          type: string
+          contentEncoding: base64
+          description: |
+            The image file, base64-encoded, at most 10 MB decoded. A `data:` URL
+            prefix is accepted and ignored.
+      additionalProperties: false
+    AgentMessageImage:
+      type: object
+      required: [index, mimeType, byteSize]
+      description: |
+        An image sent with a prompt. Fetch its bytes from `getChatMessageImage`
+        with the transcript's `chatId`, the entry's `messageId`, and this `index`.
+      properties:
+        index:
+          type: integer
+          minimum: 0
+          description: Position among the prompt's images.
+        mimeType:
+          type: string
+          description: The format the model was given, after any downscaling.
+        byteSize:
+          type: integer
+          minimum: 0
+          description: Size of the stored image in bytes.
       additionalProperties: false
     AgentModelOptionValue:
       description: A typed model option value.
@@ -10320,7 +11531,7 @@ components:
       additionalProperties: false
     AgentModel:
       type: object
-      required: [key, name, isDefault, options]
+      required: [key, name, isDefault, supportsImages, options]
       properties:
         key:
           type: string
@@ -10331,6 +11542,12 @@ components:
         isDefault:
           type: boolean
           description: Whether this is the account profile's default chat model.
+        supportsImages:
+          type: boolean
+          description: |
+            Whether this model can look at `images` sent with a prompt. A prompt
+            with images to a model that cannot is refused with
+            `MODEL_CANNOT_READ_IMAGES`.
         options:
           type: array
           description: Effective model controls and defaults available to this account.
@@ -10356,6 +11573,10 @@ components:
         sessionId:
           type: string
           format: uuid
+        chatId:
+          type: string
+          format: uuid
+          description: The chat the prompt was sent in.
         taskId:
           type: string
           description: The run the prompt joined.
@@ -10364,7 +11585,26 @@ components:
         status:
           type: string
           description: Always `message_delivered` — a refusal is a `409`, not a status here.
+        takenOverFrom:
+          type: array
+          description: |
+            Your other sessions the named chat was taken from. Each one's run in it
+            was stopped, and one that was in the chat was moved to a fresh one.
+            Absent when no session had the chat.
+          items:
+            type: string
+            format: uuid
       additionalProperties: true
+    StopAgentRequest:
+      type: object
+      properties:
+        chatId:
+          type: string
+          format: uuid
+          description: |
+            The chat whose run to stop. Omit it to stop the run in the session's
+            current chat. Only a chat this session has can be named.
+      additionalProperties: false
     AgentTranscript:
       type: object
       required: [sessionId, taskId, source, status, entryCount, messages]
@@ -10372,6 +11612,10 @@ components:
         sessionId:
           type: string
           format: uuid
+        chatId:
+          type: string
+          format: uuid
+          description: The chat the session is in.
         taskId:
           type: string
         source:
@@ -10418,6 +11662,13 @@ components:
         messageId:
           type: string
           description: Present on your own prompts, matching what you sent.
+        images:
+          type: array
+          description: |
+            The images sent with one of your prompts, described rather than
+            included. Absent when the prompt had none.
+          items:
+            $ref: '#/components/schemas/AgentMessageImage'
         tool:
           $ref: '#/components/schemas/AgentToolUse'
       additionalProperties: true
@@ -10453,6 +11704,10 @@ components:
         sessionId:
           type: string
           format: uuid
+        chatId:
+          type: string
+          format: uuid
+          description: The chat whose run was stopped.
         taskId:
           type: string
         stopped:
@@ -10462,6 +11717,141 @@ components:
             a state you already had.
         status:
           $ref: '#/components/schemas/AgentStatus'
+      additionalProperties: true
+    Chat:
+      type: object
+      required: [id, title, messageCount, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: [string, 'null']
+          description: |
+            Named from the conversation's opening unless `renameChat` set it; null
+            until it has one.
+        messageCount:
+          type: integer
+          minimum: 0
+          description: |
+            Entries stored in the conversation — prompts, replies, and tool use. Zero
+            for a fresh chat nothing has been sent in yet.
+        createdAt:
+          type: [string, 'null']
+          format: date-time
+          description: Null for a fresh chat, which is not stored until its first message.
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+          description: Last activity. Null for a fresh chat.
+      additionalProperties: true
+    ChatList:
+      type: object
+      required: [chats]
+      properties:
+        chats:
+          type: array
+          description: Most recently active first.
+          items:
+            $ref: '#/components/schemas/Chat'
+      additionalProperties: true
+    ChatTranscript:
+      type: object
+      required: [sessionId, chatId, taskId, source, status, entryCount, messages]
+      properties:
+        sessionId:
+          type: [string, 'null']
+          format: uuid
+          description: The session in this chat, when one is; null otherwise.
+        chatId:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+        source:
+          type: string
+          enum: [live, persisted, none]
+          description: |
+            Where the answer came from. `live` is the running agent's copy; `persisted`
+            is the saved copy; `none` means nothing has been said yet.
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        entryCount:
+          type: integer
+          minimum: 0
+          description: Entries in the whole conversation, not just the returned window.
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentMessage'
+          description: Oldest first. Bounded by `limit`, taken from the end.
+      additionalProperties: true
+    SwitchSessionChatRequest:
+      type: object
+      properties:
+        chatId:
+          type: [string, 'null']
+          format: uuid
+          description: |
+            The chat to carry on in. Omit it, or send null, to start a fresh chat.
+      additionalProperties: false
+    SwitchSessionChatResponse:
+      type: object
+      required: [sessionId, previousChatId, chat]
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        previousChatId:
+          type: string
+          format: uuid
+          description: The chat the session was in before. The same as `chat.id` when nothing changed.
+        chat:
+          $ref: '#/components/schemas/Chat'
+        takenOverFrom:
+          type: array
+          description: |
+            Your other sessions this chat was taken from. Each one's run here was
+            stopped, and one that was in the chat was moved to a fresh one. Absent
+            when no session had the chat.
+          items:
+            type: string
+            format: uuid
+      additionalProperties: true
+    RenameChatRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 200
+          description: The chat's new title, trimmed. Null clears it.
+      additionalProperties: false
+    RenameChatResponse:
+      type: object
+      required: [chat]
+      properties:
+        chat:
+          $ref: '#/components/schemas/Chat'
+      additionalProperties: true
+    DeleteChatResponse:
+      type: object
+      required: [success, chatId, deleted]
+      properties:
+        success:
+          type: boolean
+        chatId:
+          type: string
+          format: uuid
+        deleted:
+          type: boolean
+        releasedSessionId:
+          type: string
+          format: uuid
+          description: |
+            Present when the chat belonged to one of your sessions. Its run here was
+            stopped, and if it was in the chat it continues in a fresh one.
       additionalProperties: true
     InvokeToolRequest:
       type: object
