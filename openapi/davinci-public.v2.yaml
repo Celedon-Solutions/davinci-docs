@@ -2266,9 +2266,11 @@ paths:
             The agent refused the message (`MESSAGE_REFUSED`), the project the
             session opened is no longer running (`PROJECT_NOT_RUNNING`), another
             session took the named chat at the same moment (`CHAT_SWITCH_CONFLICT`;
-            try again), or the chat was taken over in the web app
-            (`CHAT_TAKEN_OVER`). A taken-over chat accepts nothing from a session
-            until one reopens it with `switchSessionChat`.
+            try again), the chat was taken over in the web app
+            (`CHAT_TAKEN_OVER`), or the chat has a run going in the web app
+            (`CHAT_IN_USE`; try again once it ends). A taken-over chat accepts
+            nothing from a session until one reopens it with `switchSessionChat`.
+            A session never stops a run someone started in the web app.
           content:
             application/json:
               schema:
@@ -2495,7 +2497,9 @@ paths:
         work and take a chat over. The session's run there stops, and its prompts
         to that chat answer `409 CHAT_TAKEN_OVER` until a session reopens the chat
         here. Reopening takes it back from the web app, including when it is the
-        chat the session is already in.
+        chat the session is already in. A chat with a run going in the web app
+        cannot be opened or reopened until that run ends; the switch answers
+        `409 CHAT_IN_USE` and changes nothing.
 
         Otherwise, naming the chat the session is already in changes nothing.
       security:
@@ -2563,8 +2567,9 @@ paths:
                 $ref: '#/components/schemas/ErrorEnvelope'
         '409':
           description: |
-            Another session moved into the same chat at the same moment. Error code is
-            `CHAT_SWITCH_CONFLICT`; retry.
+            Another session moved into the same chat at the same moment
+            (`CHAT_SWITCH_CONFLICT`; retry), or the chat has a run going in the web
+            app (`CHAT_IN_USE`; retry once it ends).
           content:
             application/json:
               schema:
@@ -3851,7 +3856,9 @@ paths:
         every project where the caller currently holds card read access. Cards in
         projects the caller can no longer read are left out rather than reported.
         Accepts a personal access token with `cards:read` (or a scope that implies
-        it) or a browser session access token; execution grants are refused.
+        it) or a browser session access token; execution grants are refused. A
+        token's permission ceiling applies here as on the project card routes:
+        projects where it does not allow card read are left out.
 
         `isOpen` picks the card set: open (default), closed, or both. Values within
         one repeated or comma-separated filter are ORed; distinct filter dimensions
