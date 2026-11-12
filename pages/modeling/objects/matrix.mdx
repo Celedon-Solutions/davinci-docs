@@ -43,7 +43,20 @@ The **Types** dropdown lets you select which object types to include. By default
 #### Tag Filters  
 The **Tags** dropdown filters rows by object tags. This powerful filter narrows results to specific categories.
 
-<Info>Both type and tag filters combine (AND logic)—objects must match both the selected types AND selected tags to appear.</Info>
+#### Field and Child Attribute Filters
+The **Filters** dropdown lets you filter rows either by direct properties on the row object (`Row Object Fields`) or by the values of child attributes owned by—or inherited by—each row object (`Child Attribute Filters`):
+
+- **Attribute matching**: Pick or type the child attribute's `name` or `shortName`. Inherited attributes from an `extends` base object are matched automatically.
+- **Comparison operators**: Use `==` and `!=` for enums and text, or `>`, `<`, `>=`, and `<=` for numbers with optional units. Compatible units (such as `500 g < 1 kg` or `0.5 MUSD > 120000 USD`) are converted automatically using the same unit library as equations, including your project's custom units (for example, define `kUSD` as `1000 USD`). Incompatible units do not match.
+- **AND / OR combinations**: Choose **Match All (AND)** or **Match Any (OR)** when combining multiple attribute conditions.
+- **Missing attributes**: Rows whose object does not have the target attribute are excluded by default (**Missing: Exclude Row**), with an option to retain them (**Missing: Keep Row**). Missing attributes are checked before `!=` is evaluated so objects without the attribute are never accidentally included by a not-equals rule.
+
+<Info>Type, tag, object field, and child attribute filters combine together—objects must satisfy all active filter categories to appear as rows.</Info>
+
+#### Filtering Step Chain Results
+When the first column has a step chain (for example, Scope is a base definition such as `Org` and the first column follows `inheritance (in) [entity]`), the **Filters** dropdown's object field and child attribute filters apply to the objects that chain returns, not to the scope object. Scope objects whose chain returns no matching objects are left out of the matrix.
+
+To filter inside any column's chain instead, add an **attributeFilter** step with **+ Step**. It takes an attribute name or short name, an operator, a value, an optional unit, and whether objects without the attribute are excluded or kept.
 
 ## Adding and Configuring Columns
 
@@ -267,6 +280,26 @@ Creates a bill of materials showing mass, cost, and power for all components.
   3. Children (Types: Port, Display: both)
 
 Shows component-to-component interfaces and their ports.
+
+### Customer Relationships Manager (Active Pipeline)
+
+**Setup:**
+- Scope: Accounts package
+- Depth: 2
+- Types: Entity
+- Child Attribute Filters:
+  - Combinator: Match All (AND)
+  - Missing attribute: Exclude Row
+  - Condition 1: `engagement == interested`
+  - Condition 2 (optional): `arr > 50000 USD`
+- Columns:
+  1. Name (auto-included)
+  2. Engagement (Children: Attribute filtered to `engagement`, Display: value)
+  3. Annual Contract Value (Children: Attribute filtered to `arr`, Display: value)
+
+Shows only active pipeline entities whose owned or inherited `engagement` attribute equals `interested`, and automatically adds or removes rows as engagement values change.
+
+If your entities extend a shared `Org` definition, set Scope to `Org` (Depth: 0) and make the first column a chain of `inheritance (in) [entity]` instead. The same child attribute filters then select among the entities that chain returns, and columns sourced from it stay aligned with the filtered entities.
 
 ## Tips for Effective Matrices
 
