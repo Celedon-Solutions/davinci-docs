@@ -160,11 +160,16 @@ Staged changes use a snapshot of the selected objects. Changes that are not stag
 
 Use **Unstage All Changes** (`-`) to clear the staged list and return to an ordinary full-change commit. Staging does not discard or undo changes that are left outside the commit.
 
-### Asking the Agent to Commit
+### Commits by the Agent
 
-You can ask the Davinci Agent to commit, for example: "Commit these changes with the message 'Add bracket requirements'". The agent checks the uncommitted changes, tells you what the commit will include, and commits them.
+The Davinci Agent can commit your work, and it follows your instructions about committing, whether you give them in a message or as a rule in [Skills & Rules](/pages/editor/widgets/skills-rules):
 
-- The agent commits only when your request asks it to. Mentioning commits, such as asking about the last commit or asking for a commit message, is not enough.
+- Ask for a commit, for example "Commit these changes with the message 'Add bracket requirements'", or say when to commit, for example "Commit at the end of each phase".
+- Say "Don't commit" or "Only commit when I ask" to keep commits in your hands.
+- Without an instruction, the agent commits when it judges a commit useful, such as after finishing a coherent piece of work.
+
+Before committing, the agent checks the uncommitted changes and tells you what the commit will include.
+
 - The commit is authored as you. In the Graph it shows **via Davinci Agent** beside your name, and its details say whether the message is your words or the agent's. Administrators can find agent commits in the audit log.
 - You need permission to commit on the project, and the agent needs its Git write capability.
 - The agent does not commit when there are no changes, when the branch has moved since it looked, when objects have unresolved merge conflicts, or while another commit is running.
