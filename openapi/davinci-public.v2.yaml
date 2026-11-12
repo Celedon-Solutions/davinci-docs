@@ -82,7 +82,8 @@ tags:
 
       These are the chats started through the API — from the SDKs, a terminal, or
       an app built on them. Chats started in the Davinci web app are a separate set
-      and do not appear here.
+      and do not appear here. These chats do appear in the web app, though, where
+      you can watch a session work in one and take it over (see `switchSessionChat`).
   - name: AgentModels
     description: |
       Chat models available to your account. The returned keys are the values accepted
@@ -1058,6 +1059,83 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
+  /api/v2/projects/{projectId}/personas:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      operationId: listProjectPersonas
+      tags: [Projects]
+      summary: List personas
+      description: |
+        Returns the personas a prompt can name in `persona` when sending a message,
+        and the project's default persona for new chats.
+
+        The built-in Davinci persona comes first, with id `standard` and `builtIn`
+        true. It is not stored with the project, and it is always available. The
+        branch's own personas follow in the order the project stores them.
+
+        Personas belong to the branch, so this reads the running project: it opens
+        the project if it is not already open, and it includes uncommitted edits.
+        That is the same list a sent message's `persona` is checked against.
+
+        `defaultPersonaId` is the project-wide default for new chats. It is
+        `standard` when the project has none, or when the branch does not define
+        the persona it names. It is always one of the listed ids.
+      security:
+        - ApiKeyBearer: []
+      x-routing-server-source: RoutingServer/project/project.routes.js
+      x-required-scopes: [projects:read]
+      x-sdk-methods:
+        typescript: client.projects.listPersonas
+        python: client.projects.list_personas
+      x-codeSamples:
+        - lang: typescript
+          label: TypeScript SDK
+          source: |
+            import { DavinciClient } from '@celedon/davinci-sdk';
+
+            const client = new DavinciClient({
+              apiKey: process.env.DAVINCI_API_KEY!,
+            });
+
+            const { personas, defaultPersonaId } = await client.projects.listPersonas(projectId);
+            for (const persona of personas) {
+              console.log(persona.id === defaultPersonaId ? '*' : ' ', persona.name);
+            }
+        - lang: python
+          label: Python SDK
+          source: |
+            import os
+            from davinci_sdk import DavinciClient
+
+            with DavinciClient(api_key=os.environ["DAVINCI_API_KEY"]) as client:
+                result = client.projects.list_personas(project_id)
+                for persona in result.personas:
+                    marker = "*" if persona.id == result.default_persona_id else " "
+                    print(marker, persona.name)
+      parameters:
+        - $ref: '#/components/parameters/Branch'
+      responses:
+        '200':
+          description: The personas a prompt can name, and the project default.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPersonasResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProjectNotRunning'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ProjectNotReady'
   /api/v2/projects/{projectId}/tree:
     parameters:
       - $ref: '#/components/parameters/ProjectId'
@@ -2156,7 +2234,8 @@ paths:
             for the account default); pick a model whose `supportsImages` is true.
 
             `UNKNOWN_PERSONA` names a persona the project does not define, and
-            carries `details.definedPersonas` — the ids that would have worked. The
+            carries `details.definedPersonas` — the ids that would have worked,
+            starting with the built-in `standard`. The
             message is refused rather than run under a default persona you did not
             ask for.
 
@@ -2185,9 +2264,11 @@ paths:
         '409':
           description: |
             The agent refused the message (`MESSAGE_REFUSED`), the project the
-            session opened is no longer running (`PROJECT_NOT_RUNNING`), or another
+            session opened is no longer running (`PROJECT_NOT_RUNNING`), another
             session took the named chat at the same moment (`CHAT_SWITCH_CONFLICT`;
-            try again).
+            try again), or the chat was taken over in the web app
+            (`CHAT_TAKEN_OVER`). A taken-over chat accepts nothing from a session
+            until one reopens it with `switchSessionChat`.
           content:
             application/json:
               schema:
@@ -2374,8 +2455,9 @@ paths:
                 $ref: '#/components/schemas/ErrorEnvelope'
         '409':
           description: |
-            The project this session opened is no longer running. Error code is
-            `PROJECT_NOT_RUNNING`.
+            The project this session opened is no longer running
+            (`PROJECT_NOT_RUNNING`), or the chat was taken over in the web app
+            (`CHAT_TAKEN_OVER`), which already stopped the session's run there.
           content:
             application/json:
               schema:
@@ -2409,7 +2491,13 @@ paths:
         the other session's run in it is stopped, and if it was in that chat it
         continues in a fresh one. Its ids are returned in `takenOverFrom`.
 
-        Naming the chat the session is already in changes nothing.
+        Your API chats also appear in the web app, where you can watch a session
+        work and take a chat over. The session's run there stops, and its prompts
+        to that chat answer `409 CHAT_TAKEN_OVER` until a session reopens the chat
+        here. Reopening takes it back from the web app, including when it is the
+        chat the session is already in.
+
+        Otherwise, naming the chat the session is already in changes nothing.
       security:
         - ApiKeyBearer: []
       x-routing-server-source: RoutingServer/agentChat/agentChat.routes.js
@@ -3775,7 +3863,8 @@ paths:
         ranges return `INVALID_CARD_DEADLINE_RANGE` or `INVALID_CARD_EFFORT_RANGE`.
 
         `stats` always counts the caller's open accessible cards and ignores every
-        filter and `isOpen`. `filterOptions` lists the facet values present across
+        filter and `isOpen`. Its day boundaries follow `timeZone` when it is sent;
+        deadlines themselves stay UTC instants. `filterOptions` lists the facet values present across
         the caller's accessible cards in the selected `isOpen` set, unaffected by
         the other filters, so a picker does not empty itself as filters narrow.
       security:
@@ -3802,6 +3891,7 @@ paths:
         - $ref: '#/components/parameters/CardEffortMax'
         - $ref: '#/components/parameters/CardIncludeNoEffort'
         - $ref: '#/components/parameters/MyCardsSort'
+        - $ref: '#/components/parameters/MyCardsTimeZone'
       x-routing-server-source: RoutingServer/userAccount/userAccount.routes.js
       x-required-scopes: [cards:read]
       x-sdk-methods:
@@ -6938,6 +7028,20 @@ components:
       description: |
         Stable card sort; card ID is the deterministic tie-breaker. Deadline and
         effort sorts place cards with no value last in both directions.
+    MyCardsTimeZone:
+      name: timeZone
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        example: America/Los_Angeles
+      description: |
+        IANA time zone of the caller, such as `America/Los_Angeles`. When present,
+        `stats` counts days in this zone: today starts at local midnight, and the
+        due-soon window ends at the last millisecond of the seventh local day after
+        today, counted in calendar days so daylight-saving changes are respected.
+        When omitted, the server's time zone is used. An unknown zone returns `400`.
     IfMatch:
       name: If-Match
       in: header
@@ -8165,7 +8269,8 @@ components:
       type: object
       description: |
         Counters over every open card assigned to the caller in a readable project,
-        regardless of filters and `isOpen`. Day boundaries use the server's clock.
+        regardless of filters and `isOpen`. Day boundaries are local days in the
+        request's `timeZone`, or in the server's time zone when it is omitted.
       required: [openCount, dueSoon7d, overdue]
       properties:
         openCount:
@@ -10769,6 +10874,37 @@ components:
             type: object
             additionalProperties: true
       additionalProperties: true
+    ListPersonasResponse:
+      type: object
+      required: [personas, defaultPersonaId]
+      properties:
+        personas:
+          type: array
+          description: The built-in persona first, then the branch's own.
+          items:
+            $ref: '#/components/schemas/ProjectPersona'
+        defaultPersonaId:
+          type: string
+          description: |
+            Persona new chats start with. Always the id of a listed persona;
+            `standard` when the project sets none or the branch does not define it.
+      additionalProperties: true
+    ProjectPersona:
+      type: object
+      required: [id, name, builtIn]
+      properties:
+        id:
+          type: string
+          description: Value to send as `persona` with a message.
+          example: reviewer
+        name:
+          type: string
+          description: Display name. The persona's id when it has none.
+          example: Reviewer
+        builtIn:
+          type: boolean
+          description: True only for the built-in Davinci persona, `standard`.
+      additionalProperties: true
     ListFilesResponse:
       type: object
       required: [files, count]
@@ -11293,8 +11429,12 @@ components:
             The run in every chat this session has one in, the current chat's included.
             The fields above describe the current chat only; this list is how one poll
             follows runs going on in other chats. A chat whose run was never started,
-            or was taken over by another session, is not listed. Absent from servers
-            that predate addressing chats by id.
+            or was taken over by another session or in the web app, is not listed. A
+            run that finished in a chat the session has left drops off about five
+            minutes after it ended,
+            and a session keeps at most four idle runs in chats it has left; the
+            conversation itself is kept, and messaging the chat again resumes it.
+            Absent from servers that predate addressing chats by id.
           items:
             $ref: '#/components/schemas/ChatRunState'
       additionalProperties: true
@@ -11429,6 +11569,9 @@ components:
             A chat another of your sessions has is taken over from it, the same as
             with `switchSessionChat`, and that session's id is returned in
             `takenOverFrom`.
+
+            A session grant can only name chats its own session already has; any
+            other chat answers `404 CHAT_NOT_FOUND`.
         persona:
           type: string
           maxLength: 200
@@ -11437,6 +11580,12 @@ components:
             this prompt and every one after it in the session. Omit to keep whichever
             persona the session is already running under; omitting it on the first
             prompt uses the project's default.
+
+            `standard` names the built-in Davinci persona. It is always accepted,
+            whether or not the project defines personas, and is how a session that
+            named another persona switches back to the built-in one.
+            `listProjectPersonas` lists every id a prompt can name, and the
+            project's default.
 
             This is an id, not a persona. An object is refused with `INVALID_PERSONA`,
             because a persona's name, purpose and approach are written into the system

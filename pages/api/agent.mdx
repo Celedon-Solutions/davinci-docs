@@ -64,6 +64,38 @@ key is rejected with `UNKNOWN_MODEL` and the valid keys in
 model's effective definitions before the run starts; omitted options use their
 published defaults.
 
+## Choose a persona
+
+A persona sets who the agent is: its name, purpose, and approach. Projects define
+their own on each branch, and the built-in Davinci persona, `standard`, is always
+available. List the ones a prompt can name, with the project's default for new
+chats:
+
+```typescript
+const { personas, defaultPersonaId } = await client.projects.listPersonas(projectId);
+```
+
+```python
+result = client.projects.list_personas(project_id)
+print(result.default_persona_id)
+```
+
+Send a persona's `id` as `persona` with a message:
+
+```typescript
+await session.sendMessage({ message: 'Review the bracket', persona: 'reviewer' });
+```
+
+```python
+session.send_message("Review the bracket", persona="reviewer")
+```
+
+The persona applies to that prompt and every later one in the session. Omitting
+`persona` keeps the one the session is running under, so send `standard` to
+switch back to the built-in persona. An id the branch does not define is
+rejected with `UNKNOWN_PERSONA`, and `error.details.definedPersonas` lists the
+ones that would have worked.
+
 ## Send images
 
 A prompt can carry up to 10 images for the agent to look at: a photo of a part,
