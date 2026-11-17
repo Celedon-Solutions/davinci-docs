@@ -20,7 +20,9 @@ Pages are stored with the project, so they are versioned with branches and commi
 
 Pages are listed in the **Pages** widget, which is in the [Left Panel](/pages/editor/panels/left-panel) widget rail by default (globe icon). Like other widgets, it can be moved to the [Right Panel](/pages/editor/panels/right-panel).
 
-{/* Screenshot: Pages widget in the Left Panel showing a folder, several pages, and the published badge next to one page */}
+<Frame>
+    <img height="292" noZoom src="/images/pages-widget.png" />
+</Frame>
 
 Click a page to open it in a workspace tab. A published page shows a badge after its name; hover over the badge to see who can view it and which branches it serves.
 
@@ -41,7 +43,9 @@ Anyone who can edit the project can create and edit pages. Project members witho
 
 The page editor has a code editor on the left and a live preview on the right. Use the pane toggles in the editor's header to show or hide either side.
 
-{/* Screenshot: Page editor with the HTML tab open on the left and the rendered preview on the right, showing the header with the page name, format toggle, reload, copy-link, and Publish buttons */}
+<Frame>
+    <img noZoom src="/images/pages-editor.png" />
+</Frame>
 
 The code editor has these tabs:
 
@@ -73,7 +77,9 @@ The preview header has two modes:
 
 When a binding's value differs between the two, a chip such as **Uncommitted changes to 3 objects** appears in the preview header. Hover over it to see which bindings differ and which uncommitted objects cause the difference.
 
-{/* Screenshot: Preview header with the Working and Committed toggle and the "Uncommitted changes to N objects" chip with its tooltip open */}
+<Frame>
+    <img noZoom src="/images/pages-preview-changes.png" />
+</Frame>
 
 ## Binding Model Data
 
@@ -84,7 +90,9 @@ The **Bindings** tab has two views:
 - **Form** lists each binding as a card. Click a card to edit it, or use the **Add** buttons to add a binding of each kind. Drag objects from the Model tree onto the bindings list to bind them; a dropped reference with an uploaded file becomes an **Asset** binding. Each card shows a preview of its current value or its error.
 - **JSON** shows the same bindings as raw JSON.
 
-{/* Screenshot: Bindings tab in Form view with an expanded List binding card and the Add buttons below */}
+<Frame>
+    <img height="600" noZoom src="/images/pages-bindings-form.png" />
+</Frame>
 
 ### Binding Kinds
 
@@ -257,7 +265,9 @@ Publishing, changing sharing settings, rotating secret links, and unpublishing r
   </Step>
 </Steps>
 
-{/* Screenshot: Settings tab Publishing section showing the status line, Who can view dropdown, Branches field, URL slug field, and Publish button */}
+<Frame>
+    <img noZoom src="/images/pages-publishing-settings.png" />
+</Frame>
 
 The **Commit Before Publishing?** dialog lists what the published page would be missing: this page's own changes, and any uncommitted objects (and project name, README, or tags) that its bindings read. Uncheck any objects you want to leave uncommitted. Then choose:
 
@@ -265,7 +275,9 @@ The **Commit Before Publishing?** dialog lists what the published page would be 
 - **Publish Last Commit** publishes without committing. Your uncommitted changes are not included.
 - **Cancel** stops without publishing.
 
-{/* Screenshot: Commit Before Publishing dialog listing the page and two checked objects, with the Publish Last Commit and Commit and Publish buttons */}
+<Frame>
+    <img noZoom src="/images/pages-commit-before-publishing.png" />
+</Frame>
 
 If you cannot commit on the project, the page is published as of the last commit.
 
@@ -327,7 +339,9 @@ If a binding could not be resolved, the page shows whatever its script renders f
 
 If the page has not been built on a branch yet, for example because the page does not exist in that branch's last commit, viewers see a message that the page appears after it is committed to that branch.
 
-{/* Screenshot: Published page in a browser with the header (page name, project, branch selector, Updated time, Data and Print buttons) and the Data panel open */}
+<Frame>
+    <img noZoom src="/images/pages-published-view.png" />
+</Frame>
 
 ### Keeping A Published Page Current
 
