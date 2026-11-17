@@ -37,6 +37,10 @@ Every metric must resolve to a single unitless number between 0 and 1:
 
 In the Properties view, each metric row shows the resolved value, the equation or number you entered, and the matching risk category. For an equation-driven metric, select **Recalculate Value** to recompute it. The button is highlighted when the value may be out of date, for example after a referenced Code object changes.
 
+<Frame>
+    <img noZoom src="/images/risk-equation-metrics.png" />
+</Frame>
+
 Other equations can read a risk's resolved metrics with `[risk-uuid].probability`, `[risk-uuid].impact`, and `[risk-uuid].detectability`.
 
 <Note>Equations apply only to leaf risks. A risk with sub-risks rolls up its metrics from its children and ignores its own entered values.</Note>
