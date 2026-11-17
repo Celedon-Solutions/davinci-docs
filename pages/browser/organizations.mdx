@@ -22,6 +22,7 @@ Organizations can manage:
 - Members and access.
 - Project administration.
 - Storage usage and storage tiers.
+- AI usage funding and per-member AI spending limits, when enabled for your deployment.
 - Organization-level settings.
 - Admin surfaces for users with the required permissions.
 
@@ -67,6 +68,58 @@ Organizations can have storage usage and storage limits separate from individual
 ## Billing Relationship
 
 Organization billing behavior depends on how the organization was created and whether it belongs to a group. Some organizations are paid directly; others are managed through group billing or enterprise deployment controls.
+
+The organization page includes these usage and billing tabs:
+
+- **Activity** — AI, embedding, and tool usage across the organization's projects, broken down by who funded it. Available to organization members.
+- **Wallet & Limits** — the organization's balances, AI funding setting, member spending limits, storage quota, and account ledger. Available to Owners and Admins.
+- **Plan & Invoices** — the organization's subscription, storage tier, and invoices. Available to Owners and Admins when self-service billing is enabled. For an organization billed through a group, it links to the group's plan instead.
+
+## AI Usage Funding
+
+By default, members pay for AI usage from their own accounts, even when they work in organization-owned projects. An organization can instead pay for AI usage in its projects.
+
+<Note>
+Organization AI funding is controlled by your deployment. If you do not see the controls below, organization funding is not enabled for your deployment or organization. Contact your administrator.
+</Note>
+
+### Turn On Organization Funding
+
+1. Open the organization page.
+2. Go to **Wallet & Limits**.
+3. Under **Limits & Quotas**, turn on **Organization Pays for AI Usage**.
+
+When this setting is on, AI usage in the organization's projects is charged to the organization's account. Usage in projects owned by other accounts is not affected. When it is off, members pay from their own accounts.
+
+Organization Owners and Admins can change this setting. For an organization in a group, group administrators with organization billing permissions can change it too.
+
+When the organization pays, usage draws from the organization's prepaid balance (its **Credit Balance**) first and then from its on-demand usage, up to the organization's on-demand limit. The **On-Demand Usage Limit** is set by a system administrator; organization admins see it as read-only.
+
+### Member Spending Limits
+
+Member limits cap how much each member can spend of the organization's AI funding in each usage period.
+
+- **Default Member On-Demand Limit** — set on **Wallet & Limits**. Choose **No Limit**, a preset amount, or **Custom**. The default applies to every member who does not have an individual limit.
+- **Individual limits** — on the **Members** tab, open a member's actions menu and set **AI Spending Limit**. Choose **Default** to return the member to the organization default.
+
+While organization funding is on, Owners and Admins see each member's organization-funded spend against their limit in an **AI Usage** column on the **Members** tab. **Wallet & Limits** also shows **Spend by Member** for the current period.
+
+When a member reaches their limit, AI requests in the organization's projects stop for that member until the next usage period. When the organization reaches its own on-demand limit, AI requests stop for every member until the next period.
+
+### Organization API Keys
+
+Some deployments also let organizations use their own AI provider API keys. When this option is available, Owners and Admins see an **Organization API Keys** section on **Wallet & Limits** with one row per provider.
+
+- Click **Add Key** to save a key, **Rotate** to replace it, or **Revoke** to remove it.
+- A saved key is encrypted and never shown again. Only its last four characters are kept for reference.
+- Keys are used only while **Organization Pays for AI Usage** is on. AI requests for that provider in the organization's projects then use the organization's key. The provider bills the organization directly, so Davinci does not invoice this usage. It still counts toward member limits and the organization's on-demand limit.
+- Providers without an organization key run on the deployment's key and are paid from the organization's Credit Balance and then its on-demand usage.
+
+### What Members See
+
+When the organization pays for AI usage in a project, the credit meter in the Editor shows the organization's name on its rows. For example, it shows **Credit Balance · Organization Name** and **On-Demand Usage · Organization Name**. If you have a spending limit, a **Your Limit** row shows how much of it you have used.
+
+The **Activity** tab in your account settings shows usage covered by organizations separately from usage you paid for.
 
 ## Admin Tab
 

@@ -93,9 +93,21 @@ Changes to Object Reviews and Merge Approval settings take effect immediately an
 
 ## Creating And Importing Projects
 
-Use **New** to create a blank project. Use **Import** to import supported archive formats.
+Use **New** to create a blank project. Use **Import** to import supported archive formats: `.json`, `.daf`, and encrypted `.daf.enc` files.
 
-Project exports and imports using `.DAF` retain uploaded reference files. JSON exports do not include uploaded reference files.
+Project exports and imports using `.DAF` retain uploaded reference files, including empty files. Text reference files such as `.txt`, `.md`, and `.json` come back as reference files. JSON exports do not include uploaded reference files.
+
+### Importing An Encrypted DAF
+
+An encrypted DAF (`.daf.enc`) is a `.DAF` archive that a sender encrypted for your key and signed with theirs. To import one, you need your own private key file and the sender's public key file. See [Encrypted DAF](/pages/editor/exports#encrypted-daf) for how key files are created and exchanged.
+
+1. Click **Import**, choose the `.daf.enc` file, and click **Import**.
+2. The import opens in a new tab with the **Open Encrypted DAF** dialog. It shows who the file is from, who it is for, and the key fingerprints recorded in the file.
+3. Next to **Your private key**, click **Choose…** and select your `.private.dvkey` file.
+4. Next to **Sender's public key**, click **Choose…** and select the sender's `.public.dvkey` file.
+5. Click **Verify and Import**.
+
+Before decrypting anything, Davinci checks that the file was signed with the sender's key, that it has not changed since it was signed, and that it was encrypted for your key. If all checks pass, a **Signature Verified** message appears and the project imports like any other `.DAF`. If any check fails, an **Encrypted DAF Refused** message explains why and nothing is imported.
 
 ## Browser Settings Vs. Editor Settings
 

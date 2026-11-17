@@ -201,6 +201,7 @@
                         ]
                     },
                     "pages/editor/files-and-references",
+                    "pages/editor/pages",
                     {
                         "group": "AI Agent",
                         "pages": [
@@ -279,6 +280,7 @@
                             "pages/user-guide/views/risk",
                             "pages/user-guide/views/rollup",
                             "pages/user-guide/views/sequence",
+                            "pages/user-guide/views/simulation",
                             "pages/user-guide/views/slide",
                             "pages/user-guide/views/state",
                             "pages/user-guide/views/table",
@@ -427,10 +429,23 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
-                    "pages/release-notes/v5.3.0",
+                    "pages/release-notes/v5.3.5",
                     {
                         "group": "Prior Versions",
                         "pages": [
+                            "pages/release-notes/v5.3.4",
+                            "pages/release-notes/v5.3.3",
+                            "pages/release-notes/v5.3.2",
+                            "pages/release-notes/v5.3.1",
+                            "pages/release-notes/v5.3.0",
+                            "pages/release-notes/v5.2.8",
+                            "pages/release-notes/v5.2.7",
+                            "pages/release-notes/v5.2.6",
+                            "pages/release-notes/v5.2.5",
+                            "pages/release-notes/v5.2.4",
+                            "pages/release-notes/v5.2.3",
+                            "pages/release-notes/v5.2.2",
+                            "pages/release-notes/v5.2.1",
                             "pages/release-notes/v5.2.0",
                             "pages/release-notes/v5.1.7",
                             "pages/release-notes/v5.1.6",
@@ -799,11 +814,11 @@
         },
         {
             "source": "/pages/api/project-data",
-            "destination": "/api-reference/projects/get-project-tree"
+            "destination": "/api-reference/content/read-the-object-tree"
         },
         {
             "source": "/pages/api/files",
-            "destination": "/api-reference/projects/list-files-attached-to-a-project"
+            "destination": "/api-reference/projects/list-attached-files"
         },
         {
             "source": "/pages/browser/plans",

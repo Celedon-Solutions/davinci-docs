@@ -100,6 +100,21 @@ Use **Administration → Accounting Health** to check payment-provider status an
 - **Payment Provider & Payment Enabled**: Shows the configured payment provider and whether external payment processing is enabled.
 - **Pending Charges**: Lists usage meters that were recorded but not yet charged to an accounting pool (for example, when a charge was briefly deferred by lock contention). A background sweep processes pending charges every minute, or you can click **Charge Now** to run the sweep immediately.
 
+## On-Demand Usage Invoicing
+
+When Stripe is the payment provider, on-demand usage is billed with separate one-time invoices rather than as part of the subscription invoice. Each invoice is labeled **Davinci On-Demand AI Usage** with the date range it covers. An account is invoiced:
+
+- As soon as its unbilled on-demand usage reaches the deployment's early-invoice amount ($100 by default). The invoice covers the full unbilled amount and is charged to the customer's payment method immediately.
+- When its billing period renews, for any unbilled usage from the closed period.
+- When its subscription ends, for any remaining unbilled usage.
+- At least once a month, so accounts on yearly plans are still billed monthly.
+
+If an on-demand invoice payment fails, the account is marked past due and its on-demand usage is held until the invoice is paid. Included Usage and Credit Balance stay available.
+
+Usage that runs on an organization's own provider API key is billed by the provider directly and is not invoiced by Davinci. See [AI Usage Funding](/pages/browser/organizations#ai-usage-funding).
+
+The **Catalog** tab of **Administration → Stripe** (`/admin/~/stripe`) shows the current early-invoice amount under **On-Demand AI Usage Billing**. Its **Invoices** tab lists customers' Stripe invoices, including on-demand usage invoices.
+
 ## Investigation Workflow
 
 1. Confirm the environment and **Tenant Context**.

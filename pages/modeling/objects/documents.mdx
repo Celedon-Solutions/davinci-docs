@@ -48,6 +48,12 @@ Figure blocks render live model diagrams. A block can reference a reusable [Figu
 ### Image Blocks
 Image blocks display images without the automatic numbering and caption functionality of figures. They're useful for decorative images, logos, or illustrations that don't need formal referencing.
 
+An image block shows either an image reference (PNG, JPEG, GIF, BMP, WebP, or SVG) or an SVG [Code object](/pages/modeling/objects/code). To add one, choose **Insert** > **Image** and pick the image in the **Insert Image** dialog, or drag image references or SVG code objects from the Index onto a page. To change the image later, select the block and use the **Source** picker or **Replace** in the image toolbar.
+
+When an image block shows an SVG code object, the block redraws whenever the code changes, so you can edit the SVG in the [Code view](/pages/user-guide/views/code) and see the result in the document. Dropping an `.svg` file into the Editor asks whether to **Upload as Reference** or **Import as Editable Code**; choose **Import as Editable Code** to get an SVG code object you can edit.
+
+Image blocks can be cropped with **Crop** and adjusted with filters. Crops and filters carry into PDF export. In PDF export, SVG images are drawn as vector graphics where possible and stay sharp at any zoom; SVG features the PDF cannot draw as vectors fall back to a high-resolution image. DOCX export embeds SVG images as high-resolution pictures with their crop applied.
+
 ### Caption Blocks
 Caption blocks provide descriptive text for tables and figures. Captions support full text formatting and automatically display the appropriate "Table X:" or "Figure X:" prefix based on their association.
 
@@ -254,6 +260,8 @@ The page count indicator shows:
 
 Page numbers update automatically as content reflows during editing.
 
+Davinci also saves the page count with the document each time it is laid out, so the Davinci Agent can tell how many pages a document has without opening it.
+
 ### Zoom Control
 
 Zoom in and out to adjust the document view:
@@ -290,6 +298,8 @@ The Insert menu provides access to all insertable block types:
 - **Page Break**: Force a page break at the current location
 
 ### Dynamic References
+When the caret is in a paragraph, list item, or caption, **Insert** > **Cross-Reference** adds a link to a heading, figure, or table in the same document. See [Cross-References](#cross-references).
+
 When editing a paragraph block, two special insertion options become available:
 
 - **Page Number**: Inserts `@PAGE_NUMBER`, which displays the current page number  
@@ -311,6 +321,42 @@ The following elements receive automatic sequential numbering:
 - **Headings**: Hierarchical numbering based on document numbering scheme (1.1, 1.2, 1.2.1...)
 
 Numbering updates automatically when items are added, removed, or reordered.
+
+### Cross-References
+
+A cross-reference is a link in your text to a heading, figure, or table elsewhere in the same document, such as "see Figure 3" or "as described in Section 2.1". Figures and tables are referenced through their caption blocks, so add a **Figure Caption** or **Table Caption** to anything you want to point to.
+
+To insert a cross-reference:
+
+1. Place the caret in a paragraph, list item, or caption.
+2. Choose **Insert** > **Cross-Reference**.
+3. In the **Insert Cross-Reference** dialog, search or filter by **Headings**, **Figures**, or **Tables**, then select the target.
+4. Choose a **Display format** and click **Insert**.
+
+| Display format | Example |
+| :--- | :--- |
+| **Label & Title** (default) | Figure 2 — Thermal model |
+| **Label only** | Figure 2 |
+| **Title only** | Thermal model |
+| **Page only** | p. 7 |
+| **Label & Page** | Figure 2, p. 7 |
+| **Label, Title & Page** | Figure 2 — Thermal model, p. 7 |
+
+Headings are labeled `Section` followed by their number in the document's numbering scheme, for example `Section 2.1`. Figures and tables are labeled `Figure 1`, `Table 1`, and so on.
+
+Cross-reference text updates on its own. When you add, remove, or reorder headings, figures, or tables, renumber headings, edit a caption or heading, or content moves to another page, every cross-reference shows the new label, title, and page.
+
+To work with an existing cross-reference:
+
+- **Double-click** it, or `Ctrl/Cmd + click` it, to jump to its target.
+- Place the caret on it to show **Change Target** and a display format dropdown in the toolbar.
+- Right-click it for **Jump to Target**, **Change Target…**, and the display formats.
+
+If the target is deleted, the cross-reference reads "Unresolved cross-reference". Use **Repair Target** in the toolbar or **Repair Target…** in the right-click menu to point it at another heading, figure, or table.
+
+Cross-references also display and update in the cells of tables embedded in the document, and the Davinci Agent can add them when it writes or edits a document or a document table.
+
+In PDF export, cross-references become links that jump to the target's page. In DOCX export, they become internal hyperlinks to bookmarks on the target heading or caption. An unresolved cross-reference exports as the plain text "Unresolved cross-reference".
 
 ### Table of Contents
 
@@ -336,6 +382,7 @@ Export to Microsoft Word format (.docx) preserves:
 - Block structure (headings, paragraphs, lists)  
 - Tables with data and formulas converted to values
 - Images and figures
+- Cross-references, as internal links
 - Page layout and margins
 
 **To export to DOCX:**

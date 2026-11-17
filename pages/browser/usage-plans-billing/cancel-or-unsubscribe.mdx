@@ -16,25 +16,33 @@ To cancel an individual plan when self-service billing is available:
 1. Open the Davinci Browser.
 2. Click your avatar.
 3. Open **Settings**.
-4. Go to **Billing**.
-5. Under Subscription click **Manage**
-6. Use the Stripe customer portal or cancellation controls available for your plan.
+4. Go to **Plan & Invoices**.
+5. Under **Subscription**, click **Cancel at Period End** next to the renewal date. You can also click **Manage** next to **Billing Portal** to use the Stripe customer portal.
+
+Your plan stays active until the end of the current billing period. Until then, you can click **Resume** to keep it. Any unbilled on-demand usage is invoiced when the subscription ends.
 
 If your account is managed by an enterprise deployment, contact your administrator instead.
 
 ## Leaving A Group
 
-If you are a group member but not the group owner, you may be able to leave the group from your account billing settings (**Leave Group**). Leaving a group removes access to group billing and reverts your account to the Free plan.
+If you are a group member but not the group owner, you may be able to leave the group from **Settings → Plan & Invoices** (**Leave Group**). Leaving a group removes access to group billing. You return to your previous personal plan if it has not run out yet; otherwise, your account reverts to the Free plan. Your Credit Balance is preserved.
 
 ## Disbanding A Group
 
-Group owners and billing administrators may be able to disband a group from **Group → Settings** (**Disband Group**) or account billing settings. Disbanding a group removes group membership, cancels the group subscription with proration, deletes organizations billed through the group, and reverts all members to free-tier accounts.
+Group owners and billing administrators may be able to disband a group from **Group → Settings** (**Disband Group**) or from **Settings → Plan & Invoices**. Disbanding a group:
+
+- Permanently dissolves the group.
+- Cancels the group subscription with proration.
+- Returns members to their personal plan if it is still active, or to the Free plan.
+- Deletes the group's organizations and moves their active projects to each organization owner's account.
 
 Disbanding is a high-impact action. Confirm project ownership and exports before proceeding.
 
 ## Organizations
 
 Organization billing and storage may be direct, group-managed, or enterprise-managed. Review organization ownership and project ownership before canceling a related plan or storage tier.
+
+Deleting an organization removes all members. Active projects owned by the organization are moved to the organization owner's account. Projects already in the organization's trash are permanently deleted.
 
 ## Data Warning
 

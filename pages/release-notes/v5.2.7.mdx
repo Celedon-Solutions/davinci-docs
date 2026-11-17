@@ -1,0 +1,14 @@
+---
+title: 'Version 5.2.7 - Simulation Meshing Fixes'
+description: 'October 22 2026'
+---
+
+## Version 5.2.7 - Simulation Meshing Fixes
+
+This patch makes simulation results clearer about mesh convergence and fixes compiles that overlap a new setup.
+
+### Simulation
+
+- Simulation results now say when a result is not mesh-converged and how far it moved against a finer mesh, so you know to raise the target node count
+- Compiling a simulation that is already compiling the same setup now joins the running compile instead of starting another
+- A compile whose simulation was set up again while it was running now discards its result instead of applying an outdated one

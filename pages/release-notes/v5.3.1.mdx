@@ -1,0 +1,45 @@
+---
+title: 'Version 5.3.1 - Office Import, Notebooks & API Exports'
+description: 'November 4 2026'
+---
+
+## Version 5.3.1 - Office Import, Notebooks & API Exports
+
+This patch brings Word and PowerPoint files in as editable documents and slides, runs Jupyter notebooks as code objects, adds headless exports through the API and the agent, and makes a number of agent and editor improvements.
+
+### Word, PowerPoint & Notebooks
+
+- Dropping Word (`.docx`) or [PowerPoint](/pages/modeling/objects/slide#importing-powerpoint) files now asks once whether to open them as editable Davinci documents and slides or to upload them as PDFs that keep their original layout; PowerPoint files exported from Davinci restore exactly
+- Older `.doc` and `.ppt` files can be uploaded as PDFs
+- Archive imports and file replacements keep Word and PowerPoint files as they are
+- Added [Jupyter notebooks](/pages/user-guide/views/notebooks): import an `.ipynb` file, then edit and run its cells in the project's Python runtime
+- Text files edited in Davinci now save as you type and reopen with what was typed
+
+### Exports & API
+
+- Objects can now be [exported](/pages/editor/exports) through the [public API](/pages/api/introduction) and by the agent using the same exporters as the editor, without the project being open in a browser
+- Project viewers can now export, so they can copy or template from a shared starter project
+- Objects created through the API are checked the same way the agent's writes are, and an invalid `subclassId` is refused with a `400`
+- SysML v2 files inside uploaded `.zip` archives are imported under packages that match their folders
+
+### Agent & Skills
+
+- The agent can commit when you ask it to, recorded as made by the agent on your behalf, and it commits what you have staged, as the **Commit** button does
+- Skill instructions can now hold up to 16,000 characters
+- Image generation can produce SVG vector graphics and animated GIFs
+- A reply cut off at the model's output limit is retried once at lower reasoning effort, and the chat says so
+- Generated tests and equations can measure the distance between named CAD mates with `.distance(...)`
+
+### Groups & Organizations
+
+- Joining a [group](/pages/browser/usage-plans-billing/upgrade-to-group) from a paid personal plan now sets that plan to cancel at the end of its billing period instead of prorating it, and leaving the group before then returns you to it
+- Deleting an organization or disbanding a group now moves the organization's active projects to the organization owner instead of deleting them
+- Fixed several group and organization billing issues
+
+### Editor & Reviews
+
+- Running a notebook no longer marks its review as needing re-review unless its outputs change
+- Approval state stays local to a project: package syncs and API creates no longer carry review state
+- Git diff tabs open immediately and load committed objects in parallel
+- Commit messages can be generated for staged and unstaged changes
+- Fixed backspace and the style menu in documents, the color picker, notifications, and several smaller UI issues

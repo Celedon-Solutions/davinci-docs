@@ -1,0 +1,23 @@
+---
+title: 'Version 5.2.1 - Sever Inheritance & Risk Equations'
+description: 'October 1 2026'
+---
+
+## Version 5.2.1 - Sever Inheritance & Risk Equations
+
+This patch adds a way to break an object's inheritance link, lets Risk objects compute their scores from equations, and adds image capture for simulation results.
+
+### Modeling
+
+- Added [Sever Inheritance](/pages/modeling/common/inheritance#severing-inheritance) to the Index right-click menu, which detaches an object from its base while keeping its current values as its own
+- [Risk](/pages/modeling/objects/risk#equation-driven-metrics) probability, impact, and detectability now accept equations and function calls, and the risk tree and risk matrix show the computed values
+- Fixed the **Repair** button for broken includes
+
+### Simulation
+
+- Added a button to capture an image of a simulation result view
+
+### Reliability
+
+- Improved error messages when a service is temporarily unavailable, instead of failing with a generic error
+- Small fixes to the Index, the **Generate commit message** button, and motion study controls

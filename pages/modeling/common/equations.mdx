@@ -230,6 +230,45 @@ def calculate_mass(volume, density):
 
 If a Code object used by an attribute equation changes, Davinci may mark dependent attribute values as stale until they are recomputed. The previous resolved value remains visible so downstream model content does not disappear unexpectedly.
 
+## CAD Mate Distance
+
+Use `.distance(...)` on a compiled Geometry or Assembly object to measure the straight-line distance between two of its named mates:
+
+```text
+[bracket-geometry].distance("mount_a", "mount_b")
+[arm-assembly].distance("gripper_tip", "base_mount")
+```
+
+- Pass exactly two mate names in quotes.
+- The result is the distance between the origins of the two mates, in metres. It carries its unit, so you can compare or combine it with other lengths, such as `mm`, without conversion factors.
+- A part's mates use their declared names. An assembly lists each child's mates as `instance_mate`, such as `bolt_headMate`.
+- Compile the Geometry or Assembly before using it. If the object needs to be recompiled, or a mate name does not exist, the equation shows an error. The error for an unknown mate lists the mate names that are available.
+
+Like `.state(...)`, `.distance(...)` reads a value and does not execute code. Recompiling the object updates every equation and Test that uses the distance.
+
+## Simulation Quantities of Interest
+
+Equations can read a Quantity of Interest (QoI) declared by a compiled [simulation](/pages/user-guide/views/simulation). Call the simulation with an argument list, then name the QoI:
+
+```text
+[bracket-sim]().max_von_mises
+[bracket-sim](MEOP=400000, launch_accel=[0, 0, -40], payload=[payload-mass]).max_von_mises
+[gear-system](scenario=deploy).peak_trunnion_torque
+[gear-system](scenario=deploy, speed=600 rpm).peak_trunnion_torque
+```
+
+- **QoI name**: Write the declared QoI name with each run of spaces and punctuation replaced by `_`. For example, a QoI named `peak trunnion torque` is read as `.peak_trunnion_torque`.
+- **Parameters**: Optional `name=value` arguments read the QoI at a different parameter point. A value can be a number, a number with a unit, an expression, or an attribute reference. A number without a unit is read in the parameter's declared unit. A value outside the parameter's allowed range shows an error.
+- **Field simulations**: Use `()` with no arguments to read the QoI at the compiled default parameters. Field simulations accept 3-element vector parameters, such as `[0, 0, -40]`, and do not take `scenario=`.
+- **System simulations**: Name the scenario with `scenario=`. You can omit it only when the system has a single compiled scenario.
+- **Units**: The result carries the QoI's declared unit.
+
+A simulation reference always needs the argument list and a QoI name. A bare `[simulation]` or `[simulation].qoi_name` has no value.
+
+A field simulation must be compiled and up to date. If it is stale, recompile it before its QoIs can be read. A system simulation QoI comes from a completed run at the requested point, or from a study whose surrogate covers that point. A run that ends at the scenario's own stop condition counts as completed. If no run or study covers the point, the equation reports that the scenario must be run at that point or covered by a study.
+
+QoI references work in attribute values, [risk metrics](/pages/modeling/objects/risk#equation-driven-metrics), Test **Results Value** equations, and constraints. In a constraint, place the QoI on the left side and a concrete limit on the right, such as `[bracket-sim](F_load=500 N).max_displacement <= 2 mm`. Dependent values update when the simulation is recompiled or rerun, or when a referenced parameter attribute changes.
+
 ## Unit Referencing
 Values can reference units inline, such as `10 kg`, where the number is associated with the unit.
 

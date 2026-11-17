@@ -1,0 +1,26 @@
+---
+title: 'Version 5.2.6 - Documents, Tables & SysML Diagrams'
+description: 'October 19 2026'
+---
+
+## Version 5.2.6 - Documents, Tables & SysML Diagrams
+
+This patch adds spellchecking and table editing improvements to documents, converts imported SysML v1.x diagrams into native artifacts, and tightens attribute state values.
+
+### Documents & Tables
+
+- Added native spellchecking across [documents](/pages/modeling/objects/documents)
+- Deleting with several table rows or columns selected now deletes all of them
+- New table rows and columns inherit the styling of their neighbors
+- Fixed table interactions and keeping tables in sync across documents and slides
+- Fixed typing lag and styling offsets when editing tables
+- Fixed generating a file reference while working on a branch other than `main`
+
+### SysML & Figures
+
+- Imported [SysML v1.x](/pages/modeling/overview/imports) diagrams now become native [Figure](/pages/modeling/objects/figure) and [Matrix](/pages/modeling/objects/matrix) artifacts, and Figures gain a matrix mode
+- Improved automatic layout for action-type figures
+
+### Modeling
+
+- [Attribute](/pages/modeling/objects/attributes) state values and state scope are now limited to State objects

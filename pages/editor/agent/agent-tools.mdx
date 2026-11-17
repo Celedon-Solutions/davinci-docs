@@ -76,6 +76,26 @@ Tools for generating documents, tables, slides, and other artifacts from model d
 ### Geometries
 Tools for working with 3D geometry, CAD models, and spatial relationships.
 
+`MeasureModel` measures a compiled model: the distance between two parts, the bounding box, or the volume. It can also measure from a point to a part, or to that part's nearest face or nearest edge, and it reports whether the point is inside the part's material. Use it to ask, for example, whether an inspection point sits on material or how far a point is from an edge, hole, or pocket.
+
+### Image Generation
+Tools for generating and editing images from text descriptions, such as illustrations, concept art, operational concept graphics, and CAD renders. Generated images are saved as reference objects.
+
+`GenerateGenericImage` produces a PNG by default. It can also produce:
+
+- An **SVG** vector graphic, suited to logos, icons, and flat illustrations.
+- An **animated GIF**: a short looping animation of 2–16 frames (9 by default), each shown for 20–2000 ms (200 ms by default).
+
+SVG and GIF output is generated from the prompt alone, so it cannot use reference images, and it is available only when the image model configured in your Davinci deployment supports that format. SVG and GIF images cannot be edited with `EditImage`; ask the agent to generate a revised version instead.
+
+### Source Control
+Tools for reading commit history, branches, and object history, and for committing work. See [Commits by the Agent](/pages/editor/widgets/source-control#commits-by-the-agent).
+
+`StageChanges` and `UnstageChanges` change what is staged in your [Source Control](/pages/editor/widgets/source-control#subtree-commits) view, the same as the stage controls there. Naming the top object of a set of changes covers the changed objects beneath it, and changes that must be committed together are staged or unstaged together. The agent stages only when you ask it to, or to scope a commit, and tells you what ended up staged. Staging never commits, discards, or reverts changes, and it needs the same permissions as an agent commit.
+
+### Pages
+Tools for creating, editing, previewing, and publishing project pages: HTML, JavaScript, and CSS reports and dashboards that show live model data. The agent publishes a page only when your current request asks it to publish or share the page.
+
 ### Resources & Scheduling
 Tools for resource allocation, project scheduling, and timeline management.
 
@@ -184,10 +204,11 @@ The agent analyzes your requests and automatically determines which tools are ne
 
 You can see when the agent uses tools in the chat interface:
 
-- Tool invocations appear in the conversation log
-- Tool names and parameters are shown
-- Tool outputs are displayed or summarized
-- Multiple tool calls are grouped chronologically
+- Each tool call appears as one line in the conversation, with its progress while it runs and a summary of what it did once it finishes
+- Open a line to see the call's changes, steps, output, and input
+- Tool calls appear in the order they ran
+
+See [Tool Activity](/pages/editor/widgets/agent-chat#tool-activity) for details.
 
 ### Tool Parameters
 

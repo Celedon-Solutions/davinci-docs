@@ -39,6 +39,12 @@ Other programming languages are supported for storage and syntax highlighting bu
 
 <Info>Non-executable languages are useful for storing implementation code, generated code, or reference implementations alongside your model. They provide syntax highlighting but no execution capabilities.</Info>
 
+### SVG and HTML
+
+SVG and HTML code objects do not run. Instead, the [Code view](/pages/user-guide/views/code#svg-and-html-preview) opens them in **Preview**, which shows the rendered graphic or page and redraws as the code changes.
+
+An SVG code object can also be used as an image: insert it into a document as an [image block](/pages/modeling/objects/documents#image-blocks) or embed it in slides. The image updates whenever the SVG code changes. When you drop an `.svg` file into the Editor, choose **Import as Editable Code** to create an SVG code object, or **Upload as Reference** to keep it as a fixed image file.
+
 ## Referencing Model Objects
 
 Code can reference any model object using `@` notation, creating live connections between your code and model data.

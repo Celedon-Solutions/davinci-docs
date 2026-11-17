@@ -58,6 +58,32 @@ When the first column has a step chain (for example, Scope is a base definition 
 
 To filter inside any column's chain instead, add an **attributeFilter** step with **+ Step**. It takes an attribute name or short name, an operator, a value, an optional unit, and whether objects without the attribute are excluded or kept.
 
+### Row Sorting
+
+Rows can be sorted by one or more columns. The sort is saved with the matrix, so everyone who opens it sees the same row order. Changing the sort requires edit access to the matrix.
+
+There are several ways to sort:
+
+- **Column header**: Hover over a column header and click its sort icon. Clicking cycles that column through ascending, descending, and unsorted, and replaces any other sort. **Shift**+click adds the column as the next sort rule instead.
+- **Right-click a column**: Choose **Sort Ascending** or **Sort Descending**. When other columns are already sorted, **Then Sort Ascending**, **Then Sort Descending**, and **Remove From Sort** add or remove this column as a tie-breaker. **Clear Sort** removes all sorting.
+- **Column settings**: With a column selected, set its **Sort** dropdown to **None**, **Ascending**, or **Descending**.
+- **Sort** in the settings bar: Build the full list of rules. Each rule picks a column and an order. Use the arrows to change rule priority, then select **Apply**.
+
+The first rule decides the order, and later rules only break ties. When more than one column is sorted, each sorted header shows its priority number next to the sort icon.
+
+The **Sort** editor also sets the sort mode:
+
+- **All rows (flat)** sorts every row together. Depth indentation is hidden while a flat sort is active.
+- **Within each parent (keep hierarchy)** sorts rows only among siblings under the same parent, so the tree structure is preserved.
+
+Rows are sorted by the values shown in the column:
+
+- Empty cells always sort last, in both ascending and descending order.
+- Numbers, including numbers followed by a unit such as `10 kg`, sort numerically and come before text. Units are not converted when sorting, so sort a column whose values share one unit.
+- Text sorts alphabetically, ignoring case, and numbers inside text sort in numeric order (`Item 2` before `Item 10`).
+
+Deleting a sorted column removes it from the sort.
+
 ## Adding and Configuring Columns
 
 Columns display different data fields for each row object. The matrix automatically includes a name column; you add additional columns to show the data you need.

@@ -7,13 +7,18 @@ description: Export Davinci projects and model scopes for archive, interchange, 
 
 Davinci supports several export paths from the Editor. Use exports to archive project state, share project data, integrate with external tools, or publish model content for review.
 
-Exports are available from Project Settings and from supported object or project menus.
+Exports are available from the **Export** tab in Project Settings and from supported object or project menus.
+
+## Who Can Export
+
+Project Owners, Admins, Editors, and Viewers can export a project. Because Viewers have export permission, someone invited as a Viewer can copy from a shared project, use it as a template, or include it, without being made an Editor. Public visitors who are not project members cannot export.
 
 ## Export Formats
 
 | Format | Use for | Notes |
 | --- | --- | --- |
 | `.DAF` | Davinci archive and transfer | Preserves model objects and uploaded reference files. Best for round-tripping between Davinci environments. |
+| Encrypted DAF (`.daf.enc`) | Sending a project to one specific recipient | A `.DAF` encrypted for the recipient's public key and signed with your private key. See [Encrypted DAF](#encrypted-daf). |
 | `JSON` | Raw project/model data | Exports model data without uploaded reference files. Useful for inspection and tooling. |
 | `SysML v2` | Systems engineering interchange | Exports a standards-oriented `.sysml` representation with export-only transformations. |
 | `SysML v2 JSON` | Structured SysML-oriented analysis | Exports structured JSON for workflows that need machine-readable SysML-style data. |
@@ -29,10 +34,51 @@ See [SysML v2 Export](/pages/modeling/overview/sysml-export) for detailed mappin
 ## Choosing A Format
 
 - Use `.DAF` when you want to preserve a project for another Davinci environment.
+- Use Encrypted DAF when the archive has to travel to another organization and only that recipient should be able to open it.
 - Use `ZIP` on a package when you want all of its reference files, such as the output of a code analysis, in one download.
 - Use JSON when you need model data for custom tooling.
 - Use SysML v2 when you need standards-oriented system-model interchange.
 - Use artifact exports when sharing human-readable documents, tables, or presentations.
+
+## Encrypted DAF
+
+An Encrypted DAF is a `.DAF` archive that only one recipient can open, and that the recipient can confirm came from you unchanged. You can send it by email, file share, or any other channel.
+
+It uses two kinds of key file, both created in Davinci:
+
+- A **private key file** (`.private.dvkey`) that stays with its owner. You use your own private key to sign the archives you send and to open archives sent to you.
+- A **public key file** (`.public.dvkey`) that its owner gives to partners. You need a partner's public key to encrypt an archive for them and to check the signature on archives they send you.
+
+Before the first exchange, each party creates a key pair and sends the other its public key file. Never send a private key file.
+
+### Creating A Key Pair
+
+1. In Project Settings, open the **Export** tab and click **Encrypted DAF…** in the **Export Model** card.
+2. Click **Create key pair…** and enter a name for the key pair, such as your organization or your own name.
+3. Your browser downloads two files named after the key pair, ending in `.private.dvkey` and `.public.dvkey`. The new private key is filled in as **Your private key** for this export.
+
+Key pairs are generated in your browser, and Davinci does not keep a copy of your key files. Store the private key file somewhere safe. If you lose it, archives encrypted for it cannot be opened.
+
+### Exporting An Encrypted DAF
+
+1. In Project Settings, open the **Export** tab and click **Encrypted DAF…**.
+2. Next to **Recipient's public key**, click **Choose…** and select the recipient's `.public.dvkey` file.
+3. Next to **Your private key**, click **Choose…** and select your `.private.dvkey` file.
+4. Click **Encrypt and Export**.
+
+Davinci builds the `.DAF` archive, encrypts and signs it, and downloads it as `<project name>.daf.enc`. The completion message lists who the archive is encrypted for and who signed it, with each key's fingerprint.
+
+### Key Fingerprints
+
+A key pair holds two keys: a signing key and an encryption key. Each key is identified by a fingerprint, shown as four groups of four characters, for example `3F9A 21C0 7B11 9E42`. After you choose a key file, the dialog shows the fingerprint of the key it will use: the recipient's encryption key and your signing key when exporting, and the sender's signing key and your encryption key when importing. To make sure a public key file really came from your partner, compare its fingerprints with them over a separate channel, such as a phone call.
+
+### What Is Protected
+
+- The archive contents are encrypted with AES-256-GCM, using a key agreed with the recipient's public key through ECDH-ES on P-384 with HKDF-SHA-384.
+- The file is signed with the sender's ECDSA P-384 key using SHA-384. Any change to the file after signing makes the signature check fail.
+- The sender and recipient names, their key fingerprints, and the archive's file name, size, and creation time are readable without a key, so the recipient can see who sent the file before opening it. The project contents are not.
+
+To import an Encrypted DAF, see [Creating And Importing Projects](/pages/browser/projects#creating-and-importing-projects).
 
 ## Exporting Without The Menu
 

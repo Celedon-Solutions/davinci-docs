@@ -5,21 +5,28 @@ description: Get started with the Davinci Programmatic API
 
 ## Overview
 
-The Davinci Programmatic API lets scripts, CI jobs, reporting tools, and AI systems inspect Davinci project data. The API is organized around a small set of public v2 endpoints documented in the [API Reference](/pages/api/introduction).
+The Davinci Programmatic API lets scripts, CI jobs, apps, reporting tools, and AI systems read and change Davinci projects, work with a project's agent, and manage Task Cards and team planning. The public v2 endpoints are documented in the [API Reference](/api-reference/projects/list-accessible-projects).
 
 The current public API sections are:
 
-- [General](/api-reference/meta/get-programmatic-api-metadata) — API metadata and health checks.
-- [Projects](/api-reference/projects/list-accessible-projects) — project metadata, trees, objects, attached files, and file downloads.
-
-We are currently working on expanding the API. Additional API sections and authentication options will appear here as they are released.
+- **Projects** — create, open, close, and delete projects, read their branches, packages, and personas, and manage attached files.
+- **Content** — read the object tree and objects, add and delete objects, and export an object to a file.
+- **Branches** — create and delete branches, commit, read uncommitted changes, and read an object's commit history.
+- **Sessions** — open a project session and talk to its agent: send prompts, read the conversation, and stop a run. See [Agent](/pages/api/agent).
+- **Chats** — list, read, rename, and delete your API chats with a project's agent, and move a session between them.
+- **Agent Models** — the models and model options available to your account.
+- **Tools** — invoke one of the agent's tools directly, without the agent.
+- **Files** — upload and download large files through a session.
+- **Usage** — what your model usage cost, by account, project, or session.
+- **Tests** — start an authored Test, read its status and evidence, and cancel it.
+- **Organizations**, **Teams**, and **Cards** — organizations, team boards, workflow statuses, sprints, project Task Cards, and the cards assigned to you across projects.
 
 ## Getting Started
 
 Create a personal access token, then pass it as a bearer token in the `Authorization` header:
 
 ```bash
-curl "https://davinci-app.com/api/v2/programmatic/projects?limit=10" \
+curl "https://davinci-app.com/api/v2/projects" \
   -H "Authorization: Bearer dav_ak_live_your_token"
 ```
 
@@ -43,17 +50,83 @@ Use the SDKs for application code and longer-running automation. Use raw HTTP fo
 
 Programmatic API access uses user-owned personal access tokens. Tokens identify the user who created them, inherit that user's project permissions, can be scoped, and can be revoked from account settings.
 
-Project read endpoints require the `projects:read` scope. See [Personal Access Tokens](/pages/api/personal-access-tokens) for token creation, expiration, rate limit, and format details.
+Each endpoint lists the scope it requires in the API Reference. See [Personal Access Tokens](/pages/api/personal-access-tokens) for token creation, expiration, rate limit, and format details.
 
 Store tokens in environment variables or a secret manager. Do not commit tokens to source control, paste them into shared logs, or embed them in client-side code.
 
 ## Scopes
 
-Scopes limit what a token can do. The currently implemented public API scope is:
+Scopes limit what a token can do. A token can never do more than the user who created it, and its scopes usually narrow that further.
 
-- `projects:read` — read accessible project metadata, project trees, object payloads, attached file metadata, and file downloads.
+| Scope | Allows |
+| --- | --- |
+| `projects:read` | Read project metadata, branches, packages, personas, trees, objects, files, uncommitted changes, object history, chats, and session state. |
+| `projects:write` | Everything in `projects:read`, plus open and close projects, add and delete objects, delete attached files, export objects, create branches, commit, upload files, invoke agent tools, and run Tests. |
+| `projects:manage` | Everything in `projects:write`, plus create, update, and delete projects and delete branches. |
+| `sessions:manage` | Open and close sessions, stop the agent, move a session between chats, and rename or delete chats. |
+| `agent:message` | Send prompts to a session's agent and list available agent models. |
+| `usage:read` | Read what your model usage cost. A token that reads project data cannot see spending unless it also has this scope. |
+| `cards:read`, `cards:write`, `cards:manage` | Read, change, and delete project Task Cards, card tags, comments, and links. |
+| `teams:read`, `teams:write`, `teams:manage` | List organizations, and read and change organization teams, workflow statuses, sprints, and team boards. |
 
-Future API areas may introduce additional scopes.
+The `projects`, `cards`, and `teams` scopes are ladders: `manage` includes `write`, and `write` includes `read`. A new token gets `projects:read` unless you choose other scopes.
+
+## Sessions And The Agent
+
+A session opens a project, keeps it loaded while the session lives, and is where the project's agent runs. Creating a session also returns a short-lived grant and a data-plane URL for large file transfers; the grant works only for that session's project, carries no more permission than the token that created it, and expires in minutes.
+
+Conversations with the agent are kept as chats that outlive the session. Chats started through the API also appear in the Davinci web app, where you can watch a session work and take a chat over. See [Agent](/pages/api/agent) for models, personas, images, and chats.
+
+## Invoking Tools Directly
+
+When you already know the operation you want, a session can run one of the agent's tools itself, with no model choosing it. The result is deterministic and incurs no LLM charges. The tools available are the ones the session's project has open, and the token still needs the permissions the tool's work requires. This requires `projects:write`.
+
+<CodeGroup>
+
+```typescript TypeScript
+await client.sessions.with(projectId, async (session) => {
+  const result = await session.invokeTool({
+    toolbox: 'Core',
+    tool: 'ReadObject',
+    params: { objectId },
+  });
+  console.log(result.content.text);
+});
+```
+
+```python Python
+with client.sessions.create(project_id) as session:
+    result = session.invoke_tool(
+        toolbox="Core",
+        tool="ReadObject",
+        params={"objectId": object_id},
+    )
+    print(result.content.text)
+```
+
+</CodeGroup>
+
+A tool that refuses returns `422` with the tool's own message.
+
+## Usage
+
+The Usage endpoints report what your model usage cost, for your whole account, one project, or one session, optionally between two times and broken down by `model`, `project`, `session`, or `day`. They require the `usage:read` scope; the project and session reads also require `projects:read`.
+
+<CodeGroup>
+
+```typescript TypeScript
+const usage = await client.usage.get({ groupBy: 'model' });
+console.log(usage.totals.amountUsd, usage.asOf);
+```
+
+```python Python
+usage = client.usage.get(group_by="model")
+print(usage.totals.amount_usd, usage.as_of)
+```
+
+</CodeGroup>
+
+Usage is recorded on an interval, so a run that is still going may not be fully counted yet. `asOf` is when the newest counted usage was recorded. These endpoints report spending, not your balances and limits.
 
 ## Branches
 

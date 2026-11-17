@@ -1,0 +1,353 @@
+---
+title: Pages
+description: Build HTML, JavaScript, and CSS reports and dashboards that show live model data, and publish them to the people who need them
+---
+
+## Overview
+
+A page is a report or dashboard you write in HTML, JavaScript, and CSS. A page does not store model values itself. It reads them through **bindings**: each binding names model data, such as one object's value, a filtered list of objects, a sum over matching objects, or an object's value at every commit, and the page script renders whatever the bindings return. When the model changes, the page shows the new values.
+
+Typical uses include:
+
+- Mass, power, or cost budgets with margins and charts.
+- Requirement or verification status summaries.
+- Trend charts of a key value across the project's commits.
+- Design review handouts that combine model values, images from references, and Task Card status.
+
+Pages are stored with the project, so they are versioned with branches and committed like any other change. You can [publish](#publishing-and-sharing) a page so people can open it in a browser without opening the Editor.
+
+## Opening The Pages Panel
+
+Pages are listed in the **Pages** widget, which is in the [Left Panel](/pages/editor/panels/left-panel) widget rail by default (globe icon). Like other widgets, it can be moved to the [Right Panel](/pages/editor/panels/right-panel).
+
+{/* Screenshot: Pages widget in the Left Panel showing a folder, several pages, and the published badge next to one page */}
+
+Click a page to open it in a workspace tab. A published page shows a badge after its name; hover over the badge to see who can view it and which branches it serves.
+
+## Creating And Organizing Pages
+
+To create a page:
+
+1. Open the **Pages** widget.
+2. Click **Add Page** (`+`). If a folder is selected, the page is created inside it.
+3. The new page, named **New Page**, opens in the page editor with a starter layout and script.
+4. Click the name at the top of the editor to rename it.
+
+Use **Add Folder** to group pages. Drag pages and folders to reorder them or move them into a folder. Right-click a page or folder to open, rename, move, or delete it. Deleting a folder moves its contents up one level.
+
+Anyone who can edit the project can create and edit pages. Project members without edit access can open pages and their preview, but the editor is read-only for them.
+
+## The Page Editor
+
+The page editor has a code editor on the left and a live preview on the right. Use the pane toggles in the editor's header to show or hide either side.
+
+{/* Screenshot: Page editor with the HTML tab open on the left and the rendered preview on the right, showing the header with the page name, format toggle, reload, copy-link, and Publish buttons */}
+
+The code editor has these tabs:
+
+| Tab | Contents |
+| --- | --- |
+| **HTML** | The page body. Write body content only, without `<html>`, `<head>`, or `<script>` tags. |
+| **Script** | JavaScript that runs after the HTML loads. It reads model data through the `davinci` object. |
+| **CSS** | Plain CSS for the page. |
+| **Bindings** | The data the page reads. See [Binding Model Data](#binding-model-data). |
+| **Settings** | The page description, [libraries](#libraries), and [publishing](#publishing-and-sharing) settings. |
+| **Console** | Output from the page's `console` calls, script errors with line numbers, and binding problems. |
+
+Edits save automatically, and collaborators editing the same page see each other's changes. If a source is over its [size limit](#limits-and-sandboxing), the header shows **Not saved** and the problem is listed under the code editor.
+
+The **Bindings** tab shows a count when bindings have errors, and the **Console** tab shows a count of script errors.
+
+### Formatting
+
+The format toggle in the editor header (**Code: auto format on**) formats the HTML, Script, and CSS tabs when you leave the editor: two-space indentation, single quotes, and lines up to 100 characters. The agent uses the same formatting, so your edits and the agent's do not reflow each other. Click the toggle to turn it off.
+
+### Preview
+
+The preview re-renders as you type and whenever the model changes. Click **Reload preview** to restart the page from scratch. The preview follows the Editor's light or dark theme.
+
+The preview header has two modes:
+
+- **Working** shows live data from your workspace, including uncommitted changes.
+- **Committed** shows data at the last commit on the current branch, which is what a published page shows.
+
+When a binding's value differs between the two, a chip such as **Uncommitted changes to 3 objects** appears in the preview header. Hover over it to see which bindings differ and which uncommitted objects cause the difference.
+
+{/* Screenshot: Preview header with the Working and Committed toggle and the "Uncommitted changes to N objects" chip with its tooltip open */}
+
+## Binding Model Data
+
+Bindings are the page's only route to project data. Each binding has a key, and its value is available in the page script as `davinci.data.<key>`.
+
+The **Bindings** tab has two views:
+
+- **Form** lists each binding as a card. Click a card to edit it, or use the **Add** buttons to add a binding of each kind. Drag objects from the Model tree onto the bindings list to bind them; a dropped reference with an uploaded file becomes an **Asset** binding. Each card shows a preview of its current value or its error.
+- **JSON** shows the same bindings as raw JSON.
+
+{/* Screenshot: Bindings tab in Form view with an expanded List binding card and the Add buttons below */}
+
+### Binding Kinds
+
+| Kind | Returns |
+| --- | --- |
+| **Object** | One object's name, type, value, unit, and display text, plus any extra fields you list. |
+| **List** | Rows of objects matching types, tags, a parent, and field conditions, with optional sorting and a row limit. |
+| **Number** | A count, sum, average, minimum, or maximum over matching objects. |
+| **Tree** | An object and its children, nested up to a chosen depth. |
+| **Task Cards** | Task Cards filtered by status, tag, or linked object. |
+| **Project** | The project's name, README, and tags. |
+| **Asset** | The uploaded file of a reference object, such as an image or video. |
+| **History** | One object's value at each commit that changed it. |
+
+Selection options for **List** and **Number** bindings:
+
+- **Types**: only objects of these types. Leave empty for any type.
+- **Tags**: objects with any of these tags.
+- **Inside**: only children of this object. Turn on **Include nested objects** to include all descendants, not just direct children.
+- **Matching**: only objects whose field equals the given value.
+
+For **Object**, **List**, and **Tree** bindings, name, type, value, unit, and display are always included. Add field names under **Fields** (or **Columns** for a List) to include more. Dot paths such as `resolvedValues.mass` reach nested fields. A value field of `value` means the object's resolved value, as calculated in the model.
+
+A **Number** binding combines values without unit conversion. If the matching objects use different units, the binding reports a mixed-units warning.
+
+**Task Cards** bindings always read the project's current cards. They are not versioned with commits, and a card can link to different objects on each branch.
+
+Every binding can have a **Label**, which the page and the published view's data panel show instead of the key.
+
+### Pinned Commits
+
+By default, bindings read the branch the page is viewed on. To compare against a fixed point in history, open the **Pinned commits** section of the Bindings form, click **Pin a Commit**, and enter a commit SHA from [Source Control](/pages/editor/widgets/source-control#graph) and a label such as "Baseline". Then choose that commit under **Read from** on any binding except Task Cards.
+
+A pinned commit never changes, so a binding that reads it always shows the same values. Bindings cannot read another branch live.
+
+### Using Bindings In The Script
+
+The page script reads data through the `davinci` object. Register a render function with both `davinci.ready` and `davinci.onUpdate`, and make it redraw from scratch each time:
+
+```js
+davinci.ready(render);
+davinci.onUpdate(render);
+
+function render(davinci) {
+  const total = davinci.entries.totalMass;
+  document.getElementById('mass').textContent = total.error
+    ? 'Unavailable'
+    : davinci.format.value(total.value);
+}
+```
+
+| Name | Use |
+| --- | --- |
+| `davinci.ready(fn)` | Runs `fn` once, when data first arrives. |
+| `davinci.onUpdate(fn)` | Runs `fn` every time the data refreshes. |
+| `davinci.data[key]` | The value of a binding. |
+| `davinci.entries[key]` | The binding with its `kind`, `label`, `value`, and `error`. Check `error` and show a placeholder when it is set. |
+| `davinci.meta` | The page name, project name, branch, commit, and build time. |
+| `davinci.format` | Formatting helpers: `value`, `number`, `percent`, `delta`, and `date`. Each returns an em dash for missing values. |
+| `davinci.asset(key)` | Loads the file of an **Asset** binding. See [Showing Files From References](#showing-files-from-references). |
+
+To match the viewer's light or dark theme, use the CSS variables `--page-bg`, `--page-surface`, `--page-border`, `--page-text`, `--page-muted`, `--page-accent`, `--page-good`, `--page-warn`, and `--page-bad` instead of fixed colors.
+
+<Tip>Bind values instead of typing them into the HTML or script. A typed number goes out of date as soon as the model changes; a bound one does not.</Tip>
+
+### Showing Files From References
+
+An **Asset** binding shows the uploaded file of a [reference object](/pages/editor/files-and-references#reference-objects), such as a diagram, photo, video, audio clip, PDF, or CSV. Choose the reference, or drag it from the Model tree, then load the file in the script:
+
+```js
+davinci.asset('diagram')
+  .then((file) => {
+    document.getElementById('diagram').src = file.url;
+  })
+  .catch(() => {
+    document.getElementById('diagram').alt = 'Diagram unavailable';
+  });
+```
+
+The result's `url` works as the source of an `<img>`, `<video>`, or `<audio>` element, and its `blob` can be read as text or bytes, for example to parse a CSV. A page cannot offer the file for download or embed it in a frame.
+
+Asset bindings have these limits:
+
+- Images and other files up to 25 MB, audio up to 100 MB, and video up to 250 MB.
+- The reference must belong to this project. References from an included project cannot be shown.
+- A file uploaded before file versioning was introduced cannot be shown. Replace the reference's file to use it on a page.
+
+A published page shows the file version in the branch's last commit. If you replace the reference's file, the published page shows the new file after the change is committed.
+
+### Charting A Value Over Time
+
+A **History** binding returns one object's value at each commit that changed it, oldest first, for trend charts such as mass margin over the life of the project. Each point has the commit, its time and message, and the value as it was calculated when that commit was made.
+
+- **Field** defaults to `value`, the object's resolved value. Other fields use dot paths.
+- **Points** keeps the most recent changes: 50 by default, up to 200.
+- History reads commits only, so uncommitted edits appear after the next commit. An object that has never been committed returns an error.
+
+## Libraries
+
+Turn on a library under **Libraries** in the **Settings** tab to use it in the page script:
+
+| Library | Global | Use for |
+| --- | --- | --- |
+| **Chart.js** | `Chart` | Line, bar, pie, scatter, and radar charts. |
+| **Plotly** | `Plotly` | Interactive scientific plots, 3D surfaces, and heatmaps. |
+| **D3** | `d3` | Custom data-driven SVG and layouts. |
+| **KaTeX** | `katex` | Math typesetting with `katex.render`. |
+
+Enabled libraries load before the page script. Other libraries cannot be loaded.
+
+## Limits And Sandboxing
+
+Pages run in an isolated frame, both in the editor preview and when published. In practice this means:
+
+- A page cannot make network requests or load anything from outside Davinci: no `fetch`, external scripts, stylesheets, images, or fonts. Use bindings for data, **Asset** bindings for files, and the [built-in libraries](#libraries) for charts and math. Inline `data:` images are allowed.
+- A page cannot reach the Davinci app, open popups or new windows, submit forms, embed frames, or navigate away.
+- `localStorage`, `sessionStorage`, and cookies work only in memory and are cleared whenever the page reloads.
+
+Bindings and sources have size limits:
+
+| Limit | Value |
+| --- | --- |
+| HTML, Script, and CSS | 65,536 characters each |
+| Bindings JSON | 32,768 characters |
+| Bindings per page | 100 |
+| Pinned commits per page | 8 |
+| Rows per List or Task Cards binding | 500 |
+| Fields per binding | 40 |
+| Tree depth | 8 levels (2,000 objects) |
+| History points | 200 |
+
+A binding whose result is too large returns an error asking you to narrow its selection, fields, or limit. Fields that hold secrets and other sensitive project settings are never available to a page.
+
+## Versioning And Branches
+
+Pages are part of the project, so every page edit is an uncommitted change on the current branch:
+
+- Page changes appear under **Pages** in the [Source Control](/pages/editor/widgets/source-control#changes) **Changes** list. Opening one shows a diff of each changed part: name, description, libraries, HTML, script, CSS, and bindings.
+- Commit page changes like any other change. Commit details also list changed pages.
+- Each branch has its own version of every page. Creating a branch copies the pages, and merging brings page changes across.
+- If a merge changes the same part of a page on both branches, the page is marked as conflicted in the **Pages** widget. Open it to see each conflicting part as a diff, choose **Accept Current** or **Accept Incoming** for each, then complete the resolution and commit it.
+
+<Note>A published page shows each branch as of its last commit. Uncommitted page edits and uncommitted model changes are not visible to viewers until they are committed.</Note>
+
+## Publishing And Sharing
+
+Publishing makes a page viewable in a browser at its own URL, outside the Editor. Publishing settings belong to the page, not to a branch, and you choose which branches the published page serves.
+
+### Who Can Publish
+
+Publishing, changing sharing settings, rotating secret links, and unpublishing require the **Publish Pages** permission. By default, project Owners and Admins have it; Editors and Viewers do not. See [Roles And Permissions](/pages/browser/roles-permissions). Without it, the **Publish** button is disabled and the publishing settings are read-only.
+
+### Publishing A Page
+
+<Steps>
+  <Step title="Open the publishing settings">
+    Click **Publish** in the page editor header. The first time, this opens **Publishing** in the **Settings** tab.
+  </Step>
+  <Step title="Choose who can view">
+    Pick an option under **Who can view**. See [Who Can View](#who-can-view).
+  </Step>
+  <Step title="Choose branches">
+    Enter one or more branch names under **Branches**, separated by commas. It defaults to the branch you are on.
+  </Step>
+  <Step title="Set the URL slug">
+    Optionally enter a **URL slug**. If you leave it empty, Davinci derives one from the page name.
+  </Step>
+  <Step title="Publish">
+    Click **Publish**. If the page or the objects it reads have uncommitted changes on the current branch, Davinci asks whether to commit them first.
+  </Step>
+</Steps>
+
+{/* Screenshot: Settings tab Publishing section showing the status line, Who can view dropdown, Branches field, URL slug field, and Publish button */}
+
+The **Commit Before Publishing?** dialog lists what the published page would be missing: this page's own changes, and any uncommitted objects (and project name, README, or tags) that its bindings read. Uncheck any objects you want to leave uncommitted. Then choose:
+
+- **Commit and Publish** commits this page and the checked items, then publishes. Other pages and other uncommitted work stay uncommitted. Click **Edit commit message** to change the default message, `Publish page "<name>"`.
+- **Publish Last Commit** publishes without committing. Your uncommitted changes are not included.
+- **Cancel** stops without publishing.
+
+{/* Screenshot: Commit Before Publishing dialog listing the page and two checked objects, with the Publish Last Commit and Commit and Publish buttons */}
+
+If you cannot commit on the project, the page is published as of the last commit.
+
+After the first publish, the **Publish** button reuses the saved settings. To change them, edit the Publishing section and click **Save and Publish**.
+
+### Who Can View
+
+| Option | Who can open the published page |
+| --- | --- |
+| **Project members** | Only members of the project. |
+| **Project readers** | Anyone who can open the project, including readers of a public project. |
+| **Organization** | Members of the organization that owns the project. |
+| **Secret link** | Anyone with the link. See [Secret Links](#secret-links). |
+| **Public** | Anyone on the internet. |
+
+Only **Public** pages can be indexed by search engines.
+
+Someone who opens a page URL they are not allowed to see gets a "not found" page, so the page's existence is not revealed. Visitors who are not signed in are sent to sign in first.
+
+### Branches
+
+A published page serves up to 10 branches. The first branch listed is the default view. When a page serves more than one branch, viewers can switch branches from a selector in the page header.
+
+If you edit a page on a branch the publication does not serve, the **Publish** button's tooltip says so. Add the branch under **Branches** to serve its version.
+
+When a served branch is deleted, it is removed from the publication. If it was the only branch, the page is unpublished.
+
+### URLs
+
+A published page's URL has this form:
+
+```
+https://<your Davinci address>/<owner>/<project>/~/pages/<page-slug>
+```
+
+`<owner>` is the handle of the user or organization that owns the project, and `<project>` is the project's slug. A slug uses lowercase letters, numbers, and dashes, up to 64 characters, and must be unique within the project. To open a specific branch, add `?branch=<branch name>`.
+
+The Publishing section shows the URL with a **Copy** button, and the link icon next to **Publish** copies it.
+
+### Secret Links
+
+With **Secret link** visibility, Davinci creates a link of the form `https://<your Davinci address>/pages/<token>`. Anyone with it can view the page without signing in.
+
+<Warning>The secret link is shown only once, right after it is created. Copy it then. Davinci does not keep a readable copy, so it cannot show the link again.</Warning>
+
+To revoke access, click **Rotate Link** in the Publishing section. The old link stops working immediately, and a new link is shown once. A secret-link view opens the default branch and does not show a branch selector or a link to the project.
+
+Switching to another visibility option deletes the secret link.
+
+### What Viewers See
+
+The published page opens with a header showing the page name and project, the branch, and when the page was last updated. The header also has:
+
+- **Data**: a panel listing every binding with the objects and values it resolved to, the branch, the commit, and any pinned commits.
+- **Print**: prints the page.
+- **Out of date**: shown when the branch has commits newer than the page's last update.
+
+If a binding could not be resolved, the page shows whatever its script renders for an error, usually a placeholder, and the **Data** panel marks the binding as unresolved. The detailed problem messages are shown only to editors, in the Publishing section.
+
+If the page has not been built on a branch yet, for example because the page does not exist in that branch's last commit, viewers see a message that the page appears after it is committed to that branch.
+
+{/* Screenshot: Published page in a browser with the header (page name, project, branch selector, Updated time, Data and Print buttons) and the Data panel open */}
+
+### Keeping A Published Page Current
+
+A published page updates on its own after every commit, merge, or rollback on a branch it serves. It shows that branch's last commit: both the committed version of the page and the committed model data. You do not need to publish again after each commit.
+
+The Publishing section shows the state of each served branch, such as **Showing commit** with a link to the commit, **Updating to the latest commit**, or **Update failed**. It also lists any bindings that could not be resolved at that commit. If an update failed, click **Retry Update**.
+
+The **Publish** button reads **Published** when the published page is up to date. When it reads **Publish**, its tooltip lists what has changed, such as uncommitted page edits or a served branch that is behind its latest commit.
+
+### Unpublishing
+
+To stop sharing a page, click **Unpublish** in the Publishing section. The published view and its link stop working, and its stored update history is deleted. The page stays in the project.
+
+<Note>Deleting a page does not unpublish it. Once the deletion is committed, viewers of that branch no longer see the page, but the publication remains. Unpublish the page first to remove it completely.</Note>
+
+## Pages And The Agent
+
+The [Davinci Agent](/pages/editor/agent/agent-tools#pages) can create pages, edit their HTML, script, CSS, and bindings, change their settings, and render them to check the layout, script errors, and binding problems before reporting back. Its edits appear in the open page editor as they happen.
+
+- The agent publishes a page only when your current request asks it to publish or share the page. Before publishing, it checks for uncommitted changes the page depends on and asks whether to commit them.
+- Publishing through the agent needs the same **Publish Pages** permission as publishing yourself.
+- The agent cannot create or rotate secret links. Use the page editor's Publishing settings for those.
+- You can @-mention a page in an agent chat message, and pages the agent mentions appear as links that open the page.

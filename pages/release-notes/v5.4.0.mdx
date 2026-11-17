@@ -1,0 +1,67 @@
+---
+title: 'Version 5.4.0 - Pages, Skill Includes & System Simulation'
+description: 'Unreleased'
+---
+
+{/* DRAFT: v5.4.0 is not tagged yet. Set the release date in `description`, remove this file from .mintignore, and add it to the Release Notes navigation when it ships. */}
+
+## Version 5.4.0 - Pages, Skill Includes & System Simulation
+
+Version 5.4 introduces Davinci Pages for publishing live reports and dashboards from your model, reusable skill includes, system simulation and transient structural analysis on by default, encrypted project transfer, an expanded public API with multiple chats per session, and a redesigned agent activity view, alongside broad security and reliability improvements.
+
+### Davinci Pages
+
+- Added [Pages](/pages/editor/pages): HTML, JavaScript, and CSS reports and dashboards that show live model data, edited alongside the model with a source editor and live preview
+- Pages are stored with the project, versioned with branches, and committed like any other change
+- Pages can include reference objects, images, and object history
+- Publish a page to project members, your organization, anyone with a share link, or the public, choose which branches it shows, and rotate its share link at any time
+- The agent can create, edit, preview, and publish pages, and publishes only when you ask it to
+
+### Skills
+
+- [Skills](/pages/editor/widgets/skills-rules#including-other-skills) can include other skills, so shared guidance lives in one place and later edits carry over everywhere it is included
+- Added an include picker with search and preview, include chips, an **Include skill** button, a **Show effective instructions** preview, and warnings for missing or circular includes
+- Deleting a skill that other skills include now asks for confirmation and names them
+- The agent includes existing project skills when it writes new ones instead of repeating their text
+- Skill edits made elsewhere no longer overwrite unsaved edits in an open skill
+
+### Simulation
+
+- [System simulation](/pages/user-guide/views/simulation#system-simulations) is now on by default, with a Studies section for sweeps, sampling, sensitivity, and optimization, study plots, and **Refresh** for stale simulations
+- Edits to behaviors and attributes now mark the system simulations that read them as stale and name what changed
+- Transient structural analysis is now generally available, with automatic time step and mode count and a time scrubber in the result view
+- Simulation compiles are substantially faster
+- Every simulation mesh is now validated before compiling, and the setup view shows progress, the part's minimum mesh size, and a results button
+- [Simulation Quantities of Interest](/pages/modeling/common/equations#simulation-quantities-of-interest) can be used in ordinary equations, risk metrics, tests, and constraints, and are shown in display units
+- Tests can read a scenario that ends at its own stop condition, and a scenario's `active=` list can name joint stops
+- Motion study fixes: assembly placements stay rigid, part rotation is bounded, failure reasons are kept with stored results, and exported GIFs are named after their study
+
+### Agent
+
+- Redesigned [tool activity](/pages/editor/widgets/agent-chat#tool-activity) in Agent Chat: each tool call is one line with live progress, opening to its changes, steps, output, and input, with plan previews and folded earlier turns
+- Chat tabs show the agent's status at a glance
+- The agent can [stage and unstage changes](/pages/editor/widgets/source-control) in Source Control
+- `MeasureModel` can measure from a point to a part or to its nearest face or edge, and reports whether the point is inside the material
+- The stop button now appears for a chat opened while its agent is running
+
+### Public API & SDKs
+
+- [API chats](/pages/api/agent#chats): a session can keep several chats with a project's agent, list, read, rename, and delete them, and send to any of them without switching
+- API chats appear in the web app, where you can watch a session work and [take a chat over](/pages/editor/widgets/agent-chat#api-chats)
+- Added endpoints to list a project's [personas](/pages/api/agent#choose-a-persona), invoke an agent tool directly, read [usage](/pages/api/introduction#usage) by account, project, or session, and list the Task Cards assigned to you across projects
+- New [token scopes](/pages/api/introduction#scopes) for writing and managing projects, sessions, agent messages, usage, cards, and teams
+- Updated TypeScript and Python SDKs
+
+### Projects, Exports & Billing
+
+- Added [Encrypted DAF](/pages/editor/exports#encrypted-daf) export and import: an archive signed by the sender and encrypted for one recipient's key
+- Table exports to Excel now keep formulas where they can be translated, along with number formats, borders, and merged cells
+- On-demand AI usage is now [invoiced](/pages/browser/usage-plans-billing/overview#how-on-demand-usage-is-billed) as soon as the unbilled amount reaches $100, and at renewal for any remainder
+
+### Security & Reliability
+
+- Fixed several security issues across the web app, project sharing, and sign-in
+- Projects with unsaved edits are saved automatically every 15 minutes, as well as whenever the project is closed
+- Open tabs now stay in sync and keep working through brief connection drops, and you stay signed in when the server cannot be reached
+- Improved reliability of version history, invitations, project transfers, and email delivery
+- Faster CAD previews and model-wide checks on large projects

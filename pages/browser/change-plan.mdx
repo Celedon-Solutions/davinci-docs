@@ -10,7 +10,7 @@ If you are on the Free plan and want to upgrade to Core or Max:
 
 <Steps>
     <Step title="Open the Upgrade page">
-        Go to [https://davinci-app.com/~/upgrade](https://davinci-app.com/~/upgrade). You can also get here from your Billing settings by clicking `Upgrade Plan`.
+        Go to [https://davinci-app.com/~/upgrade](https://davinci-app.com/~/upgrade). You can also get here from **Settings → Plan & Invoices** by clicking `Upgrade`.
     </Step>
     <Step title="Choose a plan and billing frequency">
         Select **Monthly** or **Yearly** using the toggle at the top. Yearly plans include more total credits at a lower effective rate. Then click `Upgrade to Core` or `Upgrade to Max`.
@@ -26,43 +26,44 @@ If you are already on a paid individual plan and want to switch to the other:
 
 <Steps>
     <Step title="Open the Upgrade page">
-        Go to [https://davinci-app.com/~/upgrade](https://davinci-app.com/~/upgrade). You can also get here from your Billing settings by clicking `Change Plan`.
+        Go to [https://davinci-app.com/~/upgrade](https://davinci-app.com/~/upgrade). You can also get here from **Settings → Plan & Invoices** by clicking `Change Plan`.
     </Step>
     <Step title="Select the plan to switch to">
-        Click `Switch to Core` or `Upgrade to Max`, depending on your current plan. You can also change your billing frequency (Monthly or Yearly) at this time.
+        Click `Switch to Core` or `Switch to Max`, depending on your current plan. To change only your billing frequency, select **Monthly** or **Yearly** and click `Change Billing` on your current plan.
     </Step>
     <Step title="Confirm the change">
-        A confirmation dialog will appear explaining the proration. Your account will be credited or charged for the difference immediately. Confirm to apply the change.
+        A confirmation dialog shows the amount due today and when the change takes effect. Confirm to apply the change.
     </Step>
 </Steps>
 
-Your new plan takes effect immediately. No separate checkout is required when switching between paid plans.
+No separate checkout is required when switching between paid plans. Upgrades take effect immediately; downgrades take effect at the end of your current billing period.
 
 ## What Happens When You Upgrade
-- Your new plan and Included Usage are applied immediately.
-- If switching from a lower tier, you will be charged the prorated difference for the remainder of your billing period.
+Moving from Core to Max, or from monthly to yearly billing, is an upgrade.
+- Your new plan applies immediately, and your billing cycle restarts today.
+- The unused time on your current plan is credited against the new plan, and you are charged the difference now.
+- You receive the new plan's full Included Usage for the new cycle. Included Usage has no cash value and does not carry over.
 
 ## What Happens When You Downgrade
-- The downgrade takes effect immediately.
-- You will receive a prorated credit to your account based on the unused portion of your previous plan.
+Moving from Max to Core, or from yearly to monthly billing, is a downgrade.
+- Nothing is charged or refunded today.
+- You keep your current plan, storage, and Included Usage until the end of your current billing period. The new plan starts when your subscription renews.
+- While a downgrade is pending, the Upgrade page and **Plan & Invoices** show the scheduled change. Click `Keep Current Plan` or `Keep Current` to cancel it.
 
 ## Cancelling Your Subscription
 
 To cancel your paid subscription and return to the Free plan:
 
 <Steps>
-    <Step title="Open Billing Settings">
-        Go to [https://davinci-app.com/~/settings/billing](https://davinci-app.com/~/settings/billing).
-    </Step>
-    <Step title="Open the Stripe Customer Portal">
-        Click the `Manage` button next to Stripe Account.
+    <Step title="Open Plan & Invoices">
+        Go to [https://davinci-app.com/~/settings/invoices](https://davinci-app.com/~/settings/invoices).
     </Step>
     <Step title="Cancel your subscription">
-        From the Stripe portal, click Cancel Subscription and follow the prompts. Your subscription will remain active until the end of the current billing period, then revert to Free.
+        Under **Subscription**, click `Cancel at Period End` next to the renewal date. You can also click `Manage` next to **Billing Portal** and cancel from the Stripe customer portal. Your subscription remains active until the end of the current billing period, then reverts to Free.
     </Step>
 </Steps>
 
-<Note>While a cancellation is pending, your Billing settings will show a Cancellation Date instead of a Renewal Date. You retain full access until that date.</Note>
+<Note>While a cancellation is pending, **Plan & Invoices** shows a Cancellation Date instead of a Renewal Date, and you can click `Resume` to keep your plan. You retain full access until that date. Any unbilled on-demand usage is invoiced when the subscription ends.</Note>
 
 ## Switching to a Group Plan
 
@@ -70,10 +71,10 @@ If you want to move from an individual plan to a Group plan:
 
 <Steps>
     <Step title="Open the Upgrade to Group page">
-        Go to [https://davinci-app.com/upgrade/team](https://davinci-app.com/upgrade/team). You can also find a link to this on the Group page (`/team`) or in your Billing settings.
+        Go to [https://davinci-app.com/upgrade/team](https://davinci-app.com/upgrade/team). You can also find a link to this on the Group page (`/team`) or in **Settings → Plan & Invoices**.
     </Step>
     <Step title="Set up your group">
-        Enter a Group Name and choose a billing frequency (Monthly or Yearly). If you are currently on Core or Max, your individual subscription will be cancelled with a prorated credit when the group plan activates.
+        Enter a Group Name and choose a billing frequency (Monthly or Yearly). If you are currently on Core or Max, your individual subscription is set to cancel at the end of its current billing period when you join the group. It is not prorated or refunded.
     </Step>
     <Step title="Complete checkout">
         Click `Continue to Checkout` and complete payment. After checkout, your group will be created and you will be redirected to the Group management page.
@@ -84,15 +85,15 @@ See [Groups](/pages/browser/groups) for details on managing your group after cre
 
 ## Returning to an Individual Plan from a Group
 
-If you leave or are removed from a group, your account reverts to the **Free** plan. You do not automatically return to your previous individual plan (Core or Max). To re-subscribe, visit the [Upgrade page](https://davinci-app.com/~/upgrade) after leaving the group.
+If you leave or are removed from a group before your previous individual subscription (Core or Max) has run out, you return to that plan. It stays set to cancel at the end of its billing period, and you can click `Resume` on **Plan & Invoices** to keep it. Otherwise, your account reverts to the **Free** plan. To re-subscribe, visit the [Upgrade page](https://davinci-app.com/~/upgrade) after leaving the group.
 
-If the group owner disbands the group, all members -- including the owner -- revert to the Free plan.
+If the group owner disbands the group, members return to their personal plan if it is still active, or to the Free plan.
 
 See [Groups - Leaving or Disbanding](/pages/browser/groups#leaving-or-disbanding-a-group) for step-by-step instructions.
 
 ## Updating Payment Information
 
-To update your payment method, view invoices, or review billing history, go to your [Billing settings](https://davinci-app.com/~/settings/billing) and click the `Manage` button next to Stripe Account. This opens the Stripe Customer Portal where you can manage payment details.
+To update your payment method, view invoices, or review billing history, go to [Plan & Invoices](https://davinci-app.com/~/settings/invoices) in your settings. The **Invoices** list shows your subscription and on-demand usage invoices, each with a `Receipt` link. To update your payment method or billing details, click the `Manage` button next to **Billing Portal** to open the Stripe customer portal.
 
 ## Enterprise Users
 For Enterprise Users, please contact support at [support@celedon.solutions](mailto:support@celedon.solutions) to change your contract or subscription.

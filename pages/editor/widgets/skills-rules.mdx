@@ -80,7 +80,61 @@ Each skill includes:
 - **Extensions** — generation-only file types or languages for code-related skills.
 - **Instructions** — the full Markdown guidance the agent should follow.
 
-You can reference project assets in instructions with `[<uuid>]` syntax. This is useful when a skill should follow a source object, template document, standard, or example already stored in the project.
+The description holds up to 500 characters and the instructions up to 16,000 characters. A counter above each field shows how much you have used.
+
+Type `@` in the instructions to reference a project object. This is useful when a skill should follow a source object, template document, standard, or example already stored in the project.
+
+If the agent or a collaborator changes a skill's instructions while you have unsaved edits in the same field, Davinci does not save over either version. A notice appears above the field: click **Load latest** to discard your edits and show the latest version, or **Keep mine** to save your edits over it.
+
+## Including Other Skills
+
+A skill can include other project skills. When the agent uses a skill, each included skill's current instructions appear in its place, so later edits to the included skill carry over to every skill that includes it. Use includes to keep shared guidance, such as a naming convention or review checklist, in one skill instead of copying it into several.
+
+### Adding An Include
+
+In a skill's **Instructions**, type `+` or click **Include skill** above the editor. A picker opens with a search over the project's other skills. Choose a skill to insert it at the cursor. The include appears as a chip with the skill's name. Click a chip to open that skill.
+
+- Skills that already include the skill you are editing, directly or through other skills, are greyed out with the note "Already includes this skill". Including one of them would create a cycle.
+- When no other skill can be included, the **Include skill** button is hidden and `+` is typed as plain text.
+- If you type after `+` and then close the picker without choosing a skill, the text you typed stays in the instructions.
+- Only project skills can be included. Built-in skills cannot.
+
+An included skill applies even when it is inactive. Where the including skill's own instructions conflict with the guidance it includes, its own instructions take precedence.
+
+### Checking Includes
+
+Below the instructions, Davinci shows:
+
+- **Warnings** for includes that cannot be expanded: a skill that includes itself, an include that creates a cycle, a skill that no longer exists, a skill nested more than 4 levels deep, or included text that was cut to fit the size limit.
+- **Included by** — the skills that include the one you are editing.
+- **Show effective instructions** — a read-only preview of the instructions the agent receives, with every include expanded in place. The preview has its own character counter. A skill's instructions can reach 32,000 characters once includes are expanded; included text beyond that is cut off.
+
+An include that points to a deleted skill shows as a red **Missing skill** chip. Remove the include or restore the skill.
+
+### Deleting A Skill That Others Include
+
+When you delete a skill that other skills include, Davinci asks you to confirm and names the skills that include it. If you delete it, those skills lose its instructions and their includes show as missing skills.
+
+### How The Agent Receives Included Skills
+
+In the agent's prompt, each included skill's text sits between a `--- Begin included skill: <name> ---` line and a matching `--- End included skill: <name> ---` line, so the including skill's own text after an include stays separate. If the same skill is included more than once among the skills the agent is using, its text appears once and later includes point back to it.
+
+Each agent prompt has a limited amount of space for skills. A skill's own instructions are kept in full, and included text is shortened first when a prompt runs out of room.
+
+### When The Agent Writes Skills
+
+When the agent creates or edits a skill, it checks the project's existing skills first. If an existing skill already states guidance the new skill needs, the agent includes that skill instead of repeating its text. The agent cannot save a skill that includes itself, creates a cycle, or includes a skill that does not exist. When the agent deletes a skill that other skills include, it tells you which skills still include it.
+
+## Exporting And Importing Skills
+
+Skills can be exported to a `.dmo` file and imported into another project.
+
+- **Export** — click **Export Skill** in the skill's header, or right-click the skill in the Skills list and choose **Export Skill**. The file also contains the skills it includes, so its includes still work after import. Exporting requires export permission on the project.
+- **Import** — click the **Import Skill** (upload) button at the top of the Skills list to import into the selected folder, or right-click a folder and choose **Import Skill**. Importing requires import permission and edit access on the project.
+
+If a skill with the same name already exists in the target folder, the import dialog lets you choose **Overwrite** to replace it or **Keep Both** to import the skill under a new title. Linked read-only skills cannot be overwritten. If the instructions reference objects that are not in the destination project, the dialog lists them and the instructions are imported unchanged. Includes between skills imported together are updated to point at the imported copies.
+
+You cannot import skills while project skills have unresolved merge conflicts.
 
 ## Writing Effective Skills
 
@@ -109,7 +163,7 @@ For example, a "Requirements Analyst" persona might make the agent more verifica
 ## Best Practices
 
 - Disable a skill instead of deleting it if you may need it later.
-- Prefer several focused skills over one large instruction document.
+- Prefer several focused skills over one large instruction document. Use includes to share guidance between them instead of copying it.
 - Use subjects on generation skills so they load only for relevant object types.
 - Keep workflow skills separate from generation skills unless the same rule truly governs both.
 - Review skills after major process changes so the agent does not follow outdated guidance.

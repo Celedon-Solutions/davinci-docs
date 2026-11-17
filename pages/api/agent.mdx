@@ -64,6 +64,43 @@ key is rejected with `UNKNOWN_MODEL` and the valid keys in
 model's effective definitions before the run starts; omitted options use their
 published defaults.
 
+## Choose a persona
+
+A [persona](/pages/editor/agent/persona) sets who the agent is: its name,
+purpose, and approach. Projects define their own on each branch, and the
+built-in Davinci persona, `standard`, is always available. List the ones a
+prompt can name, with the project's default for new chats:
+
+```typescript
+const { personas, defaultPersonaId } = await client.projects.listPersonas(projectId);
+```
+
+```python
+result = client.projects.list_personas(project_id)
+print(result.default_persona_id)
+```
+
+The built-in persona comes first, followed by the branch's own personas. The
+list reads the running project, so it includes uncommitted edits.
+`defaultPersonaId` is always one of the listed ids, and is `standard` when the
+project sets no default or the branch does not define the one it names.
+
+Send a persona's `id` as `persona` with a message:
+
+```typescript
+await session.sendMessage({ message: 'Review the bracket', persona: 'reviewer' });
+```
+
+```python
+session.send_message("Review the bracket", persona="reviewer")
+```
+
+The persona applies to that prompt and every later one in the session. Omitting
+`persona` keeps the one the session is running under, so send `standard` to
+switch back to the built-in persona. An id the branch does not define is
+rejected with `UNKNOWN_PERSONA`, and `error.details.definedPersonas` lists the
+ones that would have worked, starting with `standard`.
+
 ## Send images
 
 A prompt can carry up to 10 images for the agent to look at: a photo of a part,
@@ -149,8 +186,8 @@ if state.status == "failed":
 
 Every conversation you have with a project's agent through the API is kept as a
 chat, and it outlives the session that had it. Chats from any API client (an app,
-a script, a terminal) share one list per project. The web app's chats are
-listed separately.
+a script, a terminal) share one list per project. Chats started in the web app
+are not in this list.
 
 A new session starts in a fresh chat; `session.chatId` names it. Nothing is
 saved until the first message is sent, so a session that never sends one leaves
@@ -230,3 +267,21 @@ there is stopped, and if it was in the chat it moves to a fresh one.
 `takenOverFrom` in the response lists the sessions it was taken from. Deleting
 a chat stops any run in it first, and a session that was in it moves to a fresh
 chat.
+
+### Watching and taking over a chat in the web app
+
+Your API chats also appear in the Davinci web app, where you can watch a session
+work in one and take it over. Taking a chat over in the web app stops the
+session's run there. The session still knows the chat, but sending or stopping
+in it answers `409 CHAT_TAKEN_OVER` until a session switches back into it with
+`switchChat`, which takes it back from the web app.
+
+While a run started in the web app is going in a chat, a session cannot switch
+into it or send to it; those calls answer `409 CHAT_IN_USE` and change nothing.
+Try again once the run ends. A session never stops a run someone started in the
+web app.
+
+A run that finished in a chat the session has left drops off `agent.chats`
+about five minutes after it ended, and a session keeps at most four idle runs in
+chats it has left. The conversation itself is kept, and sending to the chat
+again resumes it.

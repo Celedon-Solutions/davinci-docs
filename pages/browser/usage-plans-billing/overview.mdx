@@ -23,6 +23,23 @@ Included usage is the usage provided with a subscription or deployment allocatio
 
 Not every deployment exposes the same billing controls. Enterprise deployments may manage usage and access centrally.
 
+## How On-Demand Usage Is Billed
+
+On-demand usage is not charged one request at a time. It builds up as an unbilled balance on the account that pays for it: you, your organization, or your group.
+
+- When the unbilled balance reaches $100, Davinci issues an invoice for the full unbilled amount and charges the payment method on file right away.
+- Any unbilled amount left at the end of a billing period is invoiced when the subscription renews.
+- If a subscription ends, any remaining unbilled usage is invoiced at that time.
+- On yearly plans, unbilled usage is still invoiced at least once a month.
+
+On-demand invoices are separate from subscription invoices. They are labeled **Davinci On-Demand AI Usage** with the date range they cover, and they appear in the **Invoices** list on **Plan & Invoices** for the paying account.
+
+If an invoice payment fails, on-demand usage is paused until the past-due invoice is settled. Included usage and Credit Balance remain available in the meantime, and **Wallet & Limits** shows a banner with a link to your invoices.
+
+<Note>
+$100 is the default amount. Enterprise and private deployments may be configured with a different amount, or may not bill on-demand usage through self-service invoices at all.
+</Note>
+
 ## Storage
 
 Storage limits apply to uploaded files and project data. Storage can be associated with a user account, organization, or group depending on who owns the project and how the deployment is configured.
@@ -30,6 +47,8 @@ Storage limits apply to uploaded files and project data. Storage can be associat
 ## Organizations
 
 Organizations can own projects, manage members, and carry their own storage and administrative controls. Paid user tiers can unlock organization creation in self-serve deployments.
+
+When enabled for your deployment, an organization can pay for AI usage in its own projects instead of its members paying. Organization admins can set per-member spending limits and, on some deployments, add the organization's own AI provider API keys. See [AI Usage Funding](/pages/browser/organizations#ai-usage-funding).
 
 See [Organizations](/pages/browser/organizations) and [Add An Organization](/pages/browser/usage-plans-billing/add-organization).
 
@@ -43,8 +62,8 @@ See [Groups](/pages/browser/groups) and [Upgrade To A Group](/pages/browser/usag
 
 Depending on your permissions and deployment:
 
-- Individual users manage personal plan and usage from account settings.
-- Organization admins manage organization storage and project ownership settings.
+- Individual users manage their personal plan and invoices from **Settings → Plan & Invoices**, and their balances and on-demand limit from **Settings → Wallet & Limits**.
+- Organization admins manage organization storage, project ownership settings, AI usage funding, and member spending limits from the organization's **Wallet & Limits** and **Plan & Invoices** tabs.
 - Group admins and billing roles manage group-level billing, member usage limits, organization storage tiers, and administrative controls.
 - Enterprise users may need to contact their system administrator.
 

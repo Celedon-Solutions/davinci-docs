@@ -30,7 +30,7 @@ Treat personal access tokens like passwords. Store them in environment variables
 | Name | Human-readable label for the token, such as `staging-sdk-tests` or `ci-indexer`. | 1-100 characters. Letters, numbers, spaces, periods, underscores, and hyphens. |
 | Expiration | Date when the token stops working. | Required. Must be within 90 days. |
 | Rate limit | Maximum requests per minute for the token. | 1-10,000 requests per minute. Default is 60. |
-| Scopes | Permissions granted to the token. | Use `projects:read` for the current SDK/API. |
+| Scopes | Permissions granted to the token. | Defaults to `projects:read`. Choose only the scopes your integration needs; see [Scopes](/pages/api/introduction#scopes). |
 
 ## Token Format And Length
 
@@ -56,7 +56,7 @@ Only the key id is stored/displayed later. The full token cannot be recovered af
 Use the token as a bearer token:
 
 ```bash
-curl "https://davinci-app.com/api/v2/programmatic/projects" \
+curl "https://davinci-app.com/api/v2/projects" \
   -H "Authorization: Bearer dav_ak_live_your_token"
 ```
 

@@ -48,7 +48,28 @@ This will add the Model Object as context for the Agent, so it knows exactly wha
 * [Skills & Rules](/pages/editor/widgets/skills-rules) provide reusable project guidance for research, workflow, and generation tasks.
 * Files can be uploaded directly to the model here. Click the Upload Button to add a reference object to the model.
 * Enable or disable Web Search for the Agent by clicking on the globe icon. Web search can be useful for finding additional information, or pulling public documents into your model as Reference objects.
-* The Play/Pause button can be used to begin or stop the execution of an Agent. If the Agent is not already running, pressing Play will begin running that Agent. While running, pressing Pause will interrupt the execution of the Agent, allowing you to provide more context, better instructions, or simply stop the Agent if it has gotten off track.
+* The Play/Pause button can be used to begin or stop the execution of an Agent. If the Agent is not already running, pressing Play will begin running that Agent. While running, pressing Pause will interrupt the execution of the Agent, allowing you to provide more context, better instructions, or simply stop the Agent if it has gotten off track. If you open a chat while its Agent is already running, the chat shows that it is working and the Pause button is available.
+
+## Chat Tabs And Status
+
+Each chat has a tab with a hexagon status light, so you can see what every agent is doing without opening its chat:
+
+* **Working** — the agent is running. The light animates while the agent thinks, writes, or uses tools.
+* **Queued** — the agent is waiting to start.
+* **Needs you** — the agent asked a question and is waiting for your answer.
+* **Failed** — the run ended with an error.
+* **Completed** — the run finished while you were not viewing the chat. The light returns to idle once you look at it.
+* **Idle** — nothing is running.
+
+Hover a tab to see the chat's title, message count, status, and when it was last updated. Click **Agent History** to find chats that are not open as tabs.
+
+## API Chats
+
+Chats you start through the [Davinci API](/pages/api/agent#chats), such as from an SDK script or an app built on the API, appear in the web app alongside your other chats in that project. Their tabs carry an **API** badge.
+
+While an API session is using a chat, the chat input is replaced by a bar that reads **An API session is working in this chat**. You can watch the session's messages and the agent's work arrive live in the chat history.
+
+To continue the conversation in the web app, click **Take Over** and confirm. The session's current run in that chat stops, and the chat input returns so you can send messages. The app or script that was using the chat has to reopen it before it can send messages there again. If it does, the chat returns to the watching state and you can take it over again.
 
 ## Chat History
 
@@ -62,6 +83,10 @@ When messaging the Agent, some or all of the current Chat History may be passed 
 
 <Note>Model Object references in Chat can be clicked to open them in the Workspace</Note>
 
+Only the latest turn stays expanded. When a turn finishes and you send your next message, the earlier turn folds down to your message, a line showing how long the agent worked (for example **Worked for 2m 05s**, or **Worked briefly** for short turns), and the agent's closing reply. Earlier turns loaded from history start folded. Click that line to show the tool calls, thoughts, and plan steps in between, and click it again to fold them.
+
+If the agent's reply is cut off at the model's output limit before it can call a tool, Davinci retries once with lower reasoning effort. If the retry is cut off too, the run stops and the chat says so. Try breaking the task into smaller steps or lowering the reasoning effort.
+
 There are several important actions you can take from the Chat History:
 
 ### Restore Checkpoint
@@ -74,20 +99,27 @@ To restore the model to its state at the time of the checkpoint, click the `Rest
     <img noZoom src="/images/restore_checkpoint.png" />
 </Frame>
 
-### Tool Use and Undo
+### Tool Activity
 
 The primary way the Davinci Agent interacts with your model is through the use of Tools. Tools allow the Agent a structured way of interacting with data, maintaining model integrity and data stability.
 
-For all tools, users can see what the Agent has requested of the tool by clicking `Input`.
+Each tool call appears as one line in the Chat History:
 
-<Frame>
-    <img noZoom src="/images/tool_input.png" />
-</Frame>
+* **While it runs**, the line says what the tool is doing, with its current step and a thin progress bar underneath. Calls that take more than a couple of seconds show their elapsed time, which stays on the line after they finish. Tools that run code show their output as it streams, with a **Halt Execution** button to stop them.
+* **When it finishes**, the line says what the tool acted on, for example "Edited mass on Bracket". Object names in the line can be clicked to open the object. The line's icon shows what kind of action it was, and its color shows whether the call succeeded or failed.
 
-Users can see the direct result of the tool call by clicking `Result` when applicable. Some components can be hidden or shown in this view by clicking the `eye` icons next to each type. This can be useful for sorting through larger batches of changes.
+Below a finished line, the first few lines of its details are shown as a preview. Click the line to open everything:
 
-<Frame>
-    <img noZoom src="/images/tool_result.png" />
-</Frame>
+* **Changes** — what the call changed. For a single edited object, each changed field is shown with its old and new values. Code, tables, and documents show a diff, and presentations show changes by slide. Calls that touched several objects show a table of changes.
+* **Steps** or **Progress** — the steps the tool went through.
+* **Output** — the tool's result or terminal output.
+* **Error** — the full error message when a call failed.
+* **Input** — what the Agent asked the tool to do. When other sections are present, Input is folded at the end of the opened line; click its label to show it.
 
-If you do not want the changes applied by a specific Tool call, simply use the `Undo` button to revert those changes specifically. Other Tool calls will not be affected. Consider using the Restore Checkpoint button and modifying your prompt if larger issues occur.
+When the Agent makes or changes a [plan](/pages/editor/agent/planning), its line shows a preview of the plan's steps that updates as the Agent works through them. Click **Open plan** to open it in the workspace, or **Run plan** to start a plan that has not been run yet.
+
+### Updates and Undo
+
+The updates summary at the bottom of the chat (for example **3 Updates**) counts the objects the Agent has created, modified, and deleted in this chat. Click it to see the objects grouped by change type, and click an object to open it. The info icon shows the credits the Agent has used.
+
+To revert every change the Agent made in the chat, click **Undo All** and confirm. To return the model to the state it was in when you sent a specific message, use Restore Checkpoint and adjust your prompt.

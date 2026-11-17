@@ -1,0 +1,44 @@
+---
+title: 'Version 5.3.4 - Matrix Filters, Agent Commits & Performance'
+description: 'November 13 2026'
+---
+
+## Version 5.3.4 - Matrix Filters, Agent Commits & Performance
+
+This patch adds attribute filters to matrices, lets the agent decide when to commit, makes agent writes more reliable, and speeds up Source Control on large change sets.
+
+### Matrices & Documents
+
+- [Matrices](/pages/modeling/objects/matrix) can filter rows by the value of an attribute the row object owns, including inherited attributes, with text, enum, and numeric comparisons and unit conversion; large matrices rebuild faster and scroll with virtualized rows
+- Documents now record their page count
+- Image crops are now applied in PDF export
+- Improved document layout when tables spill over onto the next page
+- Improved name linking in block editors, and fixed removing the caption from auto-numbered fields
+
+### Agent
+
+- The agent now [commits](/pages/editor/widgets/source-control) whenever it judges a commit useful, unless you tell it otherwise
+- When an agent's change cannot be applied, the agent is told and anything partly applied is undone, instead of the agent reporting objects that were never saved
+- Agent writes now leave out relationships the project's rules forbid, and generated tests use the project's own subject relationship
+- The agent now waits for every model change a tool makes before continuing
+
+### Skills & Projects
+
+- [Skills](/pages/editor/widgets/skills-rules) can be exported as `.dmo` files and imported into another project
+- Fixed importing skills from DAF or JSON project exports
+- DAF imports now keep empty and text reference files
+- Fixed manually updating project secrets
+
+### Source Control & Inheritance
+
+- Much faster uncommitted-change views when a branch has more than 10,000 changes, and general Source Control performance improvements
+- Fixed staging changes that involve inherited objects
+- Fixed commits that involve inheritance, and improved how inherited objects are grouped
+
+### API & Reliability
+
+- API sessions opened with a `{projectId}--{branch}` id now open that branch
+- Fixed stopping code that runs in the browser
+- Improved reliability of code execution and of the editor under heavy load
+- Task Card pages now refresh when a card's status changes
+- The chat tab divider is hidden only when the tab row overflows

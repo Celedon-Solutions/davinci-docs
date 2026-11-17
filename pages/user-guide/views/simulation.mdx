@@ -1,6 +1,6 @@
 ---
 title: Simulation View
-icon: /images/objecticons/code.svg
+icon: /images/objecticons/simulation.svg
 ---
 
 ## Description
@@ -28,9 +28,7 @@ The Simulation View has two modes: **Simulation Setup** and **Simulation Result*
 
 ## Simulation Setup View
 
-<Frame>
-    <img height="400" noZoom src="/images/workspace_simulation_setup.png" />  
-</Frame>
+{/* Screenshot needed: Simulation Setup view (images/workspace_simulation_setup.png) */}
 
 ### What a setup is
 
@@ -122,9 +120,7 @@ declares a gated fragment, or defines `system()`, still sets up, compiles and ru
 
 ## Simulation Result View
 
-<Frame>
-    <img height="400" noZoom src="/images/workspace_simulation_result.png" />  
-</Frame>
+{/* Screenshot needed: Simulation Result view (images/workspace_simulation_result.png) */}
 
 The explorer runs the same online solver as the server: every slider drag re-solves
 the reduced system in well under a millisecond and repaints the surface.
@@ -278,7 +274,9 @@ finds the static pose; `linearize` and `frequency_response` linearize the system
 its initial state, an equilibrium or an instant of a transient and report its modes
 (`natural_frequency`, `damping_ratio`, `eigenvalue`), frequency responses, and a
 loop's `gain_margin`, `phase_margin` and `bandwidth` at a `ctrl.loop_break`. Scenarios can chain (`after=`), step a parameter mid-run
-(`faults=`), and react to events (`when(...)`). QoIs read any signal: joint
+(`faults=`), and react to events (`when(...)`). A scenario with an `active=` list keeps
+only the force elements, efforts and events it names; joint stops and friction can be
+named there too, and a stop left out of the list does not act in that scenario. QoIs read any signal: joint
 coordinates, rates and efforts, reaction forces and moments, body positions and
 velocities, and expressions of them, through kinds such as `max_abs`, `final`, `rms`,
 `integral`, `time_when` and `settling_time`.
@@ -374,8 +372,7 @@ validity: when the load spectrum's 99% energy frequency passes a third of the pa
 free-free mode the answer is flagged, because the dynamic response then needs a flexible
 body. An attachment whose reactions the system leaves indeterminate is refused: the recipe
 is a compatible joint set, a bushing for the joint's compliance, or a flexible body. When
-the source's attachments change, the field simulation's setup goes stale. Like the system
-route, this stays off for authoring until its graduation report is green.
+the source's attachments change, the field simulation's setup goes stale.
 
 ## Agent tools
 

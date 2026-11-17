@@ -1,0 +1,13 @@
+---
+title: 'Version 5.2.8 - Reference Processing Fix'
+description: 'October 23 2026'
+---
+
+## Version 5.2.8 - Reference Processing Fix
+
+This patch stops PDF references from being reprocessed on every commit.
+
+### Fixes
+
+- Fixed PDF references being re-read page by page on every commit, which slowed commits in projects with large PDFs
+- Improved diagnostics for AI model errors

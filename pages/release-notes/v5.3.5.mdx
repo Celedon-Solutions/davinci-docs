@@ -1,0 +1,25 @@
+---
+title: 'Version 5.3.5 - Document Cross-References & SVG Images'
+description: 'November 16 2026'
+---
+
+## Version 5.3.5 - Document Cross-References & SVG Images
+
+This patch adds cross-references between document blocks, lets Code objects supply SVG and HTML images to documents, and smooths scrolling in documents and chat.
+
+### Documents
+
+- Added [cross-references](/pages/modeling/objects/documents#cross-references) to headings, figures, and tables; they update automatically when targets are renumbered or moved, display in table cells, and become internal links in PDF and DOCX exports
+- Code objects that produce SVG can now be used as document image blocks, and PDF export keeps the SVG as vector graphics where possible
+- SVG images can now be cropped
+- Fixed tables with merged cells spilling over onto the next page, with faster layout
+
+### Code
+
+- The Code view can preview the SVG or HTML a Code object renders, and the preview updates as the code changes
+- Fixed the Code view preview settings buttons
+
+### Fixes
+
+- Fixed flickering in documents and chat, and scrolling now renders at up to 120 Hz
+- Fixed building objects that extend other objects

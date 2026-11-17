@@ -159,6 +159,37 @@ Reverting removes local field overrides from the specialization and its inherite
 Revert to Base affects the complete specialization subtree. Use field-level Resync when only one value should return to the base.
 </Warning>
 
+## Severing Inheritance
+
+Use **Sever Inheritance** when a specialization should become a standalone object that no longer follows its base:
+
+1. Right-click the specialization in the Index.
+2. Select **Sever Inheritance**.
+3. Review the confirmation.
+4. Confirm **Sever**.
+
+Severing keeps the object exactly as it currently appears. Every inherited value on the object becomes a local value, and future changes to the base no longer propagate to it. Relationships it inherited from the base become its own relationships. The base itself is not changed, except that it no longer lists the object as one of its specializations.
+
+The sever applies to the whole inherited structure under the object:
+
+- Inherited structural counterparts, such as the Ports and Attributes created from the base's children, are severed with it and become ordinary local objects.
+- Objects you added locally to the specialization stay where they are.
+- Nested objects that were separately created with **Extend Object** or **New Object from Extension** remain linked to their own bases.
+
+**Sever Inheritance** is available only for a single object that extends a base and that you can edit. It is not offered for locked objects or for objects included from another project.
+
+Davinci refuses the sever, leaves the model unchanged, and explains why when:
+
+- The object's inheritance is set by an applied [Trade Study](/pages/modeling/objects/trade) configuration. Apply or undo the configuration instead.
+- The object inherits a file that has not been committed yet. Commit the file, then sever again.
+- An inherited child's base no longer exists, so Davinci cannot determine which children are structural counterparts.
+
+You can undo a sever. Davinci refuses the undo if the severed objects have changed since the sever or the base no longer exists.
+
+<Tip>
+Use **Revert to Base** to discard local changes and follow the base again. Use **Sever Inheritance** to keep the current values and stop following the base.
+</Tip>
+
 ## Indicators in the Interface
 
 Davinci displays inheritance status in the Index, object anchors, and Properties view:

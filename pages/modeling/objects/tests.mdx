@@ -43,6 +43,15 @@ Use `[attribute-uuid].state([state-uuid])` in Results Value or a numeric criteri
 
 The receiver must be an Attribute and the argument must be a State. This is a value accessor, not an executable method; only `[code-uuid].method(args)` with a Code receiver executes code. If a state value is an array, select a 1-based index or use `min()`, `max()`, or `mean()` to produce the single scalar required by evaluation criteria.
 
+### CAD and Simulation Results
+
+A numeric **Results Value** can read compiled CAD and simulation results directly:
+
+- `[arm-assembly].distance("gripper_tip", "base_mount")` measures the distance in metres between two named mates of a compiled Geometry or Assembly. See [CAD Mate Distance](/pages/modeling/common/equations#cad-mate-distance).
+- `[gear-system](scenario=deploy).peak_trunnion_torque` reads a simulation Quantity of Interest. See [Simulation Quantities of Interest](/pages/modeling/common/equations#simulation-quantities-of-interest).
+
+Both results carry their units. As with other equation-based results, the verdict can update when the Geometry, Assembly, or simulation is recompiled or rerun.
+
 ### Evaluation Criteria Target Syntax
 
 Numeric targets use an optional comparator (`>=`, `<=`, `>`, `<`, `=`, or `!=`) followed by a number or resolvable numeric expression. A bare number is an exact match. Use `to` for one continuous range:
