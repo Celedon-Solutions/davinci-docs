@@ -15,6 +15,7 @@ import { DEFAULT_EXCLUDES, exportDocs } from './pdf/build.mjs';
  *                      (default: pages/release-notes; pass --exclude "" to include everything)
  *   --format <size>    PDF page size: Letter (default) or A4
  *   --base-url <url>   Site used for links to pages that are not in the PDF
+ *   --doc-version <v>  Version stamped on the PDF (default: the latest release notes page)
  *   --html-only        Skip Chromium; write the intermediate HTML only
  *   --keep-html        Keep the intermediate HTML next to the PDF
  *   --strict           Exit non-zero if any warning or missing page is reported
@@ -29,6 +30,7 @@ const { values } = parseArgs({
     exclude: { type: 'string' },
     format: { type: 'string', default: 'Letter' },
     'base-url': { type: 'string' },
+    'doc-version': { type: 'string' },
     'html-only': { type: 'boolean', default: false },
     'keep-html': { type: 'boolean', default: false },
     strict: { type: 'boolean', default: false },
@@ -39,7 +41,7 @@ const { values } = parseArgs({
 const splitList = (value) => (value ? value.split(',').map((s) => s.trim()).filter(Boolean) : []);
 
 if (values.help) {
-  console.log(`Usage: node scripts/export-pdf.mjs [--out dir] [--pages a,b] [--exclude a,b] [--format Letter|A4] [--base-url url] [--html-only] [--keep-html] [--strict]`);
+  console.log(`Usage: node scripts/export-pdf.mjs [--out dir] [--pages a,b] [--exclude a,b] [--format Letter|A4] [--base-url url] [--doc-version x.y.z] [--html-only] [--keep-html] [--strict]`);
   process.exit(0);
 }
 
@@ -51,6 +53,7 @@ try {
     exclude: values.exclude === undefined ? DEFAULT_EXCLUDES : splitList(values.exclude),
     format: values.format,
     baseUrl: values['base-url'],
+    docVersion: values['doc-version'],
     htmlOnly: values['html-only'],
     keepHtml: values['keep-html'],
   });

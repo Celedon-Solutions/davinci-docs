@@ -72,6 +72,10 @@
     "navbar": {
         "links": [
             {
+                "label": "v5.3.5",
+                "href": "/pages/release-notes/v5.3.5"
+            },
+            {
                 "label": "Celedon Solutions",
                 "href": "https://www.celedon.solutions/"
             }

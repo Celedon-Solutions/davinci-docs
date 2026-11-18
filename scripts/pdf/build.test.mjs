@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { assertSafeBuildDir, copyOpenApi, exportDocs, prepareBuildDir } from './build.mjs';
+import { assertSafeBuildDir, copyOpenApi, exportDocs, pdfFileName, prepareBuildDir } from './build.mjs';
 
 const quietLogger = { log() {}, warn() {} };
 
@@ -112,6 +112,29 @@ test('exportDocs leaves out release notes by default and honors custom excludes'
   const included = await exportDocs({ docsRoot, outDir, htmlOnly: true, exclude: [] }, quietLogger);
   assert.ok(included.pages.includes('pages/release-notes/v1'));
   assert.ok(fs.readFileSync(path.join(outDir, 'davinci-docs.html'), 'utf8').includes('Version 1'));
+});
+
+test('exportDocs stamps the latest release version, or an explicit one, on the cover and report', async () => {
+  const { docsRoot } = makeDocs();
+  fs.mkdirSync(path.join(docsRoot, 'pages', 'release-notes'));
+  fs.writeFileSync(path.join(docsRoot, 'pages', 'release-notes', 'v2.1.0.mdx'), '---\ntitle: Version 2.1.0\n---\n');
+  const config = JSON.parse(fs.readFileSync(path.join(docsRoot, 'docs.json'), 'utf8'));
+  config.navigation.groups.push({ group: 'Release Notes', pages: ['pages/release-notes/v2.1.0'] });
+  fs.writeFileSync(path.join(docsRoot, 'docs.json'), JSON.stringify(config));
+  const outDir = path.join(docsRoot, 'build');
+
+  const latest = await exportDocs({ docsRoot, outDir, htmlOnly: true }, quietLogger);
+  assert.equal(latest.version, '2.1.0');
+  assert.ok(fs.readFileSync(path.join(outDir, 'davinci-docs.html'), 'utf8').includes('Version 2.1.0 · Generated'));
+
+  const explicit = await exportDocs({ docsRoot, outDir, htmlOnly: true, docVersion: 'v2.2.0-rc.1' }, quietLogger);
+  assert.equal(explicit.version, '2.2.0-rc.1');
+  assert.ok(fs.readFileSync(path.join(outDir, 'davinci-docs.html'), 'utf8').includes('Version 2.2.0-rc.1'));
+});
+
+test('pdfFileName includes the version when there is one', () => {
+  assert.equal(pdfFileName('5.3.5'), 'davinci-docs-v5.3.5.pdf');
+  assert.equal(pdfFileName(null), 'davinci-docs.pdf');
 });
 
 test('exportDocs honors the page filter', async () => {

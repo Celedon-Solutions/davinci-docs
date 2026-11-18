@@ -163,16 +163,18 @@ ${html}
  * @param {string} options.title Document title.
  * @param {string} [options.subtitle]
  * @param {string} [options.logoUrl] file:// URL of a logo for the cover.
+ * @param {string} [options.version] Documentation version shown on the cover.
  * @param {string} [options.generatedOn]
  */
-export function buildDocument({ tree, pageHtml, title, subtitle, logoUrl, generatedOn }) {
+export function buildDocument({ tree, pageHtml, title, subtitle, logoUrl, version, generatedOn }) {
   const titles = new Map([...pageHtml].map(([route, value]) => [route, value.title]));
 
+  const meta = [version && `Version ${version}`, generatedOn && `Generated ${generatedOn}`].filter(Boolean).join(' · ');
   const cover = `<section class="cover">
 ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="">` : ''}
 <h1>${escapeHtml(title)}</h1>
 ${subtitle ? `<div class="subtitle">${escapeHtml(subtitle)}</div>` : ''}
-${generatedOn ? `<div class="meta">Generated ${escapeHtml(generatedOn)}</div>` : ''}
+${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ''}
 </section>`;
 
   const toc = `<section class="toc">

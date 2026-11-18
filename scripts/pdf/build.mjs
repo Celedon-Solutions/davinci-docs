@@ -14,8 +14,13 @@ import { normalizeTree, pageIdForRoute, parsePage, prepareHeadings, renderHtml }
 import { createLinkResolver, DEFAULT_BASE_URL } from './links.mjs';
 import { buildDocument } from './template.mjs';
 import { renderPdf } from './render.mjs';
+import { latestRelease } from '../version.mjs';
 
 export const PDF_FILE_NAME = 'davinci-docs.pdf';
+
+export function pdfFileName(version) {
+  return version ? `davinci-docs-v${version}.pdf` : PDF_FILE_NAME;
+}
 export const OPENAPI_DIR_NAME = 'openapi';
 
 // Routes (or route prefixes) left out of the PDF by default.
@@ -102,6 +107,7 @@ function createImageResolver(docsRoot) {
  * @param {boolean} [options.keepHtml]
  * @param {string} [options.format]
  * @param {string} [options.baseUrl]
+ * @param {string} [options.docVersion] Version to stamp on the PDF instead of the latest release notes page.
  * @param {{log: Function, warn: Function}} [logger]
  */
 export async function exportDocs(options, logger = console) {
@@ -118,6 +124,7 @@ export async function exportDocs(options, logger = console) {
 
   const configPath = path.join(docsRoot, 'docs.json');
   const docsConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const docVersion = options.docVersion?.replace(/^v/, '') || latestRelease(docsConfig)?.version || null;
 
   const nav = collectNavigation(docsConfig, { resolveSource: (route) => resolveSourceFile(docsRoot, route) });
   const { tree, removed: excludedRoutes } = excludeNavigation(filterNavigation(nav.tree, pageFilter), exclude);
@@ -165,12 +172,14 @@ export async function exportDocs(options, logger = console) {
   }
 
   const generatedOn = new Date().toISOString().slice(0, 10);
+  const title = `${docsConfig.name ?? 'Davinci'} Documentation`;
   const html = buildDocument({
     tree,
     pageHtml,
-    title: `${docsConfig.name ?? 'Davinci'} Documentation`,
+    title,
     subtitle: 'Product guides, modeling reference, and developer API guides',
     logoUrl: resolveLogo(docsRoot, docsConfig),
+    version: docVersion,
     generatedOn,
   });
 
@@ -178,12 +187,13 @@ export async function exportDocs(options, logger = console) {
   const out = prepareBuildDir(outDir, docsRoot);
   const openapi = copyOpenApi(docsRoot, out, docsConfig);
   const htmlPath = path.join(out, 'davinci-docs.html');
-  const pdfPath = path.join(out, PDF_FILE_NAME);
+  const pdfPath = path.join(out, pdfFileName(docVersion));
   fs.writeFileSync(htmlPath, html);
 
   let pdfBytes = 0;
   if (!htmlOnly) {
-    await renderPdf({ htmlPath, pdfPath, format });
+    const footerLabel = docVersion ? `${title} · Version ${docVersion}` : title;
+    await renderPdf({ htmlPath, pdfPath, format, footerLabel });
     pdfBytes = fs.statSync(pdfPath).size;
     if (pdfBytes === 0) throw new Error('PDF export produced an empty file');
     if (!keepHtml) fs.rmSync(htmlPath, { force: true });
@@ -197,6 +207,7 @@ export async function exportDocs(options, logger = console) {
 
   const report = {
     generatedAt: new Date().toISOString(),
+    version: docVersion,
     pageCount: pageNodes.length,
     pdf: htmlOnly ? null : pdfPath,
     pdfBytes,
@@ -224,7 +235,7 @@ export async function exportDocs(options, logger = console) {
 }
 
 function logSummary(report, logger) {
-  logger.log(`Exported ${report.pageCount} pages`);
+  logger.log(`Exported ${report.pageCount} pages${report.version ? ` (version ${report.version})` : ''}`);
   if (report.pdf) logger.log(`  PDF:     ${report.pdf} (${(report.pdfBytes / 1024 / 1024).toFixed(1)} MB)`);
   if (report.html) logger.log(`  HTML:    ${report.html}`);
   logger.log(`  OpenAPI: ${report.openapi}`);

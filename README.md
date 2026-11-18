@@ -32,6 +32,17 @@ This keeps `node`, `npm`, and Mintlify out of the host environment. The command 
 - Keep links rooted at `/pages/...` for internal documentation links.
 - Do not commit generated local preview artifacts or generated database schema output.
 
+## Versioning
+
+The documentation version is the first page in the Release Notes navigation group of `docs.json` (for example `pages/release-notes/v5.3.5` is version 5.3.5). The navbar version link and the PDF export both read it from there.
+
+When a release ships:
+
+1. Add its release notes page as the first entry in the Release Notes group, and move the previous release into Prior Versions.
+2. Update the navbar version link: `node scripts/sync-version.mjs` (or `npm run version:sync` where dependencies are installed). `npm run version:check` reports whether the link is current, and `npm test` fails while it is out of date.
+3. Build the PDF (see [PDF Export](#pdf-export)). It is named and stamped with the same version.
+4. Tag the docs commit the PDF was built from: `git tag v5.3.5 && git push origin v5.3.5`.
+
 ## OpenAPI Dependency
 
 Mintlify builds the API reference from `docs/openapi/davinci-public.v2.yaml`. The canonical source lives at `../openapi/davinci-public.v2.yaml`.
@@ -60,7 +71,7 @@ The `davinci-docs-pdf-node-modules` named volume keeps dependencies off the host
 
 Output (`docs/build/` is deleted and recreated on every run):
 
-- `davinci-docs.pdf` - cover, contents, and one section per page, with PDF bookmarks and page numbers.
+- `davinci-docs-v<version>.pdf` - cover, contents, and one section per page, with PDF bookmarks, page numbers, and the documentation version on the cover and in every page footer. It is named `davinci-docs.pdf` when no versioned release notes page exists.
 - `openapi/davinci-public.v2.yaml` - the OpenAPI spec (the `docs/openapi/` copy, falling back to `../openapi/`).
 - `export-report.json` - exported pages, skipped entries, unregistered pages, links that point to the published site, and warnings.
 
@@ -72,9 +83,9 @@ Scope:
 - The export reads MDX source and renders it with a plain print stylesheet. It does not reproduce the Mintlify site's look.
 - Links to exported pages become in-PDF links. Links to anything else (for example `/api-reference/...`) point to `https://docs.davinci-app.com`.
 
-Options (append after `npm run pdf:export --`): `--pages pages/admin,pages/api` to export a subset, `--exclude pages/admin` to replace the default exclusion (`pages/release-notes`; use `--exclude ""` to include everything), `--format A4`, `--out <dir>`, `--keep-html`, `--html-only` (no Chromium), and `--strict` (exit non-zero on warnings or missing pages).
+Options (append after `npm run pdf:export --`): `--pages pages/admin,pages/api` to export a subset, `--exclude pages/admin` to replace the default exclusion (`pages/release-notes`; use `--exclude ""` to include everything), `--format A4`, `--out <dir>`, `--doc-version 5.4.0-rc.1` to stamp a version other than the latest release notes page, `--keep-html`, `--html-only` (no Chromium), and `--strict` (exit non-zero on warnings or missing pages).
 
-Run the exporter's tests the same way, replacing the last command with `npm run pdf:test`.
+Run the exporter's tests the same way, replacing the last command with `npm run pdf:test`, or `npm test` to include the version tests.
 
 Known limitations:
 
