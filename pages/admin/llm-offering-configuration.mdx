@@ -13,6 +13,36 @@ Open **Administration → LLM Control Plane → Providers**, expand a provider, 
 An offering can save successfully and still be unusable if the provider model ID, API, codec, capabilities, or pricing do not match the real provider. Verify the offering before publishing it.
 </Warning>
 
+## Add A Model That Is Not In The List
+
+**Add Model** on a provider only offers models that already have a model definition. When **Discover Models** fails or does not return the model you need, create the definition first:
+
+1. On the **Providers** tab, expand **Default Model Definitions** and select **Add Definition**.
+2. Enter the **Model name** and **Publisher**, such as `gpt-image-2` and `openai`. Davinci builds the definition's key from these two values, and the key cannot be changed later.
+3. Choose the **Primary model kind** from the [table below](#model-kinds). This decides which routes the model can serve.
+4. For an embedding model, enter the **Default vector dimensions** and any other supported dimensions.
+5. Under **Limits and capabilities**, set the context window and output limits, and set every capability the model supports to **Supported**. See [Capabilities](#capabilities) for which ones each kind needs.
+6. Under **Pricing and metadata**, enter the model's pricing in the form its route requires. See [Workload Pricing Requirements](#workload-pricing-requirements).
+7. Select **Create Model**.
+8. Expand the provider, select **Add Model**, choose the new definition, and enter the provider's exact **Model ID**, **API**, and **Codec**.
+
+To fix a definition later, including its kind, open it from **Default Model Definitions** and edit it. Every offering that uses the definition inherits the change.
+
+## Model Kinds
+
+The model kind is set on the model definition, and every offering of that model inherits it.
+
+| Kind | Use for | Routes it can serve | Also set |
+|---|---|---|---|
+| **General** | Chat and instruction models, including multimodal models that read images, audio, or video | Chat, Tools, Summarization, Project names. Reference analysis with Image input, Media analysis with Audio or Video input, and Image generation with Image output | Tools, plus the input capabilities the model has |
+| **Embedding** | Text embedding models | Embedding only | Default vector dimensions. Embeddings is set automatically |
+| **Image** | Dedicated image generation models | Image generation | Image output, plus SVG output or GIF output if the model produces them |
+| **Audio** | Models that only analyze audio | Media analysis | Audio input |
+| **Video** | Models that only analyze video | Media analysis | Video input |
+| **Realtime** | Live, low-latency voice models | None. Davinci has no realtime route yet | — |
+
+Choose **General** for any chat model, even one that also reads images, audio, or video, and describe its inputs with capabilities instead. A model set to **Audio** or **Video** cannot serve Chat or the tool routes. Chat choices and tool routes never list **Embedding** or **Image** models.
+
 ## Offering Fields
 
 ### Provider
@@ -21,7 +51,7 @@ Select the connection that serves the model. Its configured APIs determine the A
 
 ### Model
 
-Select the shared model definition. The offering inherits that definition's:
+Select the shared model definition. If the model is not in the list, [add a definition](#add-a-model-that-is-not-in-the-list) first. The offering inherits that definition's:
 
 - Model kind.
 - Context, output, and image limits.
@@ -78,59 +108,19 @@ Availability is informational. Setting an offering to unavailable or deprecated 
 
 ## API And Codec Compatibility
 
-### OpenAI Chat Completions
+Every API uses the codec with the same name, except AWS Bedrock Invoke, which needs a codec for the model family.
 
-- **API:** `openai.chat_completions`
-- **Codec:** `openai.chat_completions`
-- **Workloads:** generation and embeddings
-- **Chat Controls:** generic generation controls plus supported OpenAI controls
+| API | Codec | Workloads | Chat Controls |
+|---|---|---|---|
+| `openai.chat_completions` | `openai.chat_completions` | Generation, embeddings | Generic and OpenAI |
+| `openai.responses` | `openai.responses` | Generation, embeddings, image generation | Generic and OpenAI |
+| `openai.images` | `openai.images` | Image generation only | Not supported |
+| `anthropic.messages` | `anthropic.messages` | Generation | Generic and Anthropic |
+| `google.generate_content` | `google.generate_content` | Generation, embeddings, image generation | Generic and Google |
+| `google.interactions` | `google.interactions` | Generation, embeddings, image generation | Generic and Google |
+| `bedrock.invoke` | `anthropic.bedrock.invoke` for Anthropic generation; `amazon.titan.bedrock.invoke` for Titan embeddings | Generation, embeddings | Generic only |
 
-Use for OpenAI-compatible services, OpenRouter, Groq, Cerebras, Ollama, and LiteLLM connections that implement the Chat Completions protocol.
-
-### OpenAI Responses
-
-- **API:** `openai.responses`
-- **Codec:** `openai.responses`
-- **Workloads:** generation, embeddings, and image generation
-- **Chat Controls:** generic generation controls plus supported OpenAI controls
-
-### OpenAI Images
-
-- **API:** `openai.images`
-- **Codec:** `openai.images`
-- **Workload:** image generation only
-- **Chat Controls:** not supported
-
-### Anthropic Messages
-
-- **API:** `anthropic.messages`
-- **Codec:** `anthropic.messages`
-- **Workload:** generation
-- **Chat Controls:** generic generation controls and Anthropic controls
-
-This combination is used for both direct Anthropic and Anthropic on Vertex provider connections.
-
-### Google Generate Content
-
-- **API:** `google.generate_content`
-- **Codec:** `google.generate_content`
-- **Workloads:** generation, embeddings, and image generation
-- **Chat Controls:** generic generation controls and Google thinking controls
-
-### Google Interactions
-
-- **API:** `google.interactions`
-- **Codec:** `google.interactions`
-- **Workloads:** generation, embeddings, and image generation
-- **Chat Controls:** generic generation controls and Google thinking controls
-
-### AWS Bedrock Invoke
-
-- **API:** `bedrock.invoke`
-- **Codec for Anthropic generation:** `anthropic.bedrock.invoke`
-- **Codec for Amazon Titan embeddings:** `amazon.titan.bedrock.invoke`
-
-Bedrock requires an explicit compatible codec. Anthropic-specific Chat Control targets are not available through the Bedrock API type; use supported generic generation controls.
+`openai.chat_completions` is the API for OpenAI-compatible services, OpenRouter, Groq, Cerebras, Ollama, and LiteLLM. `anthropic.messages` serves both direct Anthropic and Anthropic On Vertex AI connections.
 
 ## Advanced Options JSON
 
@@ -180,21 +170,16 @@ Use this when a model rejects otherwise standard generation parameters:
 }
 ```
 
-Allowed values are exactly:
+Allowed values are exactly `temperature`, `topP`, `seed`, and `reasoning`:
 
-- `temperature`
-- `topP`
-- `seed`
-- `reasoning`
+| Value | APIs where omitting it has an effect |
+|---|---|
+| `temperature` | OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, Google Generate Content, Google Interactions |
+| `topP` | OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, Google Generate Content, Google Interactions |
+| `seed` | OpenAI Chat Completions, Google Generate Content, Google Interactions. OpenAI Responses and Anthropic Messages never send a seed |
+| `reasoning` | OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, Google Generate Content, Google Interactions |
 
-API behavior:
-
-- OpenAI Chat Completions can omit all four.
-- OpenAI Responses can omit temperature, top-P, and reasoning. It does not emit seed.
-- Anthropic Messages can omit temperature, top-P, and reasoning.
-- Google Generate Content and Interactions can omit all four.
-- Anthropic on Bedrock follows Anthropic generation behavior.
-- OpenAI Images and Amazon Titan embeddings do not use this option.
+Anthropic on Bedrock behaves like Anthropic Messages. OpenAI Images and Amazon Titan embeddings ignore this option.
 
 Do not create a Chat Control for a parameter omitted by the offering.
 
@@ -216,17 +201,18 @@ This option applies only to `openai.chat_completions`. OpenAI Responses always u
 
 ### Prompt Cache
 
-OpenAI Chat Completions supports:
+The `promptCache` object accepts different properties per API:
 
-```json
-{
-  "promptCache": {
-    "key": true
-  }
-}
-```
+| API | Property | Values |
+|---|---|---|
+| OpenAI Chat Completions | `key` | Boolean |
+| OpenAI Responses | `key` | Boolean |
+| | `mode` | `implicit` or `explicit` |
+| | `ttl` | Currently `30m` |
+| | `explicitBreakpoints` | Boolean |
+| Anthropic Messages | `automatic` | Boolean |
 
-OpenAI Responses supports:
+For example, on OpenAI Responses:
 
 ```json
 {
@@ -238,23 +224,6 @@ OpenAI Responses supports:
   }
 }
 ```
-
-- `key`: boolean.
-- `mode`: `implicit` or `explicit`.
-- `ttl`: currently `30m`.
-- `explicitBreakpoints`: boolean.
-
-Anthropic Messages supports:
-
-```json
-{
-  "promptCache": {
-    "automatic": true
-  }
-}
-```
-
-`automatic` is a boolean.
 
 When the model or offering declares prompt-caching support and no explicit Prompt Cache object is supplied, Davinci supplies the appropriate default for OpenAI Responses, OpenAI Chat Completions, or Anthropic Messages.
 
@@ -382,75 +351,27 @@ The editor can create a boolean toggle with separate On and Off labels. Use a to
 
 The standard provider-specific targets documented below expect string or numeric values, so they should normally use a Choice control.
 
-### Generic Targets
+### Targets
 
-These targets are available for OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, Google APIs, and Bedrock Invoke:
+Generic targets work on every generation API: OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, both Google APIs, and Bedrock Invoke. Provider targets work only on the APIs listed.
 
-- `generation.reasoning`
-- `generation.maxInputTokens`
-- `generation.maxOutputTokens`
-- `generation.temperature`
-- `generation.topP`
+| Target | APIs | Accepted values |
+|---|---|---|
+| `generation.reasoning` | All generation APIs | A non-empty, provider-compatible string |
+| `generation.maxInputTokens` | All generation APIs | A positive integer up to the effective context limit |
+| `generation.maxOutputTokens` | All generation APIs | A positive integer up to the effective output limit |
+| `generation.temperature` | All generation APIs | A number from 0 through 2 |
+| `generation.topP` | All generation APIs | A number from 0 through 1 |
+| `generation.seed` | OpenAI Chat Completions, Google Generate Content, Google Interactions | An integer |
+| `openai.reasoning.effort` | OpenAI Chat Completions, OpenAI Responses | `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max` |
+| `openai.reasoning.mode` | OpenAI Responses | `standard`, `pro` |
+| `openai.service-tier` | OpenAI Chat Completions, OpenAI Responses | Depends on the provider and model; Davinci does not check the value |
+| `anthropic.output-config.effort` | Anthropic Messages | `low`, `medium`, `high`, `xhigh`, `max` |
+| `anthropic.speed` | Anthropic Messages | `standard`, `fast` |
+| `google.thinking.level` | Google Generate Content, Google Interactions | `none`, `minimal`, `low`, `medium`, `high` |
+| `google.thinking.budget` | Google Generate Content, Google Interactions | An integer of `-1` or greater |
 
-`generation.seed` is available only for:
-
-- OpenAI Chat Completions.
-- Google Generate Content.
-- Google Interactions.
-
-Value requirements:
-
-- **Maximum input tokens:** positive integer no greater than the effective context limit.
-- **Maximum output tokens:** positive integer no greater than the effective output limit.
-- **Temperature:** number from 0 through 2.
-- **Top-P:** number from 0 through 1.
-- **Seed:** integer.
-- **Reasoning:** non-empty provider-compatible string.
-
-Any non-`none` reasoning option requires the effective **Reasoning** capability to be supported.
-
-### OpenAI Targets
-
-`openai.reasoning.effort`
-
-- APIs: OpenAI Chat Completions and OpenAI Responses.
-- Accepted values: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
-
-`openai.reasoning.mode`
-
-- API: OpenAI Responses.
-- Accepted values: `standard`, `pro`.
-
-`openai.service-tier`
-
-- APIs: OpenAI Chat Completions and OpenAI Responses.
-- Accepted values depend on the provider and model. Davinci does not impose a local value list.
-
-### Anthropic Targets
-
-`anthropic.output-config.effort`
-
-- API: Anthropic Messages.
-- Accepted values: `low`, `medium`, `high`, `xhigh`, `max`.
-
-`anthropic.speed`
-
-- API: Anthropic Messages.
-- Accepted values: `standard`, `fast`.
-
-These targets are not available when Anthropic is routed through `bedrock.invoke`.
-
-### Google Targets
-
-`google.thinking.level`
-
-- APIs: Google Generate Content and Google Interactions.
-- Accepted values: `none`, `minimal`, `low`, `medium`, `high`.
-
-`google.thinking.budget`
-
-- APIs: Google Generate Content and Google Interactions.
-- Accepted values: integers greater than or equal to `-1`.
+Any reasoning value other than `none` requires the effective **Reasoning** capability. Anthropic targets are not available when Anthropic is routed through `bedrock.invoke`.
 
 ### Derived Context Control
 
@@ -492,38 +413,45 @@ Editing a value creates an override. Use **Clear override** to return to inherit
 
 Do not enter a larger value unless the exact provider offering supports it.
 
-## Capability Overrides
+## Capabilities
 
-Capabilities can be inherited, explicitly supported, or explicitly unsupported:
+Capabilities describe what a model can do, and they decide which routes can use it. Each capability is **Inherit / unknown**, **Supported**, or **Not supported**. The model definition sets them, and an offering can override them.
 
-- Tools.
-- Streaming.
-- Structured output.
-- Image input.
-- Image output.
-- Prompt caching.
-- Reasoning.
-- Audio input.
-- Video input.
-- Audio output.
-- Video output.
-- SVG output.
-- GIF output.
-- Embeddings.
+**Unknown is not the same for every capability.** Tools, Streaming, and Structured output count as supported unless set to **Not supported**. Every other capability counts only when set to **Supported**, so set them explicitly when you add a model by hand.
 
-SVG output and GIF output apply to image-generation offerings. Davinci sends SVG and animated GIF requests only to offerings with that capability, such as GPT Image 2.6 through the OpenAI Images API. An offering with SVG output enabled must be priced as a composite with a per-token component, because the provider bills the tokens its SVG authoring model spends in addition to the image tokens.
+| Capability | What it enables | When it is not supported |
+|---|---|---|
+| **Tools** | The Simple, Standard, and Complex tool routes, and tool calls from chat | The offering is not listed for tool routes, and any request that includes tools fails |
+| **Streaming** | Streamed responses in chat and the agent's tool loop | Streamed calls fail. Leave it on unless the provider cannot stream |
+| **Structured output** | JSON-schema responses, which many tools request | Requests that ask for structured output fail |
+| **Image input** | The Reference analysis route, and images in chat and tool calls | The offering is not listed for Reference analysis, images in the conversation are omitted, and tool calls that send images fail |
+| **Image output** | The Image generation route, together with a codec that supports image generation | The offering is not listed for Image generation |
+| **Prompt caching** | Davinci's default prompt cache settings on OpenAI Responses, OpenAI Chat Completions, and Anthropic Messages, and the cache pricing fields | No prompt cache settings are sent unless set in [Advanced options JSON](#prompt-cache) |
+| **Reasoning** | Reasoning Chat Controls and generation defaults with any value other than `none` | Saving or publishing a reasoning control with values other than `none` fails |
+| **Audio input** | The Media analysis route, and audio in the conversation | Audio is omitted from requests |
+| **Video input** | The Media analysis route | The offering is not listed for Media analysis unless it has Audio input |
+| **SVG output** | SVG requests on the Image generation route. Requires composite pricing with a per-token component, because the provider also bills the tokens its SVG authoring model spends | SVG requests are not sent to the offering |
+| **GIF output** | Animated GIF requests on the Image generation route | GIF requests are not sent to the offering |
+| **Embeddings** | The Embedding route. Set automatically for the Embedding kind | The offering is not listed for Embedding |
+| **Audio output**, **Video output** | Recorded for reference; no Davinci route uses them yet | No effect |
 
-Use **Supported** only when the provider offering actually implements the capability through the selected API and codec. Capability overrides affect which profiles and workloads can select the offering, but they cannot add a capability the provider lacks.
+[Verification](/pages/admin/llm-control-plane#verification) also follows capabilities: it adds tool-calling, image-input, and embedding checks when those are **Supported**, and streaming and structured-output checks unless those are **Not supported**.
+
+Use **Supported** only when the provider offering actually implements the capability through the selected API and codec. An offering override changes which routes can select the offering, but it cannot add a capability the provider lacks.
 
 ## Runtime Controls
 
 An offering's **Runtime controls** section inherits its defaults from the selected [LLM provider](/pages/admin/llm-provider-configuration#runtime-defaults) unless overridden on the offering:
 
-- **Request / first-token timeout (ms)** (`timeoutMs`) — wait for first streaming content or a non-streaming response (inherits provider `defaultTimeoutMs` or platform default `60,000` ms).
-- **Max attempts (initial + retries)** (`retryCount`) — total attempts before failing or falling back (`1` = no retries; inherits provider `retryCount` or `5`).
-- **Stream idle timeout (ms)** (`streamIdleTimeoutMs`) — maximum inactivity gap between streamed chunks (inherits provider `streamIdleTimeoutMs` or `90,000` ms).
-- **Stream absolute timeout (ms)** (`streamAbsoluteTimeoutMs`) — maximum total wall-clock time for a single stream attempt (inherits provider `streamAbsoluteTimeoutMs` or `300,000` ms).
-- **Max request size (bytes)** (`maxRequestSizeBytes`) — payload limit before older images or messages are trimmed (inherits provider `maxRequestSizeBytes`).
+| Field | Key | Platform default | Controls |
+|---|---|---|---|
+| **Request / first-token timeout (ms)** | `timeoutMs` | `60000` | Wait for the first streamed content or a non-streaming response |
+| **Max attempts (initial + retries)** | `retryCount` | `5` | Total attempts before failing or falling back. `1` means no retries |
+| **Stream idle timeout (ms)** | `streamIdleTimeoutMs` | `90000` | Longest gap allowed between streamed chunks |
+| **Stream absolute timeout (ms)** | `streamAbsoluteTimeoutMs` | `300000` | Longest total time for one stream attempt |
+| **Max request size (bytes)** | `maxRequestSizeBytes` | None | Payload size above which older images or messages are trimmed |
+
+Each field inherits the provider's value with the same key, except `timeoutMs`, which inherits the provider's `defaultTimeoutMs`. If the provider does not set a value either, the platform default applies.
 
 Editing any field activates an offering-level override; use **Clear overrides** in the Runtime controls header to return to inheriting from the provider. Connection-wide concurrency (`Max concurrent requests / replica`) is configured on the provider.
 

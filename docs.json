@@ -374,6 +374,7 @@
                         "group": "Users And Resources",
                         "pages": [
                             "pages/admin/user-access",
+                            "pages/admin/groups-and-entitlements",
                             "pages/admin/resources-and-tenants"
                         ]
                     },
@@ -389,6 +390,7 @@
                         "group": "LLM Control Plane",
                         "pages": [
                             "pages/admin/llm-control-plane",
+                            "pages/admin/llm-model-guide",
                             "pages/admin/llm-provider-configuration",
                             "pages/admin/llm-offering-configuration"
                         ]

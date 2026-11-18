@@ -38,7 +38,10 @@ Not every page is tenant-scoped. Always use the scope indicator and page filters
 
 <CardGroup cols={2}>
   <Card title="Users, Entitlements, And Access" icon="users" href="/pages/admin/user-access">
-    Provision accounts, manage entitlement groups and overrides, configure seats and trials, reset authentication, and control sessions.
+    Provision accounts, manage per-user entitlements, seats, and trials, reset authentication, and control sessions.
+  </Card>
+  <Card title="Groups And Entitlements" icon="users-gear" href="/pages/admin/groups-and-entitlements">
+    Control which features, limits, and LLM profiles users and organizations receive.
   </Card>
   <Card title="Projects, Organizations, And Tenants" icon="diagram-project" href="/pages/admin/resources-and-tenants">
     Manage shared resources, membership, ownership, deleted projects, and tenant subscriptions, seats, and accounting.
@@ -69,7 +72,7 @@ The Administration sidebar exposes the following areas when they are available f
 - **Costs** (`/admin/~/billing`) — USD cost breakdowns across Included Usage, Credit Balance, On-Demand Usage, and Overflow pools, payer summaries, and transaction ledger.
 - **Accounting Health** (`/admin/~/billing-health`) — payment-provider status and deferred/pending meter charge sweeps.
 - **Roles** (`/admin/~/roles`) — system- and tenant-role assignment.
-- **Groups** (`/admin/~/groups`) — entitlement groups (`base`, plan groups, and custom admin groups) that govern features, limits, and LLM profiles for users and organizations.
+- **Groups** (`/admin/~/groups`) — [entitlement groups](/pages/admin/groups-and-entitlements) (`base`, plan groups, and custom admin groups) that govern features, limits, and LLM profiles for users and organizations.
 - **Audit Log** (`/admin/~/audit`) — searchable administrative and security-relevant events.
 - **Explore** (`/admin/~/explore`) — featured-project curation.
 - **Tenants** (`/admin/~/tenants`) — tenant creation, member and organization attachment, seat caps, subscriptions, trials, and tenant accounting.

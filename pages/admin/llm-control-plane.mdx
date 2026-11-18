@@ -20,6 +20,12 @@ The control plane is deployment configuration, not a user chat interface. Change
 </Info>
 
 <CardGroup cols={2}>
+  <Card title="Choosing Models" icon="route" href="/pages/admin/llm-model-guide">
+    Which kind of model belongs on each route, with example models.
+  </Card>
+  <Card title="Groups And Entitlements" icon="users-gear" href="/pages/admin/groups-and-entitlements">
+    How users receive an LLM profile.
+  </Card>
   <Card title="Provider Configuration" icon="plug" href="/pages/admin/llm-provider-configuration">
     Supported provider recipes, authentication methods, endpoints, and Additional options JSON.
   </Card>
@@ -73,7 +79,7 @@ For providers that support model discovery:
 
 Discovery can match a returned model to an existing model definition or create a new definition. If the match is ambiguous, add the model manually.
 
-Use **Add Model** when discovery is unavailable or when the provider exposes a model that is not returned by discovery.
+Use **Add Model** when discovery is unavailable or when the provider exposes a model that is not returned by discovery. **Add Model** only lists existing model definitions, so [add a definition](/pages/admin/llm-offering-configuration#add-a-model-that-is-not-in-the-list) first for a model Davinci does not know yet.
 
 ## Model Definitions And Offerings
 
@@ -88,7 +94,7 @@ Expand **Default Model Definitions** to manage shared defaults. A definition des
 - Embedding dimensions and supported vector sizes.
 - Additional metadata.
 
-Model kinds include general, embedding, image, audio, video, and realtime.
+Model kinds include general, embedding, image, audio, video, and realtime. The kind decides which routes the model can serve; see [Model Kinds](/pages/admin/llm-offering-configuration#model-kinds).
 
 When one model is offered by multiple providers, its definition is the place to keep shared defaults consistent.
 
@@ -114,7 +120,7 @@ The **Profiles** tab controls which offerings a group of users can reach.
 
 ### Assigning Profiles To Groups And Users
 
-LLM profiles are assigned through [Entitlement Groups](/pages/admin/user-access#entitlement-groups-administration--groups) (`/admin/~/groups`, where each user group can set its LLM profile option and `base` provides the baseline default) or per-user overrides on the [User Entitlements](/pages/admin/user-access#entitlements) tab.
+LLM profiles are assigned through the `llm.profile` option on [entitlement groups](/pages/admin/groups-and-entitlements) (`/admin/~/groups`, where `base` provides the baseline default) or a per-user override on the user's **Entitlements** tab. When a user's groups grant different profiles, the highest-ranked profile wins.
 
 ### Create A Profile
 
@@ -123,22 +129,27 @@ A profile has:
 - A display name (shown to administrators when assigning profiles to groups and users).
 - A stable lowercase key. The key cannot be changed after creation.
 - An enabled state.
+- A rank. When a user's groups grant different profiles, the enabled profile with the highest rank wins. A user override always wins.
 - A description for administrators.
 
 Expand a profile to configure its routes.
 
 ### Profile Routes
 
-Profiles can route these workloads:
+Profiles can route these workloads. See [Choosing Models](/pages/admin/llm-model-guide) for what runs on each route and example models for each.
 
-- **Chat** — models users can select in agent chat. Mark exactly one enabled chat route as the default.
-- **Tool-call models** — Simple, Standard, and Complex routes for internal tool reasoning.
-- **Summarization** — conversation compaction and summaries.
-- **Image generation** — generated images and graphics.
-- **Reference analysis** — OCR, image, and PDF visual understanding.
-- **Media analysis** — audio and video understanding.
-- **Project names** — automatic project titles.
-- **Embedding** — vector search and retrieval.
+| Route | Model class | Offerings must have |
+|---|---|---|
+| **Chat** (one default, plus optional choices) | Any; offer several. Image input strongly preferred | A general model |
+| **Tools: Simple** | Small | Tools capability |
+| **Tools: Standard** | Mid-size | Tools capability |
+| **Tools: Complex** | Frontier | Tools capability |
+| **Summarization** (optional; falls back to the chat model) | Small or mid-size, long context | A general model |
+| **Project names** | Small | A general model |
+| **Reference analysis** | Low-cost multimodal | Image input |
+| **Media analysis** | Multimodal on a Google provider | Audio or video input |
+| **Image generation** | Image model | Image output |
+| **Embedding** | Embedding model | Embedding model kind |
 
 Only enabled offerings that support a workload appear as choices. Removing a route prevents users of that profile from using that workload.
 

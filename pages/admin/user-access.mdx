@@ -75,33 +75,9 @@ Configure:
 
 A failure for one entry does not prevent the other entries from being processed. Review the result table for created and failed accounts, email-delivery results, and any temporary passwords that require manual delivery.
 
-## Entitlement Groups (`Administration → Groups`)
+## Entitlement Groups
 
-Entitlement groups (`/admin/~/groups`) control which features, limits, and LLM profiles users and organizations receive across the platform.
-
-### How Entitlements Resolve
-
-Every entitlement key resolves in four steps:
-
-1. **Subject Override** — A per-user or per-organization override set on that subject's **Entitlements** tab beats every group.
-2. **Active Groups** — Across all active groups a subject belongs to, the **most permissive** value wins (`On` beats `Off`, `Unlimited` beats numeric limits, largest numeric limit wins, and the highest-ranked LLM profile wins). Every user automatically belongs to the `base` group.
-3. **System Catalog Default** — Used whenever a key is left at *Catalog default* across all of the subject's active groups.
-4. **License & Seat Ceiling** — The deployment/tenant license and read-only seat status clamp the final effective result.
-
-### Managing Entitlement Groups
-
-The **Groups** table lists each group's name and key, target subject type (**Users** or **Organizations**), management source (`system`, `billing`, or `admin`), active member count, and a summary of its configured entitlements.
-
-- **System baseline (`base`)**: Every user is in `base`. Editing `base` changes the default limits, LLM profile, and features for all users who do not have a more permissive group or override.
-- **Billing-managed groups**: Plans such as `core`, `max`, `team` (Group plan), and `org_owner` are assigned automatically when subscriptions change, though administrators can inspect or customize the entitlements those groups grant.
-- **Admin-managed groups**: Click **New group** to create a custom group with a lowercase key (for example, `pilots` or `power_users`), name, description, and target (**Users** or **Organizations**). Admin-created groups can be archived when no longer needed.
-
-Click any group row to open its detail modal and configure:
-
-- **Limits** — Set each limit (such as maximum owned projects or maximum collaborators per project) to **Catalog default**, **Custom limit**, or **Unlimited**.
-- **Options** — For user groups, select the **LLM profile** granted by the group (or leave at **Catalog default**).
-- **Features** — Set feature flags and rollouts (such as Scratch Pad, Journeys, CAD Objects, Onshape Connect, Personal Access Tokens, Simulation options, or organization AI funding) to **Catalog default**, **On**, or **Off**.
-- **Members** — View all users or organizations currently in the group, how they were added (`Default group`, `Billing plan`, `Tenant membership`, `Trial`, or `Admin grant`), and when their membership ends.
+Entitlement groups (**Administration → Groups**, `/admin/~/groups`) control which features, limits, and LLM profiles users and organizations receive. See [Groups And Entitlements](/pages/admin/groups-and-entitlements) for how values resolve, every key you can set, memberships, trials, and troubleshooting.
 
 ## User Details
 
@@ -120,7 +96,7 @@ The **Account** tab shows identity, avatar, status, seat type (**Full** or **Rea
 
 ### Entitlements
 
-The **Entitlements** tab shows every resolved limit, option, and feature for the user along with its source (`Catalog default`, `Group: <name>`, `Override`, or `Platform` ceiling). From this tab, administrators can:
+The **Entitlements** tab shows every resolved limit, option, and feature for the user along with its source (`Catalog default`, `Group: <name>`, `Override`, or `Platform` ceiling). See [The Entitlements Tab](/pages/admin/groups-and-entitlements#the-entitlements-tab) for what each source and reason means. From this tab, administrators can:
 
 - **Seat type**: Switch the user between a **Full** seat and a **Read-only** seat (read-only seats can view, export, and comment, but cannot edit models or use AI).
 - **Group memberships**: View active group memberships and grant a new **Admin grant** group membership with an optional expiration date, or remove an existing admin grant.

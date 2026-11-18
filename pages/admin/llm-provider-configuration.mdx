@@ -34,45 +34,21 @@ For a private or local provider, the URL must be reachable from the Davinci runt
 
 ### Authentication Method
 
-Choose one method:
+Choose one method. The [provider recipes](#supported-provider-recipes) list which methods each provider supports.
 
-- **API key** — store a provider credential securely in Davinci.
-- **Environment variable** — resolve a key from the runtime environment.
-- **Application default credentials** — use the cloud SDK's workload identity or credential chain.
-- **Token file** — read a bearer token from a mounted file.
-- **No authentication** — connect without credentials.
+| Method | Field to fill in | Enter | Example |
+|---|---|---|---|
+| **API key** | **Credential / API Key** | The secret itself. When editing, leave it blank to keep the stored value | — |
+| **Environment variable** | **API Key Environment Variable** | The variable name only, never the secret | `PROVIDER_API_KEY` |
+| **Application default credentials** | None; the cloud SDK finds the workload identity or credential chain | — | — |
+| **Token file** | **Token File Path** | An absolute path to a file that contains the token | `/run/secrets/provider-token` |
+| **No authentication** | None | — | — |
 
-The supported method depends on the provider recipe.
-
-### Credential / API Key
-
-This field appears for **API key** authentication. Enter the secret value itself.
-
-When editing an existing provider, leave the field blank to preserve the configured credential.
+Environment variables and token files must be available to the Davinci runtime in every environment where the connection is used.
 
 <Warning>
 Use only the dedicated credential field for a provider secret. Never put a secret in Additional options JSON, a URL, a header, an exported configuration, or a screenshot.
 </Warning>
-
-### API Key Environment Variable
-
-This field appears for **Environment variable** authentication. Enter only the variable name, for example:
-
-```text
-PROVIDER_API_KEY
-```
-
-The variable must be available to the Davinci runtime in every environment where the connection is used. Do not enter the secret value.
-
-### Token File Path
-
-This field appears for **Token file** authentication. Enter an absolute path available to the Davinci runtime, for example:
-
-```text
-/run/secrets/provider-token
-```
-
-The file must contain the token value. Enter the path, not the token.
 
 ### Region / Location
 
@@ -92,15 +68,17 @@ The named Cloud Project ID field overrides a duplicate `projectId` in Additional
 
 Select one or more APIs exposed by the connection:
 
-- `openai.responses`
-- `openai.images`
-- `openai.chat_completions`
-- `anthropic.messages`
-- `google.generate_content`
-- `google.interactions`
-- `bedrock.invoke`
+| API | Protocol | Workloads |
+|---|---|---|
+| `openai.responses` | OpenAI Responses | Generation, embeddings, image generation |
+| `openai.chat_completions` | OpenAI Chat Completions | Generation, embeddings |
+| `openai.images` | OpenAI Images | Image generation |
+| `anthropic.messages` | Anthropic Messages | Generation |
+| `google.generate_content` | Google Generate Content | Generation, embeddings, image generation |
+| `google.interactions` | Google Interactions | Generation, embeddings, image generation |
+| `bedrock.invoke` | AWS Bedrock Invoke | Anthropic generation, Amazon Titan embeddings |
 
-Select only APIs actually implemented by the endpoint. An endpoint that supports OpenAI Chat Completions does not automatically support OpenAI Responses or Images.
+Many gateways and hosted services implement the OpenAI and Anthropic APIs, often several at once. Select only APIs actually implemented by the endpoint. An endpoint that supports OpenAI Chat Completions does not automatically support OpenAI Responses or Images.
 
 ### Default API
 
@@ -112,12 +90,14 @@ Each model offering still selects its exact API and compatible codec.
 
 The **Runtime defaults** section configures default concurrency, retry budget, and timeout limits inherited by all model offerings on the provider unless an offering overrides them:
 
-- **Request / first-token timeout (ms)** (`defaultTimeoutMs`, default `60000`) — default wait for first streaming content or a non-streaming response.
-- **Max attempts (initial + retries)** (`retryCount`, default `5`) — total attempts before failing or falling back (`1` = no retries).
-- **Max concurrent requests / replica** (`maxConcurrentPerConnection`, optional) — connection-wide concurrency cap per Design Engine replica.
-- **Stream idle timeout (ms)** (`streamIdleTimeoutMs`, default `90000`) — maximum inactivity gap between streamed chunks.
-- **Stream absolute timeout (ms)** (`streamAbsoluteTimeoutMs`, default `300000`) — maximum total wall-clock time for a single stream attempt.
-- **Max request size (bytes)** (`maxRequestSizeBytes`, optional) — default payload limit before old images or messages are trimmed.
+| Field | Key | Default | Controls |
+|---|---|---|---|
+| **Request / first-token timeout (ms)** | `defaultTimeoutMs` | `60000` | Wait for the first streamed content or a non-streaming response |
+| **Max attempts (initial + retries)** | `retryCount` | `5` | Total attempts before failing or falling back. `1` means no retries |
+| **Max concurrent requests / replica** | `maxConcurrentPerConnection` | None | Connection-wide concurrency cap per Design Engine replica |
+| **Stream idle timeout (ms)** | `streamIdleTimeoutMs` | `90000` | Longest gap allowed between streamed chunks |
+| **Stream absolute timeout (ms)** | `streamAbsoluteTimeoutMs` | `300000` | Longest total time for one stream attempt |
+| **Max request size (bytes)** | `maxRequestSizeBytes` | None | Payload size above which older images or messages are trimmed |
 
 ## Per-API URL Settings
 
@@ -134,6 +114,36 @@ https://llm.example.com/v1
 ```
 
 Do not repeat an extension already included in the Base URL.
+
+### Gateways With A Path Per API
+
+Some gateways serve each API under its own path. Configure one provider with every API the gateway implements, set the Base URL to the shared root, and give each API its own extension. The Anthropic SDK appends `/v1/messages` itself, so Anthropic extensions stop before `/v1`. These setups combine APIs beyond a single recipe, so verify each API separately.
+
+**Ask Sage**, with Base URL `https://api.asksage.ai/server` (the host differs per Ask Sage instance):
+
+| API | URL extension | Resolves to |
+|---|---|---|
+| `openai.responses`, `openai.chat_completions` | `/openai/v1` | `https://api.asksage.ai/server/openai/v1` |
+| `anthropic.messages` | `/anthropic` | `https://api.asksage.ai/server/anthropic` |
+
+Ask Sage's Gemini-style route at `/google/v1beta` authenticates with a non-standard `x-access-tokens` header that Davinci's Google APIs do not send, so do not add a Google API to an Ask Sage provider.
+
+**Amazon Bedrock Mantle**, with Base URL `https://bedrock-mantle.us-east-1.api.aws` and an Amazon Bedrock API key. Mantle is an OpenAI- and Anthropic-compatible endpoint, separate from the **AWS Bedrock** recipe and its `bedrock.invoke` API.
+
+| API | URL extension | Serves |
+|---|---|---|
+| `openai.responses`, `openai.chat_completions` | `/v1` | Most models, including gpt-oss, and the model list for every model |
+| `anthropic.messages` | `/anthropic` | Claude models |
+
+Mantle serves OpenAI GPT models, and some others, under `/openai/v1` instead of `/v1`. A provider has one URL per API, so add a second Mantle provider whose OpenAI APIs use the full URL `https://bedrock-mantle.us-east-1.api.aws/openai/v1`, and add those models to it with **Add Model**. Check a model's card in the Bedrock console for which path it uses.
+
+<Warning>
+**Known issue: discovery and health checks depend on the model-list endpoint.** **Discover Models** lists models only from the default API's URL, and the provider health check calls the model-list endpoint of every selected API. When a gateway keeps its model list on a different path from some of its inference routes, discovery fails or returns the wrong set, and the health check reports the provider unhealthy even though inference works.
+
+For example, Mantle lists every model at `/v1/models`, while `/openai/v1/models` returns `404`. A Mantle provider whose default API points at `/openai/v1` cannot discover models and fails its health check.
+
+To work around it, set the **Default API** to one whose URL serves the model list. On a provider where no API path has a model list, add models manually with **Add Model** and confirm them with [verification](/pages/admin/llm-control-plane#verification) instead of the health check.
+</Warning>
 
 ## Additional Options JSON
 
@@ -160,7 +170,7 @@ The field accepts a JSON object. Named form fields take precedence over duplicat
 }
 ```
 
-Header names and values should be strings. Default headers are supported by OpenAI-compatible and direct Anthropic connections.
+Header names and values should be strings. Default headers are supported by every connection that uses an OpenAI API and by direct Anthropic connections. Anthropic On Vertex AI does not send them.
 
 <Warning>
 Default headers can be included in portable configuration. Do not put authorization values, tokens, session identifiers, or other secrets in this object.
@@ -214,137 +224,48 @@ Only include options required by the selected provider. Unlisted properties shou
 
 ## Supported Provider Recipes
 
-### OpenAI
+| Provider | Base URL | Authentication | APIs |
+|---|---|---|---|
+| **OpenAI** | `https://api.openai.com/v1` | API key, environment variable | Responses (recommended default), Images, Chat Completions |
+| **OpenAI-Compatible** | Required | API key, environment variable, none | Whichever OpenAI APIs the endpoint implements |
+| **Anthropic** | `https://api.anthropic.com` | API key, environment variable | Anthropic Messages |
+| **Google Gemini** | `https://generativelanguage.googleapis.com` | API key, environment variable | Google Generate Content, Google Interactions |
+| **AWS Bedrock** | Blank unless overriding the endpoint | Application default credentials | AWS Bedrock Invoke |
+| **Google Vertex AI** | Blank unless overriding the endpoint | Application default credentials | Google Generate Content |
+| **Anthropic On Vertex AI** | Blank unless overriding the endpoint | Application default credentials | Anthropic Messages |
+| **OpenRouter** | `https://openrouter.ai/api/v1` | API key, environment variable | OpenAI Chat Completions |
+| **Groq** | `https://api.groq.com/openai/v1` | API key, environment variable | OpenAI Chat Completions |
+| **Cerebras** | `https://api.cerebras.ai/v1` | API key, environment variable | OpenAI Chat Completions |
+| **Ollama** | A URL reachable from the Davinci runtime | None | OpenAI Chat Completions |
+| **LiteLLM** | Required | API key, environment variable, token file, none | OpenAI Chat Completions |
 
-- **Base URL:** `https://api.openai.com/v1`
-- **Authentication:** API key or environment variable
-- **APIs:** OpenAI Responses, OpenAI Images, OpenAI Chat Completions
-- **Recommended default API:** OpenAI Responses
-- **Additional options:** `defaultTimeoutMs`
+Every recipe accepts `defaultTimeoutMs` in Additional options JSON. `defaultHeaders` works on any connection that uses an OpenAI API and on direct Anthropic. The Vertex recipes also accept `projectId` and `location`.
 
-Use only the APIs required by your configured offerings.
+Enable only the APIs your offerings use. Recipe-specific notes:
 
-### OpenAI-Compatible
+- **OpenAI-Compatible:** verify each selected API separately. Compatibility with Chat Completions does not prove compatibility with Responses, Images, tool calls, structured output, or usage reporting.
+- **AWS Bedrock:** the region defaults to `us-east-1`. Offerings need a model-specific codec: Anthropic on Bedrock for Anthropic generation models, or Amazon Titan for Titan embeddings. Models are normally added manually rather than discovered.
+- **Google Vertex AI and Anthropic On Vertex AI:** a **Cloud Project ID** is required. The region defaults to `us-central1` for Google Vertex AI and `us-east5` for Anthropic On Vertex AI. Prefer the named **Cloud Project ID** and **Region / Location** fields over JSON. The equivalent JSON is:
 
-- **Base URL:** required
-- **Authentication:** API key, environment variable, or no authentication
-- **APIs:** any OpenAI API surface the endpoint actually implements
-- **Additional options:** `defaultTimeoutMs`, `defaultHeaders`
-
-Verify each selected API separately. Compatibility with Chat Completions does not prove compatibility with Responses, Images, tool calls, structured output, or usage reporting.
-
-### Anthropic
-
-- **Base URL:** `https://api.anthropic.com`
-- **Authentication:** API key or environment variable
-- **API:** Anthropic Messages
-- **Additional options:** `defaultTimeoutMs`
-
-### Google Gemini
-
-- **Base URL:** `https://generativelanguage.googleapis.com`
-- **Authentication:** API key or environment variable
-- **APIs:** Google Generate Content, Google Interactions
-- **Additional options:** `defaultTimeoutMs`
-
-Enable only the API used by the model offering.
-
-### AWS Bedrock
-
-- **Base URL:** blank unless using a supported endpoint override
-- **Authentication:** application default credentials
-- **API:** AWS Bedrock Invoke
-- **Default region:** `us-east-1`
-- **Additional options:** `defaultTimeoutMs`
-
-Bedrock offerings require a model-specific codec. Use Anthropic on Bedrock for Anthropic generation models or Amazon Titan for Titan embeddings.
-
-Model entry is normally manual for this recipe.
-
-### Google Vertex AI
-
-- **Base URL:** blank unless using a supported endpoint override
-- **Authentication:** application default credentials
-- **API:** Google Generate Content
-- **Default region:** `us-central1`
-- **Cloud Project ID:** required
-- **Additional options:** `projectId`, `location`, `defaultTimeoutMs`
-
-```json
-{
-  "projectId": "example-cloud-project",
-  "location": "us-central1",
-  "defaultTimeoutMs": 60000
-}
-```
-
-The named Cloud Project ID and Region / Location fields are preferred for values they expose.
-
-### Anthropic On Vertex AI
-
-- **Base URL:** blank unless using a supported endpoint override
-- **Authentication:** application default credentials
-- **API:** Anthropic Messages
-- **Default region:** `us-east5`
-- **Cloud Project ID:** required
-- **Additional options:** `projectId`, `location`, `defaultTimeoutMs`
-
-### OpenRouter
-
-- **Base URL:** `https://openrouter.ai/api/v1`
-- **Authentication:** API key or environment variable
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`, `defaultHeaders`
-
-If attribution headers are required, configure them explicitly:
-
-```json
-{
-  "defaultHeaders": {
-    "HTTP-Referer": "https://davinci.example.com",
-    "X-Title": "Davinci"
+  ```json
+  {
+    "projectId": "example-cloud-project",
+    "location": "us-central1"
   }
-}
-```
+  ```
 
-Replace the example URL with your approved public application URL.
+- **OpenRouter:** if attribution headers are required, add them to `defaultHeaders`, using your approved public application URL:
 
-### Groq
+  ```json
+  {
+    "defaultHeaders": {
+      "HTTP-Referer": "https://davinci.example.com",
+      "X-Title": "Davinci"
+    }
+  }
+  ```
 
-- **Base URL:** `https://api.groq.com/openai/v1`
-- **Authentication:** API key or environment variable
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`
-
-### Cerebras
-
-- **Base URL:** `https://api.cerebras.ai/v1`
-- **Authentication:** API key or environment variable
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`
-
-### Ollama
-
-- **Base URL:** a URL reachable from the Davinci runtime
-- **Authentication:** no authentication
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`
-
-Do not assume the browser machine's `localhost` address is reachable by Davinci.
-
-### LiteLLM
-
-- **Base URL:** required
-- **Authentication:** API key, environment variable, or no authentication
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`
-
-### External LiteLLM
-
-- **Base URL:** required
-- **Authentication:** token file, API key, or environment variable
-- **API:** OpenAI Chat Completions
-- **Additional options:** `defaultTimeoutMs`
+- **Ollama:** the Base URL must be reachable from the Davinci runtime. The browser machine's `localhost` is usually not.
 
 ## Save And Verify
 
