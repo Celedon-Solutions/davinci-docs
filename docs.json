@@ -72,8 +72,8 @@
     "navbar": {
         "links": [
             {
-                "label": "v5.3.5",
-                "href": "/pages/release-notes/v5.3.5"
+                "label": "v5.4.0",
+                "href": "/pages/release-notes/v5.4.0"
             },
             {
                 "label": "Celedon Solutions",
@@ -435,10 +435,11 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
-                    "pages/release-notes/v5.3.5",
+                    "pages/release-notes/v5.4.0",
                     {
                         "group": "Prior Versions",
                         "pages": [
+                            "pages/release-notes/v5.3.5",
                             "pages/release-notes/v5.3.4",
                             "pages/release-notes/v5.3.3",
                             "pages/release-notes/v5.3.2",

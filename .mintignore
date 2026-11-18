@@ -2,5 +2,3 @@ db-schema/
 AI_instructions_summary.js
 build/
 scripts/
-# Draft release notes for an untagged version. Remove the line when the version ships.
-pages/release-notes/v5.4.0.mdx
