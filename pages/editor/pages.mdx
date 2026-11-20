@@ -87,7 +87,7 @@ Bindings are the page's only route to project data. Each binding has a key, and 
 
 The **Bindings** tab has two views:
 
-- **Form** lists each binding as a card. Click a card to edit it, or use the **Add** buttons to add a binding of each kind. Drag objects from the Model tree onto the bindings list to bind them; a dropped reference with an uploaded file becomes an **Asset** binding. Each card shows a preview of its current value or its error.
+- **Form** lists each binding as a card. Click a card to edit it, or use the **Add** buttons to add a binding of each kind. Drag objects from the Model tree onto the bindings list to bind them; a dropped reference with an uploaded file becomes an **Asset** binding, and a dropped part studio or assembly becomes a **3D** binding. Each card shows a preview of its current value or its error.
 - **JSON** shows the same bindings as raw JSON.
 
 <Frame>
@@ -104,7 +104,8 @@ The **Bindings** tab has two views:
 | **Tree** | An object and its children, nested up to a chosen depth. |
 | **Task Cards** | Task Cards filtered by status, tag, or linked object. |
 | **Project** | The project's name, README, and tags. |
-| **Asset** | The uploaded file of a reference object, such as an image or video. |
+| **Asset** | The uploaded file of a reference object, such as an image, video, or 3D model file. |
+| **3D** | A part studio or assembly's 3D model, as built at the page's source. See [Showing 3D Models](#showing-3d-models). |
 | **History** | One object's value at each commit that changed it. |
 
 Selection options for **List** and **Number** bindings:
@@ -150,9 +151,12 @@ function render(davinci) {
 | `davinci.onUpdate(fn)` | Runs `fn` every time the data refreshes. |
 | `davinci.data[key]` | The value of a binding. |
 | `davinci.entries[key]` | The binding with its `kind`, `label`, `value`, and `error`. Check `error` and show a placeholder when it is set. |
-| `davinci.meta` | The page name, project name, branch, commit, and build time. |
+| `davinci.meta` | The page name, project name, branch, commit, build time, and `objectLinks`, which says whether [object links](#opening-objects-in-the-editor) work. |
 | `davinci.format` | Formatting helpers: `value`, `number`, `percent`, `delta`, and `date`. Each returns an em dash for missing values. |
 | `davinci.asset(key)` | Loads the file of an **Asset** binding. See [Showing Files From References](#showing-files-from-references). |
+| `davinci.geometry(key)` | Loads the meshes of a **3D** binding. See [Showing 3D Models](#showing-3d-models). |
+| `davinci.openObjects(ids)` | Opens objects or Task Cards in the editor from a click. See [Opening Objects In The Editor](#opening-objects-in-the-editor). |
+| `davinci.objectUrl(ids)` | The editor URL that opens those objects, as text, or `null` when object links are off. |
 
 To match the viewer's light or dark theme, use the CSS variables `--page-bg`, `--page-surface`, `--page-border`, `--page-text`, `--page-muted`, `--page-accent`, `--page-good`, `--page-warn`, and `--page-bad` instead of fixed colors.
 
@@ -176,11 +180,79 @@ The result's `url` works as the source of an `<img>`, `<video>`, or `<audio>` el
 
 Asset bindings have these limits:
 
-- Images and other files up to 25 MB, audio up to 100 MB, and video up to 250 MB.
+- Images and other files up to 25 MB, audio and 3D model files up to 100 MB, and video up to 250 MB.
 - The reference must belong to this project. References from an included project cannot be shown.
 - A file uploaded before file versioning was introduced cannot be shown. Replace the reference's file to use it on a page.
 
 A published page shows the file version in the branch's last commit. If you replace the reference's file, the published page shows the new file after the change is committed.
+
+### Showing 3D Models
+
+A page can show an orbitable 3D model of a part studio or assembly built in this project, or of an uploaded 3D model file:
+
+1. Turn on the **three.js** [library](#libraries) in the **Settings** tab.
+2. Add a **3D** binding and choose the part studio or assembly, or drag it from the Model tree. For an uploaded file, use an **Asset** binding on its reference instead.
+3. In the script, create a viewer once and load the model into it on every render:
+
+```js
+const box = document.getElementById('model');
+const viewer = DavinciViewer.create(box, { height: '420px', spin: true });
+
+async function render() {
+  const entry = davinci.entries.bracket;
+  if (entry.error) {
+    box.textContent = entry.error;
+    return;
+  }
+  try {
+    await viewer.load(await davinci.geometry('bracket'));
+  } catch (error) {
+    box.textContent = error.message;
+  }
+}
+
+davinci.ready(render);
+davinci.onUpdate(render);
+```
+
+Viewers drag to orbit, scroll to zoom, and right-drag to pan. `viewer.load` also accepts `await davinci.asset(key)` for an **Asset** binding whose file is a GLB or glTF, STL, OBJ, 3MF, or PLY model. A glTF file must be a single `.glb` or self-contained `.gltf` without mesh compression.
+
+| Viewer option or method | Use |
+| --- | --- |
+| `DavinciViewer.create(element, options)` | Adds the viewer to `element`. Options include `height`, `edges` (outline edges, on by default), `background` (`'theme'` or a color), `spin`, `spinSeconds`, and `spinToggle`. |
+| `viewer.load(model, { view })` | Shows the model, replacing the previous one, and fits the camera. `view` is a preset view such as `'iso'`. |
+| `viewer.fit()`, `viewer.setView(name)` | Fits the camera, or turns it to a preset view: `iso`, `front`, `back`, `left`, `right`, `top`, or `bottom`. |
+| `viewer.highlight(ids)` | Highlights parts by object id. |
+| `viewer.onPick(fn)`, `viewer.onHover(fn)` | Calls `fn` with the part's object id, instance, name, face, point, and normal when the viewer clicks or hovers over it. |
+| `viewer.setSpin(on)`, `viewer.isSpinning()`, `viewer.onSpinChange(fn)` | Controls spin from the page's own buttons or checkboxes. |
+
+With `spin: true` the model turns slowly about its vertical axis, like the 3D view's Idle Spin. It starts 5 seconds after the model loads or the viewer last interacted, pauses while they hold the mouse down, and turns once a minute; `spinSeconds` sets the period from 5 to 120 seconds. Spin also adds a **Spin** toggle to the viewer's corner so viewers can stop it. Pass `spinToggle: false` to hide the toggle.
+
+A **3D** binding shows the model as it was last built at the page's source. Pages never start a build:
+
+- In the editor, the binding reports **Not built yet** until the part studio or assembly is built at its current state. Open it in the 3D view to build it.
+- A published page reports **Not built for this commit** until that committed state has been built. Build the part after your last edit and before committing it. The published page updates on its own once the build exists.
+- An Onshape part must have a synced version.
+- Circuits, other object types, and parts from included projects cannot be shown.
+
+Materials used by the model are applied from their current color and finish, so material edits show without rebuilding the part.
+
+<Warning>Anyone who can view the page can download the meshes of its 3D models, because the browser receives them to draw the model. Check before binding confidential CAD to a public or secret-link page.</Warning>
+
+### Opening Objects In The Editor
+
+A page can link to model objects and Task Cards so that clicking the link opens them as tabs in the Davinci editor, on the branch the page shows, with the first one focused. Add the object ids to any element with `data-davinci-objects`:
+
+```html
+<button data-davinci-objects="<object id>,<object id>">Open in editor</button>
+```
+
+In the script, `davinci.openObjects(ids)` does the same from a click handler, and `davinci.objectUrl(ids)` returns the editor URL as text. Ids are object UUIDs, or `card-<uuid>` for Task Cards, up to 20 per link.
+
+- In the page editor preview, the objects open in the current editor.
+- On a published page, the objects open in an editor already showing that project and branch, or in a new tab. Viewers need access to the project to see them.
+- Links open only when the viewer clicks, at most once a second.
+- Object links are off on [secret-link](#secret-links) pages, because the editor URL would reveal the project. There, link elements are dimmed with a tooltip explaining why, and `davinci.meta.objectLinks.url` is `null`.
 
 ### Charting A Value Over Time
 
@@ -200,6 +272,7 @@ Turn on a library under **Libraries** in the **Settings** tab to use it in the p
 | **Plotly** | `Plotly` | Interactive scientific plots, 3D surfaces, and heatmaps. |
 | **D3** | `d3` | Custom data-driven SVG and layouts. |
 | **KaTeX** | `katex` | Math typesetting with `katex.render`. |
+| **three.js** | `THREE`, `DavinciViewer` | 3D models and scenes. `DavinciViewer` shows [3D bindings and model files](#showing-3d-models); `THREE.addons` has OrbitControls and the GLTF, STL, OBJ, 3MF, and PLY loaders. |
 
 Enabled libraries load before the page script. Other libraries cannot be loaded.
 
@@ -207,15 +280,15 @@ Enabled libraries load before the page script. Other libraries cannot be loaded.
 
 Pages run in an isolated frame, both in the editor preview and when published. In practice this means:
 
-- A page cannot make network requests or load anything from outside Davinci: no `fetch`, external scripts, stylesheets, images, or fonts. Use bindings for data, **Asset** bindings for files, and the [built-in libraries](#libraries) for charts and math. Inline `data:` images are allowed.
-- A page cannot reach the Davinci app, open popups or new windows, submit forms, embed frames, or navigate away.
+- A page cannot make network requests or load anything from outside Davinci: no `fetch`, external scripts, stylesheets, images, or fonts. Use bindings for data, **Asset** and **3D** bindings for files and models, and the [built-in libraries](#libraries) for charts, math, and 3D. Inline `data:` images are allowed.
+- A page cannot reach the Davinci app, open popups or new windows, submit forms, embed frames, or navigate away. The one exception is [object links](#opening-objects-in-the-editor), which ask Davinci to open objects in the editor after a click.
 - `localStorage`, `sessionStorage`, and cookies work only in memory and are cleared whenever the page reloads.
 
 Bindings and sources have size limits:
 
 | Limit | Value |
 | --- | --- |
-| HTML, Script, and CSS | 65,536 characters each |
+| HTML, Script, and CSS | 100,000 characters each, unless the project sets another limit in [Project Settings > Pages](/pages/editor/project-settings/pages) |
 | Bindings JSON | 32,768 characters |
 | Bindings per page | 100 |
 | Pinned commits per page | 8 |
@@ -323,7 +396,7 @@ With **Secret link** visibility, Davinci creates a link of the form `https://<yo
 
 <Warning>The secret link is shown only once, right after it is created. Copy it then. Davinci does not keep a readable copy, so it cannot show the link again.</Warning>
 
-To revoke access, click **Rotate Link** in the Publishing section. The old link stops working immediately, and a new link is shown once. A secret-link view opens the default branch and does not show a branch selector or a link to the project.
+To revoke access, click **Rotate Link** in the Publishing section. The old link stops working immediately, and a new link is shown once. A secret-link view opens the default branch and does not show a branch selector, a link to the project, or working [object links](#opening-objects-in-the-editor).
 
 Switching to another visibility option deletes the secret link.
 
@@ -365,3 +438,4 @@ The [Davinci Agent](/pages/editor/agent/agent-tools#pages) can create pages, edi
 - Publishing through the agent needs the same **Publish Pages** permission as publishing yourself.
 - The agent cannot create or rotate secret links. Use the page editor's Publishing settings for those.
 - You can @-mention a page in an agent chat message, and pages the agent mentions appear as links that open the page.
+- When a **3D** binding it is working on reports **Not built yet**, the agent builds the part studio or assembly, then checks the page again.

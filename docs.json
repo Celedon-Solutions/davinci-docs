@@ -72,8 +72,8 @@
     "navbar": {
         "links": [
             {
-                "label": "v5.4.0",
-                "href": "/pages/release-notes/v5.4.0"
+                "label": "v5.4.1",
+                "href": "/pages/release-notes/v5.4.1"
             },
             {
                 "label": "Celedon Solutions",
@@ -185,6 +185,7 @@
                         "pages": [
                             "pages/editor/project-settings/project",
                             "pages/editor/project-settings/files",
+                            "pages/editor/project-settings/pages",
                             "pages/editor/project-settings/toolboxes",
                             "pages/editor/project-settings/unit-settings",
                             "pages/editor/project-settings/relationship-settings",
@@ -435,10 +436,11 @@
                 "group": "Release Notes",
                 "icon": "clock",
                 "pages": [
-                    "pages/release-notes/v5.4.0",
+                    "pages/release-notes/v5.4.1",
                     {
                         "group": "Prior Versions",
                         "pages": [
+                            "pages/release-notes/v5.4.0",
                             "pages/release-notes/v5.3.5",
                             "pages/release-notes/v5.3.4",
                             "pages/release-notes/v5.3.3",

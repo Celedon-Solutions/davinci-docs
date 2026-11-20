@@ -1,0 +1,41 @@
+---
+title: 'Version 5.4.1 - 3D Models & Object Links in Pages'
+description: 'November 20 2026'
+---
+
+## Version 5.4.1 - 3D Models & Object Links in Pages
+
+This patch lets Davinci Pages show orbitable 3D models of parts, assemblies, and uploaded model files, adds links from pages that open model objects in the editor, and makes the page size limit a project setting.
+
+### Pages
+
+- Added [3D bindings](/pages/editor/pages#showing-3d-models) that show a part studio or assembly's model as built at the page's source, in the editor preview, the agent's page renders, and published pages
+- Added the **three.js** [library](/pages/editor/pages#libraries) with **DavinciViewer**, a ready-made viewer with orbit, zoom, preset views, part picking and highlighting, and studio lighting that matches the 3D view
+- DavinciViewer can turn the model like the 3D view's Idle Spin, with a **Spin** toggle viewers can use to stop it
+- **Asset** bindings now accept 3D model files (GLB and glTF, STL, OBJ, 3MF, and PLY) up to 100 MB, which DavinciViewer can show
+- Material color and finish edits show on 3D models without rebuilding the part
+- A published page that reported a model as not built updates on its own once that model is built
+- Added [object links](/pages/editor/pages#opening-objects-in-the-editor): buttons and links on a page can open model objects and Task Cards as tabs in the editor, on the branch the page shows. Object links are off on pages shared by secret link
+- The size limit for each page's HTML, script, and CSS is now 100,000 characters by default, up from 65,536, and can be changed per project
+
+### Project Settings
+
+- Added a [Pages](/pages/editor/project-settings/pages) tab with the project's character limit per page source, the storage used by pages and 3D model files, and a table of every page's size that flags pages over the limit. Only project owners and admins can change the limit
+- The **Files** tab is reorganized into Storage, current branch, Other Branches, and Removed References sections
+
+### Editor
+
+- [Editor links](/pages/editor/interface) can open several objects or Task Cards at once with `?objects=`, the first one focused
+- Signing in now returns you to the link you opened, including after MFA or email verification
+
+### Agent
+
+- The agent can add 3D models to pages, builds a part studio or assembly when a 3D binding reports it is not built yet, and waits for 3D models to finish loading before it renders a page
+- The agent can add object links to pages
+
+### Administration
+
+- 3D mesh files written when parts and assemblies are built are kept while a published page or branch head uses them, and pruned after the number of days set by the new `PAGE_MESH_RETENTION_DAYS` setting (default 30)
+- 3D mesh files count toward project storage; [Project Settings > Pages](/pages/editor/project-settings/pages) shows their total
+- Parts and assemblies built before this release show as not built on pages until they are built again
+- Anyone who can view a page can download the meshes of its 3D models. Review public and secret-link pages before binding confidential CAD to them

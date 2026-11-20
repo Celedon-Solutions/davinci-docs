@@ -1,0 +1,29 @@
+---
+title: Pages
+description: Set the page character limit and review the storage used by a project's pages and 3D models
+---
+
+The **Pages** tab in Project Settings shows how much room the project's [pages](/pages/editor/pages) take and sets how large each page's sources may be. Click **Refresh** to reload the storage figures.
+
+## Character Limit Per Source
+
+**Character limit per source** is the most characters each of a page's HTML, script, and CSS may have. Leave it blank for the default of 100,000 characters.
+
+- The limit applies to every branch of the project at once and is not part of the commit history.
+- Only project owners and admins can change it. Other collaborators see it read-only.
+- Pages already over a new, lower limit keep working, and the tab says how many there are. An edit that leaves a page over the limit is refused, so shorten the page or raise the limit first.
+
+Every collaborator loads every page when the project opens, so keep pages as small as their content allows.
+
+## Storage
+
+| Row | Shows |
+| --- | --- |
+| **Pages** | The number of pages on the current branch and how many are published. |
+| **Page sources** | The size of all page sources. They are saved on the project, so every commit includes them and every collaborator loads them. |
+| **Largest page** | The largest page and its size. |
+| **3D model files** | The size and number of mesh files written when parts and assemblies are built, so pages can show them. Files no page or object uses are cleaned up. |
+
+## Pages On This Branch
+
+The table lists every page on the current branch, largest first, with the character count of its HTML, script, and CSS, its number of bindings, and its size. A count over the limit is highlighted, and the page is marked **Over limit**. Published pages are marked **Published**. Click a page name to open it.
