@@ -1,0 +1,190 @@
+---
+title: Simulation Results
+description: Read a compiled simulation's optics and any of its result displays, as data and as files
+---
+
+A LIVE simulation answers the API with the numbers its result view shows. Two of the
+Simulation toolbox's tools are built for it, and a session runs them directly with
+[`invokeTool`](/pages/api/introduction#invoking-tools-directly), with no agent and no
+model charges:
+
+| Tool | Returns |
+| --- | --- |
+| `QueryOptics` | The optics at a parameter point: image quality, Zernike terms, every optic's motion and figure, every field and wavelength case, the MTF and encircled-energy curves, the coronagraph contrast. |
+| `ExportSimulationPlot` | Any display of the result view at a point (a plot, map or table) as data, as a PNG figure, and optionally as files saved to the project. |
+
+Both read the same evaluator as the result view, the agent and a code object's
+`study.optics()` and `study.plot()`, so a Strehl ratio read here is the simulation's
+`strehl` QoI and an exported table is the one in the view. Invoking tools requires the
+`projects:write` scope.
+
+## Read The Optics At A Point
+
+<CodeGroup>
+
+```typescript TypeScript
+await client.sessions.with(projectId, async (session) => {
+  const result = await session.invokeTool({
+    toolbox: 'Simulation',
+    tool: 'QueryOptics',
+    params: {
+      simulationId,
+      point: { Q_pm: 5 },
+      reference: 'default',
+      convention: 'fringe',
+    },
+  });
+  const optics = result.structuredContent;
+  console.log(optics.summary.strehl, optics.summary.ee80.lod);
+  console.log(result.content.text); // the same answer as a readable report
+});
+```
+
+```python Python
+with client.sessions.create(project_id) as session:
+    result = session.invoke_tool(
+        toolbox="Simulation",
+        tool="QueryOptics",
+        params={
+            "simulationId": simulation_id,
+            "point": {"Q_pm": 5},
+            "reference": "default",
+            "convention": "fringe",
+        },
+    )
+    optics = result.structured_content
+    print(optics["summary"]["strehl"], optics["summary"]["ee80"]["lod"])
+```
+
+</CodeGroup>
+
+`structuredContent` holds the whole result; `content.text` says the same in prose.
+
+| Parameter | Meaning |
+| --- | --- |
+| `simulationId` | The simulation object's id or its unique name. |
+| `point` | Parameter values by name; omitted parameters take their defaults. |
+| `case` | The 0-based (field, wavelength) case of the optical train. Default `0`. |
+| `reference` | `total` (default), `as_designed` (less the design's own aberration and line of sight), `default` (less the default point), or a point `{name: value}`. The Zernike terms, surface motions, line of sight and wavefront become changes; image quality stays absolute. |
+| `convention` | `noll` (RMS-normalized; Zemax Zernike Standard order) or `fringe` (peak-normalized; the 37-term Zemax Zernike Fringe and CODE V order). |
+| `zernikeUnits` | `nm` (default), `waves` at the case wavelength, or `m`. |
+| `include` | Sections to compute: `summary`, `zernike`, `surfaces`, `cases`, `mtf`, `encircled_energy`, `wavefront`, `psf`, `coronagraph`. Default: every one but the arrays. |
+| `arrays` | `true` adds the `wavefront` and `psf` arrays to the default sections. |
+| `remove`, `zoom`, `angularUnits` | Shape the arrays: the wavefront terms removed (`piston`, `ptt`, `pttf`), the PSF window half-width in λ/D (or `full`), and the PSF axes (`lod`, `mas`, `urad`). |
+
+The sections:
+
+- `summary`: `rmsWavefrontNm`, `rmsWavefrontWaves`, `strehl` (from the PSF, as the
+  `strehl` QoI composes it), `strehlMarechal`, `fwhm` and `ee50` / `ee80` (in `lod`,
+  and `mas` / `urad` when the train carries its telescope constants), `lineOfSight`
+  (`detectorUm`, `magnitudeUm`, `skyUrad`, `magnitudeUrad`, `magnitudeMas`),
+  `changeRmsNm` against the reference.
+- `zernike`: every term with its `index` in the convention, its `noll` and `fringe`
+  indices, `n`, `m`, `name` and `value`.
+- `surfaces`: per optic and per segment, `dx`, `dy`, `despace` (m; a segment's despace
+  is its piston) and `tip`, `tilt`, `clock` (rad) in the surface's local frame, the
+  figure's `figureRmsNm` and Zernike terms, and `commanded`, the part the declared pose
+  axes command.
+- `cases`: every field and wavelength case with its RMS wavefront, Maréchal Strehl and
+  line of sight.
+- `mtf`: `fraction` of the cutoff with the `radial`, `x`, `y` and `diffractionLimited`
+  curves, `cutoffCyclesPerMm` and the detector's `nyquistFraction` when known.
+- `encircledEnergy`: `radiusLod`, `energy`, `diffractionLimited`, `ee50Lod`, `ee80Lod`.
+- `coronagraph`: for `raw`, `dug` and `held`, the mean contrast and the contrast
+  against separation (λ/D).
+- `wavefront` and `psf`: `rows` of the map (row 0 is the lowest y; `null` outside the
+  pupil), with the grid, extent and units.
+
+## Any Display As Data And Files
+
+<CodeGroup>
+
+```typescript TypeScript
+const result = await session.invokeTool({
+  toolbox: 'Simulation',
+  tool: 'ExportSimulationPlot',
+  params: {
+    simulationId,
+    display: 'psf',
+    point: { Q_pm: 5 },
+    options: { zoom: 8, units: 'mas' },
+    formats: ['png', 'csv', 'json'],
+    save: true,
+  },
+});
+const { record, saved } = result.structuredContent;
+const image = result.content.parts.find((part) => part.type === 'image');
+```
+
+```python Python
+result = session.invoke_tool(
+    toolbox="Simulation",
+    tool="ExportSimulationPlot",
+    params={
+        "simulationId": simulation_id,
+        "display": "psf",
+        "point": {"Q_pm": 5},
+        "options": {"zoom": 8, "units": "mas"},
+        "formats": ["png", "csv", "json"],
+        "save": True,
+    },
+)
+record = result.structured_content["record"]
+saved = result.structured_content["saved"]   # [{"id", "name"}] of the files in the Library
+image = next(p for p in result.content.parts if p["type"] == "image")
+```
+
+</CodeGroup>
+
+`structuredContent.record` is the display's data; the PNG comes back as an image part
+(`source.data` is base64), and the CSV or JSON text in `content.text`. With `save: true`
+the files are added to the project Library (or to `parentId`); exporting the same display
+under the same `name` again replaces them.
+
+| Display | Shows | Options |
+| --- | --- | --- |
+| `qois` | Every declared QoI with its unit, certificate and mesh-convergence status. | |
+| `wavefront` | The wavefront over the pupil (nm). | `case`, `reference`, `remove`, `colorMap` |
+| `psf` | The PSF normalized to the diffraction-limited peak. | `case`, `zoom`, `stretch`, `colorMap`, `units` |
+| `zernike`, `zernike_table` | The Zernike coefficients as bars, or every term in a table. | `case`, `reference`, `convention`, `zernikeUnits` |
+| `mtf` | The MTF with its diffraction-limited curve and the detector Nyquist. | `case`, `axis` (`fraction`, `cycles_per_mm`) |
+| `encircled_energy` | Encircled energy against radius. | `case`, `units` |
+| `ray_fan` | The nominal ray fan. | `case` |
+| `surfaces` | Every optic's and segment's motion and figure. | `reference`, `convention`, `zernikeUnits` |
+| `optics_cases` | Every field and wavelength case. | `reference` |
+| `coronagraph`, `contrast` | The dark hole, and the contrast against separation. | `mode` (`raw`, `dug`, `held`) |
+| `field_map_rms`, `field_map_strehl`, `field_map_vignetting` | The compile-time field map. | `train` |
+| `frf`, `srs`, `psd`, `tone_sweep`, `tone_sweep_los` | Dynamics curves. | `frequencyHz`, `case` |
+| `transient_temperature`, `transient_displacement`, `thermal_slew_wavefront`, `thermal_slew_los` | Histories against time. | `case` |
+
+A simulation offers the displays its physics can draw; asking for another answers
+`422` with the list it has.
+
+### The record format
+
+Every record carries `format: "davinci-simulation-plot/v1"`, a `kind`, a `title` and
+`details` (what the display's caption says: the case, the wavelength, the Strehl...).
+
+- `line`, `bars`, `polylines`: `xLabel`, `yLabel`, `logX`, `logY`, `series`
+  (`[{name, x, y, dash?}]`; bars also carry `labels` and `hover`), `polylines`
+  (`{x: [[...]], y: [[...]]}` for a ray fan), `markerX` and `markerLabel`.
+- `map`: `x` and `y` (`label`, `min`, `max` at the cell edges, `centers`), `value`
+  (`label`, `unit`), `rows` (row 0 is the lowest y; `null` outside the data) and the
+  `display` range, colour map and stretch.
+- `table`: `columns` (`key`, `label`, `unit`) and `rows` keyed by column.
+
+## In A Code Object
+
+A Python code object in the model reads the same results, so a script can build on
+them:
+
+```python
+from davinci import simulation
+
+study = simulation("Telescope STOP")
+opt = await study.optics({"Q_pm": 5.0}, reference="default")
+psf = await study.plot("psf", {"Q_pm": 5.0}, options={"zoom": 8})
+```
+
+See the [Simulation](/pages/user-guide/views/simulation#code-objects) page for the
+result view these numbers come from.

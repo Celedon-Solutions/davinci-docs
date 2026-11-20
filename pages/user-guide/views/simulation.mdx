@@ -159,7 +159,12 @@ peak and its multiple of the static deflection, with the displacement at the scr
 time painted and warped on one colour bar for the whole history); optics studies add
 the optics panels below.
 
-**Optics.** For the selected field and wavelength the linear-optical-model panel shows:
+**Optics.** For the selected field and wavelength the linear-optical-model panel opens
+with the numbers an optics review asks for: the RMS wavefront in nm and waves, the
+Strehl ratio from the PSF (the `strehl` QoI's own number, with the Maréchal estimate
+beside it), the PSF's full width at half maximum along x and y, the radii holding 50 %
+and 80 % of the energy (EE50, EE80), and the line of sight at the detector and on the
+sky (through the effective focal length). Its displays:
 
 - **Wavefront map**: the wavefront error over the normalized pupil in nm, with its RMS
   and peak-to-valley. Its options choose which low-order terms are left out (piston, tip
@@ -169,17 +174,44 @@ the optics panels below.
   same pupil, so its centre reads as the Strehl ratio. Its options set the zoom (±4 to
   ±32 λ/D or the whole grid), the stretch (log, square root, linear), the colour map and
   the axis units: λ/D always, and milliarcseconds and microradians when the train
-  carries its telescope constants. The kernel samples λ/2D per pixel.
-- **Zernike coefficients**: a bar per Noll term from Z4 (defocus) up, each the RMS of
-  its term over the pupil, and a table of every term with its name. Piston, tip and tilt
-  (Z1–Z3) are the pointing and appear as the line of sight. The options show either the
-  total wavefront or its change from the as-designed (nominal trace) wavefront.
-- **MTF** (radial average against the fraction of the cutoff D/λ), the **nominal ray
-  fan**, and the per-surface pose and figure.
+  carries its telescope constants. The kernel samples λ/2D per pixel; the caption gives
+  the FWHM.
+- **Zernike coefficients**: a bar per term from Z4 (defocus) up, and under it a table of
+  every term with its Noll and Fringe indices, (n, m) and name. The options choose the
+  convention — Noll (each coefficient the RMS of its term; Zemax Zernike Standard) or
+  Fringe (peak-normalized, the 37-term University of Arizona order of Zemax Zernike
+  Fringe and CODE V) — and the units, nm or waves at the case wavelength. Piston, tip and
+  tilt (Z1–Z3) are the pointing and appear as the line of sight.
+- **MTF**: the radial average and the slices along x and y, with the diffraction-limited
+  curve of the same pupil dashed. When the train carries its f-number the axis can read
+  cycles per mm at the detector, and a known pixel pitch marks the detector's Nyquist
+  frequency.
+- **Encircled energy**: the fraction of the energy inside a radius, in λ/D, mas or µrad,
+  beside the diffraction-limited curve. It integrates the sampled PSF exactly (an Airy
+  pattern reads EE50 0.535 λ/D and EE80 0.897 λ/D); the `encircled_energy` QoI counts
+  pixel centres inside its radius, so the two can differ by the pixel sampling.
+- **Surface motion and figure**: for every optic and every segment, the decenters
+  (dx, dy) and despace in µm and the tip, tilt and clock in µrad, in the surface's local
+  frame at its aperture centre, with the figure's RMS and its Zernike terms. A segment's
+  despace is its piston. What the declared pose axes command is included, and shown in
+  its own column, because the wavefront carries it.
+- **All field and wavelength cases**: the RMS wavefront, Maréchal Strehl and line of
+  sight (µm at the detector, µrad on the sky) of every case at once.
+- The **nominal ray fan**, and the rays drawn in the viewport, tinted by the wavefront.
+
+**Values** above the readout shows totals or changes: from the as-designed state (the
+design's own aberration and line of sight taken out), from the default point, or from a
+pinned point (**Pin point** pins the current one). The wavefront map, the Zernike terms,
+the surface motions, the cases and the line of sight then read as changes, which is how
+a thermal or load case is usually reviewed; image quality stays absolute.
 
 Coronagraph studies add the dark hole on a fixed log scale with the inner and outer
-working angles marked, and trains with a field map show its RMS wavefront, Strehl and
-vignetting over the field.
+working angles marked, and the contrast against separation of all three states — raw
+(DM flat), dug (DM on) and held (DM frozen at the reference) — on one plot. Trains with
+a field map show its RMS wavefront, Strehl and vignetting over the field. A thermal-slew
+study plots the wavefront and the line-of-sight drift against time; the drift reads in
+µrad on the sky when the train carries its focal length, otherwise in µm at the
+detector.
 
 ### Plots and maps
 
@@ -195,8 +227,10 @@ controls in its header:
   the wavelength, field and Strehl of a PSF. A map's CSV has one row per y and one
   column per x, with the cell centres in the header row and first column; a PSF CSV is
   the full-resolution window the zoom shows.
-- **Options**, on displays that have them (the wavefront map, the PSF and the Zernike
-  coefficients above).
+- **Options**, on displays that have them (the wavefront map, the PSF, the Zernike
+  coefficients, the MTF and the encircled energy above).
+
+Tables export the same way, and enlarge into a scrollable window.
 
 **Displays** in the panel header chooses which plots and maps the view shows and how
 large each is (S, M or L), and sets the panel width. These choices and each display's
@@ -448,11 +482,21 @@ same mesh), transient thermal kinds (the full-order march), transient structural
 steady solve) and the optical wavefront / line-of-sight kinds (a dense retrace) —
 against the Solution Space, and restates the compile's mesh-convergence record.
 `CaptureSimulationView` paints mesh fields; on an optics study `field: "wavefront"`
-renders the train's own panel (wavefront map, PSF, MTF) instead. A transient frame
+renders the result view's own optics figures (wavefront map, PSF, MTF, encircled energy)
+with the image-quality summary instead. A transient frame
 reports the declared QoIs and, separately, the static kinds re-read on the state at
 the captured time, so one name never carries two numbers. `field: "transient_displacement"`
 paints a structural history at `timeS` (by default the instant it peaks) and states that
 instant's peak beside the history's.
+
+`QueryOptics` reads an optics study at a point the way the optics panel does: image
+quality, every Zernike term (Noll or Fringe, nm or waves), every optic's and segment's
+motion and figure, every case, the MTF and encircled-energy curves and the coronagraph
+contrast, as totals or as changes from a reference. `ExportSimulationPlot` draws any
+display of the result view at a point — the figure for the agent to see, and its CSV or
+JSON — and can save the files to the project, as the export menu does. Both are what a
+script reads through `study.optics()` and `study.plot()`, and both can be called through
+the API without the agent: see [Simulation results through the API](/pages/api/simulation-results).
 
 ## Code objects
 
@@ -473,6 +517,19 @@ Each answer carries the certificate class of every QoI and what the mesh-converg
 check measured about it; a stale study answers with a warning that names the reason,
 and a study that is not LIVE refuses with its state. Samples run on the same
 multi-core backend the result view's Design space sample uses. The API is read-only.
+
+An optics study also answers what its optics panel shows, and any display as data, so a
+script can build on the same numbers — a tolerance sweep of the encircled energy, a
+contrast budget, a report table:
+
+```python
+opt = await study.optics({"Q_pm": 5.0}, reference="default", convention="fringe")
+opt.summary["strehl"], opt.summary["ee80"]["mas"]   # the panel's readout
+opt.zernike_terms()                                  # {"Z4": nm, ...}
+opt.surface_table()                                  # dx, dy, despace, tip, tilt, clock + figure
+psf = await study.plot("psf", {"Q_pm": 5.0}, options={"zoom": 8})
+psf.rows                                             # the map the view draws
+```
 
 A system simulation answers from its runs:
 
