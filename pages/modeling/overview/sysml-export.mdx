@@ -227,6 +227,7 @@ Important nuances:
 
 - an entity does **not** export with a separate SysML keyword today; it is emitted as a `part`
 - a linkage also exports as a `part`
+- a part that specializes the definition it is typed by exports only its typing (`part wheel : Wheel`), not a `:>` clause; its overridden attributes export as `:>>` redefinitions
 - transition children are never emitted directly here because state export owns them
 - if sibling states exist under a part, they may be wrapped into a synthetic state machine before export
 

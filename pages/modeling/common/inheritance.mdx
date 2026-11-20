@@ -266,3 +266,5 @@ Keep inheritance chains focused and easy to understand. When variants no longer 
 Inherited values are resolved throughout Davinci, including search and supported Agent workflows. Internal model references are mapped to the corresponding objects inside a specialization when counterparts exist.
 
 SysML v2 import and export preserve supported inheritance and redefinition structures. Locally overridden content exports as specialization-specific redefinitions where applicable.
+
+On SysML v2 import, a usage typed by a definition in the same import (`part wheel : Wheel;`) becomes a specialization of that definition, so it shows the definition's attributes and equations such as `wheel.mass` resolve to it. A configuration that selects a variant (`part :>> layout = layout::fourWheel;`) takes the selected variant's values through equations, so roll-ups it inherits compute for that configuration.
