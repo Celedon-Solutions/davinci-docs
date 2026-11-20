@@ -157,7 +157,52 @@ transient studies add a time scrubber with playback (thermal: the peak temperatu
 against time; structural: the peak surface displacement against time, the time of the
 peak and its multiple of the static deflection, with the displacement at the scrubbed
 time painted and warped on one colour bar for the whole history); optics studies add
-wavefront, PSF/MTF, Zernike and coronagraph panels.
+the optics panels below.
+
+**Optics.** For the selected field and wavelength the linear-optical-model panel shows:
+
+- **Wavefront map**: the wavefront error over the normalized pupil in nm, with its RMS
+  and peak-to-valley. Its options choose which low-order terms are left out (piston, tip
+  and tilt by default; also focus; or piston only, which shows the line of sight as
+  tilt) and the colour map. A segmented primary's pistons are part of the map.
+- **PSF**: the point spread function normalized to the diffraction-limited peak of the
+  same pupil, so its centre reads as the Strehl ratio. Its options set the zoom (±4 to
+  ±32 λ/D or the whole grid), the stretch (log, square root, linear), the colour map and
+  the axis units: λ/D always, and milliarcseconds and microradians when the train
+  carries its telescope constants. The kernel samples λ/2D per pixel.
+- **Zernike coefficients**: a bar per Noll term from Z4 (defocus) up, each the RMS of
+  its term over the pupil, and a table of every term with its name. Piston, tip and tilt
+  (Z1–Z3) are the pointing and appear as the line of sight. The options show either the
+  total wavefront or its change from the as-designed (nominal trace) wavefront.
+- **MTF** (radial average against the fraction of the cutoff D/λ), the **nominal ray
+  fan**, and the per-surface pose and figure.
+
+Coronagraph studies add the dark hole on a fixed log scale with the inner and outer
+working angles marked, and trains with a field map show its RMS wavefront, Strehl and
+vignetting over the field.
+
+### Plots and maps
+
+Every plot and map in the result view (and in the system explorer) carries three
+controls in its header:
+
+- **Enlarge** opens it in a window over the viewport with labelled axes, a colour bar
+  in data units, zoom, pan and hover readouts. It keeps following the sliders and
+  playback, and can be dragged and resized.
+- **Export** writes a PNG, a CSV or a JSON of exactly what is drawn, either downloaded
+  or added to the project Library. Each export records the simulation, the parameter
+  point (or the run, for a system simulation) and the display's own details, such as
+  the wavelength, field and Strehl of a PSF. A map's CSV has one row per y and one
+  column per x, with the cell centres in the header row and first column; a PSF CSV is
+  the full-resolution window the zoom shows.
+- **Options**, on displays that have them (the wavefront map, the PSF and the Zernike
+  coefficients above).
+
+**Displays** in the panel header chooses which plots and maps the view shows and how
+large each is (S, M or L), and sets the panel width. These choices and each display's
+options are saved to your account and apply to every simulation with the same display,
+so hiding the ray fan hides it in all of your optics studies. **Reset** shows every
+display at its default size.
 
 ### Key results and trust
 
@@ -304,6 +349,9 @@ evidence about the run, not validation of the model.
 on a schematic of the bodies when there is none), with the QoIs, signal plots against
 time with event ticks, the run's credibility record and the event list. Every panel
 follows the playback time, and clicking a QoI or an event moves playback to that instant.
+Signal and frequency-response plots enlarge and export like the field explorer's (see
+"Plots and maps"); a signal's export carries the run, its scenario and parameters, and
+the event times.
 Sliders on the declared parameters pick another point: **Run** requests a run of the
 scenario there, and **Verify** a run under the compile's gates, whose QoIs carry
 certificates.
