@@ -206,6 +206,11 @@ The `promptCache` object accepts different properties per API:
 | API | Property | Values |
 |---|---|---|
 | OpenAI Chat Completions | `key` | Boolean |
+| | `mode` | `implicit` or `explicit` |
+| | `ttl` | Currently `30m` |
+| | `explicitBreakpoints` | Boolean |
+| | `breakpointFormat` | `anthropic` or `openai` |
+| | `automatic` | Boolean |
 | OpenAI Responses | `key` | Boolean |
 | | `mode` | `implicit` or `explicit` |
 | | `ttl` | Currently `30m` |
@@ -226,6 +231,23 @@ For example, on OpenAI Responses:
 ```
 
 When the model or offering declares prompt-caching support and no explicit Prompt Cache object is supplied, Davinci supplies the appropriate default for OpenAI Responses, OpenAI Chat Completions, or Anthropic Messages.
+
+On OpenAI Chat Completions, `explicitBreakpoints` marks the stable start of the prompt so that gateways such as LiteLLM and OpenRouter can cache it with the upstream provider. `breakpointFormat` chooses the marker the model family reads: `anthropic` sends `cache_control` for Claude, including Claude served from Bedrock or Vertex, and `openai` sends `prompt_cache_breakpoint` for GPT models. `automatic` also marks the newest message so a growing conversation stays cached, and `mode` and `ttl` are sent as `prompt_cache_options`.
+
+Davinci turns these on by default for Claude models, identified by an Anthropic publisher or a model ID containing `claude`, and for OpenAI models whose Responses settings use explicit breakpoints. The defaults also fill in any of these properties a Chat Completions Prompt Cache object leaves unset; set `"explicitBreakpoints": false` to send only the cache key. For example, a Claude model through LiteLLM:
+
+```json
+{
+  "promptCache": {
+    "key": true,
+    "explicitBreakpoints": true,
+    "breakpointFormat": "anthropic",
+    "automatic": true
+  }
+}
+```
+
+Gemini models on Vertex AI cache repeated prompt prefixes automatically and need no breakpoints. If a LiteLLM model name routes to more than one deployment, enable LiteLLM's `prompt_caching` pre-call check so repeated prompts reach the deployment that holds their cache.
 
 ### Combined OpenAI Chat Completions Example
 
