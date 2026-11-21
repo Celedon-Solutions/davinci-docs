@@ -342,7 +342,7 @@ Publishing, changing sharing settings, rotating secret links, and unpublishing r
     <img noZoom src="/images/pages-publishing-settings.png" />
 </Frame>
 
-The **Commit Before Publishing?** dialog lists what the published page would be missing: this page's own changes, and any uncommitted objects (and project name, README, or tags) that its bindings read. Uncheck any objects you want to leave uncommitted. Then choose:
+The **Commit Before Publishing?** dialog lists what the published page would be missing: this page's own changes, and any uncommitted objects (and project name, README, or tags) that its bindings read. It also lists objects whose value on the page differs from the last commit even when Source Control does not show them as changed, such as a result recalculated after a merge. Uncheck any objects you want to leave uncommitted. Then choose:
 
 - **Commit and Publish** commits this page and the checked items, then publishes. Other pages and other uncommitted work stay uncommitted. Click **Edit commit message** to change the default message, `Publish page "<name>"`.
 - **Publish Last Commit** publishes without committing. Your uncommitted changes are not included.
