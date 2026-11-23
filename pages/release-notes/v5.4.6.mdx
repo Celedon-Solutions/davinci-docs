@@ -1,0 +1,43 @@
+---
+title: 'Version 5.4.6 - Agents That Survive Interruptions'
+description: 'November 23 2026'
+---
+
+## Version 5.4.6 - Agents That Survive Interruptions
+
+This patch keeps agent runs going through page refreshes, dropped connections, and server restarts, makes long chats faster to open, and adds reliability and security fixes across the platform.
+
+### Agent
+
+- An agent run [carries on through a page refresh](/pages/editor/agent/agents#when-a-run-is-interrupted) without losing its tool calls or the text written so far
+- After a server restart, the project reopens by itself and the agents that were running carry on. A chat cut off mid-run reloads as paused, and pressing **Play** carries it on
+- An agent keeps running in a background tab in Microsoft Edge, which otherwise puts the tab to sleep after 15 minutes
+- An agent code run no longer waits forever for a plot image, so later Python runs in the tab are not blocked
+- The agent's page and CAD renders prefer a transparent background and have more of the 3D view's controls
+
+### Chat
+
+- Opening a long chat draws at most 40 messages at first and loads earlier ones as you scroll up
+- Switching back to a chat within a minute no longer downloads it again
+
+### Projects
+
+- A project reopens by itself after its server restarts or its branch is deleted, and retries within 5 seconds
+- A branch switch sends the edits made on the old branch before switching
+- Fixed edits made during an overlapping save being marked as saved
+
+### Pages
+
+- A published page whose data cannot be read now says so instead of staying blank
+
+### Administration
+
+- [Email verification](/pages/admin/system-settings-authentication#platform-defaults) turns back on once email delivery is configured, instead of staying off after a start without it
+- During an outage, signed-in users get an error instead of the sign-in page, and Google sign-in returns to the sign-in page with an error instead of hanging
+- A setup check no longer slows every page by 10 seconds while the Routing Server is unreachable
+- AI usage recorded after its connection closed is still sent for billing
+- Security hardening of service-to-service requests and Git branch names
+
+### Fixes
+
+- Minor fixes to notebooks, version history, constraint checks, and Solution Space queries

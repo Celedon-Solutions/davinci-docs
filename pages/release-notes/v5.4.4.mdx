@@ -1,0 +1,37 @@
+---
+title: 'Version 5.4.4 - 3D View Rotation, Rate Limits & Code Runs'
+description: 'November 21 2026'
+---
+
+## Version 5.4.4 - 3D View Rotation, Rate Limits & Code Runs
+
+This patch lets you choose where CAD views rotate, makes code run the same in the browser and on the server, and moves every rate limit into the deployment settings.
+
+### CAD
+
+- Choose the 3D view's [rotation center](/pages/user-guide/views/geometric#3d-viewer-middle-pane): double-click a spot on the model, or right-click a face or edge. Double-clicking a reference plane rotates around the world origin
+- CAD views now frame parts placed far from the origin
+- A part dragged right after the joint that carries it turns about the joint's new position
+
+### Pages
+
+- Publishing a page also offers to commit objects whose values on the page differ from the last commit
+
+### Code
+
+- [JavaScript, TypeScript, C/C++, and MATLAB](/pages/modeling/objects/code#language-support) run the same way in the browser and on the server, with clearer errors that point to the line in your code
+- MATLAB and Octave code runs again with backend code execution
+
+### Projects
+
+- Moving many projects to Trash or into a folder, and dropping many small files at once, no longer hits the rate limit
+
+### Administration
+
+- Every [rate limit](/pages/admin/system-settings-authentication#rate-limits) is set in the deployment environment, and admins can change the Routing Server's limits in System Settings without a restart
+- Behind a load balancer, each user now has their own rate limit instead of sharing the load balancer's
+- Claude and GPT models behind LiteLLM and other gateways can [cache their prompts](/pages/admin/llm-offering-configuration#prompt-cache), as they do on the provider APIs
+
+### Fixes
+
+- Time and signal readouts hold still while a system simulation plays

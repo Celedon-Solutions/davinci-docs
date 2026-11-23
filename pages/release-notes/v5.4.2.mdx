@@ -1,0 +1,27 @@
+---
+title: 'Version 5.4.2 - Optics Results, Page Links & SysML v2 Import'
+description: 'November 20 2026'
+---
+
+## Version 5.4.2 - Optics Results, Page Links & SysML v2 Import
+
+This patch adds optics result reviews and richer result plots to simulations, links between published pages, and a more complete SysML v2 import.
+
+### Simulation
+
+- Result [plots and maps](/pages/user-guide/views/simulation#plots-and-maps) can be exported, enlarged, and arranged, with new PSF, wavefront, and Zernike displays
+- Optics results now include a review readout, deltas against a reference, MTF and encircled energy, and surface and case tables, shared by the result view, the agent, scripts, and the [API](/pages/api/simulation-results)
+
+### Pages
+
+- Pages can [link to the project's other published pages](/pages/editor/pages#linking-to-other-pages), for example to build a menu across a set of reports
+
+### Modeling
+
+- SysML v2 import: typed usages inherit from their definitions, variant selections and roll-ups compute per configuration, and constraints and calculations import. SysML export writes the typing back
+- An include is committed as its package alone, and a rollback is applied before it is committed
+
+### Fixes
+
+- Exporting an HTML code file as HTML downloads the file itself instead of a partial snapshot of its editor
+- Minor display fixes
