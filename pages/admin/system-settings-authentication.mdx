@@ -1,11 +1,11 @@
 ---
 title: System Settings And Authentication
-description: Configure deployment defaults, sign-in providers, directory access, MFA, new-user accounting defaults, and email domain policy
+description: Configure deployment defaults, sign-in providers, directory access, MFA, new-user accounting defaults, email domain policy, and rate limits
 ---
 
 ## Overview
 
-Use **Administration → Settings** (`/admin/~/settings`) to configure deployment-wide behavior. The page includes authentication providers, access feature flags, platform defaults, new-user accounting and funding defaults, and infrastructure information.
+Use **Administration → Settings** (`/admin/~/settings`) to configure deployment-wide behavior. The page includes authentication providers, access feature flags, platform defaults, new-user accounting and funding defaults, rate limits, and infrastructure information.
 
 <Warning>
 Authentication and access-policy changes can lock users out of Davinci. Keep a tested system-administrator recovery account and change one authentication layer at a time.
@@ -197,3 +197,21 @@ The **New User Defaults** section configures accounting, funding, and storage de
 Enter a comma-separated allowlist of domains that may register (for example, `example.com, acme.org`), or use `*` to allow any domain.
 
 Email-domain policy is separate from SSO or LDAP group policy. A deployment can use both domain routing and provider-side access restrictions.
+
+## Rate Limits
+
+The **Rate Limits** section sets how many requests one client address may make to the Routing Server before it answers "Too many requests":
+
+- **API, per second** — the application API (at least `50`).
+- **Admin panel, per second** — the administration and LLM configuration API (at least `20`).
+- **Sign-in, per minute** — signing in and out, session management, and SSO and LDAP sign-in (at least `5`).
+- **Password and email, per 15 min** — password reset and change, email verification, and linking a directory account (at least `1`).
+- **MFA, per 5 min** — multi-factor verification (at least `1`).
+
+A blank field keeps the deployment's value, which the field shows. That value comes from the `RATE_LIMIT_*` environment variables, so clearing a field returns to it. Saved changes reach every Routing Server within a minute, without a restart. The minimums keep the admin panel and sign-in usable, so a limit set too low can always be raised again.
+
+File uploads, and every other browser request, are also limited at the gateway by `GATEWAY_RATE_LIMIT_PER_SECOND` and `GATEWAY_RATE_LIMIT_BURST` in the deployment environment. These cannot be changed here, because the gateway reads them only when it starts.
+
+<Note>
+Limits count requests per client address. When Davinci runs behind a load balancer, set `GATEWAY_TRUSTED_PROXIES` to the balancer's addresses or CIDR ranges so each user is counted separately. Without it, every user arrives from the balancer's address and shares one limit.
+</Note>

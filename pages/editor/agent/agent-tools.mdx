@@ -111,9 +111,12 @@ validate a boundary-condition program), `CompileSimulation` (build the certified
 Solution Space), `QuerySimulation` (QoIs and certificates at parameter points),
 `OptimizeSimulation` (certified QoI optimization over the parameter box),
 `VerifySimulation` (a full-order truth solve at one point), `CaptureSimulationView`
-(headless renders of the setup or a live field) and `GetSimulationReference` (the
-closed BC-language reference with worked examples). `RunSimulation` executes Python
-simulation code objects.
+(headless renders of the setup or a live field), `QueryOptics` (an optics study's image
+quality, Zernike terms, surface motions, cases, MTF, encircled energy and coronagraph
+contrast at a point, as totals or changes from a reference), `ExportSimulationPlot` (any
+display of the result view as a figure with its CSV or JSON, optionally saved to the
+project) and `GetSimulationReference` (the closed BC-language reference with worked
+examples). `RunSimulation` executes Python simulation code objects.
 
 ### Requirements Engineering
 Tools for creating, linking, and verifying requirements throughout the model.
