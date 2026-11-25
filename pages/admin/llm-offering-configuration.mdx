@@ -390,10 +390,12 @@ Generic targets work on every generation API: OpenAI Chat Completions, OpenAI Re
 | `openai.service-tier` | OpenAI Chat Completions, OpenAI Responses | Depends on the provider and model; Davinci does not check the value |
 | `anthropic.output-config.effort` | Anthropic Messages | `low`, `medium`, `high`, `xhigh`, `max` |
 | `anthropic.speed` | Anthropic Messages | `standard`, `fast` |
-| `google.thinking.level` | Google Generate Content, Google Interactions | `none`, `minimal`, `low`, `medium`, `high` |
+| `google.thinking.level` | Google Generate Content, Google Interactions | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | `google.thinking.budget` | Google Generate Content, Google Interactions | An integer of `-1` or greater |
 
 Any reasoning value other than `none` requires the effective **Reasoning** capability. Anthropic targets are not available when Anthropic is routed through `bedrock.invoke`.
+
+Gemini accepts `xhigh` only on some models, such as Gemini 4 Neon, and rejects the request on the others. Offer it only on an offering whose model accepts it. On the Google APIs, a `generation.reasoning` value of `xhigh` is sent as `high`, so use `google.thinking.level` to offer Gemini's extra-high thinking.
 
 ### Derived Context Control
 

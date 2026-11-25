@@ -14,7 +14,7 @@ Code can be organized beneath packages or owned directly by parts, entities, act
 
 ## Language Support
 
-### Browser-Executable
+### Executable Languages
 
 **Python** is the main language that executes directly in the browser without requiring server-side infrastructure. The Pyodide runtime provides a full Python environment with scientific computing libraries including NumPy, SciPy, and Matplotlib.
 
@@ -25,7 +25,9 @@ Code can be organized beneath packages or owned directly by parts, entities, act
 - Automation scripts that read/write model data
 - Design space exploration
 
-**C/C++** and **JavaScript** is supported but more limited and does not support the model integration capabilities of Python at this time.
+**C/C++**, **JavaScript**, and **TypeScript** also run, but are more limited and do not support the model integration capabilities of Python at this time. They run the same way in the browser and with backend code execution on the server.
+
+**MATLAB** and Octave code runs only with backend code execution enabled in the deployment, or with MATLAB on your computer connected through the Davinci Bridge app. Without either, running MATLAB code explains what it needs.
 
 <Note>When creating code through the AI agent, Python is used by default unless you explicitly specify another language.</Note>
 
@@ -34,7 +36,6 @@ Code can be organized beneath packages or owned directly by parts, entities, act
 Other programming languages are supported for storage and syntax highlighting but do not execute in the browser:
 
 - **Java**
-- **MATLAB**
 - **Other languages**: Formatting and/or syntax highlighting may not function correctly
 
 <Info>Non-executable languages are useful for storing implementation code, generated code, or reference implementations alongside your model. They provide syntax highlighting but no execution capabilities.</Info>

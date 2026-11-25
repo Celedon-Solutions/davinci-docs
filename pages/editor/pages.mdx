@@ -151,12 +151,14 @@ function render(davinci) {
 | `davinci.onUpdate(fn)` | Runs `fn` every time the data refreshes. |
 | `davinci.data[key]` | The value of a binding. |
 | `davinci.entries[key]` | The binding with its `kind`, `label`, `value`, and `error`. Check `error` and show a placeholder when it is set. |
-| `davinci.meta` | The page name, project name, branch, commit, build time, and `objectLinks`, which says whether [object links](#opening-objects-in-the-editor) work. |
+| `davinci.meta` | The page name, project name, branch, commit, build time, `objectLinks`, which says whether [object links](#opening-objects-in-the-editor) work, and `pageLinks`, the [published pages this page can link to](#linking-to-other-pages). |
 | `davinci.format` | Formatting helpers: `value`, `number`, `percent`, `delta`, and `date`. Each returns an em dash for missing values. |
 | `davinci.asset(key)` | Loads the file of an **Asset** binding. See [Showing Files From References](#showing-files-from-references). |
 | `davinci.geometry(key)` | Loads the meshes of a **3D** binding. See [Showing 3D Models](#showing-3d-models). |
 | `davinci.openObjects(ids)` | Opens objects or Task Cards in the editor from a click. See [Opening Objects In The Editor](#opening-objects-in-the-editor). |
 | `davinci.objectUrl(ids)` | The editor URL that opens those objects, as text, or `null` when object links are off. |
+| `davinci.openPage(id)` | Opens another published page of the project from a click. See [Linking To Other Pages](#linking-to-other-pages). |
+| `davinci.pageUrl(id)` | The URL of that published page, as text, or `null` when it cannot be linked. |
 
 To match the viewer's light or dark theme, use the CSS variables `--page-bg`, `--page-surface`, `--page-border`, `--page-text`, `--page-muted`, `--page-accent`, `--page-good`, `--page-warn`, and `--page-bad` instead of fixed colors.
 
@@ -253,6 +255,33 @@ In the script, `davinci.openObjects(ids)` does the same from a click handler, an
 - On a published page, the objects open in an editor already showing that project and branch, or in a new tab. Viewers need access to the project to see them.
 - Links open only when the viewer clicks, at most once a second.
 - Object links are off on [secret-link](#secret-links) pages, because the editor URL would reveal the project. There, link elements are dimmed with a tooltip explaining why, and `davinci.meta.objectLinks.url` is `null`.
+
+### Linking To Other Pages
+
+A page can link to the project's other published pages, for example to build a menu across a set of reports. Add the page's id to any element with `data-davinci-page`:
+
+```html
+<button data-davinci-page="<page id>">Mass budget</button>
+```
+
+In the script, `davinci.openPage(id)` does the same from a click handler, and `davinci.pageUrl(id)` returns the published page's URL as text. `davinci.meta.pageLinks.pages` lists every page this page can link to, each with its `pageId`, `name`, and `url`, so a page can build its menu from it:
+
+```js
+const nav = document.getElementById('nav');
+for (const page of davinci.meta.pageLinks.pages) {
+  const button = document.createElement('button');
+  button.textContent = page.name;
+  button.dataset.davinciPage = page.pageId;
+  nav.appendChild(button);
+}
+```
+
+- Only published pages can be linked, and only those the viewer is allowed to open. A page that is not published, or that the viewer cannot see, is left out of the list, and its link elements show a tooltip saying so.
+- The link opens the other page on the branch this page shows when that page is published on it, and on its default branch otherwise.
+- On a published page, the other page opens in the same tab. Ctrl-click or Cmd-click opens it in a new tab, as does `davinci.openPage(id, { newTab: true })`.
+- In the page editor preview, the other page opens in its own editor tab.
+- Links open only when the viewer clicks, at most once a second.
+- Page links are off on [secret-link](#secret-links) pages, because the page URLs would reveal the project. There, link elements are dimmed with a tooltip explaining why, and `davinci.meta.pageLinks.pages` is empty.
 
 ### Charting A Value Over Time
 

@@ -25,6 +25,16 @@ For detailed information about the agent chat interface and input options, see t
 
 Stop an agent to add more context, provide clarifications, or redirect if it has gone off track. The agent will resume from where it stopped when you press play again.
 
+### When A Run Is Interrupted
+
+An agent keeps working on the server when the browser's connection drops:
+
+- Refreshing the page or a brief connection drop does not stop the agent. When the page reconnects, the chat shows the run as it is, including tool calls in progress and the text written so far.
+- If the connection stays away for more than a minute, the agent pauses. Press **Play** to carry it on.
+- If the project's server restarts, the tab reopens the project by itself and carries on the agents that were running in it. A chat opened in another tab after the restart shows the run paused; press **Play** to carry it on.
+
+Before carrying on, the agent is told its run was interrupted, so it checks what its last step left behind instead of repeating it.
+
 ### Providing Context
 
 The more specific you are with your instructions, the better results you'll get. Provide enough details so the agent has all the context needed to perform its actions effectively.

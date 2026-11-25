@@ -205,4 +205,8 @@ Click a commit to open its details in a workspace tab. From there you can inspec
 
 Use **Rollback** from a commit detail view to create a new commit that restores the project to that point. Intermediate history is preserved.
 
+The rollback is applied to the project first and committed once the server has accepted it. If it cannot be applied, the project is left unchanged. If it is applied but cannot be committed, its changes remain as uncommitted changes that you can commit.
+
+An included package is restored or removed as a whole, and its elements come from its source project. Rolling back does not change the source version of an included package that is still in the project.
+
 <Warning>Rolling back discards uncommitted changes on the current branch. Commit or undo work in progress first.</Warning>
